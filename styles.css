@@ -1,0 +1,121 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f8f8f8;
+}
+
+h1, h2 {
+    color: #333;
+    text-align: center;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: auto repeat(23, 1fr) auto;
+    gap: 10px;
+    overflow-x: auto;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+.header {
+    font-weight: bold;
+    text-align: center;
+    padding: 10px;
+    background-color: #e0e0e0;
+    border-radius: 3px;
+    color: #333;
+}
+
+.position {
+    text-align: center;
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-radius: 3px;
+    color: #333;
+}
+
+.race-slot {
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    padding: 5px;
+    min-height: 30px;
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+.race-slot:hover {
+    background-color: #f5f5f5;
+}
+
+.driver-card {
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    padding: 10px;
+    cursor: move;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: opacity 0.3s ease;
+}
+
+.driver-card:hover {
+    opacity: 0.8;
+}
+
+.total-points {
+    font-weight: bold;
+    text-align: left;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-radius: 3px;
+    color: #333;
+}
+
+.past-results {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.past-results select,
+.past-results button {
+    padding: 10px;
+    border: none;
+    border-radius: 3px;
+    background-color: #4CAF50;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.past-results select:hover,
+.past-results button:hover {
+    background-color: #45a049;
+}
+
+.driver-totals-container {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+.driver-totals-container h2 {
+    text-align: left;
+}
+
+.purple-outline {
+    border: 2px solid purple; /* Adjust the thickness and color as needed */
+    box-shadow: 0 0 5px purple; /* Optional: adds a glow effect */
+}
