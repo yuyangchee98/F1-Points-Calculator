@@ -323,8 +323,7 @@ function createDriverCard(driverName) {
     // Add a click event listener to the card to handle setting the fastest lap
     driverCard.addEventListener('click', () => {
         // Get the currently selected race from the dropdown
-        const race = document.getElementById('past-race-select').value;
-        // Prompt the user to confirm setting the fastest lap for the driver in the selected race
+        const race = document.getElementById('past-race-select').value;        // Prompt the user to confirm setting the fastest lap for the driver in the selected race
         const confirmFastestLap = confirm(`Set ${driverName} as the fastest lap driver for ${race}?`);
         // If the user confirms, call the setFastestLap function
         if (confirmFastestLap) {
@@ -366,14 +365,13 @@ function initializeAllRaces() {
     // Initialize drag and drop functionality for the race slots
     initDragAndDrop();
 }
+
 // Function to set the fastest lap for a driver in a race
-function setFastestLap(driverName) {
-    // Get the currently selected race from the dropdown
-    const race = document.getElementById('past-race-select').value;
+function setFastestLap(race, driverName) {
     // Select all race slots for the current race
     const raceSlots = document.querySelectorAll(`.race-slot[data-race="${race}"]`);
     // Find the race slot where the driver set the fastest lap
-    const fastestLapDriver = Array.from(raceSlots).find(slot => 
+    const fastestLapDriver = Array.from(raceSlots).find(slot =>
         slot.children.length > 0 && slot.children[0].dataset.driver === driverName
     );
 
