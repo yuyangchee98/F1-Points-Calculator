@@ -12,14 +12,14 @@ h1, h2 {
 
 .container {
     display: grid;
-    grid-template-columns: auto repeat(23, 1fr) auto;
+    grid-template-columns: auto repeat(24, 1fr) auto;
     gap: 10px;
     overflow-x: auto;
     background-color: #fff;
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     padding: 20px;
-}
+}  
 
 .header {
     font-weight: bold;
