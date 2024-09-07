@@ -63,9 +63,20 @@ const pastRaceResults = {
         "Piastri", "Gasly", "Tsunoda", "Magnussen", "Albon",
         "Sargeant", "Zhou", "Ricciardo", "Norris", "Perez"
     ],
+    "SAU": [
+        "Verstappen", "Perez", "Alonso", "Russell", "Hamilton",
+        "Sainz", "Leclerc", "Ocon", "Gasly", "Magnussen",
+        "Tsunoda", "Hulkenberg", "Zhou", "Bottas", "Piastri",
+        "Albon", "Norris", "Sargeant", "Stroll", "Ricciardo"
+    ],
     // Add more races as needed
 };
 
+const pastFastestLap = {
+    "BHR": "Verstappen",
+    "SAU": "Perez",
+    // Add more races as needed
+};
 
 // The rest of the functions remain the same
 function initializeGrid() {
@@ -231,6 +242,12 @@ function initializeAllRaces() {
             pastRaceResults[race].forEach((driverName, position) => {
                 const slot = document.querySelector(`.race-slot[data-race="${race}"][data-position="${position + 1}"]`);
                 const driverCard = createDriverCard(driverName);
+                
+                // Check if this driver had the fastest lap
+                if (pastFastestLap[race] === driverName) {
+                    driverCard.classList.add('purple-outline');
+                }
+                
                 slot.appendChild(driverCard);
             });
         }
@@ -240,6 +257,7 @@ function initializeAllRaces() {
     calculatePoints();
     initDragAndDrop();
 }
+
 
 // Function to set the fastest lap for a driver in a race
 function setFastestLap(race, driverName) {
@@ -266,10 +284,12 @@ function setFastestLap(race, driverName) {
     // Add purple outline to the clicked driver
     clickedDriverSlot.children[0].classList.add('purple-outline');
 
+    // Update pastFastestLap for this race
+    pastFastestLap[race] = driverName;
+
     // Recalculate points
     calculatePoints();
 }
-
 
 // Starting
 document.addEventListener('DOMContentLoaded', () => {
