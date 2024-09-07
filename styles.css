@@ -116,6 +116,5 @@ h1, h2 {
 }
 
 .purple-outline {
-    border: 2px solid purple; /* Adjust the thickness and color as needed */
-    box-shadow: 0 0 5px purple; /* Optional: adds a glow effect */
+    border: 5px solid rgb(117, 69, 138); /* Adjust the thickness and color as needed */
 }
