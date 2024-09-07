@@ -53,21 +53,104 @@ const pointsMap = {
     11: 0, 12: 0, 13: 0, 14: 0, 15: 0,
     16: 0, 17: 0, 18: 0, 19: 0, 20: 0
 };
-
 // Add a new object to store past race results
 const pastRaceResults = {
     // Example data, replace with your actual race results
     "BHR": [
-        "Verstappen", "Leclerc", "Alonso", "Stroll", "Sainz",
-        "Russell", "Hamilton", "Ocon", "Bottas", "Hulkenberg",
-        "Piastri", "Gasly", "Tsunoda", "Magnussen", "Albon",
-        "Sargeant", "Zhou", "Ricciardo", "Norris", "Perez"
+        "Verstappen", "Perez", "Sainz", "Leclerc", "Russell",
+        "Norris", "Hamilton", "Piastri", "Alonso", "Stroll",
+        "Zhou", "Magnussen", "Ricciardo", "Tsunoda", "Albon",
+        "Hulkenberg", "Ocon", "Gasly", "Bottas", "Sargeant"
     ],
     "SAU": [
-        "Verstappen", "Perez", "Alonso", "Russell", "Hamilton",
-        "Sainz", "Leclerc", "Ocon", "Gasly", "Magnussen",
-        "Tsunoda", "Hulkenberg", "Zhou", "Bottas", "Piastri",
-        "Albon", "Norris", "Sargeant", "Stroll", "Ricciardo"
+        "Verstappen", "Perez", "Leclerc", "Piastri", "Alonso",
+        "Russell", "Bearman", "Norris", "Hamilton", "Hulkenberg",
+        "Albon", "Magnussen", "Ocon", "Tsunoda", "Sargeant",
+        "Ricciardo", "Bottas", "Zhou", "Stroll", "Gasly"
+    ],
+    "AUS": [
+        "Sainz", "Leclerc", "Norris", "Piastri", "Perez",
+        "Stroll", "Tsunoda", "Alonso", "Hulkenberg", "Magnussen",
+        "Albon", "Ricciardo", "Gasly", "Bottas", "Zhou", "Ocon",
+        "Russell", "Hamilton", "Verstappen"
+    ], 
+    "JPN": [
+        "Verstappen", "Perez", "Sainz", "Leclerc", "Norris",
+        "Alonso", "Russell", "Piastri", "Hamilton", "Tsunoda",
+        "Hulkenberg", "Stroll", "Magnussen", "Bottas", "Ocon",
+        "Gasly", "Sargeant", "Zhou", "Ricciardo", "Albon"
+    ], 
+    "CHN": [
+        "Verstappen", "Norris", "Perez", "Leclerc", "Sainz",
+        "Russell", "Alonso", "Piastri", "Hamilton", "Hulkenberg",
+        "Ocon", "Albon", "Gasly", "Zhou", "Stroll", "Magnussen",
+        "Sargeant", "Ricciardo", "Tsunoda", "Bottas"
+    ], 
+    "MIA": [
+        "Norris", "Verstappen", "Leclerc", "Perez", "Sainz",
+        "Hamilton", "Tsunoda", "Russell", "Alonso", "Ocon",
+        "Hulkenberg", "Gasly", "Piastri", "Zhou", "Ricciardo",
+        "Bottas", "Stroll", "Albon", "Magnussen", "Sargeant"
+    ], 
+    "EMI": [
+        "Verstappen", "Norris", "Leclerc", "Piastri", "Sainz",
+        "Hamilton", "Russell", "Perez", "Stroll", "Tsunoda",
+        "Hulkenberg", "Magnussen", "Ricciardo", "Ocon", "Zhou",
+        "Gasly", "Sargeant", "Bottas", "Alonso", "Albon"
+    ], 
+    "MON": [
+        "Leclerc", "Piastri", "Sainz", "Norris", "Russell",
+        "Verstappen", "Hamilton", "Tsunoda", "Albon", "Gasly",
+        "Alonso", "Ricciardo", "Bottas", "Stroll", "Sargeant",
+        "Zhou", "Ocon", "Perez", "Hulkenberg", "Magnussen"
+    ], 
+    "CAN": [
+        "Verstappen", "Norris", "Russell", "Hamilton", "Piastri",
+        "Alonso", "Stroll", "Ricciardo", "Gasly", "Ocon",
+        "Hülkenberg", "Magnussen", "Bottas", "Tsunoda", "Zhou",
+        "Sainz", "Albon", "Pérez", "Leclerc", "Sargeant"
+    ], 
+    "ESP": [
+        "Verstappen", "Norris", "Hamilton", "Russell", "Leclerc",
+        "Sainz", "Piastri", "Pérez", "Gasly", "Ocon",
+        "Hülkenberg", "Alonso", "Zhou", "Stroll", "Ricciardo",
+        "Bottas", "Magnussen", "Albon", "Tsunoda", "Sargeant"
+    ],
+    "AUT": [
+        "Russell", "Piastri", "Sainz", "Hamilton", "Verstappen",
+        "Hülkenberg", "Pérez", "Magnussen", "Ricciardo", "Gasly",
+        "Leclerc", "Ocon", "Stroll", "Tsunoda", "Albon", "Bottas",
+        "Zhou", "Alonso", "Sargeant", "Norris"
+    ], 
+    "GBR": [
+        "Hamilton", "Verstappen", "Norris", "Piastri", "Sainz",
+        "Hülkenberg", "Stroll", "Alonso", "Albon", "Tsunoda",
+        "Sargeant", "Magnussen", "Ricciardo", "Leclerc", "Bottas",
+        "Ocon", "Pérez", "Zhou", "Russell", "Gasly"
+    ], 
+    "HUN": [
+        "Piastri", "Norris", "Hamilton", "Leclerc", "Verstappen",
+        "Sainz", "Pérez", "Russell", "Tsunoda", "Stroll",
+        "Alonso", "Ricciardo", "Hülkenberg", "Albon", "Magnussen",
+        "Bottas", "Sargeant", "Ocon", "Zhou", "Gasly"
+    ], 
+    "BEL": [
+        "Hamilton", "Piastri", "Leclerc", "Verstappen", "Norris",
+        "Sainz", "Pérez", "Alonso", "Ocon", "Ricciardo",
+        "Stroll", "Albon", "Gasly", "Magnussen", "Bottas",
+        "Tsunoda", "Sargeant", "Hülkenberg", "Zhou", "Russell"
+    ], 
+    "NED": [
+        "Norris", "Verstappen", "Leclerc", "Piastri", "Sainz",
+        "Pérez", "Russell", "Hamilton", "Gasly", "Alonso",
+        "Hülkenberg", "Ricciardo", "Stroll", "Albon", "Ocon",
+        "Sargeant", "Tsunoda", "Magnussen", "Bottas", "Zhou"
+    ], 
+    "ITA": [
+        "Leclerc", "Piastri", "Norris", "Sainz", "Hamilton",
+        "Verstappen", "Russell", "Pérez", "Albon", "Magnussen",
+        "Alonso", "Colapinto", "Ricciardo", "Ocon", "Gasly",
+        "Bottas", "Hülkenberg", "Zhou", "Stroll", "Tsunoda"
     ],
     // Add more races as needed
 };
