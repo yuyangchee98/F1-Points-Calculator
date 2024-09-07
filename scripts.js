@@ -1,58 +1,3 @@
-/* 
-                      +---------------------+
-                      | DOMContentLoaded    |
-                      +----------+----------+
-                                 |
-                   +-------------+-------------+
-                   |                           |
-             +-----v-----+                +----v----+
-             | initializeGrid() |          | initializeAllRaces() |
-             +-----+-----+                +----+----+
-                   |                            |
-        +----------+----------+                 |
-        |                     |                 |
-+-------v-------+   +----------v----------+     |
-| calculatePoints() | | initDragAndDrop() |     |
-+----------------+   +----------+----------+     |
-                                |                 |
-                      +----------v----------+     |
-                      | createDriverCard() |     |
-                      +----------+----------+     |
-                                |                 |
-                      +----------v----------+     |
-                      | calculatePoints() |  +----v----+
-                      +---------------------+| uploadPastResults() |
-                                              +----------+---------+
-                                                         |
-                                               +----------v----------+
-                                               | createDriverCard() |
-                                               +----------+----------+
-                                                         |
-                                               +----------v----------+
-                                               | calculatePoints() |
-                                               +---------------------+
-                                                         |
-                                               +----------v----------+
-                                               | initDragAndDrop() |
-                                               +---------------------+
-
-The DOMContentLoaded event is fired when the initial HTML document has been completely loaded and parsed. This event triggers the execution of the following functions:
-    initializeGrid()
-    initializeAllRaces()
-    createDriverCard()
-    calculatePoints()
-    initDragAndDrop()
-    createDriverCard()
-
-The uploadPastResults() function is called separately, likely when the user interacts with the UI. It calls the following functions:
-    createDriverCard()
-    calculatePoints()
-    initDragAndDrop()
-
-The setFastestLap() function is also called separately, likely when the user interacts with the UI to set the fastest lap for a driver.
-                                               
-*/ 
-
 
 const drivers = [
     "Hamilton", "Russell", "Verstappen", "Perez", "Leclerc", 
@@ -87,12 +32,11 @@ const driverTeams = {
     "Magnussen": "Haas", "Hulkenberg": "Haas"
 };
 
+// Updated races array with the new list of races
 const races = [
-    "Bahrain", "Saudi Arabia", "Australia", "Azerbaijan", "Miami",
-    "Emilia Romagna", "Monaco", "Spain", "Canada", "Austria",
-    "Great Britain", "Hungary", "Belgium", "Netherlands", "Italy",
-    "Singapore", "Japan", "Qatar", "United States", "Mexico",
-    "Brazil", "Las Vegas", "Abu Dhabi"
+    "BHR", "SAU", "AUS", "JPN", "CHN", "MIA", "EMI", "MON", "CAN", "ESP",
+    "AUT", "GBR", "HUN", "BEL", "NED", "ITA", "AZE", "SIN", "USA", "MXC",
+    "SAP", "LVG", "QAT", "ABU"
 ];
 
 const pointsMap = {
@@ -109,39 +53,37 @@ const pointsMap = {
     11: 0, 12: 0, 13: 0, 14: 0, 15: 0,
     16: 0, 17: 0, 18: 0, 19: 0, 20: 0
 };
-// Function to initialize the race grid with headers and rows for each position
+
+// Add a new object to store past race results
+const pastRaceResults = {
+    // Example data, replace with your actual race results
+    "BHR": [
+        "Verstappen", "Leclerc", "Alonso", "Stroll", "Sainz",
+        "Russell", "Hamilton", "Ocon", "Bottas", "Hulkenberg",
+        "Piastri", "Gasly", "Tsunoda", "Magnussen", "Albon",
+        "Sargeant", "Zhou", "Ricciardo", "Norris", "Perez"
+    ],
+    // Add more races as needed
+};
+
+
+// The rest of the functions remain the same
 function initializeGrid() {
-    // Retrieve the container element for the race grid and the select element for past races
     const container = document.getElementById('race-grid');
-    const pastRaceSelect = document.getElementById('past-race-select');
-
-    // Initialize the container with the "Position" header
     container.innerHTML = '<div class="header">Position</div>';
-
-    // Loop through each race to add headers and options for the past race select
     races.forEach(race => {
-        // Add a header for each race to the container
         container.innerHTML += `<div class="header">${race}</div>`;
-        // Add an option for each race to the past race select
-        pastRaceSelect.innerHTML += `<option value="${race}">${race}</option>`;
     });
-
-    // Add the "Points" header to the container
     container.innerHTML += '<div class="header">Points</div>';
-
-    // Loop through each position from 1 to 20 to add rows
     for (let i = 1; i <= 20; i++) {
-        // Add the position number to the container
         container.innerHTML += `<div class="position">${i}</div>`;
-        // Loop through each race to add a slot for each position
         races.forEach(race => {
-            // Add a race slot for each position and race
             container.innerHTML += `<div class="race-slot" data-race="${race}" data-position="${i}"></div>`;
         });
-        // Add the points for the current position to the container
         container.innerHTML += `<div class="position">${pointsMap[i]} pts</div>`;
     }
 }
+
 // Function to initialize drag and drop functionality for driver cards and race slots
 function initDragAndDrop() {
     // Select all elements with the class 'driver-card' to make them draggable
@@ -266,41 +208,7 @@ function calculatePoints(driverName, additionalPoints = 0) {
         `)
         .join('');
 }
-// Function to upload past race results and update the UI accordingly
-function uploadPastResults() {
-    // Get the value of the selected race from the dropdown
-    const race = document.getElementById('past-race-select').value;
-    // Clone the drivers array to keep track of available drivers for the race
-    let availableDrivers = [...drivers];
 
-    // Clear all race slots for the selected race
-    document.querySelectorAll(`.race-slot[data-race="${race}"]`).forEach(slot => {
-        slot.innerHTML = '';
-    });
-
-    // Iterate through each position in the race (1 to 20)
-    for (let position = 1; position <= 20; position++) {
-        // Select the race slot for the current position
-        const slot = document.querySelector(`.race-slot[data-race="${race}"][data-position="${position}"]`);
-        // If there are still available drivers
-        if (availableDrivers.length > 0) {
-            // Randomly select a driver from the available drivers
-            const driverIndex = Math.floor(Math.random() * availableDrivers.length);
-            const driverName = availableDrivers[driverIndex];
-            // Remove the selected driver from the available drivers list
-            availableDrivers.splice(driverIndex, 1);
-
-            // Create a driver card for the selected driver and append it to the slot
-            const driverCard = createDriverCard(driverName);
-            slot.appendChild(driverCard);
-        }
-    }
-
-    // Calculate points for drivers based on their positions
-    calculatePoints();
-    // Initialize drag and drop functionality for the race slots
-    initDragAndDrop();
-}
 // Function to create a driver card element with its properties and event listeners
 function createDriverCard(driverName) {
     // Create a new div element for the driver card
@@ -334,35 +242,28 @@ function createDriverCard(driverName) {
     // Return the created driver card element
     return driverCard;
 }
-// Function to initialize all races by populating race slots with drivers
+
+// Function to initialize all races based on pastRaceResults
 function initializeAllRaces() {
-    // Iterate through each race
     races.forEach(race => {
-        // Clone the drivers array to keep track of available drivers for each race
-        let availableDrivers = [...drivers];
+        // Clear all race slots for the current race
+        document.querySelectorAll(`.race-slot[data-race="${race}"]`).forEach(slot => {
+            slot.innerHTML = '';
+        });
 
-        // Loop through each position in the race (1 to 20)
-        for (let position = 1; position <= 20; position++) {
-            // Select the race slot element for the current race and position
-            const slot = document.querySelector(`.race-slot[data-race="${race}"][data-position="${position}"]`);
-            // Check if there are still available drivers to assign
-            if (availableDrivers.length > 0) {
-                // Randomly select a driver from the available drivers
-                const driverIndex = Math.floor(Math.random() * availableDrivers.length);
-                const driverName = availableDrivers[driverIndex];
-                // Remove the selected driver from the available drivers list
-                availableDrivers.splice(driverIndex, 1);
-
-                // Create a driver card for the selected driver and append it to the slot
+        // Check if the race has past results
+        if (pastRaceResults[race] && pastRaceResults[race].length > 0) {
+            // Iterate through the past results for the race
+            pastRaceResults[race].forEach((driverName, position) => {
+                const slot = document.querySelector(`.race-slot[data-race="${race}"][data-position="${position + 1}"]`);
                 const driverCard = createDriverCard(driverName);
                 slot.appendChild(driverCard);
-            }
+            });
         }
+        // If no past results, the race slots will remain empty
     });
 
-    // Calculate points for drivers based on their positions
     calculatePoints();
-    // Initialize drag and drop functionality for the race slots
     initDragAndDrop();
 }
 
