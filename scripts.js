@@ -160,45 +160,32 @@ function drop() {
     }
 }
 
-// Function to calculate points for drivers, including additional points for fastest lap
-function calculatePoints(driverName, additionalPoints = 0) {
-    // Initialize an object to store points for each driver
+function calculatePoints() {
     const driverPoints = {};
 
-    // Iterate through each race to calculate points
     races.forEach(race => {
-        // Select all race slots for the current race
         const raceSlots = document.querySelectorAll(`.race-slot[data-race="${race}"]`);
-        // Iterate through each race slot to calculate points
         raceSlots.forEach(slot => {
-            // Check if the slot has a driver card
             if (slot.children.length > 0) {
-                // Extract driver and position from the slot
                 const driver = slot.children[0].dataset.driver;
-                const position = slot.dataset.position;
-                // Get points for the position from the pointsMap or default to 0
+                const position = parseInt(slot.dataset.position);
                 const points = pointsMap[position] || 0;
 
-                // If the driver is not already in the driverPoints object, initialize their points to 0
                 if (!driverPoints[driver]) {
                     driverPoints[driver] = 0;
                 }
-                // Add the points for the current position to the driver's total points
                 driverPoints[driver] += points;
+
+                // Add fastest lap point if applicable
+                if (slot.children[0].classList.contains('purple-outline') && position <= 10) {
+                    driverPoints[driver] += 1;
+                }
             }
         });
     });
 
-    // If a driverName is provided, add additional points for the fastest lap
-    if (driverName) {
-        // Add the additional points to the driver's total points, defaulting to 0 if not already present
-        driverPoints[driverName] = (driverPoints[driverName] || 0) + additionalPoints;
-    }
-
-    // Select the element where the driver totals will be displayed
+    // Update the driver totals display
     const driverTotalsElement = document.getElementById('driver-totals');
-    // Sort the driverPoints object by points in descending order and map each entry to a string
-    // representing a driver card with their points, then set the innerHTML of the driverTotalsElement
     driverTotalsElement.innerHTML = Object.entries(driverPoints)
         .sort((a, b) => b[1] - a[1])
         .map(([driver, points]) => `
@@ -211,35 +198,22 @@ function calculatePoints(driverName, additionalPoints = 0) {
 
 // Function to create a driver card element with its properties and event listeners
 function createDriverCard(driverName) {
-    // Create a new div element for the driver card
     const driverCard = document.createElement('div');
-    // Set the class name to 'driver-card' for styling and identification
     driverCard.className = 'driver-card';
-    // Make the card draggable for future drag and drop functionality
     driverCard.draggable = true;
-    // Set the dataset.driver property to the driver's name for easy identification
     driverCard.dataset.driver = driverName;
-    // Set the text content of the card to the driver's name
     driverCard.textContent = driverName;
-    // Determine the team color based on the driver's team
     const teamColor = teamColors[driverTeams[driverName]];
-    // Set the background color of the card to the team color
     driverCard.style.backgroundColor = teamColor;
-    // Set the text color based on the team to ensure visibility
     driverCard.style.color = driverTeams[driverName] === 'Haas' ? '#000' : '#fff';
 
-    // Add a click event listener to the card to handle setting the fastest lap
-    driverCard.addEventListener('click', () => {
-        // Get the currently selected race from the dropdown
-        const race = document.getElementById('past-race-select').value;        // Prompt the user to confirm setting the fastest lap for the driver in the selected race
-        const confirmFastestLap = confirm(`Set ${driverName} as the fastest lap driver for ${race}?`);
-        // If the user confirms, call the setFastestLap function
-        if (confirmFastestLap) {
-            setFastestLap(race, driverName);
-        }
+    // Add click event listener to set fastest lap
+    driverCard.addEventListener('click', (event) => {
+        event.stopPropagation(); // Prevent event from bubbling up to parent elements
+        const race = driverCard.closest('.race-slot').dataset.race;
+        setFastestLap(race, driverName);
     });
-    
-    // Return the created driver card element
+
     return driverCard;
 }
 
@@ -271,27 +245,31 @@ function initializeAllRaces() {
 function setFastestLap(race, driverName) {
     // Select all race slots for the current race
     const raceSlots = document.querySelectorAll(`.race-slot[data-race="${race}"]`);
-    // Find the race slot where the driver set the fastest lap
-    const fastestLapDriver = Array.from(raceSlots).find(slot =>
+    
+    // Find the race slot where the clicked driver is
+    const clickedDriverSlot = Array.from(raceSlots).find(slot =>
         slot.children.length > 0 && slot.children[0].dataset.driver === driverName
     );
 
-    // Reset all driver cards to remove the purple outline
-    document.querySelectorAll('.driver-card').forEach(card => {
-        card.classList.remove('purple-outline'); // Remove the outline class
+    if (!clickedDriverSlot) {
+        alert(`${driverName} is not participating in the ${race} race.`);
+        return;
+    }
+
+    // Reset purple outline for all drivers in this race
+    raceSlots.forEach(slot => {
+        if (slot.children.length > 0) {
+            slot.children[0].classList.remove('purple-outline');
+        }
     });
 
-    // If the driver set the fastest lap, calculate points and add the purple outline
-    if (fastestLapDriver) {
-        const position = fastestLapDriver.dataset.position;
-        if (position <= 10) {
-            // Award 1 point for fastest lap if in top 10
-            calculatePoints(driverName, 1);
-            // Add the purple outline to the fastest lap driver's card
-            fastestLapDriver.children[0].classList.add('purple-outline');
-        }
-    }
+    // Add purple outline to the clicked driver
+    clickedDriverSlot.children[0].classList.add('purple-outline');
+
+    // Recalculate points
+    calculatePoints();
 }
+
 
 // Starting
 document.addEventListener('DOMContentLoaded', () => {
