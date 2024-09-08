@@ -29,7 +29,8 @@ const driverTeams = {
     "Bottas": "Alfa Romeo", "Zhou": "Alfa Romeo",
     "Tsunoda": "AlphaTauri", "Ricciardo": "AlphaTauri",
     "Albon": "Williams", "Sargeant": "Williams",
-    "Magnussen": "Haas", "Hulkenberg": "Haas"
+    "Magnussen": "Haas", "Hulkenberg": "Haas",
+    "Colapinto": "Williams",
 };
 
 // Updated races array with the new list of races
@@ -199,7 +200,9 @@ const pastRaceResults = {
         "Ocon",
         "Hamilton",
         "Alonso",
-        "Magnussen"
+        "Magnussen",
+        "Stroll",
+        "Norris",
     ],
     "AUT-S": [
         "Verstappen",
