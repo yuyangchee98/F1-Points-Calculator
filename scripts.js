@@ -613,6 +613,12 @@ function createSaveShareUI() {
     });
 }
 
+function resetFutureRaces() {
+    if (confirm('This will refresh the page and reset all your predictions for future races. Are you sure?')) {
+        window.location.reload();
+    }
+}
+
 // Modify the DOMContentLoaded event listener
 document.addEventListener('DOMContentLoaded', () => {
     initializeGrid();
