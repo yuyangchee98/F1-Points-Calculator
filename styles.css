@@ -3,7 +3,7 @@ body {
     margin: 0;
     padding: 20px;
     background-color: #f8f8f8;
-    overflow: hidden; /* Prevent scrolling on the body */
+    overflow-x: hidden; /* Prevent scrolling on the body */
 }
 
 h1, h2 {
