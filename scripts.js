@@ -620,7 +620,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const resetButton = document.createElement('button');
     resetButton.id = 'reset-button';
-    resetButton.textContent = 'Reset Grid';
+    resetButton.textContent = 'Reset All Grid';
     resetButton.addEventListener('click', () => {
         resetGrid();
         updateRaceStatus();
