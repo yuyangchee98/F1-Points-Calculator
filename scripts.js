@@ -348,28 +348,42 @@ function dragLeave() {
 function drop(e) {
     e.preventDefault();
     this.classList.remove('hovered');
-    const driverName = e.dataTransfer.getData('text/plain');
+    const draggedDriverName = e.dataTransfer.getData('text/plain');
     
     const race = this.dataset.race;
+    const targetPosition = this.dataset.position;
 
-    // Check if the driver is already participating in the race
-    const existingPosition = document.querySelector(`.race-slot[data-race="${race}"] .driver-card[data-driver="${driverName}"]`);
-    if (existingPosition && existingPosition !== this.children[0]) {
-        alert(`${driverName} is already participating in the ${race} race. Each driver can only participate once per race.`);
-        return;
+    // Check if the dragged driver is already in this race
+    const existingSlot = document.querySelector(`.race-slot[data-race="${race}"] .driver-card[data-driver="${draggedDriverName}"]`);
+    
+    if (existingSlot) {
+        // If the driver is already in this race, swap positions
+        const existingPosition = existingSlot.closest('.race-slot').dataset.position;
+        const targetSlot = document.querySelector(`.race-slot[data-race="${race}"][data-position="${targetPosition}"]`);
+        
+        if (targetSlot.children.length > 0) {
+            // Swap drivers
+            const targetDriver = targetSlot.children[0];
+            existingSlot.closest('.race-slot').appendChild(targetDriver);
+        } else {
+            // Move existing driver to new position
+            existingSlot.closest('.race-slot').removeChild(existingSlot);
+        }
+        
+        targetSlot.appendChild(existingSlot);
+    } else {
+        // If the driver is not in this race, add them to the new position
+        if (this.children.length > 0) {
+            this.removeChild(this.children[0]);
+        }
+        const newDriverCard = createDriverCard(draggedDriverName);
+        this.appendChild(newDriverCard);
     }
-
-    // If the current element already has a driver, remove it
-    if (this.children.length > 0) {
-        this.removeChild(this.children[0]);
-    }
-
-    // Create a new driver card instead of moving the original
-    const newDriverCard = createDriverCard(driverName);
-    this.appendChild(newDriverCard);
 
     calculatePoints();
+    updateRaceStatus();
 }
+
 
 function clearSlot(e) {
     if (this.children.length > 0) {
