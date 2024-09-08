@@ -1,14 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
 body {
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Poppins', sans-serif;
     margin: 0;
-    padding: 20px;
+    padding: 0;
     background-color: #f8f8f8;
-    overflow-x: hidden; /* Prevent scrolling on the body */
+    overflow-x: hidden;
+    color: #333;
 }
 
 h1, h2 {
-    color: #333;
     text-align: center;
+    color: #333;
 }
 
 .container {
@@ -17,100 +20,118 @@ h1, h2 {
     gap: 10px;
     overflow-x: auto;
     background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     padding: 20px;
-    max-height: calc(100vh - 40px); /* Adjust the height based on your needs */
-    overflow-y: auto; /* Enable vertical scrolling within the container */
-}  
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+}
 
 .header {
-    font-weight: bold;
+    font-weight: 700;
     text-align: center;
     padding: 10px;
     background-color: #e0e0e0;
-    border-radius: 3px;
+    border-radius: 5px;
     color: #333;
+    transition: background-color 0.3s ease;
+}
+
+.header:hover {
+    background-color: #d0d0d0;
 }
 
 .position {
     text-align: center;
     padding: 10px;
     background-color: #f5f5f5;
-    border-radius: 3px;
+    border-radius: 5px;
     color: #333;
+    transition: background-color 0.3s ease;
+}
+
+.position:hover {
+    background-color: #e5e5e5;
 }
 
 .race-slot {
     border: 1px solid #ddd;
-    border-radius: 3px;
+    border-radius: 5px;
     padding: 5px;
     min-height: 30px;
     background-color: #fff;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     text-align: center;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .race-slot:hover {
     background-color: #f5f5f5;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .driver-card {
     color: #fff;
     border: none;
-    border-radius: 3px;
+    border-radius: 5px;
     padding: 10px;
     cursor: move;
     text-align: center;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    transition: opacity 0.3s ease;
+    transition: opacity 0.3s ease, box-shadow 0.3s ease;
 }
 
 .driver-card:hover {
     opacity: 0.8;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .total-points {
-    font-weight: bold;
+    font-weight: 700;
     text-align: left;
     padding: 10px;
     background-color: #f0f0f0;
-    border-radius: 3px;
+    border-radius: 5px;
     color: #333;
+    transition: background-color 0.3s ease;
+}
+
+.total-points:hover {
+    background-color: #e0e0e0;
 }
 
 .past-results {
     margin-top: 30px;
     padding: 20px;
     background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     text-align: center;
 }
 
 .past-results select,
 .past-results button {
-    padding: 10px;
+    padding: 10px 20px;
     border: none;
-    border-radius: 3px;
+    border-radius: 5px;
     background-color: #4CAF50;
     color: #fff;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .past-results select:hover,
 .past-results button:hover {
     background-color: #45a049;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .driver-totals-container {
     margin-top: 30px;
     padding: 20px;
     background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     text-align: left;
 }
 
@@ -119,11 +140,11 @@ h1, h2 {
 }
 
 .purple-outline {
-    border: 5px solid rgb(117, 69, 138); /* Adjust the thickness and color as needed */
+    border: 5px solid rgb(117, 69, 138);
 }
 
 .header.sprint, .race-slot.sprint {
-    background-color: #f0f0f0; /* Light gray background for sprint races */
+    background-color: #f0f0f0;
 }
 
 .header.sprint {
@@ -137,7 +158,8 @@ h1, h2 {
     margin-bottom: 20px;
     padding: 10px;
     background-color: #f0f0f0;
-    border-radius: 5px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 #driver-selection .driver-card {
@@ -148,23 +170,25 @@ h1, h2 {
 .race-slot {
     min-height: 30px;
     border: 1px solid #ccc;
-    border-radius: 3px;
+    border-radius: 5px;
     margin: 2px;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .race-slot:hover {
     background-color: #f0f0f0;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .race-slot.hovered {
     background-color: #e0e0e0;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 /* Driver Card Styles */
 .driver-card {
     padding: 5px;
-    border-radius: 3px;
+    border-radius: 5px;
     cursor: grab;
 }
 
@@ -187,11 +211,12 @@ h1, h2 {
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 #reset-button:hover {
     background-color: #d32f2f;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 /* Styles for past races */
@@ -242,8 +267,8 @@ h1, h2 {
     position: absolute;
     background-color: #333;
     color: #fff;
-    padding: 5px;
-    border-radius: 3px;
+    padding: 5px 10px;
+    border-radius: 5px;
     font-size: 12px;
     opacity: 0;
     transition: opacity 0.3s ease;
@@ -270,14 +295,13 @@ h1, h2 {
     background-color: #d9eeff;
 }
 
-
 /* Save and Share Styles */
 #save-share-container {
     margin-bottom: 20px;
     padding: 15px;
     background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     text-align: center;
 }
 
@@ -289,11 +313,12 @@ h1, h2 {
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
-    transition: background-color 0.3s, transform 0.1s;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.1s ease;
 }
 
 #save-share-container button:hover {
     background-color: #45a049;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 #save-share-container button:active {
@@ -306,9 +331,14 @@ h1, h2 {
     padding: 10px;
     background-color: #f5f5f5;
     border: 1px solid #ddd;
-    border-radius: 3px;
+    border-radius: 5px;
     font-family: monospace;
     word-break: break-all;
+    transition: background-color 0.3s ease;
+}
+
+#save-share-container .share-url:hover {
+    background-color: #e5e5e5;
 }
 
 #save-share-container .share-message {
@@ -331,7 +361,7 @@ h1, h2 {
     background-color: #333;
     color: #fff;
     padding: 5px 10px;
-    border-radius: 3px;
+    border-radius: 5px;
     font-size: 14px;
     opacity: 0;
     transition: opacity 0.3s ease;
@@ -362,8 +392,10 @@ h1, h2 {
     background-color: #f0f0f0;
     border: 1px solid #ccc;
     border-radius: 5px;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
+
 #reset-future-button:hover {
     background-color: #e0e0e0;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
