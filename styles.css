@@ -126,3 +126,67 @@ h1, h2 {
 .header.sprint {
     font-style: italic;
 }
+
+/* Driver Selection Area */
+#driver-selection {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+}
+
+#driver-selection .driver-card {
+    margin: 5px;
+}
+
+/* Race Slot Styles */
+.race-slot {
+    min-height: 30px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    margin: 2px;
+    transition: background-color 0.3s;
+}
+
+.race-slot:hover {
+    background-color: #f0f0f0;
+}
+
+.race-slot.hovered {
+    background-color: #e0e0e0;
+}
+
+/* Driver Card Styles */
+.driver-card {
+    padding: 5px;
+    border-radius: 3px;
+    cursor: grab;
+}
+
+.driver-card:active {
+    cursor: grabbing;
+}
+
+/* Fastest Lap Indicator */
+.purple-outline {
+    box-shadow: 0 0 0 2px purple;
+}
+
+/* Reset Button */
+#reset-button {
+    margin-bottom: 10px;
+    padding: 10px 20px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+#reset-button:hover {
+    background-color: #d32f2f;
+}
