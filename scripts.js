@@ -34,9 +34,9 @@ const driverTeams = {
 
 // Updated races array with the new list of races
 const races = [
-    "BHR", "SAU", "AUS", "JPN", "CHN", "MIA", "EMI", "MON", "CAN", "ESP",
-    "AUT", "GBR", "HUN", "BEL", "NED", "ITA", "AZE", "SIN", "USA", "MXC",
-    "SAP", "LVG", "QAT", "ABU"
+    "BHR", "SAU", "AUS", "JPN", "CHN-S", "CHN", "MIA-S", "MIA", "EMI", "MON", "CAN", "ESP",
+    "AUT-S", "AUT", "GBR", "HUN", "BEL", "NED", "ITA", "AZE", "SIN", "USA-S", "USA", "MXC",
+    "SAP-S", "SAP", "LVG", "QAT-S", "QAT", "ABU"
 ];
 
 const pointsMap = {
@@ -53,6 +53,14 @@ const pointsMap = {
     11: 0, 12: 0, 13: 0, 14: 0, 15: 0,
     16: 0, 17: 0, 18: 0, 19: 0, 20: 0
 };
+
+// New points system for sprint races
+const sprintPointsMap = {
+    1: 8, 2: 7, 3: 6, 4: 5, 5: 4, 6: 3, 7: 2, 8: 1,
+    9: 0, 10: 0, 11: 0, 12: 0, 13: 0, 14: 0, 15: 0,
+    16: 0, 17: 0, 18: 0, 19: 0, 20: 0
+};
+
 // Add a new object to store past race results
 const pastRaceResults = {
     // Example data, replace with your actual race results
@@ -152,14 +160,89 @@ const pastRaceResults = {
         "Alonso", "Colapinto", "Ricciardo", "Ocon", "Gasly",
         "Bottas", "Hulkenberg", "Zhou", "Stroll", "Tsunoda"
     ],
+    "CHN-S": [
+        "Verstappen",
+        "Hamilton",
+        "Perez",
+        "Leclerc",
+        "Sainz",
+        "Norris",
+        "Piastri",
+        "Russell",
+        "Zhou",
+        "Magnussen",
+        "Ricciardo",
+        "Bottas",
+        "Ocon",
+        "Stroll",
+        "Gasly",
+        "Tsunoda",
+        "Albon",
+        "Sargeant",
+        "Hulkenberg"
+    ],
+    "MIA-S": [
+        "Verstappen",
+        "Leclerc",
+        "Perez",
+        "Ricciardo",
+        "Sainz",
+        "Piastri",
+        "Hulkenberg",
+        "Tsunoda",
+        "Gasly",
+        "Sargeant",
+        "Zhou",
+        "Russell",
+        "Albon",
+        "Bottas",
+        "Ocon",
+        "Hamilton",
+        "Alonso",
+        "Magnussen"
+    ],
+    "AUT-S": [
+        "Verstappen",
+        "Piastri",
+        "Norris",
+        "Russell",
+        "Sainz",
+        "Hamilton",
+        "Leclerc",
+        "Perez",
+        "Magnussen",
+        "Stroll",
+        "Ocon",
+        "Gasly",
+        "Tsunoda",
+        "Ricciardo",
+        "Alonso",
+        "Sargeant",
+        "Albon",
+        "Bottas",
+        "Hulkenberg",
+        "Zhou"
+    ]
     // Add more races as needed
 };
 
 const pastFastestLap = {
     "BHR": "Verstappen",
     "SAU": "Leclerc",
-    "AUS": "Leclerc", "JPN": "Verstappen", "CHN": "Alonso", "MIA": "Piastri", "EMI": "Russell", "MON": "Leclerc", "CAN": "Hamilton", "ESP": "Norris",
-    "AUT": "Alonso", "GBR": "Sainz", "HUN": "Russell", "BEL": "Perez", "NED": "Norris", "ITA": "Norris",
+    "AUS": "Leclerc", 
+    "JPN": "Verstappen", 
+    "CHN": "Alonso", 
+    "MIA": "Piastri", 
+    "EMI": "Russell", 
+    "MON": "Leclerc", 
+    "CAN": "Hamilton", 
+    "ESP": "Norris",
+    "AUT": "Alonso", 
+    "GBR": "Sainz", 
+    "HUN": "Russell", 
+    "BEL": "Perez", 
+    "NED": "Norris", 
+    "ITA": "Norris",
 };
 
 // The rest of the functions remain the same
@@ -167,15 +250,17 @@ function initializeGrid() {
     const container = document.getElementById('race-grid');
     container.innerHTML = '<div class="header">Position</div>';
     races.forEach(race => {
-        container.innerHTML += `<div class="header">${race}</div>`;
+        const isSprint = race.endsWith('-S');
+        container.innerHTML += `<div class="header ${isSprint ? 'sprint' : ''}">${isSprint ? race.replace('-S', ' Sprint') : race}</div>`;
     });
     container.innerHTML += '<div class="header">Points</div>';
     for (let i = 1; i <= 20; i++) {
         container.innerHTML += `<div class="position">${i}</div>`;
         races.forEach(race => {
-            container.innerHTML += `<div class="race-slot" data-race="${race}" data-position="${i}"></div>`;
+            const isSprint = race.endsWith('-S');
+            container.innerHTML += `<div class="race-slot ${isSprint ? 'sprint' : ''}" data-race="${race}" data-position="${i}"></div>`;
         });
-        container.innerHTML += `<div class="position">${pointsMap[i]} pts</div>`;
+        container.innerHTML += `<div class="points">${pointsMap[i]} pts</div>`;
     }
 }
 
@@ -260,26 +345,27 @@ function calculatePoints() {
 
     races.forEach(race => {
         const raceSlots = document.querySelectorAll(`.race-slot[data-race="${race}"]`);
+        const isSprint = race.endsWith('-S');
         raceSlots.forEach(slot => {
             if (slot.children.length > 0) {
                 const driver = slot.children[0].dataset.driver;
                 const position = parseInt(slot.dataset.position);
-                const points = pointsMap[position] || 0;
+                const points = isSprint ? (sprintPointsMap[position] || 0) : (pointsMap[position] || 0);
 
                 if (!driverPoints[driver]) {
                     driverPoints[driver] = 0;
                 }
                 driverPoints[driver] += points;
 
-                // Add fastest lap point if applicable
-                if (slot.children[0].classList.contains('purple-outline') && position <= 10) {
+                // Add fastest lap point if applicable (only for full races, not sprints)
+                if (!isSprint && slot.children[0].classList.contains('purple-outline') && position <= 10) {
                     driverPoints[driver] += 1;
                 }
             }
         });
     });
 
-    // Update the driver totals display
+    // Update the driver totals display (same as before)
     const driverTotalsElement = document.getElementById('driver-totals');
     driverTotalsElement.innerHTML = Object.entries(driverPoints)
         .sort((a, b) => b[1] - a[1])
@@ -327,8 +413,8 @@ function initializeAllRaces() {
                 const slot = document.querySelector(`.race-slot[data-race="${race}"][data-position="${position + 1}"]`);
                 const driverCard = createDriverCard(driverName);
                 
-                // Check if this driver had the fastest lap
-                if (pastFastestLap[race] === driverName) {
+                // Check if this driver had the fastest lap (only for full races, not sprints)
+                if (!race.endsWith('-S') && pastFastestLap[race] === driverName) {
                     driverCard.classList.add('purple-outline');
                 }
                 
