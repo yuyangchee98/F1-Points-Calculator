@@ -3,6 +3,7 @@ body {
     margin: 0;
     padding: 20px;
     background-color: #f8f8f8;
+    overflow: hidden; /* Prevent scrolling on the body */
 }
 
 h1, h2 {
@@ -19,6 +20,8 @@ h1, h2 {
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     padding: 20px;
+    max-height: calc(100vh - 40px); /* Adjust the height based on your needs */
+    overflow-y: auto; /* Enable vertical scrolling within the container */
 }  
 
 .header {
@@ -349,4 +352,18 @@ h1, h2 {
         width: 100%;
         margin-bottom: 10px;
     }
+}
+
+#reset-future-button {
+    margin-bottom: 20px;
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+#reset-future-button:hover {
+    background-color: #e0e0e0;
 }
