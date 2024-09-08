@@ -518,8 +518,102 @@ function updateRaceStatus() {
     });
 }
 
-// Modified DOMContentLoaded event listener
-// The DOMContentLoaded event listener remains the same
+// Function to encode the current grid state
+function encodeGridState() {
+    const gridState = {};
+    races.forEach(race => {
+        gridState[race] = [];
+        const raceSlots = document.querySelectorAll(`.race-slot[data-race="${race}"]`);
+        raceSlots.forEach(slot => {
+            if (slot.children.length > 0) {
+                const driver = slot.children[0].dataset.driver;
+                const position = parseInt(slot.dataset.position);
+                const isFastestLap = slot.children[0].classList.contains('purple-outline');
+                gridState[race].push({ driver, position, isFastestLap });
+            }
+        });
+    });
+    return btoa(JSON.stringify(gridState));
+}
+
+// Function to decode and apply the grid state
+function decodeAndApplyGridState(encodedState) {
+    try {
+        const gridState = JSON.parse(atob(encodedState));
+        resetGrid(); // Clear the current grid
+        Object.entries(gridState).forEach(([race, results]) => {
+            results.forEach(({ driver, position, isFastestLap }) => {
+                const slot = document.querySelector(`.race-slot[data-race="${race}"][data-position="${position}"]`);
+                if (slot) {
+                    const driverCard = createDriverCard(driver);
+                    if (isFastestLap) {
+                        driverCard.classList.add('purple-outline');
+                    }
+                    slot.appendChild(driverCard);
+                }
+            });
+        });
+        calculatePoints();
+        updateRaceStatus();
+    } catch (error) {
+        console.error("Error decoding grid state:", error);
+        alert("Invalid grid state data");
+    }
+}
+
+// Function to generate a shareable URL
+function generateShareableURL() {
+    const baseURL = window.location.href.split('?')[0]; // Get the current URL without query parameters
+    const encodedState = encodeGridState();
+    return `${baseURL}?state=${encodedState}`;
+}
+
+// Function to create UI elements for saving and sharing
+function createSaveShareUI() {
+    const container = document.createElement('div');
+    container.id = 'save-share-container';
+    container.style.marginBottom = '20px';
+
+    const saveButton = document.createElement('button');
+    saveButton.textContent = 'Save Prediction';
+    saveButton.addEventListener('click', () => {
+        const shareableURL = generateShareableURL();
+        navigator.clipboard.writeText(shareableURL).then(() => {
+            alert('Shareable link copied to clipboard!');
+        });
+    });
+
+    container.appendChild(saveButton);
+    document.body.insertBefore(container, document.getElementById('race-grid'));
+}
+
+// Function to load state from URL on page load
+function loadStateFromURL() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const encodedState = urlParams.get('state');
+    if (encodedState) {
+        decodeAndApplyGridState(encodedState);
+    }
+}
+
+function createSaveShareUI() {
+    const container = document.getElementById('save-share-container');
+    const saveButton = document.getElementById('save-button');
+    const shareUrlElement = document.getElementById('share-url');
+    const shareMessageElement = document.getElementById('share-message');
+
+    saveButton.addEventListener('click', () => {
+        const shareableURL = generateShareableURL();
+        navigator.clipboard.writeText(shareableURL).then(() => {
+            shareUrlElement.textContent = shareableURL;
+            shareMessageElement.textContent = 'Shareable link copied to clipboard!';
+            saveButton.classList.add('copied');
+            setTimeout(() => saveButton.classList.remove('copied'), 2000);
+        });
+    });
+}
+
+// Modify the DOMContentLoaded event listener
 document.addEventListener('DOMContentLoaded', () => {
     initializeGrid();
     initializeAllRaces();
@@ -529,7 +623,10 @@ document.addEventListener('DOMContentLoaded', () => {
     resetButton.textContent = 'Reset Grid';
     resetButton.addEventListener('click', () => {
         resetGrid();
-        updateRaceStatus(); // Add this line to update race status after reset
+        updateRaceStatus();
     });
     document.body.insertBefore(resetButton, document.getElementById('race-grid'));
+
+    createSaveShareUI(); // Add this line to create the save/share UI
+    loadStateFromURL(); // Add this line to load state from URL if present
 });
