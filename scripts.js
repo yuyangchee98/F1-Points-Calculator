@@ -380,7 +380,7 @@ function clearSlot(e) {
 
 // Modified initializeAllRaces function
 function initializeAllRaces() {
-    createDriverSelection(); // Create driver selection area
+    createDriverSelection();
 
     races.forEach(race => {
         document.querySelectorAll(`.race-slot[data-race="${race}"]`).forEach(slot => {
@@ -403,6 +403,7 @@ function initializeAllRaces() {
 
     calculatePoints();
     initDragAndDrop();
+    updateRaceStatus(); // Add this line to update race status
 }
 
 function calculatePoints() {
@@ -483,15 +484,52 @@ function setFastestLap(race, driverName) {
     calculatePoints();
 }
 
+function isPastRace(raceCode) {
+    return raceCode in pastRaceResults;
+}
+
+// Function to update race status visuals
+function updateRaceStatus() {
+    const raceSlots = document.querySelectorAll('.race-slot');
+    const headers = document.querySelectorAll('.header');
+
+    raceSlots.forEach(slot => {
+        const raceCode = slot.dataset.race;
+        if (isPastRace(raceCode)) {
+            slot.classList.add('past-race');
+            slot.classList.remove('future-race');
+        } else {
+            slot.classList.add('future-race');
+            slot.classList.remove('past-race');
+        }
+    });
+
+    headers.forEach(header => {
+        if (header.textContent !== 'Position' && header.textContent !== 'Points') {
+            const raceCode = header.textContent.replace(' Sprint', '-S');
+            if (isPastRace(raceCode)) {
+                header.classList.add('past-race');
+                header.classList.remove('future-race');
+            } else {
+                header.classList.add('future-race');
+                header.classList.remove('past-race');
+            }
+        }
+    });
+}
+
 // Modified DOMContentLoaded event listener
+// The DOMContentLoaded event listener remains the same
 document.addEventListener('DOMContentLoaded', () => {
     initializeGrid();
     initializeAllRaces();
 
-    // Add reset button
     const resetButton = document.createElement('button');
     resetButton.id = 'reset-button';
     resetButton.textContent = 'Reset Grid';
-    resetButton.addEventListener('click', resetGrid);
+    resetButton.addEventListener('click', () => {
+        resetGrid();
+        updateRaceStatus(); // Add this line to update race status after reset
+    });
     document.body.insertBefore(resetButton, document.getElementById('race-grid'));
 });
