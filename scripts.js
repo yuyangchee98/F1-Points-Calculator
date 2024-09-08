@@ -16,7 +16,7 @@ const teamColors = {
     "Alfa Romeo": "#900000",
     "AlphaTauri": "#2B4562",
     "Williams": "#005AFF",
-    "Haas": "#FFFFFF"
+    "Haas": "#E6002B",
 };
 
 const driverTeams = {
@@ -107,58 +107,59 @@ const pastRaceResults = {
     "CAN": [
         "Verstappen", "Norris", "Russell", "Hamilton", "Piastri",
         "Alonso", "Stroll", "Ricciardo", "Gasly", "Ocon",
-        "Hülkenberg", "Magnussen", "Bottas", "Tsunoda", "Zhou",
-        "Sainz", "Albon", "Pérez", "Leclerc", "Sargeant"
+        "Hulkenberg", "Magnussen", "Bottas", "Tsunoda", "Zhou",
+        "Sainz", "Albon", "Perez", "Leclerc", "Sargeant"
     ], 
     "ESP": [
         "Verstappen", "Norris", "Hamilton", "Russell", "Leclerc",
-        "Sainz", "Piastri", "Pérez", "Gasly", "Ocon",
-        "Hülkenberg", "Alonso", "Zhou", "Stroll", "Ricciardo",
+        "Sainz", "Piastri", "Perez", "Gasly", "Ocon",
+        "Hulkenberg", "Alonso", "Zhou", "Stroll", "Ricciardo",
         "Bottas", "Magnussen", "Albon", "Tsunoda", "Sargeant"
     ],
     "AUT": [
         "Russell", "Piastri", "Sainz", "Hamilton", "Verstappen",
-        "Hülkenberg", "Pérez", "Magnussen", "Ricciardo", "Gasly",
+        "Hulkenberg", "Perez", "Magnussen", "Ricciardo", "Gasly",
         "Leclerc", "Ocon", "Stroll", "Tsunoda", "Albon", "Bottas",
         "Zhou", "Alonso", "Sargeant", "Norris"
     ], 
     "GBR": [
         "Hamilton", "Verstappen", "Norris", "Piastri", "Sainz",
-        "Hülkenberg", "Stroll", "Alonso", "Albon", "Tsunoda",
+        "Hulkenberg", "Stroll", "Alonso", "Albon", "Tsunoda",
         "Sargeant", "Magnussen", "Ricciardo", "Leclerc", "Bottas",
-        "Ocon", "Pérez", "Zhou", "Russell", "Gasly"
+        "Ocon", "Perez", "Zhou", "Russell", "Gasly"
     ], 
     "HUN": [
         "Piastri", "Norris", "Hamilton", "Leclerc", "Verstappen",
-        "Sainz", "Pérez", "Russell", "Tsunoda", "Stroll",
-        "Alonso", "Ricciardo", "Hülkenberg", "Albon", "Magnussen",
+        "Sainz", "Perez", "Russell", "Tsunoda", "Stroll",
+        "Alonso", "Ricciardo", "Hulkenberg", "Albon", "Magnussen",
         "Bottas", "Sargeant", "Ocon", "Zhou", "Gasly"
     ], 
     "BEL": [
         "Hamilton", "Piastri", "Leclerc", "Verstappen", "Norris",
-        "Sainz", "Pérez", "Alonso", "Ocon", "Ricciardo",
+        "Sainz", "Perez", "Alonso", "Ocon", "Ricciardo",
         "Stroll", "Albon", "Gasly", "Magnussen", "Bottas",
-        "Tsunoda", "Sargeant", "Hülkenberg", "Zhou", "Russell"
+        "Tsunoda", "Sargeant", "Hulkenberg", "Zhou", "Russell"
     ], 
     "NED": [
         "Norris", "Verstappen", "Leclerc", "Piastri", "Sainz",
-        "Pérez", "Russell", "Hamilton", "Gasly", "Alonso",
-        "Hülkenberg", "Ricciardo", "Stroll", "Albon", "Ocon",
+        "Perez", "Russell", "Hamilton", "Gasly", "Alonso",
+        "Hulkenberg", "Ricciardo", "Stroll", "Albon", "Ocon",
         "Sargeant", "Tsunoda", "Magnussen", "Bottas", "Zhou"
     ], 
     "ITA": [
         "Leclerc", "Piastri", "Norris", "Sainz", "Hamilton",
-        "Verstappen", "Russell", "Pérez", "Albon", "Magnussen",
+        "Verstappen", "Russell", "Perez", "Albon", "Magnussen",
         "Alonso", "Colapinto", "Ricciardo", "Ocon", "Gasly",
-        "Bottas", "Hülkenberg", "Zhou", "Stroll", "Tsunoda"
+        "Bottas", "Hulkenberg", "Zhou", "Stroll", "Tsunoda"
     ],
     // Add more races as needed
 };
 
 const pastFastestLap = {
     "BHR": "Verstappen",
-    "SAU": "Perez",
-    // Add more races as needed
+    "SAU": "Leclerc",
+    "AUS": "Leclerc", "JPN": "Verstappen", "CHN": "Alonso", "MIA": "Piastri", "EMI": "Russell", "MON": "Leclerc", "CAN": "Hamilton", "ESP": "Norris",
+    "AUT": "Alonso", "GBR": "Sainz", "HUN": "Russell", "BEL": "Perez", "NED": "Norris", "ITA": "Norris",
 };
 
 // The rest of the functions remain the same
