@@ -248,7 +248,6 @@ const pastFastestLap = {
     "ITA": "Norris",
 };
 
-// The rest of the functions remain the same
 function initializeGrid() {
     const container = document.getElementById('race-grid');
     container.innerHTML = '<div class="header">Position</div>';
@@ -263,33 +262,69 @@ function initializeGrid() {
             const isSprint = race.endsWith('-S');
             container.innerHTML += `<div class="race-slot ${isSprint ? 'sprint' : ''}" data-race="${race}" data-position="${i}"></div>`;
         });
-        container.innerHTML += `<div class="points">${pointsMap[i]} pts</div>`;
+        container.innerHTML += `<div class="points">${i <= 10 ? pointsMap[i] : 0} pts</div>`;
     }
 }
 
-// Function to initialize drag and drop functionality for driver cards and race slots
+// Function to create a driver card element with its properties and event listeners
+function createDriverCard(driverName) {
+    const driverCard = document.createElement('div');
+    driverCard.className = 'driver-card';
+    driverCard.draggable = true;
+    driverCard.dataset.driver = driverName;
+    driverCard.textContent = driverName;
+    const teamColor = teamColors[driverTeams[driverName]];
+    driverCard.style.backgroundColor = teamColor;
+    driverCard.style.color = driverTeams[driverName] === 'Haas' ? '#000' : '#fff';
+
+    // Add click event listener to set fastest lap
+    driverCard.addEventListener('click', (event) => {
+        event.stopPropagation(); // Prevent event from bubbling up to parent elements
+        const race = driverCard.closest('.race-slot')?.dataset.race;
+        if (race) {
+            setFastestLap(race, driverName);
+        }
+    });
+
+    return driverCard;
+}
+
+// New function to create the driver selection area
+function createDriverSelection() {
+    const selectionArea = document.createElement('div');
+    selectionArea.id = 'driver-selection';
+    selectionArea.style.cssText = 'display: flex; flex-wrap: wrap; margin-bottom: 20px; padding: 10px; background-color: #f0f0f0; border-radius: 5px;';
+
+    drivers.forEach(driver => {
+        const driverCard = createDriverCard(driver);
+        driverCard.style.margin = '5px';
+        selectionArea.appendChild(driverCard);
+    });
+
+    document.body.insertBefore(selectionArea, document.getElementById('race-grid'));
+}
+
+// Modified initDragAndDrop function
 function initDragAndDrop() {
-    // Select all elements with the class 'driver-card' to make them draggable
     const draggables = document.querySelectorAll('.driver-card');
-    // Select all elements with the class 'race-slot' to make them drop zones
     const dropZones = document.querySelectorAll('.race-slot');
 
-    // Add event listeners to each draggable element for dragstart and dragend events
     draggables.forEach(draggable => {
         draggable.addEventListener('dragstart', dragStart);
         draggable.addEventListener('dragend', dragEnd);
     });
 
-    // Add event listeners to each drop zone for dragover, dragenter, dragleave, and drop events
     dropZones.forEach(zone => {
         zone.addEventListener('dragover', dragOver);
         zone.addEventListener('dragenter', dragEnter);
         zone.addEventListener('dragleave', dragLeave);
         zone.addEventListener('drop', drop);
+        zone.addEventListener('click', clearSlot);
     });
 }
 
-function dragStart() {
+function dragStart(e) {
+    e.dataTransfer.setData('text/plain', e.target.dataset.driver);
     this.classList.add('dragging');
 }
 
@@ -309,38 +344,65 @@ function dragEnter(e) {
 function dragLeave() {
     this.classList.remove('hovered');
 }
-function drop() {
-    // Remove the 'hovered' class from the current element to reset its state
+
+function drop(e) {
+    e.preventDefault();
     this.classList.remove('hovered');
-    // Find the element that is currently being dragged
-    const draggable = document.querySelector('.dragging');
-    if (draggable) {
-        // Extract the race and driver information from the current element and the draggable element
-        const race = this.dataset.race;
-        const driver = draggable.dataset.driver;
+    const driverName = e.dataTransfer.getData('text/plain');
+    
+    const race = this.dataset.race;
 
-        // Check if the driver is already participating in the race
-        const existingPosition = document.querySelector(`.race-slot[data-race="${race}"] .driver-card[data-driver="${driver}"]`);
-        if (existingPosition && existingPosition !== draggable) {
-            // Alert the user if the driver is already participating in the race
-            alert(`${driver} is already participating in the ${race} race. Each driver can only participate once per race.`);
-            return;
-        }
+    // Check if the driver is already participating in the race
+    const existingPosition = document.querySelector(`.race-slot[data-race="${race}"] .driver-card[data-driver="${driverName}"]`);
+    if (existingPosition && existingPosition !== this.children[0]) {
+        alert(`${driverName} is already participating in the ${race} race. Each driver can only participate once per race.`);
+        return;
+    }
 
-        // If the current element already has a driver, swap them with the draggable element
-        if (this.children.length > 0) {
-            const existingDriver = this.children[0];
-            const originalSlot = draggable.parentElement;
-            originalSlot.appendChild(existingDriver);
-        }
+    // If the current element already has a driver, remove it
+    if (this.children.length > 0) {
+        this.removeChild(this.children[0]);
+    }
 
-        // Clear the current element's content and append the draggable element
-        this.innerHTML = '';
-        this.appendChild(draggable);
+    // Create a new driver card instead of moving the original
+    const newDriverCard = createDriverCard(driverName);
+    this.appendChild(newDriverCard);
 
-        // Recalculate points after the drop
+    calculatePoints();
+}
+
+function clearSlot(e) {
+    if (this.children.length > 0) {
+        this.removeChild(this.children[0]);
         calculatePoints();
     }
+}
+
+// Modified initializeAllRaces function
+function initializeAllRaces() {
+    createDriverSelection(); // Create driver selection area
+
+    races.forEach(race => {
+        document.querySelectorAll(`.race-slot[data-race="${race}"]`).forEach(slot => {
+            slot.innerHTML = '';
+        });
+
+        if (pastRaceResults[race] && pastRaceResults[race].length > 0) {
+            pastRaceResults[race].forEach((driverName, position) => {
+                const slot = document.querySelector(`.race-slot[data-race="${race}"][data-position="${position + 1}"]`);
+                const driverCard = createDriverCard(driverName);
+                
+                if (!race.endsWith('-S') && pastFastestLap[race] === driverName) {
+                    driverCard.classList.add('purple-outline');
+                }
+                
+                slot.appendChild(driverCard);
+            });
+        }
+    });
+
+    calculatePoints();
+    initDragAndDrop();
 }
 
 function calculatePoints() {
@@ -368,7 +430,7 @@ function calculatePoints() {
         });
     });
 
-    // Update the driver totals display (same as before)
+    // Update the driver totals display
     const driverTotalsElement = document.getElementById('driver-totals');
     driverTotalsElement.innerHTML = Object.entries(driverPoints)
         .sort((a, b) => b[1] - a[1])
@@ -380,59 +442,16 @@ function calculatePoints() {
         .join('');
 }
 
-// Function to create a driver card element with its properties and event listeners
-function createDriverCard(driverName) {
-    const driverCard = document.createElement('div');
-    driverCard.className = 'driver-card';
-    driverCard.draggable = true;
-    driverCard.dataset.driver = driverName;
-    driverCard.textContent = driverName;
-    const teamColor = teamColors[driverTeams[driverName]];
-    driverCard.style.backgroundColor = teamColor;
-    driverCard.style.color = driverTeams[driverName] === 'Haas' ? '#000' : '#fff';
-
-    // Add click event listener to set fastest lap
-    driverCard.addEventListener('click', (event) => {
-        event.stopPropagation(); // Prevent event from bubbling up to parent elements
-        const race = driverCard.closest('.race-slot').dataset.race;
-        setFastestLap(race, driverName);
-    });
-
-    return driverCard;
-}
-
-// Function to initialize all races based on pastRaceResults
-function initializeAllRaces() {
-    races.forEach(race => {
-        // Clear all race slots for the current race
-        document.querySelectorAll(`.race-slot[data-race="${race}"]`).forEach(slot => {
-            slot.innerHTML = '';
-        });
-
-        // Check if the race has past results
-        if (pastRaceResults[race] && pastRaceResults[race].length > 0) {
-            // Iterate through the past results for the race
-            pastRaceResults[race].forEach((driverName, position) => {
-                const slot = document.querySelector(`.race-slot[data-race="${race}"][data-position="${position + 1}"]`);
-                const driverCard = createDriverCard(driverName);
-                
-                // Check if this driver had the fastest lap (only for full races, not sprints)
-                if (!race.endsWith('-S') && pastFastestLap[race] === driverName) {
-                    driverCard.classList.add('purple-outline');
-                }
-                
-                slot.appendChild(driverCard);
-            });
+// New function to reset the grid
+function resetGrid() {
+    document.querySelectorAll('.race-slot').forEach(slot => {
+        if (slot.children.length > 0) {
+            slot.removeChild(slot.children[0]);
         }
-        // If no past results, the race slots will remain empty
     });
-
     calculatePoints();
-    initDragAndDrop();
 }
 
-
-// Function to set the fastest lap for a driver in a race
 function setFastestLap(race, driverName) {
     // Select all race slots for the current race
     const raceSlots = document.querySelectorAll(`.race-slot[data-race="${race}"]`);
@@ -464,8 +483,15 @@ function setFastestLap(race, driverName) {
     calculatePoints();
 }
 
-// Starting
+// Modified DOMContentLoaded event listener
 document.addEventListener('DOMContentLoaded', () => {
     initializeGrid();
     initializeAllRaces();
+
+    // Add reset button
+    const resetButton = document.createElement('button');
+    resetButton.id = 'reset-button';
+    resetButton.textContent = 'Reset Grid';
+    resetButton.addEventListener('click', resetGrid);
+    document.body.insertBefore(resetButton, document.getElementById('race-grid'));
 });
