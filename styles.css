@@ -266,3 +266,87 @@ h1, h2 {
 .race-slot.sprint.future-race {
     background-color: #d9eeff;
 }
+
+
+/* Save and Share Styles */
+#save-share-container {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+#save-share-container button {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+#save-share-container button:hover {
+    background-color: #45a049;
+}
+
+#save-share-container button:active {
+    transform: scale(0.98);
+}
+
+#save-share-container .share-url {
+    display: block;
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    font-family: monospace;
+    word-break: break-all;
+}
+
+#save-share-container .share-message {
+    margin-top: 10px;
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+/* Tooltip for copy feedback */
+#save-share-container button {
+    position: relative;
+}
+
+#save-share-container button::after {
+    content: "Copied!";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 3px;
+    font-size: 14px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+#save-share-container button.copied::after {
+    opacity: 1;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+    #save-share-container {
+        padding: 10px;
+    }
+
+    #save-share-container button {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
