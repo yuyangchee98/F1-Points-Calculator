@@ -638,14 +638,15 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeGrid();
     initializeAllRaces();
 
+    const resetContainer = document.getElementById('reset-container');
     const resetButton = document.createElement('button');
     resetButton.id = 'reset-button';
-    resetButton.textContent = 'Reset All Grid';
+    resetButton.textContent = 'Get Empty Grid';
     resetButton.addEventListener('click', () => {
         resetGrid();
         updateRaceStatus();
     });
-    document.body.insertBefore(resetButton, document.getElementById('race-grid'));
+    resetContainer.appendChild(resetButton);
 
     createSaveShareUI(); // Add this line to create the save/share UI
     loadStateFromURL(); // Add this line to load state from URL if present
