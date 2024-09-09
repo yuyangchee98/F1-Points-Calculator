@@ -31,6 +31,7 @@ const driverTeams = {
     "Albon": "Williams", "Sargeant": "Williams",
     "Magnussen": "Haas", "Hulkenberg": "Haas",
     "Colapinto": "Williams",
+    "Bearman": "Ferrari",
 };
 
 // Updated races array with the new list of races
