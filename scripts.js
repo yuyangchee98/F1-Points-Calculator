@@ -637,7 +637,6 @@ function resetFutureRaces() {
 document.addEventListener('DOMContentLoaded', () => {
     initializeGrid();
     initializeAllRaces();
-    testLeclercScores();
 
     const resetContainer = document.getElementById('reset-container');
     const resetButton = document.createElement('button');
