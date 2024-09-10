@@ -408,3 +408,27 @@ h1, h2 {
     background-color: #e0e0e0;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
+
+#social-sharing-container button {
+    margin: 5px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  #social-sharing-container button:nth-child(1) {
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  #social-sharing-container button:nth-child(2) {
+    background-color: #1DA1F2;
+    color: white;
+  }
+  
+  #social-sharing-container button:nth-child(3) {
+    background-color: #4267B2;
+    color: white;
+  }
