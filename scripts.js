@@ -629,29 +629,89 @@ function createSaveShareUI() {
     });
 }
 
-
-
 function resetFutureRaces() {
     if (confirm('This will refresh the page and reset all your predictions for future races. Are you sure?')) {
         window.location.reload();
     }
 }
 
-
 function generateShareImage() {
-    // Use html2canvas to capture the grid as an image
-    html2canvas(document.getElementById('race-grid')).then(canvas => {
-      const imageDataUrl = canvas.toDataURL('image/png');
-
-      // Create a temporary link element to download the image
-      const link = document.createElement('a');
-      link.href = imageDataUrl;
-      link.download = 'f1-prediction-grid.png';
-      link.click();
+    // Find the necessary elements
+    const grid = document.getElementById('race-grid');
+    const driverTotals = document.querySelector('.driver-totals-container');
+  
+    if (!grid || !driverTotals) {
+      console.error("Could not find required elements");
+      alert("Error: Could not find all required elements. Please contact support.");
+      return;
+    }
+  
+    // Show a loading indicator
+    const loadingIndicator = document.createElement('div');
+    loadingIndicator.textContent = 'Generating image...';
+    loadingIndicator.style.position = 'fixed';
+    loadingIndicator.style.top = '50%';
+    loadingIndicator.style.left = '50%';
+    loadingIndicator.style.transform = 'translate(-50%, -50%)';
+    loadingIndicator.style.padding = '10px';
+    loadingIndicator.style.backgroundColor = 'rgba(0,0,0,0.7)';
+    loadingIndicator.style.color = 'white';
+    loadingIndicator.style.borderRadius = '5px';
+    loadingIndicator.style.zIndex = '9999';
+    document.body.appendChild(loadingIndicator);
+  
+    // Function to inline styles
+    function inlineStyles(element) {
+      const styles = window.getComputedStyle(element);
+      const cssText = Array.from(styles).reduce((str, property) => {
+        return `${str}${property}:${styles.getPropertyValue(property)};`;
+      }, '');
+      element.style.cssText += cssText;
+      Array.from(element.children).forEach(inlineStyles);
+    }
+  
+    // Clone the elements and inline their styles
+    const containerClone = document.createElement('div');
+    containerClone.style.position = 'absolute';
+    containerClone.style.left = '-9999px';
+    containerClone.style.top = '-9999px';
+  
+    const gridClone = grid.cloneNode(true);
+    const totalsClone = driverTotals.cloneNode(true);
+    inlineStyles(gridClone);
+    inlineStyles(totalsClone);
+  
+    containerClone.appendChild(gridClone);
+    containerClone.appendChild(totalsClone);
+    document.body.appendChild(containerClone);
+  
+    // Use html2canvas instead of dom-to-image
+    html2canvas(containerClone, {
+      allowTaint: true,
+      useCORS: true,
+      scrollX: 0,
+      scrollY: 0,
+      windowWidth: document.documentElement.offsetWidth,
+      windowHeight: document.documentElement.offsetHeight
+    }).then(canvas => {
+      canvas.toBlob(function(blob) {
+        saveAs(blob, 'f1-prediction-grid-and-scores.png');
+        
+        // Clean up
+        document.body.removeChild(containerClone);
+        document.body.removeChild(loadingIndicator);
+      });
+    }).catch(function (error) {
+      console.error('Error generating image:', error);
+      alert('There was an error generating the image. Please try again or contact support if the issue persists.');
+      
+      // Clean up
+      document.body.removeChild(containerClone);
+      document.body.removeChild(loadingIndicator);
     });
-  }
+  }  
 
-  function shareToTwitter() {
+function shareToTwitter() {
     const shareText = "Check out my F1 2024 season predictions!";
     const shareUrl = generateShareableURL();
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
@@ -664,25 +724,25 @@ function shareToFacebook() {
     window.open(facebookUrl, '_blank');
 }
 
-  function createSocialSharingUI() {
+function createSocialSharingUI() {
     const container = document.getElementById('social-sharing-container');
-
+  
     const downloadImageButton = document.createElement('button');
     downloadImageButton.textContent = 'Download as Image';
     downloadImageButton.addEventListener('click', generateShareImage);
-
+  
     const twitterButton = document.createElement('button');
     twitterButton.textContent = 'Share on Twitter';
     twitterButton.addEventListener('click', shareToTwitter);
-
+  
     const facebookButton = document.createElement('button');
     facebookButton.textContent = 'Share on Facebook';
     facebookButton.addEventListener('click', shareToFacebook);
-
+  
     container.appendChild(downloadImageButton);
     container.appendChild(twitterButton);
     container.appendChild(facebookButton);
-  }
+}  
 
 // Modify the DOMContentLoaded event listener
 document.addEventListener('DOMContentLoaded', () => {
