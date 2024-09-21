@@ -682,24 +682,39 @@ function generateShareImage() {
     containerClone.style.position = 'absolute';
     containerClone.style.left = '-9999px';
     containerClone.style.top = '-9999px';
+    containerClone.style.width = grid.scrollWidth + 'px';
+    containerClone.style.height = (grid.scrollHeight + driverTotals.offsetHeight) + 'px';
   
     const gridClone = grid.cloneNode(true);
     const totalsClone = driverTotals.cloneNode(true);
     inlineStyles(gridClone);
     inlineStyles(totalsClone);
   
+    // Remove any max-height and overflow properties
+    gridClone.style.maxHeight = 'none';
+    gridClone.style.overflow = 'visible';
+  
     containerClone.appendChild(gridClone);
     containerClone.appendChild(totalsClone);
     document.body.appendChild(containerClone);
   
-    // Use html2canvas instead of dom-to-image
+    // Use html2canvas
     html2canvas(containerClone, {
       allowTaint: true,
       useCORS: true,
       scrollX: 0,
       scrollY: 0,
-      windowWidth: document.documentElement.offsetWidth,
-      windowHeight: document.documentElement.offsetHeight
+      width: containerClone.offsetWidth,
+      height: containerClone.offsetHeight,
+      scale: 1,
+      onclone: function(clonedDoc) {
+        const clonedContainer = clonedDoc.body.querySelector('[style*="position: absolute"]');
+        if (clonedContainer) {
+          clonedContainer.style.position = 'static';
+          clonedContainer.style.left = '0';
+          clonedContainer.style.top = '0';
+        }
+      }
     }).then(canvas => {
       canvas.toBlob(function(blob) {
         saveAs(blob, 'f1-prediction-grid-and-scores.png');
