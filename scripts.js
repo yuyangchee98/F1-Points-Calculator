@@ -161,6 +161,12 @@ const pastRaceResults = {
         "Alonso", "Colapinto", "Ricciardo", "Ocon", "Gasly",
         "Bottas", "Hulkenberg", "Zhou", "Stroll", "Tsunoda"
     ],
+    "AZE": [
+    "Piastri", "Leclerc", "Russell", "Norris", "Verstappen",
+    "Alonso", "Albon", "Colapinto", "Hamilton", "Bearman",
+    "Hulkenberg", "Gasly", "Ricciardo", "Zhou", "Ocon",
+    "Bottas", "Perez", "Sainz", "Stroll", "Tsunoda"
+    ],
     "CHN-S": [
         "Verstappen",
         "Hamilton",
@@ -246,6 +252,7 @@ const pastFastestLap = {
     "BEL": "Perez",
     "NED": "Norris",
     "ITA": "Norris",
+    "AZE": "Norris",
 };
 
 function initializeGrid() {
