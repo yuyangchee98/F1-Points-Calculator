@@ -13,7 +13,7 @@ const teamColors = {
     "Aston Martin": "#006F62",
     "Alpine": "#0090FF",
     "Alfa Romeo": "#900000",
-    "AlphaTauri": "#2B4562",
+    "VCARB": "#2B4562",
     "Williams": "#005AFF",
     "Haas": "#E6002B",
 };
@@ -26,7 +26,7 @@ const driverTeams = {
     "Alonso": "Aston Martin", "Stroll": "Aston Martin",
     "Ocon": "Alpine", "Gasly": "Alpine",
     "Bottas": "Alfa Romeo", "Zhou": "Alfa Romeo",
-    "Tsunoda": "AlphaTauri", "Ricciardo": "AlphaTauri",
+    "Tsunoda": "VCARB", "Ricciardo": "VCARB", "Lawson": "VCARB",
     "Albon": "Williams", "Sargeant": "Williams",
     "Magnussen": "Haas", "Hulkenberg": "Haas",
     "Colapinto": "Williams",
