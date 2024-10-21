@@ -2,7 +2,7 @@ const drivers = [
     "Hamilton", "Russell", "Verstappen", "Perez", "Leclerc",
     "Sainz", "Norris", "Piastri", "Alonso", "Stroll",
     "Ocon", "Gasly", "Bottas", "Zhou", "Tsunoda",
-    "Ricciardo", "Albon", "Sargeant", "Magnussen", "Hulkenberg"
+    "Ricciardo", "Albon", "Sargeant", "Magnussen", "Hulkenberg", "Lawson"
 ];
 
 const teamColors = {
@@ -173,6 +173,12 @@ const pastRaceResults = {
     "Colapinto", "Tsunoda", "Ocon", "Stroll", "Zhou",
     "Bottas", "Gasly", "Ricciardo", "Magnussen", "Albon"
     ],
+    "USA": [
+        "Leclerc", "Sainz", "Verstappen", "Norris", "Piastri",
+        "Russell", "Perez", "Hulkenberg", "Lawson", "Colapinto",
+        "Magnussen", "Gasly", "Alonso", "Tsunoda", "Stroll",
+        "Albon", "Bottas", "Ocon", "Zhou", "Hamilton"
+    ],
     "CHN-S": [
         "Verstappen",
         "Hamilton",
@@ -237,6 +243,12 @@ const pastRaceResults = {
         "Bottas",
         "Hulkenberg",
         "Zhou"
+    ],
+    "USA-S": [
+        "Verstappen", "Sainz", "Norris", "Leclerc", "Russell",
+        "Hamilton", "Magnussen", "Hulkenberg", "Perez", "Piastri",
+        "Tsunoda", "Colapinto", "Stroll", "Gasly", "Ocon",
+        "Lawson", "Albon", "Alonso", "Zhou", "Bottas"
     ]
     // Add more races as needed
 };
@@ -260,6 +272,7 @@ const pastFastestLap = {
     "ITA": "Norris",
     "AZE": "Norris",
     "SIN": "Ricciardo",
+    "USA": "Ocon",
 };
 
 function initializeGrid() {
