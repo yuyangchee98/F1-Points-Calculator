@@ -1,80 +1,110 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GJ61RX1FZJ"></script>
-    <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
+    <head>
+        <!-- Google tag (gtag.js) -->
+        <script
+            async
+            src="https://www.googletagmanager.com/gtag/js?id=G-GJ61RX1FZJ"
+        ></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+            gtag("js", new Date());
 
-    gtag('config', 'G-GJ61RX1FZJ');
-    </script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Drag and Drop F1 Points Calculator</title>
-    <link rel="icon" href="logo.svg" type="image/svg+xml">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/htmx/1.9.6/htmx.min.js"></script>
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js"></script>
-    <link rel="stylesheet" href="styles.css">
-    <script src="scripts.js"></script>
+            gtag("config", "G-GJ61RX1FZJ");
+        </script>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Drag and Drop F1 Points Calculator</title>
+        <link rel="icon" href="logo.svg" type="image/svg+xml" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/htmx/1.9.6/htmx.min.js"></script>
+        <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js"></script>
+        <link rel="stylesheet" href="styles.css" />
+        <script src="scripts.js"></script>
 
-    <!-- SEO tags -->
-    <meta name="description" content="A drag and drop F1 Points Calculator that allows you to simulate race results and calculate driver standings.">
-    <meta name="keywords" content="F1, Formula 1, drag and drop, Points Calculator, Race Simulator, Driver Standings">
+        <!-- SEO tags -->
+        <meta
+            name="description"
+            content="A drag and drop F1 Points Calculator that allows you to simulate race results and calculate driver standings."
+        />
+        <meta
+            name="keywords"
+            content="F1, Formula 1, drag and drop, Points Calculator, Race Simulator, Driver Standings"
+        />
 
-    <!-- JSON-LD structured data -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "Drag and Drop F1 Points Calculator",
-        "description": "A drag and drop Formula 1 F1 Points Calculator that allows you to simulate race results and calculate driver standings.",
-        "url": "https://f1pointscalculator.yaaaang.com",
-        "applicationCategory": "SportsApplication",
-        "operatingSystem": "WebBrowser",
-        "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "USD"
-        }
-    }
-    </script>
+        <!-- JSON-LD structured data -->
+        <script type="application/ld+json">
+            {
+                "@context": "https://schema.org",
+                "@type": "WebApplication",
+                "name": "Drag and Drop F1 Points Calculator",
+                "description": "A drag and drop Formula 1 F1 Points Calculator that allows you to simulate race results and calculate driver standings.",
+                "url": "https://f1pointscalculator.yaaaang.com",
+                "applicationCategory": "SportsApplication",
+                "operatingSystem": "WebBrowser",
+                "offers": {
+                    "@type": "Offer",
+                    "price": "0",
+                    "priceCurrency": "USD"
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <h1>F1 Points Calculator</h1>
 
-</head>
-<body>
-    <h1>F1 Points Calculator</h1>
+        <div id="save-share-container">
+            <button id="save-button">Save & Share Prediction</button>
+            <div class="share-url" id="share-url"></div>
+            <div class="share-message" id="share-message"></div>
+        </div>
 
-    <div id="save-share-container">
-        <button id="save-button">Save & Share Prediction</button>
-        <div class="share-url" id="share-url"></div>
-        <div class="share-message" id="share-message"></div>
-    </div>
+        <div id="social-sharing-container"></div>
 
-    <div id="social-sharing-container"></div> 
+        <div class="driver-totals-container">
+            <h2>Driver Totals</h2>
+            <div id="driver-totals"></div>
+        </div>
 
-    <div class="driver-totals-container">
-        <h2>Driver Totals</h2>
-        <div id="driver-totals"></div>
-    </div>
+        <div id="reset-container">
+            <button id="reset-future-button" onclick="resetFutureRaces()">
+                Reset Your customization
+            </button>
+            <button id="landoP1verP2">
+                <a
+                    href="https://f1pointscalculator.yaaaang.com/?s=eyJCSFIiOlsxMDIsMyw1LDQsMSw2LDAsNyw4LDksMTMsMTgsMTUsMTQsMTYsMTksMTAsMTEsMTIsMTddLCJTQVUiOlsyLDMsMTA0LDcsOCwxLC0xLDYsMCwxOSwxNiwxOCwxMCwxNCwxNywxNSwxMiwxMyw5LDExXSwiQVVTIjpbNSwxMDQsNiw3LDMsOSwxNCw4LDE5LDE4LDE2LDE1LDExLDEyLDEzLDEwLDEsMCwyXSwiSlBOIjpbMTAyLDMsNSw0LDYsOCwxLDcsMCwxNCwxOSw5LDE4LDEyLDEwLDExLDE3LDEzLDE1LDE2XSwiQ0hOLVMiOlsyLDAsMyw0LDUsNiw3LDEsMTMsMTgsMTUsMTIsMTAsOSwxMSwxNCwxNiwxNywxOV0sIkNITiI6WzIsNiwzLDQsNSwxLDEwOCw3LDAsMTksMTAsMTYsMTEsMTMsOSwxOCwxNywxNSwxNCwxMl0sIk1JQS1TIjpbMiw0LDMsMTUsNSw3LDE5LDE0LDExLDE3LDEzLDEsMTYsMTIsMTAsMCw4LDE4LDksNl0sIk1JQSI6WzYsMiw0LDMsNSwwLDE0LDEsOCwxMCwxOSwxMSwxMDcsMTMsMTUsMTIsOSwxNiwxOCwxN10sIkVNSSI6WzIsNiw0LDcsNSwwLDEwMSwzLDksMTQsMTksMTgsMTUsMTAsMTMsMTEsMTcsMTIsOCwxNl0sIk1PTiI6WzQsNyw1LDYsMSwyLDEwMCwxNCwxNiwxMSw4LDE1LDEyLDksMTcsMTMsMTAsMywxOSwxOF0sIkNBTiI6WzIsNiwxLDEwMCw3LDgsOSwxNSwxMSwxMCwxOSwxOCwxMiwxNCwxMyw1LDE2LDMsNCwxN10sIkVTUCI6WzIsMTA2LDAsMSw0LDUsNywzLDExLDEwLDE5LDgsMTMsOSwxNSwxMiwxOCwxNiwxNCwxN10sIkFVVC1TIjpbMiw3LDYsMSw1LDAsNCwzLDE4LDksMTAsMTEsMTQsMTUsOCwxNywxNiwxMiwxOSwxM10sIkFVVCI6WzEsNyw1LDAsMiwxOSwzLDE4LDE1LDExLDQsMTAsOSwxNCwxNiwxMiwxMywxMDgsMTcsNl0sIkdCUiI6WzAsMiw2LDcsMTA1LDE5LDksOCwxNiwxNCwxNywxOCwxNSw0LDEyLDEwLDMsMTMsMSwxMV0sIkhVTiI6WzcsNiwwLDQsMiw1LDMsMTAxLDE0LDksOCwxNSwxOSwxNiwxOCwxMiwxNywxMCwxMywxMV0sIkJFTCI6WzAsNyw0LDIsNiw1LDEwMyw4LDEwLDE1LDksMTYsMTEsMTgsMTIsMTQsMTcsMTksMTMsMV0sIk5FRCI6WzEwNiwyLDQsNyw1LDMsMSwwLDExLDgsMTksMTUsOSwxNiwxMCwxNywxNCwxOCwxMiwxM10sIklUQSI6WzQsNywxMDYsNSwwLDIsMSwzLDE2LDE4LDgsLTEsMTUsMTAsMTEsMTIsMTksMTMsOSwxNF0sIkFaRSI6WzcsNCwxLDEwNiwyLDgsMTYsLTEsMCwtMSwxOSwxMSwxNSwxMywxMCwxMiwzLDUsOSwxNF0sIlNJTiI6WzYsMiw3LDEsNCwwLDUsOCwxOSwzLC0xLDE0LDEwLDksMTMsMTIsMTEsMTE1LDE4LDE2XSwiVVNBLVMiOlsyLDUsNiw0LDEsMCwxOCwxOSwzLDcsMTQsLTEsOSwxMSwxMCwyMCwxNiw4LDEzLDEyXSwiVVNBIjpbNCw1LDIsNiw3LDEsMywxOSwyMCwtMSwxOCwxMSw4LDE0LDksMTYsMTIsMTEwLDEzLDBdLCJNWEMiOlsxMDYsMl0sIlNBUC1TIjpbMTA2LDJdLCJTQVAiOlsxMDYsMl0sIkxWRyI6WzEwNiwyXSwiUUFULVMiOlsxMDYsMl0sIlFBVCI6WzEwNiwyXSwiQUJVIjpbMTA2LDJdfQ"
+                >
+                    All Lando P1, Verstappen P2
+                </a>
+            </button>
+        </div>
 
-    <div id="reset-container">
-        <button id="reset-future-button" onclick="resetFutureRaces()">Reset Your customization</button>
-        <button id="landoP1verP2">
-            <a href="https://f1pointscalculator.yaaaang.com/?s=eyJCSFIiOlsxMDIsMyw1LDQsMSw2LDAsNyw4LDksMTMsMTgsMTUsMTQsMTYsMTksMTAsMTEsMTIsMTddLCJTQVUiOlsyLDMsMTA0LDcsOCwxLC0xLDYsMCwxOSwxNiwxOCwxMCwxNCwxNywxNSwxMiwxMyw5LDExXSwiQVVTIjpbNSwxMDQsNiw3LDMsOSwxNCw4LDE5LDE4LDE2LDE1LDExLDEyLDEzLDEwLDEsMCwyXSwiSlBOIjpbMTAyLDMsNSw0LDYsOCwxLDcsMCwxNCwxOSw5LDE4LDEyLDEwLDExLDE3LDEzLDE1LDE2XSwiQ0hOLVMiOlsyLDAsMyw0LDUsNiw3LDEsMTMsMTgsMTUsMTIsMTAsOSwxMSwxNCwxNiwxNywxOV0sIkNITiI6WzIsNiwzLDQsNSwxLDEwOCw3LDAsMTksMTAsMTYsMTEsMTMsOSwxOCwxNywxNSwxNCwxMl0sIk1JQS1TIjpbMiw0LDMsMTUsNSw3LDE5LDE0LDExLDE3LDEzLDEsMTYsMTIsMTAsMCw4LDE4LDksNl0sIk1JQSI6WzYsMiw0LDMsNSwwLDE0LDEsOCwxMCwxOSwxMSwxMDcsMTMsMTUsMTIsOSwxNiwxOCwxN10sIkVNSSI6WzIsNiw0LDcsNSwwLDEwMSwzLDksMTQsMTksMTgsMTUsMTAsMTMsMTEsMTcsMTIsOCwxNl0sIk1PTiI6WzQsNyw1LDYsMSwyLDEwMCwxNCwxNiwxMSw4LDE1LDEyLDksMTcsMTMsMTAsMywxOSwxOF0sIkNBTiI6WzIsNiwxLDEwMCw3LDgsOSwxNSwxMSwxMCwxOSwxOCwxMiwxNCwxMyw1LDE2LDMsNCwxN10sIkVTUCI6WzIsMTA2LDAsMSw0LDUsNywzLDExLDEwLDE5LDgsMTMsOSwxNSwxMiwxOCwxNiwxNCwxN10sIkFVVC1TIjpbMiw3LDYsMSw1LDAsNCwzLDE4LDksMTAsMTEsMTQsMTUsOCwxNywxNiwxMiwxOSwxM10sIkFVVCI6WzEsNyw1LDAsMiwxOSwzLDE4LDE1LDExLDQsMTAsOSwxNCwxNiwxMiwxMywxMDgsMTcsNl0sIkdCUiI6WzAsMiw2LDcsMTA1LDE5LDksOCwxNiwxNCwxNywxOCwxNSw0LDEyLDEwLDMsMTMsMSwxMV0sIkhVTiI6WzcsNiwwLDQsMiw1LDMsMTAxLDE0LDksOCwxNSwxOSwxNiwxOCwxMiwxNywxMCwxMywxMV0sIkJFTCI6WzAsNyw0LDIsNiw1LDEwMyw4LDEwLDE1LDksMTYsMTEsMTgsMTIsMTQsMTcsMTksMTMsMV0sIk5FRCI6WzEwNiwyLDQsNyw1LDMsMSwwLDExLDgsMTksMTUsOSwxNiwxMCwxNywxNCwxOCwxMiwxM10sIklUQSI6WzQsNywxMDYsNSwwLDIsMSwzLDE2LDE4LDgsLTEsMTUsMTAsMTEsMTIsMTksMTMsOSwxNF0sIkFaRSI6WzcsNCwxLDEwNiwyLDgsMTYsLTEsMCwtMSwxOSwxMSwxNSwxMywxMCwxMiwzLDUsOSwxNF0sIlNJTiI6WzYsMiw3LDEsNCwwLDUsOCwxOSwzLC0xLDE0LDEwLDksMTMsMTIsMTEsMTE1LDE4LDE2XSwiVVNBLVMiOlsyLDUsNiw0LDEsMCwxOCwxOSwzLDcsMTQsLTEsOSwxMSwxMCwyMCwxNiw4LDEzLDEyXSwiVVNBIjpbNCw1LDIsNiw3LDEsMywxOSwyMCwtMSwxOCwxMSw4LDE0LDksMTYsMTIsMTEwLDEzLDBdLCJNWEMiOlsxMDYsMl0sIlNBUC1TIjpbMTA2LDJdLCJTQVAiOlsxMDYsMl0sIkxWRyI6WzEwNiwyXSwiUUFULVMiOlsxMDYsMl0sIlFBVCI6WzEwNiwyXSwiQUJVIjpbMTA2LDJdfQ">
-                All Lando P1, Verstappen P2
-            </a>
-        </button>
-    </div>
+        <div class="container" id="race-grid"></div>
 
-    <div class="container" id="race-grid"></div>
-
-    <footer>
-        <p>2024 F1 Points Calculator.</p>
-        <p>Created by <a href="https://yaaaang.com" target="_blank" rel="noopener noreferrer">Yaaaang</a></p>
-    </footer>
-
-</body>
+        <footer>
+            <p>2024 F1 Points Calculator.</p>
+            <p>
+                Created by
+                <a
+                    href="https://yaaaang.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    >Yaaaang</a
+                >
+            </p>
+            <p>
+                Open Source on
+                <a
+                    href="https://github.com/yuyangchee98/F1-Points-Calculator"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    >GitHub</a
+                >
+            </p>
+        </footer>
+    </body>
 </html>
