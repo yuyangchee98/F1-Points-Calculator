@@ -1257,10 +1257,10 @@ function createSocialSharingUI() {
   container.appendChild(facebookButton);
 }
 
-// Modify the DOMContentLoaded event listener
 document.addEventListener("DOMContentLoaded", () => {
   initializeGrid();
   initializeAllRaces();
+  initializeMobileSupport(); // Add this line
 
   const resetContainer = document.getElementById("reset-container");
   const resetButton = document.createElement("button");
@@ -1272,8 +1272,198 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   resetContainer.appendChild(resetButton);
 
-  createSaveShareUI(); // Add this line to create the save/share UI
-  loadStateFromURL(); // Add this line to load state from URL if present
-
+  createSaveShareUI();
+  loadStateFromURL();
   createSocialSharingUI();
 });
+
+function initializeMobileSupport() {
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if (!isMobile) return;
+
+  let selectedDriver = null;
+  const driverCards = document.querySelectorAll(".driver-card");
+  const raceSlots = document.querySelectorAll(".race-slot");
+
+  // Add mobile-specific styles
+  const style = document.createElement("style");
+  style.textContent = `
+    @media (max-width: 768px) {
+      #race-grid {
+        font-size: 12px;
+        overflow-x: auto;
+      }
+      .driver-card {
+        padding: 4px;
+        margin: 2px;
+        font-size: 11px;
+      }
+      .header {
+        padding: 4px;
+        font-size: 11px;
+      }
+      .race-slot {
+        min-width: 60px;
+      }
+      .race-slot.selected {
+        outline: 2px solid #fff;
+      }
+      .driver-card.selected {
+        outline: 2px solid #fff;
+        box-shadow: 0 0 5px rgba(255,255,255,0.5);
+      }
+      #driver-selection {
+        max-height: 120px;
+        overflow-y: auto;
+        position: sticky;
+        top: 0;
+        background: #f0f0f0;
+        z-index: 100;
+        padding: 5px;
+      }
+      .mobile-instructions {
+        background: #333;
+        color: white;
+        padding: 10px;
+        text-align: center;
+        font-size: 12px;
+        position: sticky;
+        top: 120px;
+        z-index: 99;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+
+  // Add mobile instructions
+  const instructions = document.createElement("div");
+  instructions.className = "mobile-instructions";
+  instructions.innerHTML =
+    "Tap a driver, then tap a grid position to place them";
+  document.body.insertBefore(
+    instructions,
+    document.getElementById("race-grid"),
+  );
+
+  // Function to check if driver is already in race
+  function isDriverInRace(driverName, race) {
+    const raceSlots = document.querySelectorAll(
+      `.race-slot[data-race="${race}"]`,
+    );
+    return Array.from(raceSlots).some(
+      (slot) =>
+        slot.children.length > 0 &&
+        slot.children[0].dataset.driver === driverName,
+    );
+  }
+
+  // Function to find and remove driver from race
+  function removeDriverFromRace(driverName, race) {
+    const raceSlots = document.querySelectorAll(
+      `.race-slot[data-race="${race}"]`,
+    );
+    raceSlots.forEach((slot) => {
+      if (
+        slot.children.length > 0 &&
+        slot.children[0].dataset.driver === driverName
+      ) {
+        slot.removeChild(slot.children[0]);
+      }
+    });
+  }
+
+  // Modify driver selection behavior for mobile
+  driverCards.forEach((card) => {
+    card.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      // Deselect if already selected
+      if (selectedDriver === card) {
+        card.classList.remove("selected");
+        selectedDriver = null;
+        return;
+      }
+
+      // Clear previous selection
+      if (selectedDriver) {
+        selectedDriver.classList.remove("selected");
+      }
+
+      // Select new driver
+      selectedDriver = card;
+      card.classList.add("selected");
+    });
+  });
+
+  // Modify race slot behavior for mobile
+  raceSlots.forEach((slot) => {
+    slot.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+
+      if (!selectedDriver) {
+        // If no driver is selected and slot has a driver, select that driver
+        if (slot.children.length > 0) {
+          const existingDriver = slot.children[0];
+          selectedDriver = existingDriver;
+          existingDriver.classList.add("selected");
+        }
+        return;
+      }
+
+      const race = slot.dataset.race;
+      const position = slot.dataset.position;
+      const driverName = selectedDriver.dataset.driver;
+
+      // Check if driver is already in this race
+      if (isDriverInRace(driverName, race)) {
+        // If driver exists in another position, remove them from that position
+        removeDriverFromRace(driverName, race);
+      }
+
+      // Handle existing driver in the slot
+      if (slot.children.length > 0) {
+        slot.removeChild(slot.children[0]);
+      }
+
+      // Create new driver card and place it
+      const newCard = createDriverCard(driverName);
+      slot.appendChild(newCard);
+
+      // Clear selection
+      selectedDriver.classList.remove("selected");
+      selectedDriver = null;
+
+      // Update points and race status
+      calculatePoints();
+      updateRaceStatus();
+    });
+  });
+
+  // Double tap to set fastest lap
+  raceSlots.forEach((slot) => {
+    let lastTap = 0;
+    slot.addEventListener("touchend", (e) => {
+      const currentTime = new Date().getTime();
+      const tapLength = currentTime - lastTap;
+      if (tapLength < 500 && tapLength > 0) {
+        // Double tap detected
+        if (slot.children.length > 0) {
+          const driver = slot.children[0].dataset.driver;
+          const race = slot.dataset.race;
+          setFastestLap(race, driver);
+        }
+      }
+      lastTap = currentTime;
+    });
+  });
+
+  // Prevent default touch behaviors that might interfere
+  document.addEventListener(
+    "touchmove",
+    (e) => {
+      if (selectedDriver) {
+        e.preventDefault();
+      }
+    },
+    { passive: false },
+  );
+}
