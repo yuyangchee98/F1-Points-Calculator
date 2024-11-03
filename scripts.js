@@ -748,9 +748,13 @@ function createDriverCard(driverName) {
   driverCard.style.backgroundColor = teamColor;
   driverCard.style.color = driverTeams[driverName] === "Haas" ? "#000" : "#fff";
 
-  // Add click event listener to set fastest lap
+  // Add drag event listeners
+  driverCard.addEventListener("dragstart", dragStart);
+  driverCard.addEventListener("dragend", dragEnd);
+
+  // Add click event listener for fastest lap
   driverCard.addEventListener("click", (event) => {
-    event.stopPropagation(); // Prevent event from bubbling up to parent elements
+    event.stopPropagation();
     const race = driverCard.closest(".race-slot")?.dataset.race;
     if (race) {
       setFastestLap(race, driverName);
@@ -768,7 +772,7 @@ function createDriverSelection() {
     "display: flex; flex-wrap: wrap; margin-bottom: 20px; padding: 10px; background-color: #f0f0f0; border-radius: 5px;";
 
   drivers.forEach((driver) => {
-    const driverCard = createDriverCard(driver);
+    const driverCard = createDriverCard(driver); // Now includes drag listeners
     driverCard.style.margin = "5px";
     selectionArea.appendChild(driverCard);
   });
@@ -781,14 +785,7 @@ function createDriverSelection() {
 
 // Modified initDragAndDrop function
 function initDragAndDrop() {
-  const draggables = document.querySelectorAll(".driver-card");
   const dropZones = document.querySelectorAll(".race-slot");
-
-  draggables.forEach((draggable) => {
-    draggable.addEventListener("dragstart", dragStart);
-    draggable.addEventListener("dragend", dragEnd);
-  });
-
   dropZones.forEach((zone) => {
     zone.addEventListener("dragover", dragOver);
     zone.addEventListener("dragenter", dragEnter);
@@ -796,15 +793,57 @@ function initDragAndDrop() {
     zone.addEventListener("drop", drop);
     zone.addEventListener("click", clearSlot);
   });
+
+  // Initialize drag for selection area cards
+  const selectionAreaCards = document.querySelectorAll(
+    "#driver-selection .driver-card",
+  );
+  selectionAreaCards.forEach((card) => {
+    card.addEventListener("dragstart", dragStart);
+    card.addEventListener("dragend", dragEnd);
+  });
 }
 
+// Event handler helper functions
 function dragStart(e) {
-  e.dataTransfer.setData("text/plain", e.target.dataset.driver);
-  this.classList.add("dragging");
+  const driverCard = e.target.closest(".driver-card");
+
+  if (!driverCard) {
+    console.log("No driver card found in dragStart");
+    return;
+  }
+
+  const driverName = driverCard.dataset.driver;
+  const isFromRaceSlot = !!driverCard.closest(".race-slot");
+
+  const dragData = {
+    driverName: driverName,
+    isFromRaceSlot: isFromRaceSlot,
+  };
+
+  const jsonString = JSON.stringify(dragData);
+
+  try {
+    e.dataTransfer.setData("text/plain", jsonString);
+    e.dataTransfer.setData("application/json", jsonString);
+    driverCard.classList.add("dragging");
+
+    console.log("Drag data set successfully:", {
+      driverName,
+      isFromRaceSlot,
+      jsonString,
+    });
+  } catch (err) {
+    console.error("Error setting drag data:", err);
+  }
 }
 
-function dragEnd() {
-  this.classList.remove("dragging");
+function dragEnd(e) {
+  // Use e.target instead of this
+  const driverCard = e.target.closest(".driver-card");
+  if (driverCard) {
+    driverCard.classList.remove("dragging");
+  }
 }
 
 function dragOver(e) {
@@ -813,51 +852,108 @@ function dragOver(e) {
 
 function dragEnter(e) {
   e.preventDefault();
-  this.classList.add("hovered");
+  e.target.closest(".race-slot")?.classList.add("hovered");
 }
 
-function dragLeave() {
-  this.classList.remove("hovered");
+function dragLeave(e) {
+  e.target.closest(".race-slot")?.classList.remove("hovered");
 }
 
 function drop(e) {
   e.preventDefault();
   this.classList.remove("hovered");
-  const draggedDriverName = e.dataTransfer.getData("text/plain");
 
-  const race = this.dataset.race;
-  const targetPosition = this.dataset.position;
+  let dragData;
+  try {
+    // Try to get the data in either format
+    const jsonData = e.dataTransfer.getData("application/json");
+    const textData = e.dataTransfer.getData("text/plain");
 
-  // Check if the dragged driver is already in this race
-  const existingSlot = document.querySelector(
-    `.race-slot[data-race="${race}"] .driver-card[data-driver="${draggedDriverName}"]`,
-  );
+    console.log("Retrieved drag data:", { jsonData, textData });
 
-  if (existingSlot) {
-    // If the driver is already in this race, swap positions
-    const existingPosition =
-      existingSlot.closest(".race-slot").dataset.position;
-    const targetSlot = document.querySelector(
-      `.race-slot[data-race="${race}"][data-position="${targetPosition}"]`,
+    // Use whichever data is available
+    const dataString = jsonData || textData;
+
+    if (!dataString) {
+      console.error("No drag data found");
+      return;
+    }
+
+    dragData = JSON.parse(dataString);
+
+    if (!dragData || !dragData.driverName) {
+      console.error("Invalid drag data structure");
+      return;
+    }
+  } catch (err) {
+    console.error("Failed to parse drag data:", err);
+    return;
+  }
+
+  const draggedDriverName = dragData.driverName;
+  const isFromRaceSlot = dragData.isFromRaceSlot;
+  const targetSlot = e.currentTarget;
+  const race = targetSlot.dataset.race;
+
+  // Find the current slot of the dragged driver in this race
+  const draggedDriverCurrentSlot = document
+    .querySelector(
+      `.race-slot[data-race="${race}"] .driver-card[data-driver="${draggedDriverName}"]`,
+    )
+    ?.closest(".race-slot");
+
+  // Handle dropping onto an occupied slot
+  if (targetSlot.children.length > 0) {
+    const targetDriver = targetSlot.children[0];
+    const targetDriverName = targetDriver.dataset.driver;
+
+    if (draggedDriverCurrentSlot) {
+      // Swap the drivers
+      const newDraggedCard = createDriverCard(draggedDriverName);
+      const newTargetCard = createDriverCard(targetDriverName);
+
+      // Preserve fastest lap status
+      if (targetDriver.classList.contains("purple-outline")) {
+        newDraggedCard.classList.add("purple-outline");
+      }
+      if (
+        draggedDriverCurrentSlot.children[0].classList.contains(
+          "purple-outline",
+        )
+      ) {
+        newTargetCard.classList.add("purple-outline");
+      }
+
+      // Perform the swap
+      targetSlot.innerHTML = "";
+      draggedDriverCurrentSlot.innerHTML = "";
+      targetSlot.appendChild(newDraggedCard);
+      draggedDriverCurrentSlot.appendChild(newTargetCard);
+    } else {
+      // Only allow the swap if the driver isn't already in the race
+      const existingDriverInRace = document.querySelector(
+        `.race-slot[data-race="${race}"] .driver-card[data-driver="${draggedDriverName}"]`,
+      );
+
+      if (!existingDriverInRace) {
+        const newCard = createDriverCard(draggedDriverName);
+        if (targetDriver.classList.contains("purple-outline")) {
+          newCard.classList.add("purple-outline");
+        }
+        targetSlot.innerHTML = "";
+        targetSlot.appendChild(newCard);
+      }
+    }
+  } else {
+    // Handle dropping onto an empty slot
+    const existingDriverInRace = document.querySelector(
+      `.race-slot[data-race="${race}"] .driver-card[data-driver="${draggedDriverName}"]`,
     );
 
-    if (targetSlot.children.length > 0) {
-      // Swap drivers
-      const targetDriver = targetSlot.children[0];
-      existingSlot.closest(".race-slot").appendChild(targetDriver);
-    } else {
-      // Move existing driver to new position
-      existingSlot.closest(".race-slot").removeChild(existingSlot);
+    if (!existingDriverInRace) {
+      const newCard = createDriverCard(draggedDriverName);
+      targetSlot.appendChild(newCard);
     }
-
-    targetSlot.appendChild(existingSlot);
-  } else {
-    // If the driver is not in this race, add them to the new position
-    if (this.children.length > 0) {
-      this.removeChild(this.children[0]);
-    }
-    const newDriverCard = createDriverCard(draggedDriverName);
-    this.appendChild(newDriverCard);
   }
 
   calculatePoints();
