@@ -671,6 +671,28 @@ const pastRaceResults = {
     "Zhou",
     "Bottas",
   ],
+  "SAP-S": [
+    "Norris",
+    "Piastri",
+    "Leclerc",
+    "Verstappen",
+    "Sainz",
+    "Russell",
+    "Gasly",
+    "Perez",
+    "Lawson",
+    "Albon",
+    "Hamilton",
+    "Colapinto",
+    "Ocon",
+    "Bearman",
+    "Tsunoda",
+    "Bottas",
+    "Zhou",
+    "Alonso",
+    "Stroll",
+    "Hulkenberg",
+  ],
   // Add more races as needed
 };
 
