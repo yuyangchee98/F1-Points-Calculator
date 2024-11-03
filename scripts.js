@@ -721,14 +721,14 @@ const pastFastestLap = {
 
 function initializeGrid() {
   const container = document.getElementById("race-grid");
-  container.innerHTML = '<div class="header">Position</div>';
+  container.innerHTML = '<div class="header sticky-position">Position</div>';
   races.forEach((race) => {
     const isSprint = race.endsWith("-S");
     container.innerHTML += `<div class="header ${isSprint ? "sprint" : ""}">${isSprint ? race.replace("-S", " Sprint") : race}</div>`;
   });
   container.innerHTML += '<div class="header">Points</div>';
   for (let i = 1; i <= 20; i++) {
-    container.innerHTML += `<div class="position">${i}</div>`;
+    container.innerHTML += `<div class="position sticky-position">${i}</div>`;
     races.forEach((race) => {
       const isSprint = race.endsWith("-S");
       container.innerHTML += `<div class="race-slot ${isSprint ? "sprint" : ""}" data-race="${race}" data-position="${i}"></div>`;
@@ -1280,6 +1280,50 @@ function createSocialSharingUI() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Add the new styles for sticky position
+  const style = document.createElement("style");
+  style.textContent = `
+    #race-grid {
+      position: relative;
+    }
+    .sticky-position {
+      position: sticky;
+      left: 0;
+      z-index: 10;
+    }
+    /* Match the position cell styles */
+    .position.sticky-position {
+      background-color: #f5f5f5;
+      text-align: center;
+      padding: 10px;
+      border-radius: 5px;
+      color: #333;
+      transition: background-color 0.3s ease;
+    }
+    .position.sticky-position:hover {
+      background-color: #e5e5e5;
+    }
+    /* Match the header styles */
+    .header.sticky-position {
+      background-color: #e0e0e0;
+      font-weight: 700;
+      text-align: center;
+      padding: 10px;
+      border-radius: 5px;
+      color: #333;
+      z-index: 11;
+      transition: background-color 0.3s ease;
+    }
+    .header.sticky-position:hover {
+      background-color: #d0d0d0;
+    }
+    /* Add a subtle shadow for depth */
+    .sticky-position {
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    }
+  `;
+  document.head.appendChild(style);
+
   initializeGrid();
   initializeAllRaces();
   initializeMobileSupport(); // Add this line
@@ -1314,6 +1358,12 @@ function initializeMobileSupport() {
       #race-grid {
         font-size: 12px;
         overflow-x: auto;
+      }
+      .sticky-position {
+        position: sticky;
+        left: 0;
+        background: #1a1a1a;
+        z-index: 10;
       }
       .driver-card {
         padding: 4px;
@@ -1356,7 +1406,6 @@ function initializeMobileSupport() {
     }
   `;
   document.head.appendChild(style);
-
   // Add mobile instructions
   const instructions = document.createElement("div");
   instructions.className = "mobile-instructions";
