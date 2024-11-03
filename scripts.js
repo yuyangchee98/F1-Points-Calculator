@@ -1444,6 +1444,7 @@ function initializeMobileSupport() {
   if (!isMobile) return;
 
   let selectedDriver = null;
+  let selectedDriverElement = null;
   const driverCards = document.querySelectorAll(".driver-card");
   const raceSlots = document.querySelectorAll(".race-slot");
 
@@ -1502,61 +1503,49 @@ function initializeMobileSupport() {
     }
   `;
   document.head.appendChild(style);
+
   // Add mobile instructions
   const instructions = document.createElement("div");
   instructions.className = "mobile-instructions";
   instructions.innerHTML =
-    "Tap a driver, then tap a grid position to place them";
+    "Tap a driver, then tap a grid position to place them. Tap occupied positions to swap drivers.";
   document.body.insertBefore(
     instructions,
     document.getElementById("race-grid"),
   );
 
-  // Function to check if driver is already in race
-  function isDriverInRace(driverName, race) {
-    const raceSlots = document.querySelectorAll(
-      `.race-slot[data-race="${race}"]`,
-    );
-    return Array.from(raceSlots).some(
+  function clearSelection() {
+    if (selectedDriverElement) {
+      selectedDriverElement.classList.remove("selected");
+    }
+    selectedDriver = null;
+    selectedDriverElement = null;
+  }
+
+  function findDriverSlotInRace(driverName, race) {
+    return Array.from(
+      document.querySelectorAll(`.race-slot[data-race="${race}"]`),
+    ).find(
       (slot) =>
         slot.children.length > 0 &&
         slot.children[0].dataset.driver === driverName,
     );
   }
 
-  // Function to find and remove driver from race
-  function removeDriverFromRace(driverName, race) {
-    const raceSlots = document.querySelectorAll(
-      `.race-slot[data-race="${race}"]`,
-    );
-    raceSlots.forEach((slot) => {
-      if (
-        slot.children.length > 0 &&
-        slot.children[0].dataset.driver === driverName
-      ) {
-        slot.removeChild(slot.children[0]);
-      }
-    });
-  }
-
   // Modify driver selection behavior for mobile
   driverCards.forEach((card) => {
     card.addEventListener("touchstart", (e) => {
       e.preventDefault();
-      // Deselect if already selected
-      if (selectedDriver === card) {
-        card.classList.remove("selected");
-        selectedDriver = null;
+      e.stopPropagation();
+
+      if (selectedDriverElement === card) {
+        clearSelection();
         return;
       }
 
-      // Clear previous selection
-      if (selectedDriver) {
-        selectedDriver.classList.remove("selected");
-      }
-
-      // Select new driver
-      selectedDriver = card;
+      clearSelection();
+      selectedDriver = card.dataset.driver;
+      selectedDriverElement = card;
       card.classList.add("selected");
     });
   });
@@ -1565,41 +1554,76 @@ function initializeMobileSupport() {
   raceSlots.forEach((slot) => {
     slot.addEventListener("touchstart", (e) => {
       e.preventDefault();
+      e.stopPropagation();
 
-      if (!selectedDriver) {
-        // If no driver is selected and slot has a driver, select that driver
-        if (slot.children.length > 0) {
-          const existingDriver = slot.children[0];
-          selectedDriver = existingDriver;
-          existingDriver.classList.add("selected");
-        }
+      const race = slot.dataset.race;
+
+      // If no driver is selected and slot has a driver, select that driver
+      if (!selectedDriver && slot.children.length > 0) {
+        const driverCard = slot.children[0];
+        selectedDriver = driverCard.dataset.driver;
+        selectedDriverElement = driverCard;
+        driverCard.classList.add("selected");
         return;
       }
 
-      const race = slot.dataset.race;
-      const position = slot.dataset.position;
-      const driverName = selectedDriver.dataset.driver;
+      if (!selectedDriver) return;
 
-      // Check if driver is already in this race
-      if (isDriverInRace(driverName, race)) {
-        // If driver exists in another position, remove them from that position
-        removeDriverFromRace(driverName, race);
+      const targetSlot = slot;
+
+      // If target slot has a driver
+      if (targetSlot.children.length > 0) {
+        const targetDriver = targetSlot.children[0];
+        const targetDriverName = targetDriver.dataset.driver;
+
+        // Find selected driver's current position in this race
+        const selectedDriverSlot = findDriverSlotInRace(selectedDriver, race);
+
+        if (selectedDriverSlot) {
+          // Swap the drivers
+          const hasTargetFastestLap =
+            targetDriver.classList.contains("purple-outline");
+          const hasSelectedFastestLap =
+            selectedDriverSlot.children[0].classList.contains("purple-outline");
+
+          // Create new driver cards
+          const newSelectedCard = createDriverCard(selectedDriver);
+          const newTargetCard = createDriverCard(targetDriverName);
+
+          // Apply fastest lap status
+          if (hasTargetFastestLap) {
+            newSelectedCard.classList.add("purple-outline");
+          }
+          if (hasSelectedFastestLap) {
+            newTargetCard.classList.add("purple-outline");
+          }
+
+          // Clear slots and perform swap
+          targetSlot.innerHTML = "";
+          selectedDriverSlot.innerHTML = "";
+          targetSlot.appendChild(newSelectedCard);
+          selectedDriverSlot.appendChild(newTargetCard);
+        } else {
+          // Replace existing driver if selected driver isn't already in the race
+          const hasTargetFastestLap =
+            targetDriver.classList.contains("purple-outline");
+          const newCard = createDriverCard(selectedDriver);
+          if (hasTargetFastestLap) {
+            newCard.classList.add("purple-outline");
+          }
+          targetSlot.innerHTML = "";
+          targetSlot.appendChild(newCard);
+        }
+      } else {
+        // Place in empty slot if driver isn't already in the race
+        const selectedDriverSlot = findDriverSlotInRace(selectedDriver, race);
+        if (!selectedDriverSlot) {
+          const newCard = createDriverCard(selectedDriver);
+          targetSlot.appendChild(newCard);
+        }
       }
 
-      // Handle existing driver in the slot
-      if (slot.children.length > 0) {
-        slot.removeChild(slot.children[0]);
-      }
-
-      // Create new driver card and place it
-      const newCard = createDriverCard(driverName);
-      slot.appendChild(newCard);
-
-      // Clear selection
-      selectedDriver.classList.remove("selected");
-      selectedDriver = null;
-
-      // Update points and race status
+      clearSelection();
       calculatePoints();
       updateRaceStatus();
     });
@@ -1612,7 +1636,6 @@ function initializeMobileSupport() {
       const currentTime = new Date().getTime();
       const tapLength = currentTime - lastTap;
       if (tapLength < 500 && tapLength > 0) {
-        // Double tap detected
         if (slot.children.length > 0) {
           const driver = slot.children[0].dataset.driver;
           const race = slot.dataset.race;
@@ -1633,4 +1656,11 @@ function initializeMobileSupport() {
     },
     { passive: false },
   );
+
+  // Clear selection when tapping outside
+  document.addEventListener("touchstart", (e) => {
+    if (!e.target.closest(".driver-card") && !e.target.closest(".race-slot")) {
+      clearSelection();
+    }
+  });
 }
