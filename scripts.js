@@ -739,6 +739,7 @@ const pastFastestLap = {
   SIN: "Ricciardo",
   USA: "Ocon",
   MXC: "Leclerc",
+  SAP: "Verstappen",
 };
 // Initialize the main grid structure with position headers and race slots
 function initializeGrid() {
