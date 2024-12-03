@@ -1,13 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap");
 
-html, body {
+html,
+body {
     height: 100%;
     margin: 0;
     padding: 0;
 }
 
 body {
-    font-family: 'Poppins', sans-serif;
+    font-family: "Poppins", sans-serif;
     margin: 0;
     padding: 32px 32px 32px 32px;
     background-color: #f8f8f8;
@@ -21,7 +22,8 @@ footer {
     margin-top: auto;
 }
 
-h1, h2 {
+h1,
+h2 {
     text-align: center;
     color: #333;
 }
@@ -73,7 +75,9 @@ h1, h2 {
     background-color: #fff;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     text-align: center;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    transition:
+        background-color 0.3s ease,
+        box-shadow 0.3s ease;
 }
 
 .race-slot:hover {
@@ -89,7 +93,9 @@ h1, h2 {
     cursor: move;
     text-align: center;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    transition: opacity 0.3s ease, box-shadow 0.3s ease;
+    transition:
+        opacity 0.3s ease,
+        box-shadow 0.3s ease;
 }
 
 .driver-card:hover {
@@ -125,10 +131,12 @@ h1, h2 {
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
-    background-color: #4CAF50;
+    background-color: #4caf50;
     color: #fff;
     cursor: pointer;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    transition:
+        background-color 0.3s ease,
+        box-shadow 0.3s ease;
 }
 
 .past-results select:hover,
@@ -154,7 +162,8 @@ h1, h2 {
     border: 5px solid rgb(117, 69, 138);
 }
 
-.header.sprint, .race-slot.sprint {
+.header.sprint,
+.race-slot.sprint {
     background-color: #f0f0f0;
 }
 
@@ -183,7 +192,9 @@ h1, h2 {
     border: 1px solid #ccc;
     border-radius: 5px;
     margin: 2px;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    transition:
+        background-color 0.3s ease,
+        box-shadow 0.3s ease;
 }
 
 .race-slot:hover {
@@ -222,7 +233,9 @@ h1, h2 {
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    transition:
+        background-color 0.3s ease,
+        box-shadow 0.3s ease;
 }
 
 #reset-button:hover {
@@ -318,13 +331,16 @@ h1, h2 {
 
 #save-share-container button {
     padding: 10px 20px;
-    background-color: #4CAF50;
+    background-color: #4caf50;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.1s ease;
+    transition:
+        background-color 0.3s ease,
+        box-shadow 0.3s ease,
+        transform 0.1s ease;
 }
 
 #save-share-container button:hover {
@@ -354,7 +370,7 @@ h1, h2 {
 
 #save-share-container .share-message {
     margin-top: 10px;
-    color: #4CAF50;
+    color: #4caf50;
     font-weight: bold;
 }
 
@@ -403,7 +419,9 @@ h1, h2 {
     background-color: #f0f0f0;
     border: 1px solid #ccc;
     border-radius: 5px;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    transition:
+        background-color 0.3s ease,
+        box-shadow 0.3s ease;
 }
 
 #reset-future-button:hover {
@@ -419,7 +437,9 @@ h1, h2 {
     background-color: #f0f0f0;
     border: 1px solid #ccc;
     border-radius: 5px;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    transition:
+        background-color 0.3s ease,
+        box-shadow 0.3s ease;
 }
 
 #landoP1verP2 a {
@@ -432,7 +452,6 @@ h1, h2 {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-
 #social-sharing-container button {
     margin: 5px;
     padding: 10px 15px;
@@ -440,21 +459,53 @@ h1, h2 {
     border-radius: 5px;
     cursor: pointer;
     font-weight: bold;
-  }
-  
-  #social-sharing-container button:nth-child(1) {
-    background-color: #4CAF50;
-    color: white;
-  }
-  
-  #social-sharing-container button:nth-child(2) {
-    background-color: #1DA1F2;
-    color: white;
-  }
-  
-  #social-sharing-container button:nth-child(3) {
-    background-color: #4267B2;
-    color: white;
-  }
+}
 
-  
+#social-sharing-container button:nth-child(1) {
+    background-color: #4caf50;
+    color: white;
+}
+
+#social-sharing-container button:nth-child(2) {
+    background-color: #1da1f2;
+    color: white;
+}
+
+#social-sharing-container button:nth-child(3) {
+    background-color: #4267b2;
+    color: white;
+}
+
+.constructor-totals-container {
+    margin: 20px;
+    padding: 15px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.constructor-totals-container h2 {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.constructor-card {
+    font-weight: bold;
+    transition: transform 0.2s ease;
+}
+
+.constructor-card:hover {
+    transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+    .constructor-totals-container {
+        margin: 10px;
+        padding: 10px;
+    }
+
+    .constructor-card {
+        font-size: 12px;
+        padding: 6px;
+    }
+}
