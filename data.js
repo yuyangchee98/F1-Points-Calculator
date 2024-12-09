@@ -782,6 +782,28 @@ export const pastRaceResults = {
     "Stroll",
     "Hulkenberg",
   ],
+  ABU: [
+    "Norris",
+    "Sainz",
+    "Leclerc",
+    "Hamilton",
+    "Russell",
+    "Verstappen",
+    "Gasly",
+    "Hulkenberg",
+    "Alonso",
+    "Piastri",
+    "Albon",
+    "Tsunoda",
+    "Zhou",
+    "Stroll",
+    "Doohan",
+    "Magnussen",
+    "Lawson",
+    "Bottas",
+    "Colapinto",
+    "Perez",
+  ],
   // Add more races as needed
 };
 
