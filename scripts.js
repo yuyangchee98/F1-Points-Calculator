@@ -3,6 +3,11 @@ import * as data from "./data.js";
 // Initialize the main grid structure with position headers and race slots
 function initializeGrid() {
   const container = document.getElementById("race-grid");
+
+  // Set grid template columns dynamically based on number of races
+  const numColumns = data.races.length + 2; // +2 for Position and Points columns
+  container.style.gridTemplateColumns = `auto repeat(${numColumns - 2}, 1fr) auto`;
+
   container.innerHTML = '<div class="header sticky-position">Position</div>';
   data.races.forEach((race) => {
     const isSprint = race.endsWith("-S");

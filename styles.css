@@ -13,9 +13,9 @@ body {
     padding: 32px 32px 32px 32px;
     background-color: #f8f8f8;
     color: #333;
-    min-height: 100vh; /* Ensure the body takes at least the full viewport height */
-    overflow-x: hidden; /* Move this property to the parent container */
-    position: relative; /* Add this line */
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
 }
 
 footer {
@@ -30,7 +30,6 @@ h2 {
 
 .container {
     display: grid;
-    grid-template-columns: auto repeat(30, 1fr) auto;
     gap: 10px;
     overflow-x: auto;
     background-color: #fff;
