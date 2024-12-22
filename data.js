@@ -60,6 +60,7 @@ export const driverTeams = {
   Colapinto: "Williams",
   "Bearman (F)": "Ferrari",
   "Bearman (H)": "Haas",
+  Doohan: "Alpine",
 };
 
 // Updated races array with the new list of races
