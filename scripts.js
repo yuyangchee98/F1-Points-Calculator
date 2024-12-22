@@ -10,8 +10,6 @@ import { calculatePoints } from "./modules/points/calculatePoints.js";
 import { setFastestLap } from "./modules/points/fastestLap.js";
 import { updateRaceStatus } from "./modules/ui/raceStatus.js";
 import {
-  loadStateFromURL,
-  createSaveShareUI,
   resetGrid,
   resetFutureRaces,
 } from "./modules/state/gridState.js";
@@ -74,7 +72,4 @@ document.addEventListener("DOMContentLoaded", () => {
     updateRaceStatus();
   });
   resetContainer.appendChild(resetButton);
-
-  createSaveShareUI();
-  loadStateFromURL();
 });
