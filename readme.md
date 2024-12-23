@@ -1,7 +1,7 @@
 # F1 Points Calculator
 
 The F1 Points Calculator is an interactive web application that allows users to predict and simulate Formula 1 season results. With an intuitive drag-and-drop interface, users can place drivers in their predicted finishing positions for each race. The application automatically calculates points based on the official F1 scoring system and provides real-time updates on driver and constructor standings.
-
+![F1 Points Calculator](screenshot.png)
 ## Features
 
 - Drag-and-drop interface for easy prediction of race results
