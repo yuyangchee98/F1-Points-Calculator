@@ -1,0 +1,84 @@
+/* Main Layout Structure */
+.app-layout {
+    display: grid;
+    grid-template-columns: 200px 1fr; /* Even smaller now that we use text */
+    gap: 16px;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 16px;
+}
+
+/* Sticky Sidebar - Ultra compact */
+.standings-sidebar {
+    position: sticky;
+    top: 16px;
+    height: calc(100vh - 32px);
+    overflow-y: auto;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 12px;
+}
+
+/* Hide scrollbar but keep functionality */
+.standings-sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.standings-sidebar::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+}
+
+.standings-sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* Rest of the styles remain the same */
+.main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+}
+
+.actions-bar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 12px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.container {
+    margin: 0;
+    overflow-x: auto;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 16px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .app-layout {
+        grid-template-columns: 180px 1fr;
+        gap: 12px;
+        padding: 12px;
+    }
+}
+
+@media (max-width: 768px) {
+    .app-layout {
+        grid-template-columns: 1fr;
+    }
+    
+    .standings-sidebar {
+        position: relative;
+        top: 0;
+        height: auto;
+        margin-bottom: 16px;
+    }
+}
