@@ -33,17 +33,6 @@ export function calculatePoints() {
         }
         driverPoints[driver] += points;
 
-        // Add fastest lap bonus point
-        /* NO fastest lap bonus poits in 2025
-        if (
-          !isSprint &&
-          slot.children[0].classList.contains("purple-outline") &&
-          position <= 10
-        ) {
-          driverPoints[driver] += 1;
-          constructorPoints[team] += 1;
-          } */
-
         // Add points to constructor total
         constructorPoints[team] += points;
       }

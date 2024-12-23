@@ -5,15 +5,245 @@ import { calculatePoints } from "../points/calculatePoints.js";
 import { updateRaceStatus } from "../ui/raceStatus.js";
 import { createDriverSelection } from "../drivers/driverSelection.js";
 
-/**
- * Initializes the race grid with past results and empty slots
- */
+let mobileState = {
+  selectedDriver: null,
+  selectedDriverElement: null
+};
+
+function clearMobileSelection() {
+  if (mobileState.selectedDriverElement) {
+    mobileState.selectedDriverElement.classList.remove("selected");
+    document.querySelectorAll('.race-slot').forEach(slot => slot.classList.remove('highlight-slot'));
+  }
+  mobileState.selectedDriver = null;
+  mobileState.selectedDriverElement = null;
+}
+
+function findDriverSlotInRace(driverName, race) {
+  return Array.from(document.querySelectorAll(`.race-slot[data-race="${race}"]`))
+    .find(slot => slot.children.length > 0 && slot.children[0].dataset.driver === driverName);
+}
+
+function handleDriverCardTouch(e) {
+  e.preventDefault();
+  e.stopPropagation();
+
+  const card = e.currentTarget;
+  
+  if (mobileState.selectedDriverElement === card) {
+    clearMobileSelection();
+    return;
+  }
+
+  clearMobileSelection();
+  mobileState.selectedDriver = card.dataset.driver;
+  mobileState.selectedDriverElement = card;
+  card.classList.add("selected");
+  
+  // Highlight valid drop zones
+  document.querySelectorAll('.race-slot').forEach(slot => {
+    const race = slot.dataset.race;
+    const existingSlot = findDriverSlotInRace(mobileState.selectedDriver, race);
+    if (!existingSlot || slot === existingSlot) {
+      slot.classList.add('highlight-slot');
+    }
+  });
+}
+
+function handleSlotTouch(e) {
+  e.preventDefault();
+  e.stopPropagation();
+
+  const slot = e.currentTarget;
+  const race = slot.dataset.race;
+
+  // If no driver is selected and slot is occupied, select that driver
+  if (!mobileState.selectedDriver && slot.children.length > 0) {
+    const driverCard = slot.children[0];
+    mobileState.selectedDriver = driverCard.dataset.driver;
+    mobileState.selectedDriverElement = driverCard;
+    driverCard.classList.add("selected");
+    
+    // Highlight valid drop zones
+    document.querySelectorAll('.race-slot').forEach(s => {
+      if (s.dataset.race === race) {
+        s.classList.add('highlight-slot');
+      }
+    });
+    return;
+  }
+
+  if (!mobileState.selectedDriver) return;
+
+  const selectedDriverSlot = findDriverSlotInRace(mobileState.selectedDriver, race);
+  
+  // Handle placement/swapping
+  if (slot.children.length > 0) {
+    const targetDriver = slot.children[0];
+    const targetDriverName = targetDriver.dataset.driver;
+    
+    if (selectedDriverSlot) {
+      // Swap drivers
+      const newSelectedCard = createDriverCard(mobileState.selectedDriver);
+      const newTargetCard = createDriverCard(targetDriverName);
+      
+      targetDriver.parentNode.replaceChild(newSelectedCard, targetDriver);
+      if (selectedDriverSlot !== slot) {
+        selectedDriverSlot.innerHTML = '';
+        selectedDriverSlot.appendChild(newTargetCard);
+      }
+    } else {
+      // Replace existing driver
+      const newCard = createDriverCard(mobileState.selectedDriver);
+      targetDriver.parentNode.replaceChild(newCard, targetDriver);
+    }
+  } else {
+    // Place in empty slot
+    if (!selectedDriverSlot || selectedDriverSlot === slot) {
+      const newCard = createDriverCard(mobileState.selectedDriver);
+      slot.appendChild(newCard);
+    } else {
+      // Move from existing slot to empty slot
+      const newCard = createDriverCard(mobileState.selectedDriver);
+      selectedDriverSlot.innerHTML = '';
+      slot.appendChild(newCard);
+    }
+  }
+
+  clearMobileSelection();
+  calculatePoints();
+  updateRaceStatus();
+}
+
+export function initializeMobileSupport() {
+  if (!/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) return;
+
+  // Add mobile-specific styles
+  const style = document.createElement('style');
+  style.textContent = `
+    @media (max-width: 768px) {
+      .driver-card {
+        padding: 12px 16px;
+        margin: 4px;
+        font-size: 14px;
+        min-height: 44px;
+        touch-action: none;
+      }
+      
+      .driver-card.selected {
+        outline: 3px solid #4CAF50;
+        background-color: #E8F5E9;
+        transform: scale(1.02);
+      }
+      
+      .race-slot {
+        min-width: 70px;
+        min-height: 50px;
+        padding: 8px;
+        transition: all 0.2s ease;
+      }
+      
+      .race-slot.highlight-slot {
+        background-color: rgba(76, 175, 80, 0.1);
+        box-shadow: inset 0 0 0 2px #4CAF50;
+      }
+      
+      .mobile-instructions {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background-color: #2196F3;
+        color: white;
+        padding: 12px;
+        text-align: center;
+        font-size: 14px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 16px;
+      }
+      
+      .mobile-instructions.hidden {
+        display: none;
+      }
+      
+      #driver-selection {
+        max-height: 30vh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 8px;
+        background: #f5f5f5;
+        border-radius: 8px;
+        margin-bottom: 16px;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+
+  // Add mobile instructions
+  const instructions = document.createElement('div');
+  instructions.className = 'mobile-instructions';
+  instructions.innerHTML = `
+    <div style="margin-bottom: 8px">📱 Mobile Controls:</div>
+    <div>• Tap a driver to select</div>
+    <div>• Tap a position to place driver</div>
+    <div>• Tap again to swap positions</div>
+    <button style="margin-top: 8px; padding: 4px 8px; border-radius: 4px; border: none; background: white; color: #2196F3">Got it!</button>
+  `;
+  document.querySelector('.main-content').insertBefore(instructions, document.querySelector('#race-grid'));
+  
+  instructions.querySelector('button').addEventListener('click', () => {
+    instructions.classList.add('hidden');
+  });
+
+  // Clear selection when tapping outside
+  document.addEventListener('touchstart', (e) => {
+    if (!e.target.closest('.driver-card') && !e.target.closest('.race-slot')) {
+      clearMobileSelection();
+    }
+  });
+
+  // Prevent unwanted scrolling when using the interface
+  document.addEventListener('touchmove', (e) => {
+    if (mobileState.selectedDriver && !e.target.closest('#driver-selection')) {
+      e.preventDefault();
+    }
+  }, { passive: false });
+
+  // Initialize touch handlers
+  function initializeTouchHandlers() {
+    document.querySelectorAll('.driver-card').forEach(card => {
+      card.removeEventListener('touchstart', handleDriverCardTouch);
+      card.addEventListener('touchstart', handleDriverCardTouch);
+    });
+
+    document.querySelectorAll('.race-slot').forEach(slot => {
+      slot.removeEventListener('touchstart', handleSlotTouch);
+      slot.addEventListener('touchstart', handleSlotTouch);
+    });
+  }
+
+  // Initialize handlers initially
+  initializeTouchHandlers();
+
+  // Re-initialize handlers after grid updates
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.type === 'childList') {
+        initializeTouchHandlers();
+      }
+    });
+  });
+
+  observer.observe(document.querySelector('#race-grid'), {
+    childList: true,
+    subtree: true
+  });
+}
+
 export function initializeAllRaces() {
   createDriverSelection();
 
   data.races.forEach((race) => {
-    document
-      .querySelectorAll(`.race-slot[data-race="${race}"]`)
+    document.querySelectorAll(`.race-slot[data-race="${race}"]`)
       .forEach((slot) => {
         slot.innerHTML = "";
       });
@@ -24,11 +254,6 @@ export function initializeAllRaces() {
           `.race-slot[data-race="${race}"][data-position="${position + 1}"]`
         );
         const driverCard = createDriverCard(driverName);
-
-        if (!race.endsWith("-S") && data.pastFastestLap[race] === driverName) {
-          driverCard.classList.add("purple-outline");
-        }
-
         slot.appendChild(driverCard);
       });
     }
@@ -37,209 +262,4 @@ export function initializeAllRaces() {
   calculatePoints();
   initDragAndDrop();
   updateRaceStatus();
-}
-
-/**
- * Initializes mobile-specific functionality and interface
- */
-export function initializeMobileSupport() {
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  if (!isMobile) return;
-
-  let selectedDriver = null;
-  let selectedDriverElement = null;
-
-  // Add mobile-specific styles
-  const style = document.createElement("style");
-  style.textContent = `
-    @media (max-width: 768px) {
-      #race-grid {
-        font-size: 12px;
-        overflow-x: auto;
-      }
-      .sticky-position {
-        position: sticky;
-        left: 0;
-        background: #1a1a1a;
-        z-index: 10;
-      }
-      .driver-card {
-        padding: 4px;
-        margin: 2px;
-        font-size: 11px;
-      }
-      .header {
-        padding: 4px;
-        font-size: 11px;
-      }
-      .race-slot {
-        min-width: 60px;
-      }
-      .race-slot.selected {
-        outline: 2px solid #fff;
-      }
-      .driver-card.selected {
-        outline: 2px solid #fff;
-        box-shadow: 0 0 5px rgba(255,255,255,0.5);
-      }
-      #driver-selection {
-        max-height: 120px;
-        overflow-y: auto;
-        position: sticky;
-        top: 0;
-        background: #f0f0f0;
-        z-index: 100;
-        padding: 5px;
-      }
-      .mobile-instructions {
-        background: #333;
-        color: white;
-        padding: 10px;
-        text-align: center;
-        font-size: 12px;
-        position: sticky;
-        top: 120px;
-        z-index: 99;
-      }
-    }
-  `;
-  document.head.appendChild(style);
-
-  // Add mobile instructions
-  const instructions = document.createElement("div");
-  instructions.className = "mobile-instructions";
-  instructions.innerHTML = "Tap a driver, then tap a grid position to place them. Tap occupied positions to swap drivers.";
-  document.body.insertBefore(instructions, document.getElementById("race-grid"));
-
-  // Helper functions for mobile support
-  function clearSelection() {
-    if (selectedDriverElement) {
-      selectedDriverElement.classList.remove("selected");
-    }
-    selectedDriver = null;
-    selectedDriverElement = null;
-  }
-
-  function findDriverSlotInRace(driverName, race) {
-    return Array.from(document.querySelectorAll(`.race-slot[data-race="${race}"]`))
-      .find(slot => slot.children.length > 0 && slot.children[0].dataset.driver === driverName);
-  }
-
-  // Add mobile event listeners
-  const driverCards = document.querySelectorAll(".driver-card");
-  const raceSlots = document.querySelectorAll(".race-slot");
-
-  driverCards.forEach(card => {
-    card.addEventListener("touchstart", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-
-      if (selectedDriverElement === card) {
-        clearSelection();
-        return;
-      }
-
-      clearSelection();
-      selectedDriver = card.dataset.driver;
-      selectedDriverElement = card;
-      card.classList.add("selected");
-    });
-  });
-
-  raceSlots.forEach(slot => {
-    slot.addEventListener("touchstart", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-
-      const race = slot.dataset.race;
-
-      if (!selectedDriver && slot.children.length > 0) {
-        const driverCard = slot.children[0];
-        selectedDriver = driverCard.dataset.driver;
-        selectedDriverElement = driverCard;
-        driverCard.classList.add("selected");
-        return;
-      }
-
-      if (!selectedDriver) return;
-
-      const targetSlot = slot;
-
-      if (targetSlot.children.length > 0) {
-        const targetDriver = targetSlot.children[0];
-        const targetDriverName = targetDriver.dataset.driver;
-
-        const selectedDriverSlot = findDriverSlotInRace(selectedDriver, race);
-
-        if (selectedDriverSlot) {
-          const hasTargetFastestLap = targetDriver.classList.contains("purple-outline");
-          const hasSelectedFastestLap = selectedDriverSlot.children[0].classList.contains("purple-outline");
-
-          const newSelectedCard = createDriverCard(selectedDriver);
-          const newTargetCard = createDriverCard(targetDriverName);
-
-          if (hasTargetFastestLap) {
-            newSelectedCard.classList.add("purple-outline");
-          }
-          if (hasSelectedFastestLap) {
-            newTargetCard.classList.add("purple-outline");
-          }
-
-          targetSlot.innerHTML = "";
-          selectedDriverSlot.innerHTML = "";
-          targetSlot.appendChild(newSelectedCard);
-          selectedDriverSlot.appendChild(newTargetCard);
-        } else {
-          const hasTargetFastestLap = targetDriver.classList.contains("purple-outline");
-          const newCard = createDriverCard(selectedDriver);
-          if (hasTargetFastestLap) {
-            newCard.classList.add("purple-outline");
-          }
-          targetSlot.innerHTML = "";
-          targetSlot.appendChild(newCard);
-        }
-      } else {
-        const selectedDriverSlot = findDriverSlotInRace(selectedDriver, race);
-        if (!selectedDriverSlot) {
-          const newCard = createDriverCard(selectedDriver);
-          targetSlot.appendChild(newCard);
-        }
-      }
-
-      clearSelection();
-      calculatePoints();
-      updateRaceStatus();
-    });
-  });
-
-  // Add fastest lap handling for mobile
-  raceSlots.forEach(slot => {
-    let lastTap = 0;
-    slot.addEventListener("touchend", (e) => {
-      const currentTime = new Date().getTime();
-      const tapLength = currentTime - lastTap;
-      if (tapLength < 500 && tapLength > 0) {
-        if (slot.children.length > 0) {
-          const driver = slot.children[0].dataset.driver;
-          const race = slot.dataset.race;
-          setFastestLap(race, driver);
-        }
-      }
-      lastTap = currentTime;
-    });
-  });
-
-  // Prevent default touch behaviors
-  document.addEventListener("touchmove", (e) => {
-    if (selectedDriver) {
-      e.preventDefault();
-    }
-  }, { passive: false });
-
-  // Clear selection when tapping outside
-  document.addEventListener("touchstart", (e) => {
-    if (!e.target.closest(".driver-card") && !e.target.closest(".race-slot")) {
-      clearSelection();
-    }
-  });
 }

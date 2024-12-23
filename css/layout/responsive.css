@@ -1,30 +1,108 @@
-/* Responsive Design */
-@media (max-width: 1024px) {
+/* Base styles (mobile-first approach) */
+.app-layout {
+    display: flex;
+    flex-direction: column;
+    padding: 8px;
+    gap: 12px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.standings-sidebar {
+    position: relative;
+    height: auto;
+    max-height: 60vh;
+    margin-bottom: 16px;
+    width: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.main-content {
+    width: 100%;
+    overflow-x: hidden;
+}
+
+.actions-bar {
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px;
+}
+
+.actions-bar button {
+    width: 100%;
+    min-height: 44px; /* Better touch target */
+    margin: 2px 0;
+}
+
+/* Driver cards and race grid adjustments for mobile */
+.driver-card {
+    padding: 8px 12px;
+    margin: 4px;
+    touch-action: none; /* Better touch handling */
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.container {
+    padding: 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    margin: 0 -8px; /* Compensate for parent padding */
+}
+
+/* Footer adjustments for mobile */
+.footer-content {
+    flex-direction: column;
+    padding: 16px;
+    gap: 24px;
+}
+
+.footer-links {
+    margin-left: 0;
+}
+
+/* Tablet breakpoint */
+@media (min-width: 768px) {
     .app-layout {
-        grid-template-columns: 250px 1fr;
         padding: 16px;
-        gap: 16px;
+    }
+    
+    .actions-bar {
+        flex-direction: row;
+        padding: 12px;
+    }
+    
+    .actions-bar button {
+        width: auto;
+    }
+    
+    .footer-content {
+        flex-direction: row;
+        padding: 24px;
     }
 }
 
-@media (max-width: 768px) {
+/* Desktop breakpoint */
+@media (min-width: 1024px) {
     .app-layout {
-        grid-template-columns: 1fr;
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 24px;
+        padding: 24px;
     }
-
+    
     .standings-sidebar {
-        position: relative;
-        top: 0;
-        height: auto;
-        margin-bottom: 24px;
+        position: sticky;
+        top: 24px;
+        height: calc(100vh - 48px);
+        max-height: none;
     }
-
-    .actions-bar {
-        flex-direction: column;
-    }
-
-    #save-share-container button,
-    #reset-future-button {
-        width: 100%;
+    
+    .container {
+        margin: 0;
     }
 }
