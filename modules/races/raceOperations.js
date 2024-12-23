@@ -152,17 +152,55 @@ export function initializeMobileSupport() {
         position: sticky;
         top: 0;
         z-index: 1000;
-        background-color: #2196F3;
+        background: linear-gradient(135deg, #FF4B4B, #FF6B6B);
         color: white;
-        padding: 12px;
-        text-align: center;
-        font-size: 14px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        margin-bottom: 16px;
+        padding: 12px 16px;
+        margin: -8px -8px 12px -8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
       }
-      
+
       .mobile-instructions.hidden {
         display: none;
+      }
+
+      .mobile-instructions .header {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .mobile-instructions .steps {
+        font-size: 14px;
+        margin: 8px 0;
+        line-height: 1.4;
+      }
+
+      .mobile-instructions .step {
+        display: flex;
+        align-items: center;
+        margin: 4px 0;
+      }
+
+      .mobile-instructions .step span {
+        margin-left: 8px;
+      }
+
+      .mobile-instructions button {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        padding: 4px 12px;
+        color: white;
+        border-radius: 4px;
+        font-size: 13px;
+        cursor: pointer;
+        transition: background 0.2s ease;
+      }
+
+      .mobile-instructions button:active {
+        background: rgba(255, 255, 255, 0.3);
       }
       
       #driver-selection {
@@ -182,12 +220,23 @@ export function initializeMobileSupport() {
   const instructions = document.createElement('div');
   instructions.className = 'mobile-instructions';
   instructions.innerHTML = `
-    <div style="margin-bottom: 8px">📱 Mobile Controls:</div>
-    <div>• Tap a driver to select</div>
-    <div>• Tap a position to place driver</div>
-    <div>• Tap again to swap positions</div>
-    <button style="margin-top: 8px; padding: 4px 8px; border-radius: 4px; border: none; background: white; color: #2196F3">Got it!</button>
+    <div class="header">
+      <span>📱 How to use on mobile</span>
+      <button>✕</button>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <span>1. Tap any driver to select</span>
+      </div>
+      <div class="step">
+        <span>2. Tap a position to place them</span>
+      </div>
+      <div class="step">
+        <span>3. Tap drivers to swap positions</span>
+      </div>
+    </div>
   `;
+  
   document.querySelector('.main-content').insertBefore(instructions, document.querySelector('#race-grid'));
   
   instructions.querySelector('button').addEventListener('click', () => {
