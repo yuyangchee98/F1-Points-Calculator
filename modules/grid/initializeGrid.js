@@ -4,9 +4,9 @@ import * as data from "../../data.js";
 export function initializeGrid() {
   const container = document.getElementById("race-grid");
 
-  // Set grid template columns dynamically based on number of races
-  const numColumns = data.races.length + 2; // +2 for Position and Points columns
-  container.style.gridTemplateColumns = `auto repeat(${numColumns - 2}, 1fr) auto`;
+  // Set grid template columns with fixed widths
+  const numRaces = data.races.length;
+  container.style.gridTemplateColumns = `80px repeat(${numRaces}, minmax(120px, 1fr)) 80px`;
 
   container.innerHTML = '<div class="header sticky-position">Position</div>';
   data.races.forEach((race) => {

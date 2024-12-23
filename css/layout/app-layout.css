@@ -1,45 +1,41 @@
 /* Main Layout Structure */
 .app-layout {
     display: grid;
-    grid-template-columns: 200px 1fr; /* Even smaller now that we use text */
+    grid-template-columns: 300px 1fr;
     gap: 16px;
-    max-width: 1600px;
-    margin: 0 auto;
     padding: 16px;
+    box-sizing: border-box;
+    width: 100%;
 }
 
-/* Sticky Sidebar - Ultra compact */
+/* Sticky Sidebar with scrolling */
 .standings-sidebar {
     position: sticky;
     top: 16px;
     height: calc(100vh - 32px);
-    overflow-y: auto;
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     padding: 12px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 10;
 }
 
-/* Hide scrollbar but keep functionality */
-.standings-sidebar::-webkit-scrollbar {
-    width: 4px;
-}
-
-.standings-sidebar::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.1);
-    border-radius: 2px;
-}
-
-.standings-sidebar::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-/* Rest of the styles remain the same */
+/* Main content area */
 .main-content {
     display: flex;
     flex-direction: column;
     gap: 16px;
-    min-width: 0;
+    min-width: 0; /* Important! Allows child to scroll */
+}
+
+.main-content h1 {
+    margin: 0;
+    text-align: left;
+    font-size: 1.5rem;
+    color: #333;
 }
 
 .actions-bar {
@@ -50,21 +46,22 @@
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    box-sizing: border-box;
 }
 
+/* Container that enables scrolling */
 .container {
-    margin: 0;
     overflow-x: auto;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    padding: 16px;
+    max-width: 100%;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    padding-bottom: 16px; /* Space for scrollbar */
 }
 
-/* Responsive adjustments */
+/* Responsive layout */
 @media (max-width: 1024px) {
     .app-layout {
-        grid-template-columns: 180px 1fr;
+        grid-template-columns: 250px 1fr;
         gap: 12px;
         padding: 12px;
     }
@@ -79,6 +76,7 @@
         position: relative;
         top: 0;
         height: auto;
+        max-height: 80vh;
         margin-bottom: 16px;
     }
 }
