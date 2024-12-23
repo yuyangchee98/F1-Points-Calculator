@@ -1,0 +1,37 @@
+.driver-card {
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px;
+    cursor: move;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: opacity 0.3s ease, box-shadow 0.3s ease;
+}
+
+.driver-card:hover {
+    opacity: 0.8;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.driver-card:active {
+    cursor: grabbing;
+}
+
+.purple-outline {
+    border: 5px solid rgb(117, 69, 138);
+    box-shadow: 0 0 0 2px purple;
+}
+
+#driver-selection .driver-card {
+    margin: 5px;
+}
+
+.constructor-card {
+    font-weight: bold;
+    transition: transform 0.2s ease;
+}
+
+.constructor-card:hover {
+    transform: scale(1.05);
+}
