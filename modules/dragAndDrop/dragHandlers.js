@@ -25,12 +25,6 @@ export function dragStart(e) {
     e.dataTransfer.setData("text/plain", jsonString);
     e.dataTransfer.setData("application/json", jsonString);
     driverCard.classList.add("dragging");
-
-    console.log("Drag data set successfully:", {
-      driverName,
-      isFromRaceSlot,
-      jsonString,
-    });
   } catch (err) {
     console.error("Error setting drag data:", err);
   }
@@ -67,12 +61,8 @@ export function drop(e) {
 
   let dragData;
   try {
-    // Attempt to retrieve drag data in multiple formats
     const jsonData = e.dataTransfer.getData("application/json");
     const textData = e.dataTransfer.getData("text/plain");
-
-    console.log("Retrieved drag data:", { jsonData, textData });
-
     const dataString = jsonData || textData;
 
     if (!dataString) {
@@ -81,7 +71,6 @@ export function drop(e) {
     }
 
     dragData = JSON.parse(dataString);
-
     if (!dragData || !dragData.driverName) {
       console.error("Invalid drag data structure");
       return;
@@ -95,61 +84,59 @@ export function drop(e) {
   const targetSlot = e.currentTarget;
   const race = targetSlot.dataset.race;
 
-  // Locate current position of dragged driver in this race
-  const draggedDriverCurrentSlot = document
-    .querySelector(
-      `.race-slot[data-race="${race}"] .driver-card[data-driver="${draggedDriverName}"]`
-    )
-    ?.closest(".race-slot");
+  // Check if the driver is already in another slot in this race
+  const existingDriverSlot = document.querySelector(
+    `.race-slot[data-race="${race}"] .driver-card[data-driver="${draggedDriverName}"]`
+  )?.closest(".race-slot");
 
-  // Handle dropping onto occupied slot
+  // If target slot is occupied
   if (targetSlot.children.length > 0) {
     const targetDriver = targetSlot.children[0];
     const targetDriverName = targetDriver.dataset.driver;
 
-    if (draggedDriverCurrentSlot) {
-      // Perform driver swap
-      const newDraggedCard = createDriverCard(draggedDriverName);
-      const newTargetCard = createDriverCard(targetDriverName);
+    // If the dragged driver is already in the race (swap positions)
+    if (existingDriverSlot) {
+      if (existingDriverSlot !== targetSlot) { // Only swap if different slots
+        // Create new cards
+        const newDraggedCard = createDriverCard(draggedDriverName);
+        const newTargetCard = createDriverCard(targetDriverName);
 
-      // Maintain fastest lap indicators
-      if (targetDriver.classList.contains("purple-outline")) {
-        newDraggedCard.classList.add("purple-outline");
-      }
-      if (
-        draggedDriverCurrentSlot.children[0].classList.contains("purple-outline")
-      ) {
-        newTargetCard.classList.add("purple-outline");
-      }
-
-      // Execute the swap
-      targetSlot.innerHTML = "";
-      draggedDriverCurrentSlot.innerHTML = "";
-      targetSlot.appendChild(newDraggedCard);
-      draggedDriverCurrentSlot.appendChild(newTargetCard);
-    } else {
-      // Check if driver can be added to race
-      const existingDriverInRace = document.querySelector(
-        `.race-slot[data-race="${race}"] .driver-card[data-driver="${draggedDriverName}"]`
-      );
-
-      if (!existingDriverInRace) {
-        const newCard = createDriverCard(draggedDriverName);
+        // Transfer fastest lap indicator if present
         if (targetDriver.classList.contains("purple-outline")) {
-          newCard.classList.add("purple-outline");
+          newDraggedCard.classList.add("purple-outline");
         }
+        if (existingDriverSlot.children[0].classList.contains("purple-outline")) {
+          newTargetCard.classList.add("purple-outline");
+        }
+
+        // Perform the swap
         targetSlot.innerHTML = "";
-        targetSlot.appendChild(newCard);
+        existingDriverSlot.innerHTML = "";
+        targetSlot.appendChild(newDraggedCard);
+        existingDriverSlot.appendChild(newTargetCard);
       }
     }
-  } else {
-    // Handle dropping onto empty slot
-    const existingDriverInRace = document.querySelector(
-      `.race-slot[data-race="${race}"] .driver-card[data-driver="${draggedDriverName}"]`
-    );
-
-    if (!existingDriverInRace) {
+    // If the dragged driver is not in the race yet
+    else {
+      // Don't allow the drop - driver would be duplicated
+      return;
+    }
+  } 
+  // If target slot is empty
+  else {
+    // Only allow drop if driver is not already in the race
+    if (!existingDriverSlot) {
       const newCard = createDriverCard(draggedDriverName);
+      targetSlot.appendChild(newCard);
+    }
+    // If driver is already in the race, move them to the new position
+    else if (existingDriverSlot !== targetSlot) {
+      const draggedCard = existingDriverSlot.children[0];
+      const newCard = createDriverCard(draggedDriverName);
+      if (draggedCard.classList.contains("purple-outline")) {
+        newCard.classList.add("purple-outline");
+      }
+      existingDriverSlot.innerHTML = "";
       targetSlot.appendChild(newCard);
     }
   }
@@ -184,5 +171,6 @@ export function clearSlot(e) {
   if (this.children.length > 0) {
     this.removeChild(this.children[0]);
     calculatePoints();
+    updateRaceStatus();
   }
 }
