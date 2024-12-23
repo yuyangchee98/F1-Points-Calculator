@@ -97,17 +97,9 @@ export function drop(e) {
     // If the dragged driver is already in the race (swap positions)
     if (existingDriverSlot) {
       if (existingDriverSlot !== targetSlot) { // Only swap if different slots
-        // Create new cards
+        // Create new cards and swap them
         const newDraggedCard = createDriverCard(draggedDriverName);
         const newTargetCard = createDriverCard(targetDriverName);
-
-        // Transfer fastest lap indicator if present
-        if (targetDriver.classList.contains("purple-outline")) {
-          newDraggedCard.classList.add("purple-outline");
-        }
-        if (existingDriverSlot.children[0].classList.contains("purple-outline")) {
-          newTargetCard.classList.add("purple-outline");
-        }
 
         // Perform the swap
         targetSlot.innerHTML = "";
@@ -131,11 +123,7 @@ export function drop(e) {
     }
     // If driver is already in the race, move them to the new position
     else if (existingDriverSlot !== targetSlot) {
-      const draggedCard = existingDriverSlot.children[0];
       const newCard = createDriverCard(draggedDriverName);
-      if (draggedCard.classList.contains("purple-outline")) {
-        newCard.classList.add("purple-outline");
-      }
       existingDriverSlot.innerHTML = "";
       targetSlot.appendChild(newCard);
     }
