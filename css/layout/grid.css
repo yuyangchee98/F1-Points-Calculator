@@ -1,61 +1,61 @@
-/* Grid layout improvements */
-.container {
-  max-width: 100%;
-  overflow-x: auto;
-  padding: 1rem;
-  margin: 0 auto;
-}
-
 #race-grid {
-  display: grid;
-  grid-auto-flow: column;
-  gap: 1rem;
-  padding: 1rem;
-  background: #f8f9fa;
-  border-radius: 8px;
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+    display: grid;
+    gap: 4px;
+    padding: 4px;
+    overflow-x: auto;
+    max-width: 100%;
 }
 
 .race-column {
-  min-width: 180px;
-  background: white;
-  padding: 1rem;
-  border-radius: 6px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    min-width: 120px;
 }
 
 .race-header {
-  font-weight: 600;
-  text-align: center;
-  padding: 0.5rem;
-  background: #f8f9fa;
-  border-radius: 4px;
-  margin-bottom: 1rem;
+    font-weight: 600;
+    text-align: center;
+    padding: 8px;
+    border-radius: 4px;
 }
 
 .position {
-  padding: 0.5rem;
-  border: 1px solid #e9ecef;
-  border-radius: 4px;
-  margin: 0.25rem 0;
-  min-height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: white;
-  transition: background-color 0.2s ease;
+    min-height: 40px;
+    border: 1px solid #eee;
+    margin: 2px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
 }
 
-.position:hover {
-  background: #f8f9fa;
+.race-slot {
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    margin: 2px 0;
+    background: white;
 }
 
-/* Sprint race styling */
+.race-slot.hovered {
+    background: #f5f5f5;
+    border-color: #ddd;
+}
+
 .sprint-race {
-  background: #f0f8ff;
+    background: #f8f9fa;
 }
 
 .sprint-race .race-header {
-  background: #e3f2fd;
-  color: #1565c0;
+    color: #1565c0;
+}
+
+.past-race {
+    opacity: 0.85;
+    background: #fafafa;
+}
+
+.future-race {
+    background: white;
 }
