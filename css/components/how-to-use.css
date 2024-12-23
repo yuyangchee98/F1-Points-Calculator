@@ -1,0 +1,60 @@
+.how-to-use {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    width: 300px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    display: none;
+}
+
+.how-to-use.visible {
+    display: block;
+}
+
+.how-to-use h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.2em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.how-to-use-close {
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-size: 1.2em;
+    padding: 0;
+    color: #666;
+}
+
+.how-to-use-steps {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.how-to-use-steps li {
+    margin-bottom: 8px;
+    padding-left: 20px;
+    position: relative;
+}
+
+.how-to-use-steps li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #666;
+}
+
+/* Only show on desktop */
+@media (max-width: 768px) {
+    .how-to-use {
+        display: none !important;
+    }
+}
