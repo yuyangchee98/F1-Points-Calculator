@@ -2,12 +2,18 @@
 .driver-card {
   background: #fff;
   border-radius: 6px;
-  padding: 0.75rem;
-  margin: 0.5rem;
+  padding: 0.5rem 1rem;  /* Reduced vertical padding, increased horizontal padding */
+  margin: 0.25rem;       /* Reduced margin to make it more compact */
   cursor: grab;
   transition: all 0.2s ease;
   border: 1px solid rgba(0,0,0,0.1);
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  min-width: 100px;     /* Added minimum width to prevent text wrapping */
+  white-space: nowrap;  /* Prevent text from wrapping */
+  overflow: hidden;     /* Hide overflow text */
+  text-overflow: ellipsis; /* Add ellipsis for overflow text */
+  font-size: 0.9rem;    /* Slightly smaller font size */
+  line-height: 1.2;     /* Reduced line height */
 }
 
 .driver-card:hover {
