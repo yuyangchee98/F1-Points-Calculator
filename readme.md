@@ -1,45 +1,56 @@
-# F1 2024 Season Prediction Grid
+# F1 Points Calculator
 
-An interactive web application that allows Formula 1 fans to create and share their predictions for the 2024 F1 season. Users can drag and drop drivers into grid positions for each race, track points, and share their predictions with others.
-
-Live here: https://f1pointscalculator.yaaaang.com/
+The F1 Points Calculator is an interactive web application that allows users to predict and simulate Formula 1 season results. With an intuitive drag-and-drop interface, users can place drivers in their predicted finishing positions for each race. The application automatically calculates points based on the official F1 scoring system and provides real-time updates on driver and constructor standings.
 
 ## Features
 
-- **Interactive Grid System**
-  - Drag-and-drop interface for placing drivers in race positions
-  - Support for all 2024 F1 races including Sprint races
-  - Automatic points calculation based on F1's current scoring system
-  - Fastest lap point allocation functionality
-  - Color-coded teams for easy visualization
-  - Distinction between past races and future predictions
+- Drag-and-drop interface for easy prediction of race results
+- Automatic points calculation adhering to F1 regulations
+- Responsive design optimized for both desktop and mobile devices
+- Shareable links for users to showcase and compare their predictions
 
-- **Mobile Support**
-  - Touch-friendly interface
-  - Optimized layout for smaller screens
-  - Tap-to-place driver functionality
-  - Double-tap for fastest lap selection
+## Usage
 
-- **Sharing Capabilities**
-  - Generate shareable URLs of your predictions
-  - Download grid as an image
-  - Direct sharing to Twitter and Facebook
-  - Copy link to clipboard functionality
+1. Select a driver from the provided list
+2. Drag the driver to their predicted finishing position on the grid
+3. Repeat steps 1 and 2 for all drivers and races in the season
+4. Share your predictions with others using the generated shareable link
 
-- **Real-Time Updates**
-  - Automatic points calculation
-  - Running championship standings
-  - Visual indicators for past vs. future races
+## Project Structure
 
-## How to Use
+```
+F1-Points-Calculator/
+├── css/
+│   ├── base/
+│   ├── components/
+│   └── layout/
+├── images/
+├── modules/
+│   ├── dragAndDrop/
+│   ├── drivers/
+│   ├── grid/
+│   ├── points/
+│   ├── races/
+│   ├── state/
+│   └── ui/
+├── data.js
+├── index.html
+├── scripts.js
+└── README.md
+```
 
-### Desktop Users
-1. Browse the driver selection area at the top of the page
-2. Drag drivers into their predicted finishing positions for each race
-3. Click on a driver's name to assign them the fastest lap for that race
-4. Use the reset button to clear future race predictions
-5. Share your predictions using the sharing options
+## Implementation Details
 
-### Mobile Users
-1. Tap a driver from the selection area to select them
-2. Tap a grid position to place
+- The `css` directory contains stylesheets organized into base, components, and layout subdirectories for maintainable and modular styling.
+- The `images` directory stores flag images used to represent different race tracks.
+- The `modules` directory houses the core functionality of the application:
+  - `dragAndDrop`: Implements the drag-and-drop functionality for placing drivers on the grid.
+  - `drivers`: Handles driver selection and display.
+  - `grid`: Manages the race grid initialization and updates.
+  - `points`: Calculates points based on finishing positions and fastest laps.
+  - `races`: Handles race-specific operations and data management.
+  - `state`: Manages the overall application state and data flow.
+  - `ui`: Controls user interface interactions and updates.
+- `data.js` serves as a centralized data source, storing information about drivers, teams, and races.
+- `index.html` is the main entry point of the application, defining the structure of the user interface.
+- `scripts.js` acts as the main controller, orchestrating the interaction between different modules and handling user actions.
