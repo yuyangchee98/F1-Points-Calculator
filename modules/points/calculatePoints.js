@@ -49,27 +49,37 @@ export function calculatePoints() {
     });
   });
 
-  // Update driver points display
+  // Update driver points display with new format
   const driverTotalsElement = document.getElementById("driver-totals");
   driverTotalsElement.innerHTML = Object.entries(driverPoints)
     .sort((a, b) => b[1] - a[1])
     .map(
-      ([driver, points]) => `
-        <div class="driver-card" style="background-color: ${data.teamColors[data.driverTeams[driver]]}; color: ${data.driverTeams[driver] === "Haas" ? "#000" : "#fff"}; display: inline-block; margin-right: 10px; margin-bottom: 10px;">
-          ${driver}: ${points}
+      ([driver, points], index) => `
+        <div class="standings-row">
+          <span class="standings-pos">${index + 1}</span>
+          <span class="standings-name">
+            <span class="team-color" style="background-color: ${data.teamColors[data.driverTeams[driver]]}"></span>
+            ${driver}
+          </span>
+          <span class="standings-points">${points}</span>
         </div>
       `
     )
     .join("");
 
-  // Update constructor points display
+  // Update constructor points display with new format
   const constructorTotalsElement = document.getElementById("constructor-totals");
   constructorTotalsElement.innerHTML = Object.entries(constructorPoints)
     .sort((a, b) => b[1] - a[1])
     .map(
-      ([team, points]) => `
-        <div class="constructor-card" style="background-color: ${data.teamColors[team]}; color: ${team === "Haas" ? "#000" : "#fff"}; display: inline-block; margin-right: 10px; margin-bottom: 10px; padding: 8px; border-radius: 4px;">
-          ${team}: ${points}
+      ([team, points], index) => `
+        <div class="standings-row">
+          <span class="standings-pos">${index + 1}</span>
+          <span class="standings-name">
+            <span class="team-color" style="background-color: ${data.teamColors[team]}"></span>
+            ${team}
+          </span>
+          <span class="standings-points">${points}</span>
         </div>
       `
     )

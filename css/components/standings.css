@@ -1,0 +1,62 @@
+/* Simple text-based standings */
+.standings-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 8px;
+    font-size: 0.813rem;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.standings-row:last-child {
+    border-bottom: none;
+}
+
+.standings-pos {
+    font-weight: 600;
+    min-width: 20px;
+    margin-right: 8px;
+}
+
+.standings-name {
+    flex: 1;
+}
+
+.standings-points {
+    font-weight: 500;
+    min-width: 40px;
+    text-align: right;
+}
+
+/* Team colors as small dots */
+.standings-row .team-color {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+    display: inline-block;
+}
+
+/* Container styles */
+.standings-section {
+    background-color: #f8f8f8;
+    border-radius: 6px;
+    padding: 8px;
+    margin-bottom: 12px;
+}
+
+.standings-section h2 {
+    font-size: 0.875rem;
+    margin: 0 0 8px 0;
+    padding: 0 8px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Remove card styles from standings */
+.standings-sidebar .driver-card {
+    all: unset;
+    cursor: default;
+}

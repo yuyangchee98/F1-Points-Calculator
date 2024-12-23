@@ -1,84 +1,30 @@
-@media (max-width: 768px) {
-    body {
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .app-layout {
+        grid-template-columns: 250px 1fr;
         padding: 16px;
+        gap: 16px;
+    }
+}
+
+@media (max-width: 768px) {
+    .app-layout {
+        grid-template-columns: 1fr;
     }
 
-    #save-share-container {
-        padding: 10px;
-    }
-
-    #save-share-container button {
-        width: 100%;
-        margin-bottom: 10px;
-    }
-
-    .constructor-totals-container {
-        margin: 10px;
-        padding: 10px;
-    }
-
-    .constructor-card {
-        font-size: 12px;
-        padding: 6px;
-    }
-
-    /* Mobile Grid Layout */
-    #race-grid {
-        font-size: 12px;
-        overflow-x: auto;
-    }
-
-    .sticky-position {
-        position: sticky;
-        left: 0;
-        background: #1a1a1a;
-        z-index: 10;
-    }
-
-    .driver-card {
-        padding: 4px;
-        margin: 2px;
-        font-size: 11px;
-    }
-
-    .header {
-        padding: 4px;
-        font-size: 11px;
-    }
-
-    .race-slot {
-        min-width: 60px;
-    }
-
-    /* Mobile Selection States */
-    .race-slot.selected {
-        outline: 2px solid #fff;
-    }
-
-    .driver-card.selected {
-        outline: 2px solid #fff;
-        box-shadow: 0 0 5px rgba(255,255,255,0.5);
-    }
-
-    /* Mobile Driver Selection Area */
-    #driver-selection {
-        max-height: 120px;
-        overflow-y: auto;
-        position: sticky;
+    .standings-sidebar {
+        position: relative;
         top: 0;
-        background: #f0f0f0;
-        z-index: 100;
-        padding: 5px;
+        height: auto;
+        margin-bottom: 24px;
     }
 
-    .mobile-instructions {
-        background: #333;
-        color: white;
-        padding: 10px;
-        text-align: center;
-        font-size: 12px;
-        position: sticky;
-        top: 120px;
-        z-index: 99;
+    .actions-bar {
+        flex-direction: column;
+    }
+
+    #save-share-container button,
+    #reset-future-button {
+        width: 100%;
     }
 }

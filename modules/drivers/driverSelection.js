@@ -17,5 +17,10 @@ export function createDriverSelection() {
     selectionArea.appendChild(driverCard);
   });
 
-  document.body.insertBefore(selectionArea, document.getElementById("race-grid"));
+  // Find the race grid and its parent (main-content)
+  const raceGrid = document.getElementById("race-grid");
+  const mainContent = raceGrid.parentElement;
+
+  // Insert before the race grid but within main-content
+  mainContent.insertBefore(selectionArea, raceGrid);
 }
