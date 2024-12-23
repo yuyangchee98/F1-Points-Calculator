@@ -1,61 +1,30 @@
 #race-grid {
     display: grid;
-    gap: 4px;
-    padding: 4px;
-    overflow-x: auto;
-    max-width: 100%;
+    /* grid-template-columns will be set by JS */
+    gap: 10px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: max-content;  /* Take the width of all columns */
+    min-width: 100%;    /* Ensure it takes at least full width */
+    box-sizing: border-box;
 }
 
-.race-column {
-    min-width: 120px;
-}
-
-.race-header {
-    font-weight: 600;
-    text-align: center;
-    padding: 8px;
-    border-radius: 4px;
-}
-
-.position {
-    min-height: 40px;
-    border: 1px solid #eee;
-    margin: 2px 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: white;
-}
-
+/* Set minimum width for race slots */
 .race-slot {
-    min-height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #eee;
-    border-radius: 4px;
-    margin: 2px 0;
-    background: white;
+    min-width: 120px;  /* Minimum width for race slots */
+    width: 100%;       /* Fill available space */
 }
 
-.race-slot.hovered {
-    background: #f5f5f5;
-    border-color: #ddd;
+/* Set width for position column */
+.position.sticky-position {
+    min-width: 80px;   /* Minimum width for position column */
+    width: 80px;       /* Fixed width */
 }
 
-.sprint-race {
-    background: #f8f9fa;
-}
-
-.sprint-race .race-header {
-    color: #1565c0;
-}
-
-.past-race {
-    opacity: 0.85;
-    background: #fafafa;
-}
-
-.future-race {
-    background: white;
+/* Set width for points column */
+.points {
+    min-width: 80px;   /* Minimum width for points column */
+    width: 80px;       /* Fixed width */
 }
