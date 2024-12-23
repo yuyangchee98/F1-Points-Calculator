@@ -1,0 +1,21 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap");
+
+h1,
+h2 {
+    text-align: center;
+    color: #333;
+}
+
+.total-points {
+    font-weight: 700;
+    text-align: left;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    color: #333;
+    transition: background-color 0.3s ease;
+}
+
+.total-points:hover {
+    background-color: #e0e0e0;
+}

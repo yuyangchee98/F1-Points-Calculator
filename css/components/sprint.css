@@ -1,0 +1,27 @@
+.header.sprint,
+.race-slot.sprint {
+    background-color: #f0f0f0;
+}
+
+.header.sprint {
+    font-style: italic;
+}
+
+/* Sprint race status styles */
+.race-slot.sprint.past-race {
+    background-color: #e6e6e6;
+}
+
+.race-slot.sprint.future-race {
+    background-color: #d9eeff;
+}
+
+.header.sprint.past-race,
+.race-slot.sprint.past-race {
+    background-color: #e6e6e6;
+}
+
+.header.sprint.future-race,
+.race-slot.sprint.future-race {
+    background-color: #d9eeff;
+}
