@@ -14,9 +14,9 @@ export function calculatePoints() {
 
   data.races.forEach((race) => {
     const raceSlots = document.querySelectorAll(
-      `.race-slot[data-race="${race}"]`
+      `.race-slot[data-race="${race}"]`,
     );
-    const isSprint = race.endsWith("-S");
+    const isSprint = race.endsWith("Sprint");
 
     raceSlots.forEach((slot) => {
       if (slot.children.length > 0) {
@@ -63,12 +63,13 @@ export function calculatePoints() {
           </span>
           <span class="standings-points">${points}</span>
         </div>
-      `
+      `,
     )
     .join("");
 
   // Update constructor points display with new format
-  const constructorTotalsElement = document.getElementById("constructor-totals");
+  const constructorTotalsElement =
+    document.getElementById("constructor-totals");
   constructorTotalsElement.innerHTML = Object.entries(constructorPoints)
     .sort((a, b) => b[1] - a[1])
     .map(
@@ -81,7 +82,7 @@ export function calculatePoints() {
           </span>
           <span class="standings-points">${points}</span>
         </div>
-      `
+      `,
     )
     .join("");
 }
