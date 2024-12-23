@@ -1,37 +1,50 @@
+/* Driver card improvements */
 .driver-card {
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    padding: 10px;
-    cursor: move;
-    text-align: center;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    transition: opacity 0.3s ease, box-shadow 0.3s ease;
+  background: #fff;
+  border-radius: 6px;
+  padding: 0.75rem;
+  margin: 0.5rem;
+  cursor: grab;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .driver-card:hover {
-    opacity: 0.8;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
-.driver-card:active {
-    cursor: grabbing;
+.driver-card.dragging {
+  opacity: 0.8;
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
 }
 
-.purple-outline {
-    border: 5px solid rgb(117, 69, 138);
-    box-shadow: 0 0 0 2px purple;
+.driver-name {
+  font-weight: 500;
+  text-align: center;
+  margin-bottom: 0.25rem;
 }
 
-#driver-selection .driver-card {
-    margin: 5px;
+/* Fastest lap indicator */
+.fastest-lap {
+  border: 2px solid #ff4081;
+  position: relative;
 }
 
-.constructor-card {
-    font-weight: bold;
-    transition: transform 0.2s ease;
-}
-
-.constructor-card:hover {
-    transform: scale(1.05);
+.fastest-lap::after {
+  content: "⚡";
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #ff4081;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
 }
