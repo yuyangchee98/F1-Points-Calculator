@@ -12,7 +12,6 @@
                 dataLayer.push(arguments);
             }
             gtag("js", new Date());
-
             gtag("config", "G-GJ61RX1FZJ");
         </script>
         <meta charset="UTF-8" />
@@ -35,44 +34,46 @@
             name="keywords"
             content="F1, Formula 1, drag and drop, Points Calculator, Race Simulator, Driver Standings"
         />
-
-        <!-- JSON-LD structured data -->
-        <script type="application/ld+json">
-            {
-                "@context": "https://schema.org",
-                "@type": "WebApplication",
-                "name": "Drag and Drop F1 Points Calculator",
-                "description": "A drag and drop Formula 1 F1 Points Calculator that allows you to simulate race results and calculate driver standings.",
-                "url": "https://f1pointscalculator.yaaaang.com",
-                "applicationCategory": "SportsApplication",
-                "operatingSystem": "WebBrowser",
-                "offers": {
-                    "@type": "Offer",
-                    "price": "0",
-                    "priceCurrency": "USD"
-                }
-            }
-        </script>
     </head>
     <body>
-        <h1>F1 Points Calculator</h1>
+        <div class="app-layout">
+            <!-- Left Sidebar -->
+            <aside class="standings-sidebar">
+                <div class="standings-section">
+                    <h2>Driver Standings</h2>
+                    <div id="driver-totals"></div>
+                </div>
+                <div class="standings-section">
+                    <h2>Constructor Championship</h2>
+                    <div id="constructor-totals"></div>
+                </div>
+            </aside>
 
-        <div class="driver-totals-container">
-            <h2>Driver Totals</h2>
-            <div id="driver-totals"></div>
-        </div>
-        <div class="constructor-totals-container">
-            <h2>Constructor Championship</h2>
-            <div id="constructor-totals"></div>
-        </div>
+            <!-- Main Content -->
+            <main class="main-content">
+                <h1>F1 Points Calculator</h1>
 
-        <div id="reset-container">
-            <button id="reset-future-button" onclick="resetFutureRaces()">
-                Reset Your customization
-            </button>
-        </div>
+                <!-- Actions Bar -->
+                <div class="actions-bar">
+                    <div id="reset-container">
+                        <button
+                            id="reset-future-button"
+                            onclick="resetFutureRaces()"
+                        >
+                            Reset Your customization
+                        </button>
+                    </div>
+                </div>
 
-        <div class="container" id="race-grid"></div>
+                <!-- Social Sharing -->
+                <div id="social-sharing-container"></div>
+
+                <!-- Driver selection will be inserted here by JS -->
+
+                <!-- Race Grid -->
+                <div class="container" id="race-grid"></div>
+            </main>
+        </div>
 
         <footer>
             <p>2024 F1 Points Calculator.</p>
