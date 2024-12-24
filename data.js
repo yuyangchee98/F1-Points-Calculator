@@ -59,8 +59,8 @@ export const driverTeams = {
 
 export const races = [
   "Australia",
-  "China",
   "China Sprint",
+  "China",
   "Japan",
   "Bahrain",
   "Saudi Arabia",
@@ -138,4 +138,3 @@ export const sprintPointsMap = {
 
 // Reset past race results since it's a new season
 export const pastRaceResults = {};
-export const pastFastestLap = {};
