@@ -18,6 +18,7 @@ import {
   initializeMobileSupport,
 } from "./modules/races/raceOperations.js";
 import { initPredictionControls } from "./modules/ui/predictionControls.js";
+import { initializeCharts } from "./modules/charts/chartManager.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   const style = document.createElement("style");
@@ -64,6 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initializeAllRaces();
   initializeMobileSupport();
   initPredictionControls();
+  initializeCharts();
 
   const resetContainer = document.getElementById("reset-container");
   const resetButton = document.createElement("button");
