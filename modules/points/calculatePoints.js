@@ -1,4 +1,5 @@
 import * as data from "../../data.js";
+import { updateCharts } from "../charts/chartManager.js";
 
 /**
  * Calculates and updates points for all drivers
@@ -56,6 +57,9 @@ export function calculatePoints() {
       `,
     )
     .join("");
+    
+  // Update charts if they exist
+  updateCharts();
 
   // Update constructor points display with new format
   const constructorTotalsElement =
