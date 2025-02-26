@@ -97,21 +97,12 @@ function setupDriverPointsChart() {
   console.log('Found driver points chart canvas, initializing chart...');
   
   try {
+    // Initialize with empty data - will be populated in updateDriverPointsChart
     driverPointsChart = new Chart(canvas, {
       type: 'line',
       data: {
-        labels: [], // Will be populated with driver names
-        datasets: [{
-          label: 'Points',
-          data: [], // Will be populated with points
-          backgroundColor: [], // Will be populated with team colors
-          borderColor: [], // Will be populated with team colors
-          borderWidth: 2,
-          pointBackgroundColor: [],
-          pointBorderColor: [],
-          pointRadius: 5,
-          tension: 0.1
-        }]
+        labels: data.races, // X-axis shows all races
+        datasets: [] // Will be populated with one dataset per driver
       },
       options: {
         responsive: true,
@@ -122,48 +113,66 @@ function setupDriverPointsChart() {
           padding: {
             left: 10,
             right: 10,
-            top: 0,
-            bottom: 0
+            top: 10,
+            bottom: 10
           }
         },
         plugins: {
           legend: {
-            display: false
+            display: true,
+            position: 'top',
+            labels: {
+              color: '#000',
+              boxWidth: 12,
+              usePointStyle: true
+            }
           },
           tooltip: {
+            mode: 'index',
+            intersect: false,
             callbacks: {
               label: function(context) {
-                return `${context.formattedValue} points`;
+                return `${context.dataset.label}: ${context.formattedValue} points`;
               }
             }
           }
         },
         scales: {
           x: {
-            beginAtZero: true,
-            title: {
-            display: true,
-            text: 'Points',
-            color: '#000'
-            },
-            ticks: {
-            color: '#000'
-            },
-            grid: {
-            color: 'rgba(0, 0, 0, 0.1)'
-            }
-          },
-          y: {
             ticks: {
               color: '#000'
             },
             grid: {
               color: 'rgba(0, 0, 0, 0.1)'
+            },
+            title: {
+              display: true,
+              text: 'Races',
+              color: '#000'
+            }
+          },
+          y: {
+            beginAtZero: true,
+            min: 0,
+            ticks: {
+              color: '#000',
+              precision: 0
+            },
+            grid: {
+              color: 'rgba(0, 0, 0, 0.1)'
+            },
+            title: {
+              display: true,
+              text: 'Points',
+              color: '#000'
             }
           }
         }
       }
     });
+    
+    // Initialize with placeholder data for better initial appearance
+    addPlaceholderData(driverPointsChart);
     
     return true;
   } catch (error) {
@@ -186,21 +195,12 @@ function setupConstructorPointsChart() {
   console.log('Found constructor points chart canvas, initializing chart...');
   
   try {
+    // Initialize with empty data - will be populated in updateConstructorPointsChart
     constructorPointsChart = new Chart(canvas, {
       type: 'line',
       data: {
-        labels: [], // Will be populated with constructor names
-        datasets: [{
-          label: 'Points',
-          data: [], // Will be populated with points
-          backgroundColor: [], // Will be populated with team colors
-          borderColor: [], // Will be populated with team colors
-          borderWidth: 2,
-          pointBackgroundColor: [],
-          pointBorderColor: [],
-          pointRadius: 5,
-          tension: 0.1
-        }]
+        labels: data.races, // X-axis shows all races
+        datasets: [] // Will be populated with one dataset per constructor
       },
       options: {
         responsive: true,
@@ -211,54 +211,91 @@ function setupConstructorPointsChart() {
           padding: {
             left: 10,
             right: 10,
-            top: 0,
-            bottom: 0
+            top: 10,
+            bottom: 10
           }
         },
         plugins: {
           legend: {
-            display: false
+            display: true,
+            position: 'top',
+            labels: {
+              color: '#000',
+              boxWidth: 12,
+              usePointStyle: true
+            }
           },
           tooltip: {
+            mode: 'index',
+            intersect: false,
             callbacks: {
               label: function(context) {
-                return `${context.formattedValue} points`;
+                return `${context.dataset.label}: ${context.formattedValue} points`;
               }
             }
           }
         },
         scales: {
           x: {
+            ticks: {
+              color: '#000'
+            },
+            grid: {
+              color: 'rgba(0, 0, 0, 0.1)'
+            },
+            title: {
+              display: true,
+              text: 'Races',
+              color: '#000'
+            }
+          },
+          y: {
             beginAtZero: true,
+            min: 0,
+            ticks: {
+              color: '#000',
+              precision: 0
+            },
+            grid: {
+              color: 'rgba(0, 0, 0, 0.1)'
+            },
             title: {
               display: true,
               text: 'Points',
               color: '#000'
-            },
-            ticks: {
-              color: '#000'
-            },
-            grid: {
-              color: 'rgba(0, 0, 0, 0.1)'
-            }
-          },
-          y: {
-            ticks: {
-              color: '#000'
-            },
-            grid: {
-              color: 'rgba(0, 0, 0, 0.1)'
             }
           }
         }
       }
     });
     
+    // Initialize with placeholder data for better initial appearance
+    addPlaceholderData(constructorPointsChart);
+    
     return true;
   } catch (error) {
     console.error('Error setting up constructor chart:', error);
     return false;
   }
+}
+
+/**
+ * Add placeholder data to a chart for better initial appearance
+ * @param {Chart} chart - The chart to add placeholder data to
+ */
+function addPlaceholderData(chart) {
+  chart.data.datasets = [{
+    label: 'No Data',
+    data: new Array(data.races.length).fill(0),
+    borderColor: '#cccccc',
+    backgroundColor: '#cccccc',
+    borderWidth: 2,
+    pointRadius: 3,
+    pointHoverRadius: 5,
+    tension: 0.1
+  }];
+  
+  chart.update('none');
 }
 
 /**
@@ -293,7 +330,8 @@ function updateDriverPointsChart() {
   const driverRows = document.querySelectorAll('#driver-totals .standings-row');
   console.log('Found driver rows:', driverRows.length);
   
-  const driverStandings = [...driverRows]
+  // Get top drivers with their colors for our lines
+  const topDrivers = [...driverRows]
     .map(row => {
       const nameElement = row.querySelector('.standings-name');
       const driverName = nameElement ? nameElement.textContent.trim() : 'Unknown';
@@ -309,33 +347,66 @@ function updateDriverPointsChart() {
       };
     })
     .filter(item => item.points > 0) // Only show drivers with points
-    .sort((a, b) => b.points - a.points);
-    
-  console.log('Processed driver standings:', driverStandings);
+    .sort((a, b) => b.points - a.points)
+    .slice(0, 5); // Limit to top 5 drivers for readability
   
-  // If no data, add a placeholder
-  if (driverStandings.length === 0) {
-    driverStandings.push({
-      driver: 'No Data',
-      points: 0,
-      color: '#ccc'
+  console.log('Processed top drivers:', topDrivers);
+  
+  // Clear existing datasets
+  driverPointsChart.data.datasets = [];
+  
+  // If we have data, create one dataset per driver
+  if (topDrivers.length > 0) {
+    // For each top driver, create a dataset
+    topDrivers.forEach(driver => {
+      // Get this driver's points per race by looking at the race slots
+      const pointsPerRace = [];
+      let cumulativePoints = [];
+      let total = 0;
+      
+      // Go through each race and calculate points
+      data.races.forEach(race => {
+        // Find all race slots for this race
+        const raceSlots = document.querySelectorAll(`.race-slot[data-race="${race}"]`);
+        let racePoints = 0;
+        
+        // Check each slot for this driver
+        raceSlots.forEach(slot => {
+          if (slot.children.length > 0) {
+            const slotDriver = slot.children[0].dataset.driver;
+            if (slotDriver === driver.driver) {
+              const position = parseInt(slot.dataset.position);
+              // Add points based on position
+              const isSprint = race.includes('Sprint');
+              racePoints = isSprint ? 
+                data.sprintPointsMap[position] || 0 : 
+                data.pointsMap[position] || 0;
+            }
+          }
+        });
+        
+        // Add this race's points to the total
+        pointsPerRace.push(racePoints);
+        total += racePoints;
+        cumulativePoints.push(total);
+      });
+      
+      // Create a dataset for this driver
+      driverPointsChart.data.datasets.push({
+        label: driver.driver,
+        data: cumulativePoints,
+        borderColor: driver.color,
+        backgroundColor: driver.color,
+        borderWidth: 2,
+        pointRadius: 3,
+        pointHoverRadius: 5,
+        tension: 0.1
+      });
     });
+  } else {
+    // If no data, add a placeholder dataset
+    addPlaceholderData(driverPointsChart);
   }
-  
-  // Clear existing data and destroy old chart
-  driverPointsChart.data.labels.length = 0;
-  driverPointsChart.data.datasets[0].data.length = 0;
-  driverPointsChart.data.datasets[0].backgroundColor.length = 0;
-  
-  // Update the chart to handle line chart format with team colors
-  driverPointsChart.data.labels = driverStandings.map(d => d.driver);
-  driverPointsChart.data.datasets[0].data = driverStandings.map(d => d.points);
-  
-  // For line chart, we need to set colors for borders and points
-  driverPointsChart.data.datasets[0].backgroundColor = driverStandings.map(d => d.color);
-  driverPointsChart.data.datasets[0].borderColor = driverStandings.map(d => d.color);
-  driverPointsChart.data.datasets[0].pointBackgroundColor = driverStandings.map(d => d.color);
-  driverPointsChart.data.datasets[0].pointBorderColor = driverStandings.map(d => d.color);
   
   // Update the chart with no animation for immediate update
   try {
@@ -356,7 +427,8 @@ function updateConstructorPointsChart() {
   const constructorRows = document.querySelectorAll('#constructor-totals .standings-row');
   console.log('Found constructor rows:', constructorRows.length);
   
-  const constructorStandings = [...constructorRows]
+  // Get top constructors with their colors for our lines
+  const topConstructors = [...constructorRows]
     .map(row => {
       const nameElement = row.querySelector('.standings-name');
       const teamName = nameElement ? nameElement.textContent.trim() : 'Unknown';
@@ -371,33 +443,71 @@ function updateConstructorPointsChart() {
       };
     })
     .filter(item => item.points > 0) // Only show teams with points
-    .sort((a, b) => b.points - a.points);
-    
-  console.log('Processed constructor standings:', constructorStandings);
+    .sort((a, b) => b.points - a.points)
+    .slice(0, 5); // Limit to top 5 teams for readability
   
-  // If no data, add a placeholder
-  if (constructorStandings.length === 0) {
-    constructorStandings.push({
-      team: 'No Data',
-      points: 0,
-      color: '#ccc'
+  console.log('Processed top constructors:', topConstructors);
+  
+  // Clear existing datasets
+  constructorPointsChart.data.datasets = [];
+  
+  // If we have data, create one dataset per constructor
+  if (topConstructors.length > 0) {
+    // For each constructor, find all their drivers
+    topConstructors.forEach(constructor => {
+      // Get this constructor's drivers
+      const teamDrivers = Object.entries(data.driverTeams)
+        .filter(([driver, team]) => team === constructor.team)
+        .map(([driver]) => driver);
+      
+      // Get points per race for this constructor
+      const pointsPerRace = [];
+      let cumulativePoints = [];
+      let total = 0;
+      
+      // Go through each race and calculate team points
+      data.races.forEach(race => {
+        // Find all race slots for this race
+        const raceSlots = document.querySelectorAll(`.race-slot[data-race="${race}"]`);
+        let racePoints = 0;
+        
+        // Check each slot for drivers from this team
+        raceSlots.forEach(slot => {
+          if (slot.children.length > 0) {
+            const slotDriver = slot.children[0].dataset.driver;
+            if (teamDrivers.includes(slotDriver)) {
+              const position = parseInt(slot.dataset.position);
+              // Add points based on position
+              const isSprint = race.includes('Sprint');
+              racePoints += isSprint ? 
+                data.sprintPointsMap[position] || 0 : 
+                data.pointsMap[position] || 0;
+            }
+          }
+        });
+        
+        // Add this race's points to the total
+        pointsPerRace.push(racePoints);
+        total += racePoints;
+        cumulativePoints.push(total);
+      });
+      
+      // Create a dataset for this constructor
+      constructorPointsChart.data.datasets.push({
+        label: constructor.team,
+        data: cumulativePoints,
+        borderColor: constructor.color,
+        backgroundColor: constructor.color,
+        borderWidth: 2,
+        pointRadius: 3,
+        pointHoverRadius: 5,
+        tension: 0.1
+      });
     });
+  } else {
+    // If no data, add a placeholder dataset
+    addPlaceholderData(constructorPointsChart);
   }
-    
-  // Clear existing data and destroy old chart
-  constructorPointsChart.data.labels.length = 0;
-  constructorPointsChart.data.datasets[0].data.length = 0;
-  constructorPointsChart.data.datasets[0].backgroundColor.length = 0;
-  
-  // Update the chart to handle line chart format with team colors
-  constructorPointsChart.data.labels = constructorStandings.map(d => d.team);
-  constructorPointsChart.data.datasets[0].data = constructorStandings.map(d => d.points);
-  
-  // For line chart, we need to set colors for borders and points
-  constructorPointsChart.data.datasets[0].backgroundColor = constructorStandings.map(d => d.color);
-  constructorPointsChart.data.datasets[0].borderColor = constructorStandings.map(d => d.color);
-  constructorPointsChart.data.datasets[0].pointBackgroundColor = constructorStandings.map(d => d.color);
-  constructorPointsChart.data.datasets[0].pointBorderColor = constructorStandings.map(d => d.color);
   
   // Update the chart with no animation for immediate update
   try {
@@ -461,7 +571,6 @@ function addChartStyles() {
       background: #4a90e2;
     }
     
-    /* Styles removed - no longer needed */
     .tab-button:hover {
       color: #4a90e2;
     }
