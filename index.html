@@ -68,13 +68,29 @@
         <div class="app-layout">
             <!-- Left Sidebar -->
             <aside class="standings-sidebar">
-                <div class="standings-section">
-                    <h2>Driver Standings</h2>
-                    <div id="driver-totals"></div>
+                <div class="standings-tabs">
+                    <button class="tab-button active" data-tab="tables">Tables</button>
+                    <button class="tab-button" data-tab="charts">Charts</button>
                 </div>
-                <div class="standings-section">
-                    <h2>Constructor Championship</h2>
-                    <div id="constructor-totals"></div>
+                <div id="tables-content" class="tab-content active">
+                    <div class="standings-section">
+                        <h2>Driver Standings</h2>
+                        <div id="driver-totals"></div>
+                    </div>
+                    <div class="standings-section">
+                        <h2>Constructor Championship</h2>
+                        <div id="constructor-totals"></div>
+                    </div>
+                </div>
+                <div id="charts-content" class="tab-content">
+                    <div class="chart-wrapper">
+                        <h3>Driver Championship</h3>
+                        <canvas id="driver-points-chart"></canvas>
+                    </div>
+                    <div class="chart-wrapper">
+                        <h3>Constructor Championship</h3>
+                        <canvas id="constructor-points-chart"></canvas>
+                    </div>
                 </div>
             </aside>
 
