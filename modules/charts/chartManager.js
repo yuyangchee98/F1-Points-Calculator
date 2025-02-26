@@ -8,224 +8,257 @@ let constructorPointsChart = null;
  * Initialize charts on the page
  */
 export function initializeCharts() {
-  // Create container for charts
-  createChartContainers();
+  // Add chart styles
+  addChartStyles();
   
-  // Wait for Chart.js to load (if using CDN)
+  // Set up tab switching
+  setupTabSwitching();
+  
+  // Initialize charts if Chart.js is available
   if (typeof Chart === 'undefined') {
     console.error('Chart.js library not found. Please include it in your HTML.');
     return;
   }
   
-  setupCharts();
-}
-
-/**
- * Create containers for charts
- */
-function createChartContainers() {
-  // Find the standings sidebar
-  const standingsSidebar = document.querySelector('.standings-sidebar');
+  console.log('Chart.js is available, initializing charts...');
   
-  // Create tab navigation for the sidebar
-  const tabsNav = document.createElement('div');
-  tabsNav.className = 'standings-tabs';
-  tabsNav.innerHTML = `
-    <button class="tab-button active" data-tab="tables">Tables</button>
-    <button class="tab-button" data-tab="charts">Charts</button>
-  `;
-  
-  // Insert tabs at the top of the sidebar
-  standingsSidebar.insertBefore(tabsNav, standingsSidebar.firstChild);
-  
-  // Add tab content containers
-  const tablesContent = document.createElement('div');
-  tablesContent.className = 'tab-content active';
-  tablesContent.id = 'tables-content';
-  
-  const chartsContent = document.createElement('div');
-  chartsContent.className = 'tab-content';
-  chartsContent.id = 'charts-content';
-  chartsContent.innerHTML = `
-    <div class="chart-wrapper">
-      <h3>Driver Championship</h3>
-      <canvas id="driver-points-chart"></canvas>
-    </div>
-    <div class="chart-wrapper">
-      <h3>Constructor Championship</h3>
-      <canvas id="constructor-points-chart"></canvas>
-    </div>
-  `;
-  
-  // Move existing standings sections into the tables content
-  const driverSection = standingsSidebar.querySelector('.standings-section:nth-child(1)');
-  const constructorSection = standingsSidebar.querySelector('.standings-section:nth-child(2)');
-  
-  if (driverSection && constructorSection) {
-    tablesContent.appendChild(driverSection);
-    tablesContent.appendChild(constructorSection);
+  // Set up charts with delay to ensure DOM is ready
+  setTimeout(() => {
+    console.log('Setting up driver chart...');
+    const driverResult = setupDriverPointsChart();
+    console.log('Driver chart setup result:', driverResult);
     
-    // Add the tab content containers to the sidebar
-    standingsSidebar.appendChild(tablesContent);
-    standingsSidebar.appendChild(chartsContent);
+    console.log('Setting up constructor chart...');
+    const constructorResult = setupConstructorPointsChart();
+    console.log('Constructor chart setup result:', constructorResult);
     
-    // Add event listeners to tab buttons
-    const tabButtons = tabsNav.querySelectorAll('.tab-button');
-    tabButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        // Remove active class from all buttons and contents
-        tabButtons.forEach(btn => btn.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(content => {
-          content.classList.remove('active');
-        });
-        
-        // Add active class to clicked button and corresponding content
-        button.classList.add('active');
-        document.getElementById(`${button.dataset.tab}-content`).classList.add('active');
-        
-        // If switching to charts tab, update charts
-        if (button.dataset.tab === 'charts') {
-          updateCharts();
-        }
-      });
+    // Initial update when we have data
+    document.addEventListener('hasPointsData', () => {
+      console.log('Points data is now available, updating charts');
+      updateCharts();
     });
-  }
-  
-  // Add tab styles
-  addChartStyles();
+  }, 1000);
 }
 
 /**
- * Setup charts initial rendering
+ * Set up tab switching behavior
  */
-function setupCharts() {
-  setupDriverPointsChart();
-  setupConstructorPointsChart();
-  updateCharts();
+function setupTabSwitching() {
+  document.querySelectorAll('.tab-button').forEach(button => {
+    button.addEventListener('click', () => {
+      const tabId = button.dataset.tab;
+      
+      // Special handling for charts tab
+      if (tabId === 'charts') {
+        // Ensure charts are initialized
+        if (!driverPointsChart || !constructorPointsChart) {
+          setupDriverPointsChart();
+          setupConstructorPointsChart();
+        }
+      }
+      // Remove active class from all buttons and contents
+      document.querySelectorAll('.tab-button').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+      });
+      
+      // Add active class to clicked button and corresponding content
+      button.classList.add('active');
+      document.getElementById(`${tabId}-content`).classList.add('active');
+      
+      // If switching to charts tab, update charts
+      if (tabId === 'charts') {
+        console.log('Charts tab selected, triggering update');
+        // Force rebuild of charts if they're null
+        if (!driverPointsChart || !constructorPointsChart) {
+          console.log('Charts not initialized, setting up charts now...');
+          setupDriverPointsChart();
+          setupConstructorPointsChart();
+        }
+        updateCharts();
+      }
+    });
+  });
 }
 
 /**
  * Setup driver points chart
+ * @returns {boolean} Success status
  */
 function setupDriverPointsChart() {
-  const ctx = document.getElementById('driver-points-chart');
+  const canvas = document.getElementById('driver-points-chart');
+  if (!canvas) {
+    console.error('Driver points chart canvas not found');
+    return false;
+  }
   
-  driverPointsChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: [], // Will be populated with driver names
-      datasets: [{
-        label: 'Points',
-        data: [], // Will be populated with points
-        backgroundColor: [], // Will be populated with team colors
-        borderColor: 'rgba(255, 255, 255, 0.2)',
-        borderWidth: 1
-      }]
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          display: false
+  console.log('Found driver points chart canvas, initializing chart...');
+  
+  try {
+    driverPointsChart = new Chart(canvas, {
+      type: 'line',
+      data: {
+        labels: [], // Will be populated with driver names
+        datasets: [{
+          label: 'Points',
+          data: [], // Will be populated with points
+          backgroundColor: [], // Will be populated with team colors
+          borderColor: [], // Will be populated with team colors
+          borderWidth: 2,
+          pointBackgroundColor: [],
+          pointBorderColor: [],
+          pointRadius: 5,
+          tension: 0.1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        resizeDelay: 0,
+        animation: false,
+        layout: {
+          padding: {
+            left: 10,
+            right: 10,
+            top: 0,
+            bottom: 0
+          }
         },
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              return `${context.formattedValue} points`;
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return `${context.formattedValue} points`;
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            title: {
+            display: true,
+            text: 'Points',
+            color: '#000'
+            },
+            ticks: {
+            color: '#000'
+            },
+            grid: {
+            color: 'rgba(0, 0, 0, 0.1)'
+            }
+          },
+          y: {
+            ticks: {
+              color: '#000'
+            },
+            grid: {
+              color: 'rgba(0, 0, 0, 0.1)'
             }
           }
         }
-      },
-      scales: {
-        x: {
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: 'Points',
-            color: '#fff'
-          },
-          ticks: {
-            color: '#fff'
-          },
-          grid: {
-            color: 'rgba(255, 255, 255, 0.1)'
-          }
-        },
-        y: {
-          ticks: {
-            color: '#fff'
-          },
-          grid: {
-            color: 'rgba(255, 255, 255, 0.1)'
-          }
-        }
       }
-    }
-  });
+    });
+    
+    return true;
+  } catch (error) {
+    console.error('Error setting up driver chart:', error);
+    return false;
+  }
 }
 
 /**
  * Setup constructor points chart
+ * @returns {boolean} Success status
  */
 function setupConstructorPointsChart() {
-  const ctx = document.getElementById('constructor-points-chart');
+  const canvas = document.getElementById('constructor-points-chart');
+  if (!canvas) {
+    console.error('Constructor points chart canvas not found');
+    return false;
+  }
   
-  constructorPointsChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: [], // Will be populated with constructor names
-      datasets: [{
-        label: 'Points',
-        data: [], // Will be populated with points
-        backgroundColor: [], // Will be populated with team colors
-        borderColor: 'rgba(255, 255, 255, 0.2)',
-        borderWidth: 1
-      }]
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          display: false
+  console.log('Found constructor points chart canvas, initializing chart...');
+  
+  try {
+    constructorPointsChart = new Chart(canvas, {
+      type: 'line',
+      data: {
+        labels: [], // Will be populated with constructor names
+        datasets: [{
+          label: 'Points',
+          data: [], // Will be populated with points
+          backgroundColor: [], // Will be populated with team colors
+          borderColor: [], // Will be populated with team colors
+          borderWidth: 2,
+          pointBackgroundColor: [],
+          pointBorderColor: [],
+          pointRadius: 5,
+          tension: 0.1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        resizeDelay: 0,
+        animation: false,
+        layout: {
+          padding: {
+            left: 10,
+            right: 10,
+            top: 0,
+            bottom: 0
+          }
         },
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              return `${context.formattedValue} points`;
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return `${context.formattedValue} points`;
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Points',
+              color: '#000'
+            },
+            ticks: {
+              color: '#000'
+            },
+            grid: {
+              color: 'rgba(0, 0, 0, 0.1)'
+            }
+          },
+          y: {
+            ticks: {
+              color: '#000'
+            },
+            grid: {
+              color: 'rgba(0, 0, 0, 0.1)'
             }
           }
         }
-      },
-      scales: {
-        x: {
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: 'Points',
-            color: '#fff'
-          },
-          ticks: {
-            color: '#fff'
-          },
-          grid: {
-            color: 'rgba(255, 255, 255, 0.1)'
-          }
-        },
-        y: {
-          ticks: {
-            color: '#fff'
-          },
-          grid: {
-            color: 'rgba(255, 255, 255, 0.1)'
-          }
-        }
       }
-    }
-  });
+    });
+    
+    return true;
+  } catch (error) {
+    console.error('Error setting up constructor chart:', error);
+    return false;
+  }
 }
 
 /**
@@ -233,8 +266,19 @@ function setupConstructorPointsChart() {
  * This function is called whenever points are recalculated
  */
 export function updateCharts() {
-  if (!driverPointsChart || !constructorPointsChart) return;
+  // Only update if charts are initialized and charts tab is active
+  if (!driverPointsChart || !constructorPointsChart) {
+    console.log('Charts not initialized, cannot update');
+    return;
+  }
   
+  const chartsTab = document.getElementById('charts-content');
+  if (!chartsTab || !chartsTab.classList.contains('active')) {
+    console.log('Charts tab not active, skipping update');
+    return;
+  }
+  
+  console.log('Updating both charts...');
   updateDriverPointsChart();
   updateConstructorPointsChart();
 }
@@ -243,70 +287,125 @@ export function updateCharts() {
  * Update driver points chart with current data
  */
 function updateDriverPointsChart() {
+  console.log('Updating driver points chart');
+  
   // Extract data from DOM (already calculated and displayed in standings)
-  const driverStandings = [...document.querySelectorAll('#driver-totals .standings-row')]
+  const driverRows = document.querySelectorAll('#driver-totals .standings-row');
+  console.log('Found driver rows:', driverRows.length);
+  
+  const driverStandings = [...driverRows]
     .map(row => {
       const nameElement = row.querySelector('.standings-name');
-      const driverName = nameElement.textContent.trim();
+      const driverName = nameElement ? nameElement.textContent.trim() : 'Unknown';
       const team = data.driverTeams[driverName];
       const teamColor = data.teamColors[team];
+      const pointsElement = row.querySelector('.standings-points');
+      const points = pointsElement ? parseInt(pointsElement.textContent) : 0;
       
       return {
         driver: driverName,
-        points: parseInt(row.querySelector('.standings-points').textContent),
+        points: points,
         color: teamColor || '#ccc'
       };
     })
     .filter(item => item.points > 0) // Only show drivers with points
-    .sort((a, b) => b.points - a.points)
-    .slice(0, 10); // Limit to top 10 drivers for better visibility
+    .sort((a, b) => b.points - a.points);
+    
+  console.log('Processed driver standings:', driverStandings);
   
-  // Clear existing data
-  driverPointsChart.data.labels = [];
-  driverPointsChart.data.datasets[0].data = [];
-  driverPointsChart.data.datasets[0].backgroundColor = [];
+  // If no data, add a placeholder
+  if (driverStandings.length === 0) {
+    driverStandings.push({
+      driver: 'No Data',
+      points: 0,
+      color: '#ccc'
+    });
+  }
   
-  // Add new data
+  // Clear existing data and destroy old chart
+  driverPointsChart.data.labels.length = 0;
+  driverPointsChart.data.datasets[0].data.length = 0;
+  driverPointsChart.data.datasets[0].backgroundColor.length = 0;
+  
+  // Update the chart to handle line chart format with team colors
   driverPointsChart.data.labels = driverStandings.map(d => d.driver);
   driverPointsChart.data.datasets[0].data = driverStandings.map(d => d.points);
-  driverPointsChart.data.datasets[0].backgroundColor = driverStandings.map(d => d.color);
   
-  // Update the chart
-  driverPointsChart.update('none'); // Use 'none' animation for immediate update
+  // For line chart, we need to set colors for borders and points
+  driverPointsChart.data.datasets[0].backgroundColor = driverStandings.map(d => d.color);
+  driverPointsChart.data.datasets[0].borderColor = driverStandings.map(d => d.color);
+  driverPointsChart.data.datasets[0].pointBackgroundColor = driverStandings.map(d => d.color);
+  driverPointsChart.data.datasets[0].pointBorderColor = driverStandings.map(d => d.color);
+  
+  // Update the chart with no animation for immediate update
+  try {
+    driverPointsChart.update('none');
+    console.log('Driver chart updated successfully');
+  } catch (error) {
+    console.error('Error updating driver chart:', error);
+  }
 }
 
 /**
  * Update constructor points chart with current data
  */
 function updateConstructorPointsChart() {
+  console.log('Updating constructor points chart');
+  
   // Extract data from DOM (already calculated and displayed in standings)
-  const constructorStandings = [...document.querySelectorAll('#constructor-totals .standings-row')]
+  const constructorRows = document.querySelectorAll('#constructor-totals .standings-row');
+  console.log('Found constructor rows:', constructorRows.length);
+  
+  const constructorStandings = [...constructorRows]
     .map(row => {
       const nameElement = row.querySelector('.standings-name');
-      const teamName = nameElement.textContent.trim();
-      const teamColor = data.teamColors[teamName];
+      const teamName = nameElement ? nameElement.textContent.trim() : 'Unknown';
+      const teamColor = data.teamColors[teamName] || '#ccc';
+      const pointsElement = row.querySelector('.standings-points');
+      const points = pointsElement ? parseInt(pointsElement.textContent) : 0;
       
       return {
         team: teamName,
-        points: parseInt(row.querySelector('.standings-points').textContent),
-        color: teamColor || '#ccc'
+        points: points,
+        color: teamColor
       };
     })
     .filter(item => item.points > 0) // Only show teams with points
     .sort((a, b) => b.points - a.points);
     
-  // Clear existing data
-  constructorPointsChart.data.labels = [];
-  constructorPointsChart.data.datasets[0].data = [];
-  constructorPointsChart.data.datasets[0].backgroundColor = [];
+  console.log('Processed constructor standings:', constructorStandings);
   
-  // Add new data
+  // If no data, add a placeholder
+  if (constructorStandings.length === 0) {
+    constructorStandings.push({
+      team: 'No Data',
+      points: 0,
+      color: '#ccc'
+    });
+  }
+    
+  // Clear existing data and destroy old chart
+  constructorPointsChart.data.labels.length = 0;
+  constructorPointsChart.data.datasets[0].data.length = 0;
+  constructorPointsChart.data.datasets[0].backgroundColor.length = 0;
+  
+  // Update the chart to handle line chart format with team colors
   constructorPointsChart.data.labels = constructorStandings.map(d => d.team);
   constructorPointsChart.data.datasets[0].data = constructorStandings.map(d => d.points);
-  constructorPointsChart.data.datasets[0].backgroundColor = constructorStandings.map(d => d.color);
   
-  // Update the chart
-  constructorPointsChart.update('none'); // Use 'none' animation for immediate update
+  // For line chart, we need to set colors for borders and points
+  constructorPointsChart.data.datasets[0].backgroundColor = constructorStandings.map(d => d.color);
+  constructorPointsChart.data.datasets[0].borderColor = constructorStandings.map(d => d.color);
+  constructorPointsChart.data.datasets[0].pointBackgroundColor = constructorStandings.map(d => d.color);
+  constructorPointsChart.data.datasets[0].pointBorderColor = constructorStandings.map(d => d.color);
+  
+  // Update the chart with no animation for immediate update
+  try {
+    constructorPointsChart.update('none');
+    console.log('Constructor chart updated successfully');
+  } catch (error) {
+    console.error('Error updating constructor chart:', error);
+  }
 }
 
 /**
@@ -362,12 +461,22 @@ function addChartStyles() {
       background: #4a90e2;
     }
     
+    /* Styles removed - no longer needed */
     .tab-button:hover {
       color: #4a90e2;
     }
     
+    .standings-sidebar {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    
     .tab-content {
       display: none;
+      overflow-y: auto;
+      flex-grow: 1;
+      max-height: calc(100vh - 50px); /* Adjust based on tab height */
     }
     
     .tab-content.active {
@@ -376,9 +485,13 @@ function addChartStyles() {
     
     /* Chart styles */
     .chart-wrapper {
-      background: transparent;
-      padding: 15px 0;
+      background: #fff;
+      padding: 15px;
       margin-bottom: 20px;
+      height: auto;
+      position: relative;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
     
     .chart-wrapper h3 {
@@ -386,12 +499,22 @@ function addChartStyles() {
       font-size: 18px;
       font-weight: 500;
       text-align: center;
-      color: #fff;
+      color: #000;
+    }
+    
+    #charts-content {
+      height: 100%;
+      max-height: 100%;
+      overflow-y: auto;
+      background-color: #fff;
+      padding: 15px;
+      border-radius: 8px;
     }
     
     canvas {
-      width: 100%;
-      height: 300px;
+      width: 100% !important;
+      height: 400px !important;
+      max-height: 400px !important;
     }
   `;
   

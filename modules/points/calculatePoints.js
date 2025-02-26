@@ -60,6 +60,14 @@ export function calculatePoints() {
     
   // Update charts if they exist
   updateCharts();
+  
+  // Ensure charts tab can have data the first time points are calculated
+  if (window.initialPointsCalculated === undefined) {
+    window.initialPointsCalculated = true;
+    
+    // Signal that data is available for charts
+    document.dispatchEvent(new CustomEvent('hasPointsData'));
+  }
 
   // Update constructor points display with new format
   const constructorTotalsElement =
