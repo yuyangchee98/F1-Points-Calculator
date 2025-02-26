@@ -24,13 +24,18 @@ export function initializeCharts() {
   
   // Set up charts with delay to ensure DOM is ready
   setTimeout(() => {
-    console.log('Setting up driver chart...');
-    const driverResult = setupDriverPointsChart();
-    console.log('Driver chart setup result:', driverResult);
+    // Only set up charts if they don't already exist
+    if (!driverPointsChart) {
+      console.log('Setting up driver chart...');
+      const driverResult = setupDriverPointsChart();
+      console.log('Driver chart setup result:', driverResult);
+    }
     
-    console.log('Setting up constructor chart...');
-    const constructorResult = setupConstructorPointsChart();
-    console.log('Constructor chart setup result:', constructorResult);
+    if (!constructorPointsChart) {
+      console.log('Setting up constructor chart...');
+      const constructorResult = setupConstructorPointsChart();
+      console.log('Constructor chart setup result:', constructorResult);
+    }
     
     // Initial update when we have data
     document.addEventListener('hasPointsData', () => {
@@ -97,6 +102,13 @@ function setupDriverPointsChart() {
   console.log('Found driver points chart canvas, initializing chart...');
   
   try {
+    // Destroy existing chart if it exists
+    if (driverPointsChart) {
+      console.log('Destroying existing driver chart before recreation');
+      driverPointsChart.destroy();
+      driverPointsChart = null;
+    }
+    
     // Initialize with empty data - will be populated in updateDriverPointsChart
     driverPointsChart = new Chart(canvas, {
       type: 'line',
@@ -195,6 +207,12 @@ function setupConstructorPointsChart() {
   console.log('Found constructor points chart canvas, initializing chart...');
   
   try {
+    // Destroy existing chart if it exists
+    if (constructorPointsChart) {
+      console.log('Destroying existing constructor chart before recreation');
+      constructorPointsChart.destroy();
+      constructorPointsChart = null;
+    }
     // Initialize with empty data - will be populated in updateConstructorPointsChart
     constructorPointsChart = new Chart(canvas, {
       type: 'line',
@@ -326,6 +344,12 @@ export function updateCharts() {
 function updateDriverPointsChart() {
   console.log('Updating driver points chart');
   
+  // Ensure chart exists before updating
+  if (!driverPointsChart) {
+    console.log('Driver chart does not exist, setting up before update');
+    setupDriverPointsChart();
+  }
+  
   // Extract data from DOM (already calculated and displayed in standings)
   const driverRows = document.querySelectorAll('#driver-totals .standings-row');
   console.log('Found driver rows:', driverRows.length);
@@ -353,7 +377,12 @@ function updateDriverPointsChart() {
   console.log('Processed top drivers:', topDrivers);
   
   // Clear existing datasets
-  driverPointsChart.data.datasets = [];
+  if (driverPointsChart && driverPointsChart.data && driverPointsChart.data.datasets) {
+    driverPointsChart.data.datasets = [];
+  } else {
+    console.warn('Driver chart not properly initialized, can\'t update datasets');
+    return;
+  }
   
   // If we have data, create one dataset per driver
   if (topDrivers.length > 0) {
@@ -423,6 +452,12 @@ function updateDriverPointsChart() {
 function updateConstructorPointsChart() {
   console.log('Updating constructor points chart');
   
+  // Ensure chart exists before updating
+  if (!constructorPointsChart) {
+    console.log('Constructor chart does not exist, setting up before update');
+    setupConstructorPointsChart();
+  }
+  
   // Extract data from DOM (already calculated and displayed in standings)
   const constructorRows = document.querySelectorAll('#constructor-totals .standings-row');
   console.log('Found constructor rows:', constructorRows.length);
@@ -449,7 +484,12 @@ function updateConstructorPointsChart() {
   console.log('Processed top constructors:', topConstructors);
   
   // Clear existing datasets
-  constructorPointsChart.data.datasets = [];
+  if (constructorPointsChart && constructorPointsChart.data && constructorPointsChart.data.datasets) {
+    constructorPointsChart.data.datasets = [];
+  } else {
+    console.warn('Constructor chart not properly initialized, can\'t update datasets');
+    return;
+  }
   
   // If we have data, create one dataset per constructor
   if (topConstructors.length > 0) {
