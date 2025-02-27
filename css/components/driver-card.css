@@ -42,28 +42,55 @@
 /* Mobile styles */
 @media (max-width: 768px) {
     #driver-selection {
-        grid-template-columns: repeat(5, 1fr); /* 5 columns on typical mobile */
+        display: flex;
+        flex-wrap: wrap;
         gap: 4px;
-        padding: 6px;
-        margin-bottom: 12px;
+        padding: 10px;
+        justify-content: space-between;
+        background-color: #f5f5f5;
+        border-radius: 8px;
+        margin-bottom: 16px;
     }
 
     .driver-card {
-        height: 32px;
-        padding: 4px;
-        font-size: 0.75rem;
+        flex: 0 0 calc(33.333% - 4px); /* 3 columns with smaller gap */
+        height: 44px; /* Recommended minimum touch target height */
+        margin: 0; /* Remove default margins */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 8px;
+        font-size: 14px;
+        font-weight: 500;
+        border-radius: 6px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-align: center;
     }
 
     .driver-card:active {
-        background-color: #f5f5f5;
-        transform: scale(0.98);
+        transform: scale(0.97);
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .driver-card.selected {
+        outline: 3px solid #4CAF50;
+        outline-offset: -1px;
     }
 }
 
 /* Very small screens */
 @media (max-width: 375px) {
     #driver-selection {
-        grid-template-columns: repeat(4, 1fr); /* 4 columns on very small screens */
+        gap: 4px;
+    }
+    
+    .driver-card {
+        flex: 0 0 calc(50% - 4px); /* 2 columns with smaller gap */
+        height: 48px; /* Slightly larger for even better touch targets */
+        font-size: 13px;
     }
 }
 
