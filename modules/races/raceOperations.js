@@ -250,10 +250,6 @@ export function initializeMobileSupport() {
   style.textContent = `
     @media (max-width: 768px) {
       .driver-card {
-        padding: 12px 16px;
-        margin: 4px;
-        font-size: 14px;
-        min-height: 44px;
         touch-action: none;
         -webkit-touch-callout: none;
         -webkit-tap-highlight-color: transparent;
@@ -261,9 +257,7 @@ export function initializeMobileSupport() {
       }
       
       .driver-card.selected {
-        outline: 3px solid #4CAF50;
         background-color: #E8F5E9;
-        transform: scale(1.02);
       }
       
       .race-slot {
