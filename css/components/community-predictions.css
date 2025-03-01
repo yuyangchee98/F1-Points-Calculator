@@ -2,24 +2,41 @@
  * Styling for community predictions display
  */
 
-/* Toggle button styling */
+/* Toggle button styling - updated for consistency */
 #community-toggle {
-  margin-left: 1rem;
-  padding: 0.5rem 1rem;
-  background-color: #1a1a1a;
-  color: #ffffff;
-  border: none;
-  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: #f8f9fa;
+  color: #495057;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  margin-left: 16px;
 }
 
 #community-toggle:hover {
-  background-color: #333333;
+  background-color: #e9ecef;
+  border-color: #dee2e6;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
 }
 
 #community-toggle.active {
-  background-color: #0044cc;
+  background-color: #4a90e2;
+  border-color: #4a90e2;
+  color: white;
+}
+
+#community-toggle::before {
+  content: '👥';
+  font-size: 18px;
 }
 
 /* Community consensus label on driver cards */
@@ -27,31 +44,34 @@
   position: absolute;
   top: -8px;
   right: -8px;
-  background-color: #0044cc;
+  background-color: #4a90e2;
   color: white;
   border-radius: 12px;
   padding: 2px 6px;
   font-size: 10px;
   font-weight: bold;
   z-index: 10;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border: 1px solid white;
 }
 
 /* Info banner styling */
 .community-info-banner {
-  background-color: #f0f8ff;
-  border-left: 4px solid #0044cc;
-  border-radius: 4px;
+  background-color: #f8f9fa;
+  border-left: 4px solid #4a90e2;
+  border-radius: 8px;
   padding: 1rem;
   margin-bottom: 1.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .community-info-banner h3 {
   margin: 0 0 0.5rem 0;
-  color: #0044cc;
+  color: #4a90e2;
+  font-weight: 600;
 }
 
 .community-info-banner p {
@@ -62,20 +82,35 @@
 .updated-date {
   font-size: 0.8rem;
   color: #666666 !important;
+  font-style: italic;
 }
 
 .secondary-button {
-  background-color: #ffffff;
-  color: #0044cc;
-  border: 1px solid #0044cc;
-  border-radius: 4px;
-  padding: 0.5rem 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: white;
+  color: #4a90e2;
+  border: 2px solid #4a90e2;
+  border-radius: 8px;
   cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .secondary-button:hover {
   background-color: #f0f8ff;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.secondary-button::before {
+  content: '↩️';
+  font-size: 16px;
 }
 
 /* Loading animation */
@@ -85,7 +120,7 @@
   height: 20px;
   border: 3px solid rgba(0, 0, 0, 0.1);
   border-radius: 50%;
-  border-top-color: #0044cc;
+  border-top-color: #4a90e2;
   animation: spin 1s ease-in-out infinite;
   margin-left: 10px;
 }
@@ -103,5 +138,20 @@
   
   .secondary-button {
     margin-top: 1rem;
+    width: 100%;
+  }
+  
+  #community-toggle {
+    margin-left: 0;
+    margin-top: 1rem;
+    width: 100%;
+  }
+}
+
+/* Smaller screens */
+@media (max-width: 480px) {
+  .community-consensus-label {
+    font-size: 8px;
+    padding: 1px 4px;
   }
 }
