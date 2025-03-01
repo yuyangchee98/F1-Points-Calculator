@@ -1,218 +1,245 @@
-import * as data from "../../data.js";
-// import "./predictionStubs.js"; // Commented out as we'll now use the real API
+/**
+ * Prediction Manager - Handles saving and loading predictions
+ */
+import { loadPredictions } from "../state/gridState.js";
 
-// API base URL for the deployed backend
-const API_BASE_URL = 'https://f1-points-calculator-api.yuyangchee98.workers.dev';
+// API endpoints for predictions
+const API_BASE_URL = 'https://f1-points-calculator-api.yuyangchee98.workers.dev/api';
+const PREDICTIONS_ENDPOINT = `${API_BASE_URL}/predictions`;
+const USER_PREDICTIONS_ENDPOINT = `${API_BASE_URL}/users`;
 
-import { resetGrid } from "../state/gridState.js";
-import { createDriverCard } from "../drivers/driverCard.js";
-import { initDragAndDrop } from "../dragAndDrop/dragHandlers.js";
-import { calculatePoints } from "../points/calculatePoints.js";
-import { updateRaceStatus } from "../ui/raceStatus.js";
+// User ID storage key
+const USER_ID_KEY = 'f1-calculator-user-id';
+// Prediction history storage key
+const PREDICTION_HISTORY_KEY = 'f1-calculator-predictions';
+// Local prediction storage key
+const LOCAL_PREDICTION_KEY = 'f1-predictions';
 
 /**
- * Get or create a unique user ID stored in localStorage
- * @returns {string} User ID
+ * Generate a persistent user ID if one doesn't exist
+ * @returns {string} The user ID
  */
-export function getUserId() {
-  // Check if user ID exists in localStorage
-  let userId = localStorage.getItem('f1-calculator-user-id');
+function getUserId() {
+  let userId = localStorage.getItem(USER_ID_KEY);
   
-  // If not, create one and store it
   if (!userId) {
+    // Generate a UUID for the user
     userId = crypto.randomUUID();
-    localStorage.setItem('f1-calculator-user-id', userId);
+    localStorage.setItem(USER_ID_KEY, userId);
   }
   
   return userId;
 }
 
 /**
- * Extract current predictions from the grid
- * @returns {Object} Object containing race predictions
+ * Get prediction history from local storage
+ * @returns {Array} Array of prediction IDs
  */
-export function getCurrentPredictions() {
+export function getPredictionHistory() {
+  const historyJson = localStorage.getItem(PREDICTION_HISTORY_KEY);
+  
+  if (historyJson) {
+    try {
+      return JSON.parse(historyJson);
+    } catch (e) {
+      console.error('Error parsing prediction history:', e);
+      return [];
+    }
+  }
+  
+  return [];
+}
+
+/**
+ * Save prediction ID to history
+ * @param {string} id - The prediction ID
+ */
+function savePredictionToHistory(id) {
+  const history = getPredictionHistory();
+  
+  // Add new ID to beginning of history (most recent first)
+  history.unshift(id);
+  
+  // Remove duplicates and limit to 10 entries
+  const uniqueHistory = [...new Set(history)].slice(0, 10);
+  
+  // Save to local storage
+  localStorage.setItem(PREDICTION_HISTORY_KEY, JSON.stringify(uniqueHistory));
+}
+
+/**
+ * Get current predictions from the grid
+ * @returns {Object} Prediction data
+ */
+function getCurrentPredictions() {
   const predictions = {};
   
-  // Loop through all races
-  data.races.forEach(race => {
-    predictions[race] = {};
+  // Get all race slots
+  const slots = document.querySelectorAll('.race-slot');
+  
+  slots.forEach(slot => {
+    // Skip empty slots
+    if (!slot.firstChild) return;
     
-    // For each position 1-20
-    for (let position = 1; position <= 20; position++) {
-      const slot = document.querySelector(`.race-slot[data-race="${race}"][data-position="${position}"]`);
-      if (slot && slot.children.length > 0) {
-        const driverCard = slot.children[0];
-        predictions[race][position] = driverCard.dataset.driver;
-      }
+    // Get race name and position from slot ID
+    const [raceId, position] = slot.id.split('-p');
+    const raceName = raceId.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    
+    // Get driver name from the card
+    const driverName = slot.firstChild.getAttribute('data-driver');
+    
+    if (!predictions[raceName]) {
+      predictions[raceName] = {};
     }
+    
+    predictions[raceName][position] = driverName;
   });
   
   return predictions;
 }
 
 /**
- * Apply prediction data to the grid
- * @param {Object} predictions - The prediction data to apply
- */
-export function applyPredictions(predictions) {
-  // First clear the grid
-  resetGrid();
-  
-  // For each race in the predictions
-  Object.entries(predictions).forEach(([race, positions]) => {
-    // For each position in the race
-    Object.entries(positions).forEach(([position, driver]) => {
-      // Find the slot for this race and position
-      const slot = document.querySelector(`.race-slot[data-race="${race}"][data-position="${position}"]`);
-      
-      if (slot) {
-        // Create and add the driver card
-        const driverCard = createDriverCard(driver);
-        slot.appendChild(driverCard);
-      }
-    });
-  });
-  
-  // Re-initialize drag and drop and update calculations
-  initDragAndDrop();
-  calculatePoints();
-  updateRaceStatus();
-}
-
-/**
- * Save current prediction to the server
+ * Save current predictions to the API
+ * @returns {Promise<string>} The prediction ID
  */
 export async function savePrediction() {
   try {
     const userId = getUserId();
     const predictions = getCurrentPredictions();
     
-    // Show saving indicator
-    const notification = document.createElement('div');
-    notification.className = 'notification';
-    notification.textContent = 'Saving your prediction...';
-    document.body.appendChild(notification);
+    // Save locally first in case API fails
+    localStorage.setItem(LOCAL_PREDICTION_KEY, JSON.stringify(predictions));
     
-    // Send data to server
-    const response = await fetch(`${API_BASE_URL}/api/predictions`, {
+    // Send to API
+    const response = await fetch(PREDICTIONS_ENDPOINT, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({
-        userId: userId,
-        predictions: predictions
+        userId,
+        predictions
       })
     });
     
-    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
     
-    // Remove saving indicator
-    document.body.removeChild(notification);
+    const data = await response.json();
     
-    if (result.success) {
-      // Show success message
-      showNotification(`Prediction saved! Your ID is: ${result.id}`);
+    if (data.success && data.id) {
+      // Save to history
+      savePredictionToHistory(data.id);
       
-      // Add ID to URL to make it shareable
-      window.history.pushState({}, '', `?prediction=${result.id}`);
-      
-      // Store in local history
-      saveToLocalHistory(result.id);
-      
-      return result.id;
+      // Return the prediction ID
+      showNotification('Prediction saved successfully!', 'success');
+      return data.id;
     } else {
-      showNotification('Failed to save prediction', 'error');
-      return null;
+      throw new Error('Failed to save prediction');
     }
   } catch (error) {
     console.error('Error saving prediction:', error);
-    showNotification('Error saving prediction', 'error');
+    showNotification('Failed to save prediction', 'error');
     return null;
   }
 }
 
 /**
- * Load prediction by ID
- * @param {string} id - The prediction ID to load
+ * Load a prediction by ID
+ * @param {string} id - The prediction ID
  */
 export async function loadPredictionById(id) {
   try {
-    // Show loading indicator
-    const notification = document.createElement('div');
-    notification.className = 'notification';
-    notification.textContent = 'Loading prediction...';
-    document.body.appendChild(notification);
+    // Show loading notification
+    showNotification('Loading prediction...', 'info');
     
-    const response = await fetch(`${API_BASE_URL}/api/predictions/${id}`);
-    
-    // Remove loading indicator
-    document.body.removeChild(notification);
+    // Fetch from API
+    const response = await fetch(`${PREDICTIONS_ENDPOINT}/${id}`);
     
     if (!response.ok) {
-      throw new Error('Prediction not found');
+      throw new Error(`API error: ${response.status}`);
     }
     
     const data = await response.json();
     
-    // Apply the loaded predictions to the grid
-    applyPredictions(data.predictions);
-    
-    // Update URL
-    window.history.pushState({}, '', `?prediction=${id}`);
-    
-    // Save to local history
-    saveToLocalHistory(id);
-    
-    showNotification('Prediction loaded successfully');
-    return true;
+    if (data && data.predictions) {
+      // Add to history
+      savePredictionToHistory(id);
+      
+      // Save locally
+      localStorage.setItem(LOCAL_PREDICTION_KEY, JSON.stringify(data.predictions));
+      
+      // Load into grid
+      loadPredictions(data.predictions);
+      
+      // Show success notification
+      showNotification('Prediction loaded successfully!', 'success');
+      
+      // Update URL without reloading page
+      const url = new URL(window.location);
+      url.searchParams.set('prediction', id);
+      window.history.pushState({}, '', url);
+    } else {
+      throw new Error('Invalid prediction data');
+    }
   } catch (error) {
     console.error('Error loading prediction:', error);
-    showNotification('Error loading prediction: ' + error.message, 'error');
-    return false;
+    showNotification('Failed to load prediction', 'error');
   }
 }
 
 /**
- * Save prediction ID to local history
- * @param {string} id - The prediction ID to save
+ * Load saved predictions from local storage
  */
-export function saveToLocalHistory(id) {
-  const history = JSON.parse(localStorage.getItem('f1-prediction-history') || '[]');
+export function loadSavedPredictions() {
+  const savedPredictions = localStorage.getItem(LOCAL_PREDICTION_KEY);
   
-  // Add to beginning, remove duplicates
-  const newHistory = [id, ...history.filter(item => item !== id)];
+  if (savedPredictions) {
+    try {
+      const predictions = JSON.parse(savedPredictions);
+      loadPredictions(predictions);
+      return true;
+    } catch (e) {
+      console.error('Error parsing saved predictions:', e);
+      return false;
+    }
+  }
   
-  // Limit history size
-  const limitedHistory = newHistory.slice(0, 10);
-  
-  localStorage.setItem('f1-prediction-history', JSON.stringify(limitedHistory));
+  return false;
 }
 
 /**
- * Get prediction history from localStorage
- * @returns {Array} Array of prediction IDs
+ * Show a notification
+ * @param {string} message - The notification message
+ * @param {string} type - The notification type (success, error, info)
  */
-export function getPredictionHistory() {
-  return JSON.parse(localStorage.getItem('f1-prediction-history') || '[]');
-}
-
-/**
- * Show a notification message
- * @param {string} message - The message to display
- * @param {string} type - The notification type (default, error, success)
- */
-export function showNotification(message, type = 'default') {
+export function showNotification(message, type = 'info') {
+  // Remove existing notifications
+  const existingNotifications = document.querySelectorAll('.notification');
+  existingNotifications.forEach(notification => {
+    notification.classList.add('fade-out');
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.parentNode.removeChild(notification);
+      }
+    }, 300);
+  });
+  
+  // Create notification element
   const notification = document.createElement('div');
   notification.className = `notification ${type}`;
   notification.textContent = message;
+  
+  // Add to document
   document.body.appendChild(notification);
   
-  // Auto-hide after 3 seconds
+  // Remove after 3 seconds
   setTimeout(() => {
     notification.classList.add('fade-out');
     setTimeout(() => {
-      if (document.body.contains(notification)) {
-        document.body.removeChild(notification);
+      if (notification.parentNode) {
+        notification.parentNode.removeChild(notification);
       }
     }, 300);
   }, 3000);

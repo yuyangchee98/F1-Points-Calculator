@@ -4,6 +4,7 @@ import {
   getPredictionHistory, 
   showNotification 
 } from "../predictions/predictionManager.js";
+import { fetchCommunityPredictions, displayCommunityPredictions, resetCommunityView } from "../community/communityPredictions.js";
 
 /**
  * Initialize prediction controls (save/load buttons)
@@ -29,12 +30,21 @@ export function initPredictionControls() {
   loadButton.innerHTML = '<span class="button-icon">📂</span><span class="button-text">Load</span>';
   loadButton.addEventListener('click', handleLoadPrediction);
   
+  // Add community predictions button
+  const communityButton = document.createElement('button');
+  communityButton.id = 'community-toggle';
+  communityButton.textContent = 'Show Community Predictions';
+  communityButton.addEventListener('click', toggleCommunityPredictions);
+  
   // Add buttons to container
   controlsContainer.appendChild(saveButton);
   controlsContainer.appendChild(loadButton);
   
   // Add container to actions bar
   actionsBar.appendChild(controlsContainer);
+  
+  // Add community button separately
+  actionsBar.appendChild(communityButton);
   
   // Add notification styles if not already present
   addNotificationStyles();
@@ -207,6 +217,46 @@ function checkUrlForPrediction() {
   
   if (predictionId) {
     loadPredictionById(predictionId);
+  }
+}
+
+/**
+ * Toggle community predictions display
+ */
+async function toggleCommunityPredictions() {
+  const button = document.getElementById('community-toggle');
+  
+  if (button.classList.contains('active')) {
+    // Hide community predictions
+    resetCommunityView();
+  } else {
+    // Show loading state
+    button.textContent = 'Loading...';
+    button.disabled = true;
+    
+    try {
+      // Fetch community predictions
+      const communityData = await fetchCommunityPredictions();
+      
+      if (communityData) {
+        // Display community predictions
+        displayCommunityPredictions(communityData);
+        
+        // Update button
+        button.textContent = 'Hide Community Predictions';
+        button.classList.add('active');
+      } else {
+        // Show error
+        showNotification('Failed to load community predictions', 'error');
+        button.textContent = 'Show Community Predictions';
+      }
+    } catch (error) {
+      console.error('Error loading community predictions:', error);
+      showNotification('Failed to load community predictions', 'error');
+      button.textContent = 'Show Community Predictions';
+    } finally {
+      button.disabled = false;
+    }
   }
 }
 
