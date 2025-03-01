@@ -42,6 +42,9 @@ export function initializeCharts() {
       console.log('Points data is now available, updating charts');
       updateCharts();
     });
+    
+    // Expose updateCharts globally so it can be called from other modules
+    window.updateCharts = updateCharts;
   }, 1000);
 }
 
