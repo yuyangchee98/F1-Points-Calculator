@@ -81,12 +81,24 @@ function getCurrentPredictions() {
     // Skip empty slots
     if (!slot.firstChild) return;
     
-    // Get race name and position from slot ID
-    const [raceId, position] = slot.id.split('-p');
-    const raceName = raceId.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    // Get race name and position from slot attributes
+    const raceName = slot.getAttribute('data-race');
+    const position = slot.getAttribute('data-position');
+    
+    // Skip if race name or position is missing
+    if (!raceName || !position) {
+      console.warn('Slot missing race name or position:', slot);
+      return;
+    }
     
     // Get driver name from the card
     const driverName = slot.firstChild.getAttribute('data-driver');
+    
+    // Skip if driver name is missing
+    if (!driverName) {
+      console.warn('Driver card missing driver name:', slot.firstChild);
+      return;
+    }
     
     if (!predictions[raceName]) {
       predictions[raceName] = {};
