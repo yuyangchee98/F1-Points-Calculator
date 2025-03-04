@@ -53,6 +53,12 @@
   z-index: 10;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   border: 1px solid white;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.driver-card:hover .community-consensus-label {
+  opacity: 1;
 }
 
 /* Info banner styling */
