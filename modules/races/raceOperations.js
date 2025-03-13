@@ -37,7 +37,9 @@ let mobileState = {
   selectedDriver: null,
   selectedDriverElement: null,
   selectedFromRace: null,
-  selectedPosition: null
+  selectedPosition: null,
+  touchStartX: null,
+  touchStartY: null
 };
 
 function logState(action) {
@@ -91,9 +93,11 @@ function swapDrivers(slot1, slot2) {
   return true;
 }
 
-function handleDriverCardTouch(e) {
-  e.preventDefault();
-  e.stopPropagation();
+function handleDriverCardTouchStart(e) {
+  // Record touch start position without preventing default
+  const touch = e.touches[0];
+  mobileState.touchStartX = touch.clientX;
+  mobileState.touchStartY = touch.clientY;
   
   const card = e.currentTarget;
   if (!card) return;
@@ -159,9 +163,11 @@ function handleDriverCardTouch(e) {
   }
 }
 
-function handleSlotTouch(e) {
-  e.preventDefault();
-  e.stopPropagation();
+function handleSlotTouchStart(e) {
+  // Record touch start position without preventing default
+  const touch = e.touches[0];
+  mobileState.touchStartX = touch.clientX;
+  mobileState.touchStartY = touch.clientY;
 
   const targetSlot = e.currentTarget;
   if (!targetSlot) return;
@@ -280,25 +286,225 @@ export function initializeMobileSupport() {
 
   const touchHandlers = new WeakMap();
 
-  function initializeTouchHandlers() {
-    document.querySelectorAll('.driver-card').forEach(card => {
-      const oldHandler = touchHandlers.get(card);
-      if (oldHandler) {
-        card.removeEventListener('touchstart', oldHandler);
+  function handleDriverCardTouchEnd(e) {
+  // Check if this was a tap or a scroll
+  if (!wasTouchAScroll(e)) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const card = e.currentTarget;
+    if (!card) return;
+    
+    const raceSlot = card.closest(".race-slot");
+    console.log('Touched driver card:', {
+      driver: card.dataset.driver,
+      race: raceSlot?.dataset.race,
+      position: raceSlot?.dataset.position
+    });
+    
+    if (mobileState.selectedDriver === card.dataset.driver &&
+        mobileState.selectedFromRace === raceSlot?.dataset.race &&
+        mobileState.selectedPosition === raceSlot?.dataset.position) {
+      clearMobileSelection();
+      return;
+    }
+
+    if (mobileState.selectedDriver && raceSlot &&
+        mobileState.selectedFromRace === raceSlot.dataset.race &&
+        mobileState.selectedPosition !== raceSlot.dataset.position) {
+      
+      const sourceSlot = findDriverSlotInRace(mobileState.selectedDriver, mobileState.selectedFromRace);
+      const targetSlot = raceSlot;
+      
+      if (sourceSlot && targetSlot && swapDrivers(sourceSlot, targetSlot)) {
+        console.log('Swapped drivers:', {
+          driver1: mobileState.selectedDriver,
+          driver2: card.dataset.driver
+        });
+        calculatePoints();
+        updateRaceStatus();
       }
-      const handler = (e) => handleDriverCardTouch(e);
-      touchHandlers.set(card, handler);
-      card.addEventListener('touchstart', handler, { passive: false });
+      
+      clearMobileSelection();
+      return;
+    }
+
+    clearMobileSelection();
+    mobileState.selectedDriver = card.dataset.driver;
+    mobileState.selectedDriverElement = card;
+    mobileState.selectedFromRace = raceSlot ? raceSlot.dataset.race : null;
+    mobileState.selectedPosition = raceSlot ? raceSlot.dataset.position : null;
+    card.classList.add("selected");
+    
+    logState('After Driver Selection');
+    
+    if (mobileState.selectedFromRace) {
+      document.querySelectorAll(`.race-slot[data-race="${mobileState.selectedFromRace}"]`)
+        .forEach(slot => {
+          if (slot.dataset.position !== mobileState.selectedPosition) {
+            slot.classList.add('highlight-slot');
+          }
+        });
+    } else {
+      document.querySelectorAll('.race-slot').forEach(slot => {
+        const race = slot.dataset.race;
+        // Only highlight empty slots where the driver isn't already in the race
+        if (slot.children.length === 0 && !isDriverInRace(mobileState.selectedDriver, race)) {
+          slot.classList.add('highlight-slot');
+        }
+      });
+    }
+  }
+}
+
+function handleSlotTouchEnd(e) {
+  // Check if this was a tap or a scroll
+  if (!wasTouchAScroll(e)) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const targetSlot = e.currentTarget;
+    if (!targetSlot) return;
+
+    const race = targetSlot.dataset.race;
+    const position = targetSlot.dataset.position;
+
+    console.log('Touched slot:', {
+      race,
+      position,
+      hasDriver: targetSlot.children.length > 0,
+      currentState: { ...mobileState }
+    });
+
+    if (!mobileState.selectedDriver && targetSlot.children.length > 0) {
+      const driverCard = targetSlot.children[0];
+      mobileState.selectedDriver = driverCard.dataset.driver;
+      mobileState.selectedDriverElement = driverCard;
+      mobileState.selectedFromRace = race;
+      mobileState.selectedPosition = position;
+      driverCard.classList.add("selected");
+      
+      document.querySelectorAll(`.race-slot[data-race="${race}"]`)
+        .forEach(slot => {
+          if (slot.dataset.position !== position) {
+            slot.classList.add('highlight-slot');
+          }
+        });
+      return;
+    }
+
+    if (mobileState.selectedDriver) {
+      // Check if this driver is already in this race (except for their current position)
+      const existingSlot = findDriverSlotInRace(mobileState.selectedDriver, race);
+      const isMovingWithinRace = mobileState.selectedFromRace === race;
+      
+      // Don't allow placing if driver is already in this race (unless it's a swap within the same race)
+      if (existingSlot && !isMovingWithinRace) {
+        console.log('Driver already in race:', race);
+        clearMobileSelection();
+        return;
+      }
+
+      const sourceSlot = findDriverSlotInRace(mobileState.selectedDriver, mobileState.selectedFromRace);
+      
+      if (isMovingWithinRace) {
+        if (targetSlot.children.length > 0) {
+          if (sourceSlot && swapDrivers(sourceSlot, targetSlot)) {
+            console.log('Swapped drivers in race:', race);
+            calculatePoints();
+            updateRaceStatus();
+          }
+        } else {
+          if (sourceSlot) {
+            const newCard = createDriverCard(mobileState.selectedDriver);
+            sourceSlot.innerHTML = '';
+            targetSlot.appendChild(newCard);
+            console.log('Moved driver to empty slot in race:', race);
+            calculatePoints();
+            updateRaceStatus();
+          }
+        }
+      }
+      else if (!mobileState.selectedFromRace && targetSlot.children.length === 0) {
+        console.log('Placing from selection area', {
+          driver: mobileState.selectedDriver,
+          toRace: race,
+          toPosition: position
+        });
+        
+        const newCard = createDriverCard(mobileState.selectedDriver);
+        targetSlot.appendChild(newCard);
+        calculatePoints();
+        updateRaceStatus();
+      }
+
+      clearMobileSelection();
+    }
+  }
+}
+
+// Helper function to determine if a touch was actually a scroll
+function wasTouchAScroll(e) {
+  const touch = e.changedTouches[0];
+  const touchEndX = touch.clientX;
+  const touchEndY = touch.clientY;
+  
+  // If the start position wasn't recorded, assume it's not a scroll
+  if (mobileState.touchStartX === null || mobileState.touchStartY === null) {
+    return false;
+  }
+  
+  // Calculate the distance moved
+  const distanceX = Math.abs(touchEndX - mobileState.touchStartX);
+  const distanceY = Math.abs(touchEndY - mobileState.touchStartY);
+  
+  // Reset the touch start positions
+  mobileState.touchStartX = null;
+  mobileState.touchStartY = null;
+  
+  // If the touch moved more than 10 pixels in any direction, consider it a scroll
+  return distanceX > 10 || distanceY > 10;
+}
+
+function initializeTouchHandlers() {
+    document.querySelectorAll('.driver-card').forEach(card => {
+      const oldStartHandler = touchHandlers.get(card)?.start;
+      const oldEndHandler = touchHandlers.get(card)?.end;
+      
+      if (oldStartHandler) {
+        card.removeEventListener('touchstart', oldStartHandler);
+      }
+      if (oldEndHandler) {
+        card.removeEventListener('touchend', oldEndHandler);
+      }
+      
+      const startHandler = (e) => handleDriverCardTouchStart(e);
+      const endHandler = (e) => handleDriverCardTouchEnd(e);
+      
+      touchHandlers.set(card, { start: startHandler, end: endHandler });
+      
+      card.addEventListener('touchstart', startHandler, { passive: true });
+      card.addEventListener('touchend', endHandler, { passive: false });
     });
 
     document.querySelectorAll('.race-slot').forEach(slot => {
-      const oldHandler = touchHandlers.get(slot);
-      if (oldHandler) {
-        slot.removeEventListener('touchstart', oldHandler);
+      const oldStartHandler = touchHandlers.get(slot)?.start;
+      const oldEndHandler = touchHandlers.get(slot)?.end;
+      
+      if (oldStartHandler) {
+        slot.removeEventListener('touchstart', oldStartHandler);
       }
-      const handler = (e) => handleSlotTouch(e);
-      touchHandlers.set(slot, handler);
-      slot.addEventListener('touchstart', handler, { passive: false });
+      if (oldEndHandler) {
+        slot.removeEventListener('touchend', oldEndHandler);
+      }
+      
+      const startHandler = (e) => handleSlotTouchStart(e);
+      const endHandler = (e) => handleSlotTouchEnd(e);
+      
+      touchHandlers.set(slot, { start: startHandler, end: endHandler });
+      
+      slot.addEventListener('touchstart', startHandler, { passive: true });
+      slot.addEventListener('touchend', endHandler, { passive: false });
     });
   }
 
@@ -319,12 +525,13 @@ export function initializeMobileSupport() {
     }
   }, { passive: true });
 
+  // We won't prevent touchmove to allow natural scrolling
   document.addEventListener('touchmove', (e) => {
     if (mobileState.selectedDriver && 
       (e.target.closest('.driver-card') || e.target.closest('.race-slot'))) {
-      e.preventDefault();
+      // Don't prevent default to allow scrolling
     }
-  }, { passive: false });
+  }, { passive: true });
 
   document.addEventListener('gesturestart', function(e) {
     e.preventDefault();
