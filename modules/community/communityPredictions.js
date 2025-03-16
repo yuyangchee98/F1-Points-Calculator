@@ -160,27 +160,58 @@ export function resetCommunityView() {
     communityToggle.classList.remove('active');
   }
   
-  // Reload user's own predictions
-  // This will depend on how you're storing the user's predictions
-  // If using localStorage:
-  const savedPredictions = localStorage.getItem('f1-predictions');
-  if (savedPredictions) {
-    try {
-      const predictions = JSON.parse(savedPredictions);
-      // Load these predictions back into the UI
-      // This would call a function from your existing code
-      window.loadSavedPredictions(predictions);
-    } catch (e) {
-      console.error('Error loading saved predictions:', e);
+  // First, restore official past race results
+  import('../../data.js').then(data => {
+    Object.entries(data.pastRaceResults).forEach(([race, results]) => {
+      if (results && results.length > 0) {
+        results.forEach((driverName, position) => {
+          const slot = document.querySelector(
+            `.race-slot[data-race="${race}"][data-position="${position + 1}"]`
+          );
+          if (slot) {
+            // Create a new driver card for the official result
+            const driverCard = createDriverCard(driverName);
+            // Remove any existing card first
+            if (slot.querySelector('.driver-card')) {
+              slot.innerHTML = '';
+            }
+            slot.appendChild(driverCard);
+          }
+        });
+      }
+    });
+    
+    // Now load user's own predictions for future races
+    const savedPredictions = localStorage.getItem('f1-predictions');
+    if (savedPredictions) {
+      try {
+        const predictions = JSON.parse(savedPredictions);
+        // Only load predictions for races that don't have official results
+        const pastRaces = Object.keys(data.pastRaceResults);
+        const filteredPredictions = {};
+        
+        Object.entries(predictions).forEach(([race, positions]) => {
+          if (!pastRaces.includes(race)) {
+            filteredPredictions[race] = positions;
+          }
+        });
+        
+        // Load filtered predictions
+        if (window.loadSavedPredictions) {
+          window.loadSavedPredictions(filteredPredictions);
+        }
+      } catch (e) {
+        console.error('Error loading saved predictions:', e);
+      }
     }
-  }
-  
-  // Update race status and recalculate points
-  calculatePoints();
-  updateRaceStatus();
-  
-  // Update charts if they exist
-  if (window.updateCharts) {
-    window.updateCharts();
-  }
+    
+    // Update race status and recalculate points
+    calculatePoints();
+    updateRaceStatus();
+    
+    // Update charts if they exist
+    if (window.updateCharts) {
+      window.updateCharts();
+    }
+  });
 }
