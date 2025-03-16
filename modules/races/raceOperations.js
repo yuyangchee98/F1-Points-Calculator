@@ -98,6 +98,43 @@ let mobileState = {
   touchStartY: null
 };
 
+/**
+ * Helper function to show the mobile selection indicator
+ */
+function showMobileSelectionIndicator(driverName) {
+  if (!driverName) return;
+  
+  const indicator = document.getElementById('mobile-selection-indicator');
+  console.log('Explicitly showing selection indicator for driver:', driverName);
+  
+  if (indicator) {
+    const driverNameElement = indicator.querySelector('.selected-driver-name');
+    if (driverNameElement) {
+      driverNameElement.textContent = driverName;
+      
+      // Set background color based on team
+      const teamColor = data.teamColors[data.driverTeams[driverName]];
+      indicator.style.backgroundColor = teamColor || '#4a90e2';
+      
+      // Set text color based on team
+      indicator.style.color = data.driverTeams[driverName] === "Haas" ? '#000' : '#fff';
+    }
+    
+    // Force to be visible
+    indicator.style.display = 'flex';
+    indicator.style.opacity = '1';
+    indicator.classList.remove('hidden');
+  }
+}
+
+/**
+ * Get the current mobile state object (for other modules)
+ * @returns {Object} The mobile state object
+ */
+export function getMobileState() {
+  return mobileState;
+}
+
 function logState(action) {
   console.log(`[${action}] Mobile State:`, {
     selectedDriver: mobileState.selectedDriver,
@@ -108,14 +145,30 @@ function logState(action) {
 }
 
 function clearMobileSelection() {
-  if (mobileState.selectedDriverElement && mobileState.selectedDriverElement.isConnected) {
-    mobileState.selectedDriverElement.classList.remove("selected");
+  // Clear all selected drivers
+  document.querySelectorAll('.driver-card.selected').forEach(card => {
+    card.classList.remove('selected');
+  });
+  
+  // Clear all highlighted slots
+  document.querySelectorAll('.race-slot.highlight-slot').forEach(slot => {
+    slot.classList.remove('highlight-slot');
+  });
+  
+  // Hide the mobile selection indicator
+  const indicator = document.getElementById('mobile-selection-indicator');
+  if (indicator) {
+    indicator.classList.add('hidden');
   }
-  document.querySelectorAll('.race-slot').forEach(slot => slot.classList.remove('highlight-slot'));
+  
+  // Reset state variables
   mobileState.selectedDriver = null;
   mobileState.selectedDriverElement = null;
   mobileState.selectedFromRace = null;
   mobileState.selectedPosition = null;
+  mobileState.touchStartX = null;
+  mobileState.touchStartY = null;
+  
   logState('After Clear');
 }
 
@@ -199,6 +252,20 @@ function handleDriverCardTouchStart(e) {
   mobileState.selectedPosition = raceSlot ? raceSlot.dataset.position : null;
   card.classList.add("selected");
   
+  // Show the selection indicator
+  showMobileSelectionIndicator(mobileState.selectedDriver);
+  
+  // If we're on mobile, collapse the driver selection panel
+  if (window.matchMedia('(max-width: 768px)').matches) {
+    const driverSelection = document.getElementById('driver-selection');
+    if (driverSelection && driverSelection.classList.contains('expanded')) {
+      const toggleButton = document.getElementById('driver-toggle-button');
+      if (toggleButton) {
+        toggleButton.click();
+      }
+    }
+  }
+  
   logState('After Driver Selection');
   
   if (mobileState.selectedFromRace) {
@@ -245,6 +312,9 @@ function handleSlotTouchStart(e) {
     mobileState.selectedFromRace = race;
     mobileState.selectedPosition = position;
     driverCard.classList.add("selected");
+    
+    // Show the selection indicator
+    showMobileSelectionIndicator(mobileState.selectedDriver);
     
     document.querySelectorAll(`.race-slot[data-race="${race}"]`)
       .forEach(slot => {
@@ -304,9 +374,135 @@ function handleSlotTouchStart(e) {
   }
 }
 
+/**
+ * Fix mobile indicator issues by attaching special event listeners
+ */
+function fixMobileIndicator() {
+  // Add direct touchend listeners to all driver cards
+  document.querySelectorAll('.driver-card').forEach(card => {
+    // Remove previous listeners if any
+    const oldHandler = card._directSelectHandler;
+    if (oldHandler) {
+      card.removeEventListener('touchend', oldHandler);
+    }
+    
+    // Add new handler
+    const directSelectHandler = (e) => {
+      if (card.dataset.driver) {
+        console.log('Direct touchend on driver card:', card.dataset.driver);
+        showMobileSelectionIndicator(card.dataset.driver);
+        
+        // Set the mobile state to reflect the selection
+        mobileState.selectedDriver = card.dataset.driver;
+        mobileState.selectedDriverElement = card;
+        mobileState.selectedFromRace = card.closest('.race-slot')?.dataset.race || null;
+        mobileState.selectedPosition = card.closest('.race-slot')?.dataset.position || null;
+        
+        // Add selected class
+        card.classList.add('selected');
+        
+        // Highlight valid slots
+        if (mobileState.selectedFromRace) {
+          document.querySelectorAll(`.race-slot[data-race="${mobileState.selectedFromRace}"]`)
+            .forEach(slot => {
+              if (slot.dataset.position !== mobileState.selectedPosition) {
+                slot.classList.add('highlight-slot');
+              }
+            });
+        } else {
+          document.querySelectorAll('.race-slot').forEach(slot => {
+            const race = slot.dataset.race;
+            if (slot.children.length === 0 && !isDriverInRace(mobileState.selectedDriver, race)) {
+              slot.classList.add('highlight-slot');
+            }
+          });
+        }
+      }
+    };
+    
+    // Store the handler so we can remove it later
+    card._directSelectHandler = directSelectHandler;
+    card.addEventListener('touchend', directSelectHandler, { passive: false });
+  });
+  
+  // Also add direct handlers to race slots for selection
+  document.querySelectorAll('.race-slot').forEach(slot => {
+    // Remove previous listeners if any
+    const oldHandler = slot._directTouchHandler;
+    if (oldHandler) {
+      slot.removeEventListener('touchend', oldHandler);
+    }
+    
+    // Add new handler for when there's a driver selected
+    const directTouchHandler = (e) => {
+      // If we have a driver selected and this slot is highlighted, place the driver
+      if (mobileState.selectedDriver && slot.classList.contains('highlight-slot')) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const race = slot.dataset.race;
+        const position = slot.dataset.position;
+        
+        // Handle placement based on if slot is empty or occupied
+        if (slot.children.length > 0) {
+          // If there's a driver already in this slot, do a swap
+          const sourceSlot = findDriverSlotInRace(mobileState.selectedDriver, mobileState.selectedFromRace);
+          if (sourceSlot && swapDrivers(sourceSlot, slot)) {
+            console.log('Swapped drivers in race:', race);
+            calculatePoints();
+            updateRaceStatus();
+          }
+        } else {
+          // Place in empty slot
+          if (mobileState.selectedFromRace) {
+            // Moving from existing position
+            const sourceSlot = findDriverSlotInRace(mobileState.selectedDriver, mobileState.selectedFromRace);
+            if (sourceSlot) {
+              const newCard = createDriverCard(mobileState.selectedDriver);
+              sourceSlot.innerHTML = '';
+              slot.appendChild(newCard);
+              console.log('Moved driver to empty slot in race:', race);
+              calculatePoints();
+              updateRaceStatus();
+            }
+          } else {
+            // Placing from selection area
+            const newCard = createDriverCard(mobileState.selectedDriver);
+            slot.appendChild(newCard);
+            console.log('Placed driver in empty slot:', race, position);
+            calculatePoints();
+            updateRaceStatus();
+          }
+        }
+        
+        // Clear selection after placement
+        clearMobileSelection();
+      }
+    };
+    
+    // Store the handler so we can remove it later
+    slot._directTouchHandler = directTouchHandler;
+    slot.addEventListener('touchend', directTouchHandler, { passive: false });
+  });
+}
+
+// Call the fix function initially and add it to the observer
 export function initializeMobileSupport() {
   if (!/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) return;
   console.log('Initializing mobile support');
+  
+  // Add cancel button handler for selection indicator
+  const indicator = document.getElementById('mobile-selection-indicator');
+  if (indicator) {
+    const cancelButton = indicator.querySelector('.cancel-selection');
+    if (cancelButton) {
+      cancelButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        clearMobileSelection();
+      });
+    }
+  }
 
   const style = document.createElement('style');
   style.textContent = `
@@ -565,9 +761,11 @@ function initializeTouchHandlers() {
   }
 
   initializeTouchHandlers();
+  fixMobileIndicator();
 
   const observer = new MutationObserver(() => {
     initializeTouchHandlers();
+    fixMobileIndicator();
   });
 
   observer.observe(document.querySelector('#race-grid'), {
