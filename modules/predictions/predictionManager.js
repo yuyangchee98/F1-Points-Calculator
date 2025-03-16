@@ -14,6 +14,8 @@ const USER_ID_KEY = 'f1-calculator-user-id';
 const PREDICTION_HISTORY_KEY = 'f1-calculator-predictions';
 // Local prediction storage key
 const LOCAL_PREDICTION_KEY = 'f1-predictions';
+// Flag for viewing a shared session
+const VIEWING_SHARED_SESSION_KEY = 'f1-viewing-shared-session';
 
 /**
  * Generate a persistent user ID if one doesn't exist
@@ -126,6 +128,42 @@ function getCurrentPredictions() {
 }
 
 /**
+ * Check if currently viewing a shared session
+ * @returns {boolean} True if viewing a shared session
+ */
+export function isViewingSharedSession() {
+  return localStorage.getItem(VIEWING_SHARED_SESSION_KEY) === 'true';
+}
+
+/**
+ * Update UI elements based on shared session status
+ * @param {boolean} isShared - Whether viewing a shared session
+ */
+export function updateSharedSessionUI(isShared) {
+  // Update toggle button state
+  const officialToggle = document.getElementById('official-results-toggle');
+  if (officialToggle) {
+    if (isShared) {
+      officialToggle.disabled = true;
+      officialToggle.classList.add('disabled');
+      officialToggle.title = 'Cannot toggle official results while viewing a shared prediction';
+    } else {
+      officialToggle.disabled = false;
+      officialToggle.classList.remove('disabled');
+      officialToggle.title = '';
+    }
+  }
+}
+
+/**
+ * Reset shared session status
+ */
+export function resetSharedSessionStatus() {
+  localStorage.removeItem(VIEWING_SHARED_SESSION_KEY);
+  updateSharedSessionUI(false);
+}
+
+/**
  * Save current predictions to the API
  * @returns {Promise<string>} The prediction ID
  */
@@ -229,6 +267,12 @@ export async function loadPredictionById(id) {
       
       // Show success notification
       showNotification('Prediction loaded successfully!', 'success');
+      
+      // Mark as viewing a shared session
+      localStorage.setItem(VIEWING_SHARED_SESSION_KEY, 'true');
+      
+      // Update UI for shared session
+      updateSharedSessionUI(true);
       
       // Update URL without reloading page
       const url = new URL(window.location);
