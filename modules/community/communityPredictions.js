@@ -49,6 +49,10 @@ export function displayCommunityPredictions(communityData) {
     if (driverCard) {
       driverCard.remove();
     }
+    // Remove official result flags
+    if (slot.dataset.officialResult) {
+      delete slot.dataset.officialResult;
+    }
   });
   
   // Add community predictions to the grid
@@ -134,6 +138,8 @@ function addCommunityInfoBanner(communityData) {
  * Reset the view back to user's own predictions
  */
 export function resetCommunityView() {
+  // Check if official results should be shown
+  const hideOfficialResults = localStorage.getItem('hide-official-results') === 'true';
   // Remove community info banner
   const banner = document.getElementById('community-info-banner');
   if (banner) {
@@ -160,26 +166,31 @@ export function resetCommunityView() {
     communityToggle.classList.remove('active');
   }
   
-  // First, restore official past race results
+  // First, restore official past race results if they shouldn't be hidden
   import('../../data.js').then(data => {
-    Object.entries(data.pastRaceResults).forEach(([race, results]) => {
-      if (results && results.length > 0) {
-        results.forEach((driverName, position) => {
-          const slot = document.querySelector(
-            `.race-slot[data-race="${race}"][data-position="${position + 1}"]`
-          );
-          if (slot) {
-            // Create a new driver card for the official result
-            const driverCard = createDriverCard(driverName);
-            // Remove any existing card first
-            if (slot.querySelector('.driver-card')) {
-              slot.innerHTML = '';
+    if (!hideOfficialResults) {
+      Object.entries(data.pastRaceResults).forEach(([race, results]) => {
+        if (results && results.length > 0) {
+          results.forEach((driverName, position) => {
+            const slot = document.querySelector(
+              `.race-slot[data-race="${race}"][data-position="${position + 1}"]`
+            );
+            if (slot) {
+              // Create a new driver card for the official result
+              const driverCard = createDriverCard(driverName);
+              // Mark as official result
+              slot.dataset.officialResult = 'true';
+              driverCard.dataset.officialResult = 'true';
+              // Remove any existing card first
+              if (slot.querySelector('.driver-card')) {
+                slot.innerHTML = '';
+              }
+              slot.appendChild(driverCard);
             }
-            slot.appendChild(driverCard);
-          }
-        });
-      }
-    });
+          });
+        }
+      });
+    }
     
     // Now load user's own predictions for future races
     const savedPredictions = localStorage.getItem('f1-predictions');
@@ -197,8 +208,13 @@ export function resetCommunityView() {
         });
         
         // Load filtered predictions
-        if (window.loadSavedPredictions) {
-          window.loadSavedPredictions(filteredPredictions);
+        if (window.loadPredictions) {
+          window.loadPredictions(filteredPredictions);
+        } else {
+          // Fall back to local function
+          import('../state/gridState.js').then(module => {
+            module.loadPredictions(filteredPredictions);
+          });
         }
       } catch (e) {
         console.error('Error loading saved predictions:', e);
