@@ -136,5 +136,28 @@ export const sprintPointsMap = {
   20: 0,
 };
 
-// Reset past race results since it's a new season
-export const pastRaceResults = {};
+// Past race results for the 2025 season
+export const pastRaceResults = {
+  "Australia": [
+    "Norris",
+    "Verstappen",
+    "Russell",
+    "Albon",
+    "Antonelli",
+    "Stroll",
+    "Hulkenberg",
+    "Leclerc",
+    "Piastri",
+    "Hamilton",
+    "Gasly",
+    "Tsunoda",
+    "Ocon",
+    "Bearman",
+    "Lawson",
+    "Bortoleto",
+    "Alonso",
+    "Sainz",
+    "Doohan",
+    "Hadjar"
+  ]
+};
