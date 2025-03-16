@@ -41,6 +41,12 @@ export function displayCommunityPredictions(communityData) {
   
   console.log('Displaying community predictions:', communityData.consensus);
   
+  // Hide the official results toggle while in community mode
+  const officialToggle = document.getElementById('official-results-toggle');
+  if (officialToggle) {
+    officialToggle.style.display = 'none';
+  }
+  
   // Clear current grid
   const slots = document.querySelectorAll('.race-slot');
   slots.forEach(slot => {
@@ -55,48 +61,73 @@ export function displayCommunityPredictions(communityData) {
     }
   });
   
-  // Add community predictions to the grid
-  Object.entries(communityData.consensus).forEach(([raceName, positions]) => {
-    Object.entries(positions).forEach(([position, data]) => {
-      const { driver, percentage } = data;
-      if (!driver) return;
-      
-      // Find the slot for this race and position
-      const slot = document.querySelector(`.race-slot[data-race="${raceName}"][data-position="${position}"]`);
-      
-      console.log(`Looking for slot: race=${raceName}, position=${position}`, slot ? 'Found' : 'Not found');
-      
-      if (slot) {
-        // Create a driver card with community percentage
-        const driverCard = createDriverCard(driver);
-        
-        // Add community consensus label
-        const consensusLabel = document.createElement('div');
-        consensusLabel.className = 'community-consensus-label';
-        consensusLabel.textContent = `${percentage}%`;
-        consensusLabel.title = `${percentage}% of users predicted ${driver} to finish P${position} in ${raceName}`;
-        driverCard.appendChild(consensusLabel);
-        
-        // Add it to the slot
-        slot.appendChild(driverCard);
-        
-        // Mark this as a community prediction
-        slot.dataset.communityPrediction = 'true';
+  // First, get list of races with official results
+  import('../../data.js').then(data => {
+    const pastRaces = Object.keys(data.pastRaceResults);
+    
+    // Add official results for past races
+    pastRaces.forEach(race => {
+      if (data.pastRaceResults[race] && data.pastRaceResults[race].length > 0) {
+        data.pastRaceResults[race].forEach((driverName, position) => {
+          const slot = document.querySelector(
+            `.race-slot[data-race="${race}"][data-position="${position + 1}"]`
+          );
+          if (slot) {
+            // Create a new driver card for the official result
+            const driverCard = createDriverCard(driverName);
+            // Mark as official result
+            slot.dataset.officialResult = 'true';
+            driverCard.dataset.officialResult = 'true';
+            slot.appendChild(driverCard);
+          }
+        });
       }
     });
+    
+    // Now add community predictions for future races
+    Object.entries(communityData.consensus).forEach(([raceName, positions]) => {
+      // Skip past races with official results
+      if (pastRaces.includes(raceName)) return;
+      
+      Object.entries(positions).forEach(([position, data]) => {
+        const { driver, percentage } = data;
+        if (!driver) return;
+        
+        // Find the slot for this race and position
+        const slot = document.querySelector(`.race-slot[data-race="${raceName}"][data-position="${position}"]`);
+        
+        if (slot) {
+          // Create a driver card with community percentage
+          const driverCard = createDriverCard(driver);
+          
+          // Add community consensus label
+          const consensusLabel = document.createElement('div');
+          consensusLabel.className = 'community-consensus-label';
+          consensusLabel.textContent = `${percentage}%`;
+          consensusLabel.title = `${percentage}% of users predicted ${driver} to finish P${position} in ${raceName}`;
+          driverCard.appendChild(consensusLabel);
+          
+          // Add it to the slot
+          slot.appendChild(driverCard);
+          
+          // Mark this as a community prediction
+          slot.dataset.communityPrediction = 'true';
+        }
+      });
+    });
+    
+    // Update race status and recalculate points to reflect community predictions
+    calculatePoints();
+    updateRaceStatus();
+    
+    // Update charts if they exist
+    if (window.updateCharts) {
+      window.updateCharts();
+    }
+    
+    // Add community info banner
+    addCommunityInfoBanner(communityData);
   });
-  
-  // Update race status and recalculate points to reflect community predictions
-  calculatePoints();
-  updateRaceStatus();
-  
-  // Update charts if they exist
-  if (window.updateCharts) {
-    window.updateCharts();
-  }
-  
-  // Add community info banner
-  addCommunityInfoBanner(communityData);
 }
 
 /**
@@ -140,6 +171,12 @@ function addCommunityInfoBanner(communityData) {
 export function resetCommunityView() {
   // Check if official results should be shown
   const hideOfficialResults = localStorage.getItem('hide-official-results') === 'true';
+
+  // Restore the official results toggle
+  const officialToggle = document.getElementById('official-results-toggle');
+  if (officialToggle) {
+    officialToggle.style.display = '';
+  }
   // Remove community info banner
   const banner = document.getElementById('community-info-banner');
   if (banner) {
