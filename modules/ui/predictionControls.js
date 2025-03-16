@@ -10,6 +10,18 @@ import { fetchCommunityPredictions, displayCommunityPredictions, resetCommunityV
  * Initialize prediction controls (save/load buttons)
  */
 export function initPredictionControls() {
+  // Check if we're viewing a shared session
+  const urlParams = new URLSearchParams(window.location.search);
+  const predictionId = urlParams.get('prediction');
+  const isSharedSession = !!predictionId;
+  
+  // Import prediction manager for shared session status
+  if (isSharedSession) {
+    import('../predictions/predictionManager.js').then(module => {
+      module.updateSharedSessionUI(true);
+    });
+  }
+  
   const actionsBar = document.querySelector('.actions-bar');
   
   // Create container for prediction controls
@@ -235,23 +247,36 @@ function checkUrlForPrediction() {
  * Toggle official results visibility
  */
 function toggleOfficialResults() {
+  // Check if button is disabled (shared session)
   const button = document.getElementById('official-results-toggle');
-  const isCurrentlyShowing = button.classList.contains('active');
-  
-  // Toggle button state
-  if (isCurrentlyShowing) {
-    button.classList.remove('active');
-    button.textContent = 'Show Official Results';
-    localStorage.setItem('hide-official-results', 'true');
-  } else {
-    button.classList.add('active');
-    button.textContent = 'Hide Official Results';
-    localStorage.setItem('hide-official-results', 'false');
+  if (button.disabled) {
+    return;
   }
   
-  // Update the grid to show/hide official results
-  import('../races/raceOperations.js').then(module => {
-    module.refreshRaceResults();
+  // Import predictionManager to check shared session status
+  import('../predictions/predictionManager.js').then(predictionModule => {
+    if (predictionModule.isViewingSharedSession()) {
+      predictionModule.showNotification('Cannot toggle official results while viewing a shared prediction', 'error');
+      return;
+    }
+    
+    const isCurrentlyShowing = button.classList.contains('active');
+    
+    // Toggle button state
+    if (isCurrentlyShowing) {
+      button.classList.remove('active');
+      button.textContent = 'Show Official Results';
+      localStorage.setItem('hide-official-results', 'true');
+    } else {
+      button.classList.add('active');
+      button.textContent = 'Hide Official Results';
+      localStorage.setItem('hide-official-results', 'false');
+    }
+    
+    // Update the grid to show/hide official results
+    import('../races/raceOperations.js').then(raceModule => {
+      raceModule.refreshRaceResults();
+    });
   });
 }
 
@@ -321,6 +346,15 @@ function addNotificationStyles() {
       font-weight: 600;
       transition: all 0.2s;
       margin-left: 16px;
+    }
+    
+    button#community-toggle.disabled,
+    button#official-results-toggle.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      background: #e9ecef;
+      pointer-events: none;
+      box-shadow: none;
     }
     
     button#community-toggle:hover,
