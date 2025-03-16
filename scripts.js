@@ -62,10 +62,10 @@ document.addEventListener("DOMContentLoaded", () => {
       box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
     }
     /* Official result styling */
-    [data-official-result="true"] {
+    .race-slot[data-official-result="true"] {
       position: relative;
     }
-    [data-official-result="true"]::after {
+    .race-slot[data-official-result="true"]::after {
       content: '✓';
       position: absolute;
       top: 2px;
@@ -80,6 +80,10 @@ document.addEventListener("DOMContentLoaded", () => {
       align-items: center;
       justify-content: center;
       box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+    /* Remove checkmark from driver card to prevent duplicates */
+    .driver-card[data-official-result="true"]::after {
+      display: none;
     }
   `;
   document.head.appendChild(style);
