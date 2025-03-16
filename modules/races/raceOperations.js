@@ -15,13 +15,19 @@ export function initializeAllRaces() {
         slot.innerHTML = "";
       });
 
-    if (data.pastRaceResults[race] && data.pastRaceResults[race].length > 0) {
+    // Check if we should show official results
+    const hideOfficialResults = localStorage.getItem('hide-official-results') === 'true';
+    
+    if (!hideOfficialResults && data.pastRaceResults[race] && data.pastRaceResults[race].length > 0) {
       data.pastRaceResults[race].forEach((driverName, position) => {
         const slot = document.querySelector(
           `.race-slot[data-race="${race}"][data-position="${position + 1}"]`
         );
         if (slot) {
           const driverCard = createDriverCard(driverName);
+          // Mark this as an official result
+          slot.dataset.officialResult = 'true';
+          driverCard.dataset.officialResult = 'true';
           slot.appendChild(driverCard);
         }
       });
@@ -30,6 +36,56 @@ export function initializeAllRaces() {
 
   calculatePoints();
   initDragAndDrop();
+  updateRaceStatus();
+}
+
+/**
+ * Refresh race results based on toggle state
+ */
+export function refreshRaceResults() {
+  const hideOfficialResults = localStorage.getItem('hide-official-results') === 'true';
+  
+  // Handle official results
+  data.races.forEach((race) => {
+    // Skip races without official results
+    if (!data.pastRaceResults[race] || data.pastRaceResults[race].length === 0) {
+      return;
+    }
+    
+    // Get all slots for this race
+    const slots = document.querySelectorAll(`.race-slot[data-race="${race}"]`);
+    
+    slots.forEach((slot) => {
+      const isOfficialResult = slot.dataset.officialResult === 'true';
+      
+      // If this is an official result slot
+      if (isOfficialResult) {
+        // If hiding, remove the official result
+        if (hideOfficialResults) {
+          slot.innerHTML = "";
+          delete slot.dataset.officialResult;
+        }
+      } else if (!hideOfficialResults) {
+        // If showing and not already present, add the official result
+        const position = parseInt(slot.dataset.position);
+        if (position <= data.pastRaceResults[race].length) {
+          const driverName = data.pastRaceResults[race][position - 1];
+          // Check if user has overridden this slot with their own prediction
+          if (!slot.querySelector('.driver-card:not([data-official-result="true"])')) {
+            slot.innerHTML = "";
+            const driverCard = createDriverCard(driverName);
+            // Mark as official result
+            slot.dataset.officialResult = 'true';
+            driverCard.dataset.officialResult = 'true';
+            slot.appendChild(driverCard);
+          }
+        }
+      }
+    });
+  });
+  
+  // Recalculate points
+  calculatePoints();
   updateRaceStatus();
 }
 

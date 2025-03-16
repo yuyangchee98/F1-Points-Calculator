@@ -30,6 +30,13 @@ export function initPredictionControls() {
   loadButton.innerHTML = '<span class="button-icon">📂</span><span class="button-text">Load</span>';
   loadButton.addEventListener('click', handleLoadPrediction);
   
+  // Add toggle official results button
+  const officialResultsToggle = document.createElement('button');
+  officialResultsToggle.id = 'official-results-toggle';
+  officialResultsToggle.className = localStorage.getItem('hide-official-results') === 'true' ? '' : 'active';
+  officialResultsToggle.textContent = localStorage.getItem('hide-official-results') === 'true' ? 'Show Official Results' : 'Hide Official Results';
+  officialResultsToggle.addEventListener('click', toggleOfficialResults);
+
   // Add community predictions button
   const communityButton = document.createElement('button');
   communityButton.id = 'community-toggle';
@@ -42,6 +49,9 @@ export function initPredictionControls() {
   
   // Add container to actions bar
   actionsBar.appendChild(controlsContainer);
+  
+  // Add toggle official results button
+  actionsBar.appendChild(officialResultsToggle);
   
   // Add community button separately
   actionsBar.appendChild(communityButton);
@@ -221,6 +231,30 @@ function checkUrlForPrediction() {
 }
 
 /**
+ * Toggle official results visibility
+ */
+function toggleOfficialResults() {
+  const button = document.getElementById('official-results-toggle');
+  const isCurrentlyShowing = button.classList.contains('active');
+  
+  // Toggle button state
+  if (isCurrentlyShowing) {
+    button.classList.remove('active');
+    button.textContent = 'Show Official Results';
+    localStorage.setItem('hide-official-results', 'true');
+  } else {
+    button.classList.add('active');
+    button.textContent = 'Hide Official Results';
+    localStorage.setItem('hide-official-results', 'false');
+  }
+  
+  // Update the grid to show/hide official results
+  import('../races/raceOperations.js').then(module => {
+    module.refreshRaceResults();
+  });
+}
+
+/**
  * Toggle community predictions display
  */
 async function toggleCommunityPredictions() {
@@ -275,6 +309,34 @@ function addNotificationStyles() {
   
   // Add styles
   style.textContent = `
+    /* Toggle button styles */
+    #official-results-toggle {
+      padding: 8px 16px;
+      background: #f1f3f5;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+      margin-left: 16px;
+    }
+    
+    #official-results-toggle:hover {
+      background: #e9ecef;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    #official-results-toggle.active {
+      background-color: #4a90e2;
+      border-color: #4a90e2;
+      color: white;
+    }
+    
+    #official-results-toggle.active:hover {
+      background-color: #3a7bc8;
+      border-color: #3a7bc8;
+    }
+    
     /* Notification styles */
     .notification {
       position: fixed;

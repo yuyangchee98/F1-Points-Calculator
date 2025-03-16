@@ -12,6 +12,7 @@ import { updateRaceStatus } from "./modules/ui/raceStatus.js";
 import {
   resetGrid,
   resetFutureRaces,
+  loadPredictions,
 } from "./modules/state/gridState.js";
 import {
   initializeAllRaces,
@@ -21,6 +22,8 @@ import { initPredictionControls } from "./modules/ui/predictionControls.js";
 import { initializeCharts } from "./modules/charts/chartManager.js";
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Make loadPredictions available globally
+  window.loadPredictions = loadPredictions;
   const style = document.createElement("style");
   style.textContent = `
     #race-grid {
@@ -57,6 +60,26 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     .sticky-position {
       box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    }
+    /* Official result styling */
+    [data-official-result="true"] {
+      position: relative;
+    }
+    [data-official-result="true"]::after {
+      content: '✓';
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      font-size: 10px;
+      color: #4CAF50;
+      background-color: white;
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.2);
     }
   `;
   document.head.appendChild(style);

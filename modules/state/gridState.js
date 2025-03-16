@@ -29,16 +29,28 @@ export function resetFutureRaces() {
 export function loadPredictions(predictions) {
   // Clear the grid first
   resetGrid();
+
+  // Check if we should show official results
+  const hideOfficialResults = localStorage.getItem('hide-official-results') === 'true';
+  
+  // Load official results first if they're visible
+  if (!hideOfficialResults) {
+    import('../races/raceOperations.js').then(module => {
+      module.refreshRaceResults();
+    });
+  }
   
   // Load predictions into grid
   Object.entries(predictions).forEach(([raceName, positions]) => {
-    const raceId = raceName.replace(/\s+/g, '-').toLowerCase();
-    
     Object.entries(positions).forEach(([position, driver]) => {
-      const slotId = `${raceId}-p${position}`;
-      const slot = document.getElementById(slotId);
+      const slot = document.querySelector(`.race-slot[data-race="${raceName}"][data-position="${position}"]`);
       
       if (slot && driver) {
+        // Remove any existing official result
+        if (slot.dataset.officialResult === 'true') {
+          slot.innerHTML = '';
+          delete slot.dataset.officialResult;
+        }
         const driverCard = createDriverCard(driver);
         slot.appendChild(driverCard);
       }

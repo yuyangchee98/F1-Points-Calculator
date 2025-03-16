@@ -68,6 +68,16 @@ function savePredictionToHistory(id) {
 }
 
 /**
+ * Get metadata for saving/loading
+ * @returns {Object} Metadata object
+ */
+function getMetadata() {
+  return {
+    hideOfficialResults: localStorage.getItem('hide-official-results') === 'true'
+  };
+}
+
+/**
  * Get current predictions from the grid
  * @returns {Object} Prediction data
  */
@@ -80,6 +90,11 @@ function getCurrentPredictions() {
   slots.forEach(slot => {
     // Skip empty slots
     if (!slot.firstChild) return;
+    
+    // Skip official results unless they've been overridden by the user
+    if (slot.dataset.officialResult === 'true' && slot.firstChild.dataset.officialResult === 'true') {
+      return;
+    }
     
     // Get race name and position from slot attributes
     const raceName = slot.getAttribute('data-race');
@@ -118,9 +133,13 @@ export async function savePrediction() {
   try {
     const userId = getUserId();
     const predictions = getCurrentPredictions();
+    const metadata = getMetadata();
     
     // Save locally first in case API fails
-    localStorage.setItem(LOCAL_PREDICTION_KEY, JSON.stringify(predictions));
+    localStorage.setItem(LOCAL_PREDICTION_KEY, JSON.stringify({
+      predictions,
+      metadata
+    }));
     
     // Send to API
     const response = await fetch(PREDICTIONS_ENDPOINT, {
@@ -130,7 +149,8 @@ export async function savePrediction() {
       },
       body: JSON.stringify({
         userId,
-        predictions
+        predictions,
+        metadata
       })
     });
     
@@ -179,8 +199,30 @@ export async function loadPredictionById(id) {
       // Add to history
       savePredictionToHistory(id);
       
+      // Apply metadata settings if present
+      if (data.metadata) {
+        // Set official results visibility
+        const shouldHideOfficials = data.metadata.hideOfficialResults;
+        localStorage.setItem('hide-official-results', shouldHideOfficials ? 'true' : 'false');
+        
+        // Update toggle button
+        const officialToggle = document.getElementById('official-results-toggle');
+        if (officialToggle) {
+          if (shouldHideOfficials) {
+            officialToggle.classList.remove('active');
+            officialToggle.textContent = 'Show Official Results';
+          } else {
+            officialToggle.classList.add('active');
+            officialToggle.textContent = 'Hide Official Results';
+          }
+        }
+      }
+      
       // Save locally
-      localStorage.setItem(LOCAL_PREDICTION_KEY, JSON.stringify(data.predictions));
+      localStorage.setItem(LOCAL_PREDICTION_KEY, JSON.stringify({
+        predictions: data.predictions,
+        metadata: data.metadata || getMetadata()
+      }));
       
       // Load into grid
       loadPredictions(data.predictions);
@@ -205,11 +247,34 @@ export async function loadPredictionById(id) {
  * Load saved predictions from local storage
  */
 export function loadSavedPredictions() {
-  const savedPredictions = localStorage.getItem(LOCAL_PREDICTION_KEY);
+  const savedData = localStorage.getItem(LOCAL_PREDICTION_KEY);
   
-  if (savedPredictions) {
+  if (savedData) {
     try {
-      const predictions = JSON.parse(savedPredictions);
+      const parsedData = JSON.parse(savedData);
+      
+      // Handle both new and old format
+      const predictions = parsedData.predictions || parsedData;
+      
+      // Apply metadata if present
+      if (parsedData.metadata) {
+        // Set official results visibility
+        const shouldHideOfficials = parsedData.metadata.hideOfficialResults;
+        localStorage.setItem('hide-official-results', shouldHideOfficials ? 'true' : 'false');
+        
+        // Update toggle button
+        const officialToggle = document.getElementById('official-results-toggle');
+        if (officialToggle) {
+          if (shouldHideOfficials) {
+            officialToggle.classList.remove('active');
+            officialToggle.textContent = 'Show Official Results';
+          } else {
+            officialToggle.classList.add('active');
+            officialToggle.textContent = 'Hide Official Results';
+          }
+        }
+      }
+      
       loadPredictions(predictions);
       return true;
     } catch (e) {
