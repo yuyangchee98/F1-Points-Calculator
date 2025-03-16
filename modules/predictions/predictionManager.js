@@ -256,7 +256,7 @@ export function loadSavedPredictions() {
       // Handle both new and old format
       const predictions = parsedData.predictions || parsedData;
       
-      // Apply metadata if present
+      // Apply metadata if present (for new format)
       if (parsedData.metadata) {
         // Set official results visibility
         const shouldHideOfficials = parsedData.metadata.hideOfficialResults;
@@ -273,6 +273,9 @@ export function loadSavedPredictions() {
             officialToggle.textContent = 'Hide Official Results';
           }
         }
+      } else {
+        // For backward compatibility with old predictions, use current setting
+        // Don't change the toggle status when loading old predictions
       }
       
       loadPredictions(predictions);

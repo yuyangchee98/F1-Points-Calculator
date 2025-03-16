@@ -90,13 +90,12 @@ document.addEventListener("DOMContentLoaded", () => {
   initPredictionControls();
   initializeCharts();
 
-  const resetContainer = document.getElementById("reset-container");
-  const resetButton = document.createElement("button");
-  resetButton.id = "reset-button";
-  resetButton.textContent = "Get Empty Grid";
-  resetButton.addEventListener("click", () => {
-    resetGrid();
-    updateRaceStatus();
-  });
-  resetContainer.appendChild(resetButton);
+  // Add event listener to the existing reset button in HTML
+  const resetButton = document.getElementById("reset-button");
+  if (resetButton) {
+    resetButton.addEventListener("click", () => {
+      resetGrid();
+      updateRaceStatus();
+    });
+  }
 });

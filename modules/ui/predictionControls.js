@@ -36,6 +36,7 @@ export function initPredictionControls() {
   officialResultsToggle.className = localStorage.getItem('hide-official-results') === 'true' ? '' : 'active';
   officialResultsToggle.textContent = localStorage.getItem('hide-official-results') === 'true' ? 'Show Official Results' : 'Hide Official Results';
   officialResultsToggle.addEventListener('click', toggleOfficialResults);
+  officialResultsToggle.style.marginLeft = '16px';
 
   // Add community predictions button
   const communityButton = document.createElement('button');
@@ -309,8 +310,9 @@ function addNotificationStyles() {
   
   // Add styles
   style.textContent = `
-    /* Toggle button styles */
-    #official-results-toggle {
+    /* Common button styles */
+    button#community-toggle,
+    button#official-results-toggle {
       padding: 8px 16px;
       background: #f1f3f5;
       border: 2px solid #e9ecef;
@@ -321,18 +323,21 @@ function addNotificationStyles() {
       margin-left: 16px;
     }
     
-    #official-results-toggle:hover {
+    button#community-toggle:hover,
+    button#official-results-toggle:hover {
       background: #e9ecef;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
     
-    #official-results-toggle.active {
+    button#community-toggle.active,
+    button#official-results-toggle.active {
       background-color: #4a90e2;
       border-color: #4a90e2;
       color: white;
     }
     
-    #official-results-toggle.active:hover {
+    button#community-toggle.active:hover,
+    button#official-results-toggle.active:hover {
       background-color: #3a7bc8;
       border-color: #3a7bc8;
     }
