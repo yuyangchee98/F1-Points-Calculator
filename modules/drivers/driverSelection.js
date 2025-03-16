@@ -34,8 +34,8 @@ export function createDriverSelection() {
   // Create selection indicator
   const selectionIndicator = document.createElement('div');
   selectionIndicator.id = 'mobile-selection-indicator';
-  // Don't start with hidden class to make sure it's at least visible initially
-  selectionIndicator.className = '';
+  // Start with hidden class
+  selectionIndicator.className = 'hidden';
   selectionIndicator.innerHTML = `
     <div class="indicator-content">
       <span class="selected-driver-text">Selected: </span>
@@ -109,7 +109,7 @@ export function createDriverSelection() {
         margin-top: 0;
       }
       
-      /* Selection indicator styles - not media-query restricted */
+      /* Selection indicator styles - should only show on mobile */
         #mobile-selection-indicator {
           position: fixed;
           bottom: 20px;
@@ -129,6 +129,13 @@ export function createDriverSelection() {
           opacity: 1; /* Make sure it's visible */
           /* Add a subtle border to ensure visibility regardless of background */
           border: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        /* Hide on desktop by default */
+        @media (min-width: 769px) {
+          #mobile-selection-indicator {
+            display: none !important;
+          }
         }
         
         @media print {
