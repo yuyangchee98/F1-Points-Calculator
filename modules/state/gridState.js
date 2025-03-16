@@ -1,5 +1,6 @@
 import { calculatePoints } from "../points/calculatePoints.js";
 import { createDriverCard } from "../drivers/driverCard.js";
+import { resetSharedSessionStatus } from "../predictions/predictionManager.js";
 
 /**
  * Clears all race slots and recalculates points
@@ -9,8 +10,20 @@ export function resetGrid() {
     if (slot.children.length > 0) {
       slot.removeChild(slot.children[0]);
     }
+    // Clear official result flag
+    delete slot.dataset.officialResult;
   });
   calculatePoints();
+  
+  // Reset the URL if it contains a prediction parameter
+  const url = new URL(window.location);
+  if (url.searchParams.has('prediction')) {
+    url.searchParams.delete('prediction');
+    window.history.pushState({}, '', url);
+  }
+  
+  // Reset shared session status
+  resetSharedSessionStatus();
 }
 
 /**
