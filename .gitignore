@@ -3,3 +3,4 @@
 .aider*
 .env
 automatic-updates/*
+.vite
