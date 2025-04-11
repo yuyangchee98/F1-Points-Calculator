@@ -11,6 +11,7 @@ interface DriverCardProps {
   onClick?: () => void;
   raceId?: string;
   position?: number;
+  hideCode?: boolean;
 }
 
 const DriverCard: React.FC<DriverCardProps> = ({ 
@@ -19,7 +20,8 @@ const DriverCard: React.FC<DriverCardProps> = ({
   isSelected = false,
   onClick,
   raceId,
-  position
+  position,
+  hideCode = false
 }) => {
   const team = teamById[driver.team.toLowerCase().replace(/\s/g, '-')];
   
@@ -30,7 +32,7 @@ const DriverCard: React.FC<DriverCardProps> = ({
     <div 
       ref={drag}
       className={`
-        driver-card flex items-center rounded-md overflow-hidden
+        driver-card flex items-center justify-between rounded-md overflow-hidden
         ${isSelected ? 'selected' : ''}
         ${isOfficialResult ? 'official-result-styling' : ''}
         ${isDragging ? 'opacity-50' : 'opacity-100'}
@@ -53,17 +55,31 @@ const DriverCard: React.FC<DriverCardProps> = ({
         }}
       />
 
-      {/* Driver name */}
-      <div className="flex flex-col ml-3">
+      {/* Driver name and team */}
+      <div className="flex flex-col ml-3 flex-grow">
         <span className="text-sm font-bold">
           {driver.id.includes('tsunoda') ? driver.name.split(' ')[0] :
            driver.id.includes('lawson') ? driver.name.split(' ')[0] :
            driver.name.split(' ')[1]?.toUpperCase() || driver.name}
         </span>
-        <span className="text-xs text-gray-500">
+        <span className="text-xs text-gray-600" style={{ color: team?.color || '#555' }}>
           {team?.name || driver.team}
         </span>
       </div>
+
+      {/* Driver code (3 letters) */}
+      {!hideCode && (
+        <div 
+          className="flex-shrink-0 bg-gray-800 text-white text-xs font-bold py-1 px-2 rounded mr-2"
+          style={{ 
+            backgroundColor: team?.color || '#555',
+            minWidth: '40px',
+            textAlign: 'center'
+          }}
+        >
+          {driver.name.slice(0, 3).toUpperCase()}
+        </div>
+      )}
 
     </div>
   );
