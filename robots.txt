@@ -1,5 +1,0 @@
-User-agent: *
-Allow: /
-
-# Point to sitemap if you add one in the future
-# Sitemap: https://f1calculator.com/sitemap.xml

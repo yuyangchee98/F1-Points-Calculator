@@ -1,298 +1,54 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-    <head>
-        <!-- Google tag (gtag.js) -->
-        <script
-            async
-            src="https://www.googletagmanager.com/gtag/js?id=G-GJ61RX1FZJ"
-        ></script>
-        <script>
-            window.dataLayer = window.dataLayer || [];
-            function gtag() {
-                dataLayer.push(arguments);
-            }
-            gtag("js", new Date());
-            gtag("config", "G-GJ61RX1FZJ");
-        </script>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <!-- Disable touch zooming for better drag-and-drop experience -->
+    <!-- SEO Meta Tags -->
+    <title>F1 Points Calculator - For the 2025 Season!</title>
+    <meta name="description" content="Interactive Formula 1 points calculator for the 2025 season. Predict race results with our drag-and-drop interface and simulate F1 championship standings." />
+    <meta name="keywords" content="F1, Formula 1, 2025 season, points calculator, championship predictor, race simulator, F1 standings" />
+    <link rel="canonical" href="https://f1pointscalculator.yaaaang.com/" />
 
-        <!-- SEO Meta Tags (New) -->
-        <title>F1 Points Calculator - For the 2025 Season!</title>
-        <meta
-            name="description"
-            content="Interactive Formula 1 points calculator for the 2025 season. Predict race results with our drag-and-drop interface and simulate F1 championship standings."
-        />
-        <meta
-            name="keywords"
-            content="F1, Formula 1, 2025 season, points calculator, championship predictor, race simulator, F1 standings"
-        />
-        <link rel="canonical" href="https://f1calculator.com/" />
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://f1pointscalculator.yaaaang.com/" />
+    <meta property="og:title" content="F1 Points Calculator 2025" />
+    <meta property="og:description" content="Predict F1 race results and championship standings with our interactive calculator" />
+    <meta property="og:image" content="https://f1pointscalculator.yaaaang.com/images/og-image.jpg" />
 
-        <!-- Open Graph / Facebook (New) -->
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://f1calculator.com/" />
-        <meta property="og:title" content="F1 Points Calculator 2025" />
-        <meta
-            property="og:description"
-            content="Predict F1 race results and championship standings with our interactive calculator"
-        />
-        <meta
-            property="og:image"
-            content="https://f1calculator.com/images/og-image.jpg"
-        />
+    <link rel="icon" href="/logo.svg" type="image/svg+xml" />
 
-        <link rel="icon" href="logo.svg" type="image/svg+xml" />
-        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
-        <link rel="stylesheet" href="css/main.css" />
-        <script type="module" src="scripts.js"></script>
-
-        <!-- Schema.org data (New) -->
-        <script type="application/ld+json">
-            {
-                "@context": "https://schema.org",
-                "@type": "SportsApplication",
-                "name": "F1 Points Calculator",
-                "description": "Interactive Formula 1 points calculator for predicting race results and championship standings",
-                "applicationCategory": "Sports Calculator",
-                "operatingSystem": "Web Browser",
-                "author": {
-                    "@type": "Person",
-                    "name": "Yaaaang",
-                    "url": "https://yaaaang.com"
-                }
-            }
-        </script>
-    </head>
-    <body>
-        <div class="app-layout">
-            <!-- Left Sidebar -->
-            <aside class="standings-sidebar">
-                <div class="standings-tabs">
-                    <button class="tab-button active" data-tab="tables">Tables</button>
-                    <button class="tab-button" data-tab="charts">Charts</button>
-                </div>
-                <div id="tables-content" class="tab-content active">
-                    <div class="standings-section">
-                        <h2>Driver Standings</h2>
-                        <div id="driver-totals"></div>
-                    </div>
-                    <div class="standings-section">
-                        <h2>Constructor Championship</h2>
-                        <div id="constructor-totals"></div>
-                    </div>
-                </div>
-                <div id="charts-content" class="tab-content">
-                    <div class="chart-wrapper">
-                        <h3>Driver Championship</h3>
-                        <canvas id="driver-points-chart"></canvas>
-                    </div>
-                    <div class="chart-wrapper">
-                        <h3>Constructor Championship</h3>
-                        <canvas id="constructor-points-chart"></canvas>
-                    </div>
-                </div>
-            </aside>
-
-            <!-- Main Content -->
-            <main class="main-content">
-                <h1><a href="https://f1pointscalculator.yaaaang.com/" style="text-decoration: none; color: inherit;">F1 Points Calculator - For the 2025 Season!</a></h1>
-
-                <!-- Buy Me a Coffee Link at Top -->
-                <div style="margin-bottom: 20px;">
-                    <a href="https://buymeacoffee.com/yaang" target="_blank" rel="noopener noreferrer" style="display: inline-block; padding: 8px 16px; background-color: #FFDD00; color: #000000; text-decoration: none; border-radius: 6px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-                        <span style="margin-right: 6px;">🔴</span> Buy Chyuang a soft tyre
-                    </a>
-                </div>
-
-                <!-- How to Use Section -->
-                <div class="how-to-use visible">
-                    <h3>
-                        How to Use
-                        <button class="how-to-use-close" id="close-how-to-use">
-                            &times;
-                        </button>
-                    </h3>
-                    <ul class="how-to-use-steps">
-                        <li>
-                            Click and drag drivers from the list to place them
-                            in their predicted finishing positions
-                        </li>
-                        <li>
-                            Points are automatically calculated based on F1's
-                            official scoring system
-                        </li>
-                        <li>Use the reset button to clear your predictions</li>
-                        <li>Official results are marked with a checkmark (✓) and can be toggled on/off</li>
-                    </ul>
-                    <p>
-                        <strong>Note:</strong> Constructors points are inaccurate right now due to the Yuki/ Lawson swap. Fix coming soon!
-                    
-                </div>
-
-                <!-- Actions Bar -->
-                <div class="actions-bar">
-                    <div id="reset-container">
-                        <button
-                            id="reset-button"
-                            class="action-button"
-                        >
-                            Get Empty Grid
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Social Sharing -->
-                <div id="social-sharing-container"></div>
-
-                <!-- Driver selection will be inserted here by JS -->
-
-                <!-- Race Grid -->
-                <div class="container" id="race-grid"></div>
-            </main>
-        </div>
-        <footer
-            class="site-footer"
-            style="
-                background-color: #1a1a1a;
-                color: #ffffff;
-                padding: 2rem 0;
-                margin-top: 3rem;
-            "
-        >
-            <div
-                class="footer-content"
-                style="
-                    max-width: 1200px;
-                    margin: 0 auto;
-                    display: flex;
-                    justify-content: space-between;
-                    padding: 0 2rem;
-                "
-            >
-                <div class="footer-main" style="flex: 1">
-                    <p style="margin: 0.5rem 0">2025 F1 Points Calculator</p>
-                    <p style="margin: 0.5rem 0">
-                        Created by
-                        <a
-                            href="https://yaaaang.com"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style="
-                                color: #f1f1f1;
-                                text-decoration: none;
-                                border-bottom: 1px dotted #f1f1f1;
-                            "
-                            >Chyuang</a
-                        >
-                    </p>
-                    <p style="margin: 0.5rem 0">
-                        <a
-                            href="https://buymeacoffee.com/yaang"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style="
-                                color: #FFDD00;
-                                text-decoration: none;
-                                border-bottom: 1px dotted #FFDD00;
-                                font-weight: bold;
-                            "
-                            >🔴 Buy Chyuang a soft tyre</a
-                        >
-                    </p>
-                    <p style="margin: 0.5rem 0">
-                        Open Source on
-                        <a
-                            href="https://github.com/yuyangchee98/F1-Points-Calculator"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style="
-                                color: #f1f1f1;
-                                text-decoration: none;
-                                border-bottom: 1px dotted #f1f1f1;
-                            "
-                            >GitHub</a
-                        >
-                    </p>
-                </div>
-                <div class="footer-links" style="flex: 1; margin-left: 2rem">
-                    <h3 style="color: #f1f1f1; margin-bottom: 1rem">
-                        Other Interesting F1 Projects
-                    </h3>
-                    <ul style="list-style: none; padding: 0; margin: 0">
-                        <li style="margin: 0.5rem 0">
-                            <a
-                                href="https://f1-dash.com/"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                style="
-                                    color: #f1f1f1;
-                                    text-decoration: none;
-                                    border-bottom: 1px dotted #f1f1f1;
-                                "
-                                >F1 Dash</a
-                            >
-                        </li>
-                        <li style="margin: 0.5rem 0">
-                            <a
-                                href="https://f1calendar.com/"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                style="
-                                    color: #f1f1f1;
-                                    text-decoration: none;
-                                    border-bottom: 1px dotted #f1f1f1;
-                                "
-                                >F1 Calendar</a
-                            >
-                        </li>
-                    </ul>
-                </div>
-                <div class="footer-links" style="flex: 1; margin-left: 2rem">
-                    <h3 style="color: #f1f1f1; margin-bottom: 1rem">
-                        Other Projects by Chyuang
-                    </h3>
-                    <ul style="list-style: none; padding: 0; margin: 0">
-                        <li style="margin: 0.5rem 0">
-                            <a
-                                href="https://readpatents.com/"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                style="
-                                    color: #f1f1f1;
-                                    text-decoration: none;
-                                    border-bottom: 1px dotted #f1f1f1;
-                                "
-                                >Readpatents</a
-                            >
-                        </li>
-                        <li style="margin: 0.5rem 0">
-                            <a
-                                href="https://patent-figure-shirts.yaaaang.com/"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                style="
-                                    color: #f1f1f1;
-                                    text-decoration: none;
-                                    border-bottom: 1px dotted #f1f1f1;
-                                "
-                                >Patent Figure Shirts</a
-                            >
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </footer>
-
-        <script>
-            // How to Use section toggle
-            document
-                .getElementById("close-how-to-use")
-                .addEventListener("click", function () {
-                    document
-                        .querySelector(".how-to-use")
-                        .classList.remove("visible");
-                });
-        </script>
-    </body>
+    <!-- Schema.org data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SportsApplication",
+        "name": "F1 Points Calculator",
+        "description": "Interactive Formula 1 points calculator for predicting race results and championship standings",
+        "applicationCategory": "Sports Calculator",
+        "operatingSystem": "Web Browser",
+        "author": {
+          "@type": "Person",
+          "name": "Yaaaang",
+          "url": "https://yaaaang.com"
+        }
+      }
+    </script>
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GJ61RX1FZJ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-GJ61RX1FZJ");
+    </script>
+  </head>
+  <body class="bg-gray-100">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>
