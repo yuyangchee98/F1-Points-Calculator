@@ -1,0 +1,15 @@
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer-when-downgrade
+  
+/*.js
+  Content-Type: application/javascript
+/*.jsx
+  Content-Type: application/javascript
+/*.ts
+  Content-Type: application/javascript
+/*.tsx
+  Content-Type: application/javascript
+/*.css
+  Content-Type: text/css
