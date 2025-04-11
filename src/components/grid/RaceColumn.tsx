@@ -109,6 +109,7 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
             isOfficialResult={isOfficialResult}
             raceId={race.id}
             position={position}
+            hideCode={true}
           />
         </div>
       )}

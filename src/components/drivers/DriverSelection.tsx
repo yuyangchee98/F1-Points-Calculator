@@ -82,7 +82,7 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({ forceExpanded = false
           ${isExpanded ? 'max-h-[800px]' : 'max-h-0 sm:max-h-[800px]'} 
           overflow-hidden transition-all duration-300 ease-in-out
           ${forceExpanded ? 'overflow-y-auto pb-20' : 'sm:overflow-visible sm:max-h-full'} 
-          p-2 bg-gray-50 rounded-lg shadow-sm border border-gray-200
+          p-4 bg-gray-50 rounded-lg shadow-sm border border-gray-200
         `}
       >
         {drivers.map(driver => (
