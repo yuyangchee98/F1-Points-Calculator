@@ -4,3 +4,4 @@
 .env
 automatic-updates/*
 .vite
+dist/*
