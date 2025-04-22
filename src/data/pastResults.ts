@@ -111,5 +111,27 @@ export const pastRaceResults: PastRaceResult = {
     "Bortoleto",
     "Sainz",
     "Hulkenberg"
+  ],
+  "Saudi Arabia": [
+    "Piastri",
+    "Verstappen",
+    "Leclerc",
+    "Norris",
+    "Russell",
+    "Antonelli",
+    "Hamilton",
+    "Sainz",
+    "Albon",
+    "Hadjar",
+    "Alonso",
+    "Lawson (RB)",
+    "Bearman",
+    "Ocon",
+    "Hulkenberg",
+    "Stroll",
+    "Doohan",
+    "Bortoleto",
+    "Tsunoda (RBR)", 
+    "Gasly"
   ]
 };
