@@ -22,6 +22,7 @@ export const driverNames = [
   "Lawson (RBR)",  // Red Bull Lawson (pre-Japan)
   "Lawson (RB)",   // Racing Bulls Lawson (Japan onwards)
   "Doohan",
+  "Colapinto",
   "Bortoleto",
   "Hadjar",
 ];
@@ -49,6 +50,7 @@ export const driverTeamMapping = {
   Bearman: "Haas",
   Hulkenberg: "Sauber",
   Doohan: "Alpine",
+  Colapinto: "Alpine",
   Bortoleto: "Sauber",
 };
 
