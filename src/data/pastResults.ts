@@ -200,6 +200,28 @@ export const pastRaceResults: PastRaceResult = {
     "Antonelli",
     "Ocon"
   ],
+  "Monaco": [
+    "Norris",
+    "Leclerc",
+    "Piastri",
+    "Verstappen",
+    "Hamilton",
+    "Hadjar",
+    "Ocon",
+    "Lawson (RB)",
+    "Albon",
+    "Sainz",
+    "Russell",
+    "Bearman",
+    "Colapinto",
+    "Bortoleto",
+    "Stroll",
+    "Hulkenberg",
+    "Tsunoda (RBR)",
+    "Antonelli",
+    "Alonso",
+    "Gasly"
+  ],
   "Spain": [
     "Piastri",
     "Norris",
