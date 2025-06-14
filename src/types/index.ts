@@ -66,18 +66,6 @@ export interface PastRaceResult {
   [race: string]: string[];
 }
 
-// Types for prediction related features
-export interface PredictionMetadata {
-  hideOfficialResults?: boolean;
-  appVersion?: string;
-  timestamp?: string;
-}
-
-export interface CommunityPredictionStats {
-  totalPredictions: number;
-  updatedAt: string;
-}
-
 // State types
 export interface DriversState {
   list: Driver[];
@@ -96,20 +84,13 @@ export interface GridState {
 
 export type StandingsTab = 'tables' | 'charts';
 export type MobileView = 'grid' | 'standings';
-export type PredictionDialogType = 'save' | 'load' | null;
 
 export interface UiState {
   activeTab: StandingsTab;
   mobileView: MobileView;
   showOfficialResults: boolean;
   selectedDriver: string | null;
-  shareableLink: string | null;
   selectedRace: string | null;
-  // Prediction management states
-  showingPredictionDialog: boolean;
-  predictionDialogType: PredictionDialogType;
-  predictionError: string | null;
-  predictionLoading: boolean;
 }
 
 export interface ResultsState {

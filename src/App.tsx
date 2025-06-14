@@ -16,7 +16,6 @@ import DriverSelection from './components/drivers/DriverSelection';
 import { NotificationManager } from './components/Notification';
 import useAppDispatch from './hooks/useAppDispatch';
 import useWindowSize from './hooks/useWindowSize';
-import { checkUrlForPrediction } from './store/thunks/predictionThunks';
 
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -31,9 +30,6 @@ const App: React.FC = () => {
     
     // Calculate initial results
     dispatch(calculateResults());
-    
-    // Check for prediction ID in URL
-    dispatch(checkUrlForPrediction());
   }, [dispatch]);
   
   // Auto-update layout when window is resized
