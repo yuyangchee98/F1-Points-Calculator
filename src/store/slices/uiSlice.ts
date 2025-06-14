@@ -6,13 +6,7 @@ const initialState: UiState = {
   mobileView: 'grid', // Default mobile view shows the race grid
   showOfficialResults: true, // Default to showing official results
   selectedDriver: null,
-  shareableLink: null,
-  selectedRace: null,
-  // Prediction management states
-  showingPredictionDialog: false,
-  predictionDialogType: null,
-  predictionError: null,
-  predictionLoading: false
+  selectedRace: null
 };
 
 export const uiSlice = createSlice({
@@ -48,31 +42,7 @@ export const uiSlice = createSlice({
       state.selectedRace = action.payload;
     },
     
-    // Updated/renamed action for shareable link
-    setShareableLink: (state, action: PayloadAction<string | null>) => {
-      state.shareableLink = action.payload;
-    },
-    
-    // Set prediction dialog state
-    setPredictionDialog: (state, action: PayloadAction<{
-      show: boolean;
-      type?: 'save' | 'load' | null;
-    }>) => {
-      state.showingPredictionDialog = action.payload.show;
-      state.predictionDialogType = action.payload.type || null;
-    },
-    
-    // Set prediction loading state
-    setPredictionLoading: (state, action: PayloadAction<boolean>) => {
-      state.predictionLoading = action.payload;
-    },
-    
-    // Set prediction error
-    setPredictionError: (state, action: PayloadAction<string | null>) => {
-      state.predictionError = action.payload;
-    },
-    
-    // Initialize UI state from localStorage or URL parameters
+    // Initialize UI state from localStorage
     initializeUiState: (state) => {
       // Load official results preference from localStorage
       const hideOfficialResults = localStorage.getItem('hide-official-results');
@@ -85,15 +55,6 @@ export const uiSlice = createSlice({
       if (savedMobileView && ['grid', 'standings'].includes(savedMobileView)) {
         state.mobileView = savedMobileView;
       }
-      
-      // Check for shared prediction in URL
-      const url = new URL(window.location.href);
-      const predictionParam = url.searchParams.get('prediction');
-      if (predictionParam) {
-        // We'll handle loading the prediction in the grid slice
-        // Just note here that we have a shared prediction
-        state.shareableLink = window.location.href;
-      }
     }
   }
 });
@@ -104,10 +65,6 @@ export const {
   toggleOfficialResults, 
   selectDriver, 
   selectRace, 
-  setShareableLink,
-  setPredictionDialog,
-  setPredictionLoading,
-  setPredictionError,
   initializeUiState
 } = uiSlice.actions;
 
