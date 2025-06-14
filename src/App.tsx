@@ -13,7 +13,6 @@ import ActionsBar from './components/common/ActionsBar';
 import InfoBanner from './components/common/InfoBanner';
 import ToastContainer from './components/common/ToastContainer';
 import DriverSelection from './components/drivers/DriverSelection';
-import { NotificationManager } from './components/Notification';
 import useAppDispatch from './hooks/useAppDispatch';
 import useWindowSize from './hooks/useWindowSize';
 
@@ -47,8 +46,6 @@ const App: React.FC = () => {
     <DndProvider backend={HTML5Backend}>
       <div className="app min-h-screen">
         <ToastContainer />
-        {/* Add notification manager */}
-        <NotificationManager />
         
         <Layout
           sidebar={<StandingsSidebar />}
