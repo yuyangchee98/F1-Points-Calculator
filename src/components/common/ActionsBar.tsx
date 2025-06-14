@@ -10,7 +10,6 @@ import { PredictionControls } from '../PredictionControls';
 const ActionsBar: React.FC = () => {
   const dispatch = useAppDispatch(); // Use typed dispatch
   const showOfficialResults = useSelector((state: RootState) => state.ui.showOfficialResults);
-  const isShowingCommunityPredictions = useSelector((state: RootState) => state.ui.isShowingCommunityPredictions);
 
   // Handle grid reset
   const handleReset = () => {
@@ -35,7 +34,6 @@ const ActionsBar: React.FC = () => {
         <button
           onClick={handleReset}
           className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md shadow transition"
-          disabled={isShowingCommunityPredictions}
         >
           Reset Predictions
         </button>
@@ -45,7 +43,6 @@ const ActionsBar: React.FC = () => {
           className={`${
             showOfficialResults ? 'bg-green-600' : 'bg-gray-500'
           } hover:bg-opacity-90 text-white px-4 py-2 rounded-md shadow transition`}
-          disabled={isShowingCommunityPredictions}
         >
           {showOfficialResults ? 'Hide Official Results' : 'Show Official Results'}
         </button>
