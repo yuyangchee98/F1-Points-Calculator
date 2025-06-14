@@ -105,13 +105,11 @@ export interface UiState {
   selectedDriver: string | null;
   shareableLink: string | null;
   selectedRace: string | null;
-  // New UI states for prediction management
-  isShowingCommunityPredictions: boolean;
+  // Prediction management states
   showingPredictionDialog: boolean;
   predictionDialogType: PredictionDialogType;
   predictionError: string | null;
   predictionLoading: boolean;
-  communityPredictionStats: CommunityPredictionStats | null;
 }
 
 export interface ResultsState {
