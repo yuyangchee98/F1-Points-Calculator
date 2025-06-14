@@ -4,20 +4,16 @@ import { RootState, AppDispatch } from '../../store';
 import {
   setPredictionDialog,
   setShareableLink,
-  setShowingCommunityPredictions,
   setPredictionError
 } from '../../store/slices/uiSlice';
 import {
   saveGridPrediction,
   loadGridPrediction,
-  checkUrlForPrediction,
-  fetchCommunityPredictions,
-  resetSharedPrediction
+  checkUrlForPrediction
 } from '../../store/thunks/predictionThunks';
 import { getPredictionHistory } from '../../utils/api/prediction/userManager';
 import ShareLinkModal from './ShareLinkModal';
 import LoadPredictionModal from './LoadPredictionModal';
-import CommunityBanner from './CommunityBanner';
 import './predictionControls.css';
 
 const PredictionControls: React.FC = () => {
@@ -27,9 +23,7 @@ const PredictionControls: React.FC = () => {
     showingPredictionDialog,
     predictionDialogType,
     predictionLoading,
-    predictionError,
-    isShowingCommunityPredictions,
-    communityPredictionStats
+    predictionError
   } = useSelector((state: RootState) => state.ui);
 
   // Check URL for prediction param on initial load
@@ -73,42 +67,14 @@ const PredictionControls: React.FC = () => {
     dispatch(setPredictionError(null));
   };
 
-  // Toggle community predictions
-  const handleToggleCommunity = () => {
-    if (isShowingCommunityPredictions) {
-      // Turn off community predictions
-      dispatch(setShowingCommunityPredictions(false));
-      dispatch(resetSharedPrediction());
-    } else {
-      // Turn on community predictions
-      dispatch(fetchCommunityPredictions())
-        .unwrap()
-        .then(() => {
-          dispatch(setShowingCommunityPredictions(true));
-        })
-        .catch((error: any) => {
-          dispatch(setPredictionError(error.toString()));
-        });
-    }
-  };
-
   return (
     <div className="prediction-controls">
-      {/* Community Banner - shown when viewing community predictions */}
-      {isShowingCommunityPredictions && communityPredictionStats && (
-        <CommunityBanner
-          totalPredictions={communityPredictionStats.totalPredictions}
-          updatedAt={communityPredictionStats.updatedAt}
-          onClose={() => handleToggleCommunity()}
-        />
-      )}
-
       {/* Control Buttons */}
       <div className="prediction-buttons animate-fade-in">
         <button
           className="prediction-button save-button"
           onClick={handleSave}
-          disabled={predictionLoading || isShowingCommunityPredictions}
+          disabled={predictionLoading}
         >
           <span className="button-icon">📊</span>
           <span className="button-text">Save Prediction</span>
@@ -117,21 +83,10 @@ const PredictionControls: React.FC = () => {
         <button
           className="prediction-button load-button"
           onClick={handleLoad}
-          disabled={predictionLoading || isShowingCommunityPredictions}
+          disabled={predictionLoading}
         >
           <span className="button-icon">📝</span>
           <span className="button-text">Load Prediction</span>
-        </button>
-
-        <button
-          className={`prediction-button community-button ${isShowingCommunityPredictions ? 'active' : ''}`}
-          onClick={handleToggleCommunity}
-          disabled={predictionLoading}
-        >
-          <span className="button-icon">🌎</span>
-          <span className="button-text">
-            {isShowingCommunityPredictions ? 'Hide Community Predictions' : 'Show Community Predictions'}
-          </span>
         </button>
       </div>
 

@@ -6,16 +6,13 @@ import { RootState } from '../index';
 import { loadPredictions } from '../slices/gridSlice';
 import { 
   setShareableLink, 
-  setPredictionDialog, 
-  setCommunityPredictionStats,
-  setShowingCommunityPredictions
+  setPredictionDialog
 } from '../slices/uiSlice';
 import { calculateResults } from '../slices/resultsSlice';
 
 import { 
   savePrediction,
-  loadPrediction,
-  getCommunityPredictions 
+  loadPrediction
 } from '../../utils/api/prediction/apiService';
 
 import {
@@ -131,73 +128,6 @@ export const loadGridPrediction = createAsyncThunk(
 );
 
 /**
- * Thunk to fetch and apply community predictions
- */
-export const fetchCommunityPredictions = createAsyncThunk(
-  'predictions/community',
-  async (_, { dispatch }) => {
-    try {
-      // Show loading notification
-      const notifyId = window.notifications?.info('Loading community predictions...') || '';
-      
-      // Fetch community data
-      const communityData = await getCommunityPredictions();
-      
-      if (!communityData || !communityData.consensus) {
-        throw new Error('Invalid community prediction data');
-      }
-      
-      // Transform to the format expected by loadPredictions
-      const predictions: Record<string, Record<string, string>> = {};
-      
-      Object.entries(communityData.consensus).forEach(([raceName, positions]) => {
-        predictions[raceName] = {};
-        
-        Object.entries(positions).forEach(([position, data]) => {
-          // Fix for team-specific drivers like Tsunoda and Lawson
-          let driverName = data.driver;
-          
-          // Map Tsunoda to Tsunoda (RBR) and Lawson to Lawson (RB)
-          if (driverName === 'Tsunoda') {
-            driverName = 'Tsunoda (RBR)';
-          } else if (driverName === 'Lawson') {
-            driverName = 'Lawson (RB)';
-          }
-          
-          predictions[raceName][position] = driverName;
-        });
-      });
-      
-      // Load the predictions into the grid
-      dispatch(loadPredictions(predictions));
-      
-      // Recalculate results
-      dispatch(calculateResults());
-      
-      // Set community stats in UI
-      dispatch(setCommunityPredictionStats({
-        totalPredictions: communityData.totalPredictions,
-        updatedAt: communityData.updatedAt
-      }));
-      
-      // Clear loading notification and show success
-      window.notifications?.remove(notifyId);
-      window.notifications?.success('Community predictions loaded successfully!');
-      
-      return {
-        totalPredictions: communityData.totalPredictions,
-        updatedAt: communityData.updatedAt
-      };
-    } catch (error) {
-      // Show error notification
-      window.notifications?.error('Failed to load community predictions. Please try again later.');
-      console.error('Error loading community predictions:', error);
-      throw error;
-    }
-  }
-);
-
-/**
  * Thunk to check for and load prediction from URL
  */
 export const checkUrlForPrediction = createAsyncThunk(
@@ -237,9 +167,6 @@ export const resetSharedPrediction = createAsyncThunk(
     
     // Clear shareable link from UI
     dispatch(setShareableLink(null));
-    
-    // Turn off community predictions flag
-    dispatch(setShowingCommunityPredictions(false));
     
     // Show info notification
     window.notifications?.info('Returned to your predictions');

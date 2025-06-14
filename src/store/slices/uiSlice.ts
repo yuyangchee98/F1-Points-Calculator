@@ -8,13 +8,11 @@ const initialState: UiState = {
   selectedDriver: null,
   shareableLink: null,
   selectedRace: null,
-  // New UI states for prediction management
-  isShowingCommunityPredictions: false,
+  // Prediction management states
   showingPredictionDialog: false,
   predictionDialogType: null,
   predictionError: null,
-  predictionLoading: false,
-  communityPredictionStats: null
+  predictionLoading: false
 };
 
 export const uiSlice = createSlice({
@@ -53,19 +51,6 @@ export const uiSlice = createSlice({
     // Updated/renamed action for shareable link
     setShareableLink: (state, action: PayloadAction<string | null>) => {
       state.shareableLink = action.payload;
-    },
-    
-    // Set community prediction stats
-    setCommunityPredictionStats: (state, action: PayloadAction<{
-      totalPredictions: number;
-      updatedAt: string;
-    } | null>) => {
-      state.communityPredictionStats = action.payload;
-    },
-    
-    // Toggle showing community predictions
-    setShowingCommunityPredictions: (state, action: PayloadAction<boolean>) => {
-      state.isShowingCommunityPredictions = action.payload;
     },
     
     // Set prediction dialog state
@@ -120,8 +105,6 @@ export const {
   selectDriver, 
   selectRace, 
   setShareableLink,
-  setCommunityPredictionStats,
-  setShowingCommunityPredictions,
   setPredictionDialog,
   setPredictionLoading,
   setPredictionError,

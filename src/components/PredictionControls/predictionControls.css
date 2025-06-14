@@ -66,22 +66,6 @@
   background-color: #f9fafb; /* bg-gray-50 */
 }
 
-.community-button {
-  background-color: white;
-  border-color: #e5e7eb; /* border-gray-200 */
-}
-
-.community-button:hover:not(:disabled) {
-  border-color: #d1d5db; /* border-gray-300 */
-  background-color: #f9fafb; /* bg-gray-50 */
-}
-
-.community-button.active {
-  background-color: #3b82f6; /* bg-blue-500 */
-  border-color: #3b82f6;
-  color: white;
-}
-
 .button-icon {
   font-size: 1.125rem;
 }
@@ -139,10 +123,6 @@
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 0.5rem;
-    }
-    
-    .prediction-button.community-button {
-      grid-column: span 2;
     }
   }
 }
