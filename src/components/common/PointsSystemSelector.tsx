@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store';
 import { selectPointsSystem } from '../../store/slices/uiSlice';
 import { POINTS_SYSTEMS } from '../../data/pointsSystems';
+import { trackPointsSystemChange } from '../../utils/analytics';
 
 const PointsSystemSelector: React.FC = () => {
   const dispatch = useDispatch();
@@ -38,6 +39,7 @@ const PointsSystemSelector: React.FC = () => {
     dispatch(selectPointsSystem(systemId));
     setIsOpen(false);
     setSearchQuery('');
+    trackPointsSystemChange(systemId);
   };
 
   // Categorize systems

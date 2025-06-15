@@ -7,6 +7,7 @@ import { RootState } from '../../store';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import PointsSystemSelector from './PointsSystemSelector';
 import PointsReference from './PointsReference';
+import { GA_EVENTS, trackEvent } from '../../utils/analytics';
 
 const ActionsBar: React.FC = () => {
   const dispatch = useAppDispatch(); // Use typed dispatch
@@ -17,6 +18,7 @@ const ActionsBar: React.FC = () => {
     if (window.confirm('Are you sure you want to reset your predictions?')) {
       dispatch(resetGrid());
       dispatch(calculateResults());
+      trackEvent(GA_EVENTS.GRID_ACTIONS.RESET_PREDICTIONS, 'Grid Actions');
     }
   };
 
@@ -26,6 +28,11 @@ const ActionsBar: React.FC = () => {
     dispatch(toggleOfficialResultsUI(newValue));
     dispatch(toggleOfficialResults({ show: newValue }));
     dispatch(calculateResults());
+    trackEvent(
+      GA_EVENTS.GRID_ACTIONS.TOGGLE_OFFICIAL, 
+      'Grid Actions', 
+      newValue ? 'show' : 'hide'
+    );
   };
 
   return (
