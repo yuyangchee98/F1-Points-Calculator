@@ -18,7 +18,8 @@
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.2.0",
-    "react-redux": "^9.1.0"
+    "react-redux": "^9.1.0",
+    "terser": "^5.42.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.55",
