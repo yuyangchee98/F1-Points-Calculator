@@ -1,14 +1,12 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
-import { POINTS_MAP } from '../../data/points';
 import PositionColumn from './PositionColumn';
 import RaceColumn from './RaceColumn';
 import useWindowSize from '../../hooks/useWindowSize';
 
 const RaceGrid: React.FC = () => {
   const races = useSelector((state: RootState) => state.races.list);
-  const selectedRace = useSelector((state: RootState) => state.ui.selectedRace);
   const { isMobile, isTablet } = useWindowSize();
   
   // Determine column width based on screen size

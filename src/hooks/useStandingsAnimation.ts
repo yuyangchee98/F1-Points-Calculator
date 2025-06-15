@@ -19,8 +19,6 @@ export function useStandingsAnimation<T extends StandingItem>(
   options: UseStandingsAnimationOptions<T>
 ) {
   const { 
-    getItemId, 
-    compareItems,
     animationDuration = 1000 
   } = options;
 
