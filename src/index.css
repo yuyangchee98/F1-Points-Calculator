@@ -352,6 +352,17 @@ body {
   .team-color {
     @apply w-3 h-5 rounded-sm mr-2 inline-block;
   }
+  
+  /* Form Select Styling */
+  .form-select {
+    @apply px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm;
+    @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+    @apply transition duration-150 ease-in-out;
+  }
+  
+  .form-select:hover {
+    @apply border-gray-400;
+  }
 }
 
 /* Flag styling */
