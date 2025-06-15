@@ -13,6 +13,7 @@ import ActionsBar from './components/common/ActionsBar';
 import InfoBanner from './components/common/InfoBanner';
 import ToastContainer from './components/common/ToastContainer';
 import DriverSelection from './components/drivers/DriverSelection';
+import FAQ from './components/common/FAQ';
 import useAppDispatch from './hooks/useAppDispatch';
 import useWindowSize from './hooks/useWindowSize';
 
@@ -60,9 +61,9 @@ const App: React.FC = () => {
               <h1 className="text-3xl sm:text-4xl font-bold mb-6 text-gray-800 flex flex-wrap sm:flex-nowrap items-center">
                 <a href="/" className="no-underline text-inherit whitespace-nowrap">
                   <span className="bg-red-600 text-white px-3 py-1 mr-3 rounded-md">F1</span>
-                  POINTS CALCULATOR
+                  Championship Calculator
                 </a>
-                <span className="text-base sm:text-lg text-gray-500 ml-0 sm:ml-3 font-normal">2025 Season</span>
+                <span className="text-base sm:text-lg text-gray-500 ml-0 sm:ml-3 font-normal">2025 Season Predictor</span>
               </h1>
               
               {/* Buy me a coffee link at top */}
@@ -85,6 +86,9 @@ const App: React.FC = () => {
                 <DriverSelection />
                 <RaceGrid />
               </div>
+              
+              {/* FAQ Section for SEO */}
+              <FAQ />
             </div>
           }
         />
