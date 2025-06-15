@@ -5,6 +5,7 @@ import { toggleOfficialResults as toggleOfficialResultsUI } from '../../store/sl
 import { calculateResults } from '../../store/slices/resultsSlice';
 import { RootState } from '../../store';
 import useAppDispatch from '../../hooks/useAppDispatch';
+import PointsSystemSelector from './PointsSystemSelector';
 
 const ActionsBar: React.FC = () => {
   const dispatch = useAppDispatch(); // Use typed dispatch
@@ -29,7 +30,7 @@ const ActionsBar: React.FC = () => {
   return (
     <div className="mb-6">
       {/* Basic action buttons */}
-      <div className="flex flex-wrap gap-4">
+      <div className="flex flex-wrap gap-4 items-center">
         <button
           onClick={handleReset}
           className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md shadow transition"
@@ -45,6 +46,11 @@ const ActionsBar: React.FC = () => {
         >
           {showOfficialResults ? 'Hide Official Results' : 'Show Official Results'}
         </button>
+        
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-600">Points System:</span>
+          <PointsSystemSelector />
+        </div>
       </div>
     </div>
   );

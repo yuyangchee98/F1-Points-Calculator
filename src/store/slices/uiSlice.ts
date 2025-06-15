@@ -1,12 +1,14 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { UiState, StandingsTab, MobileView } from '../../types';
+import { DEFAULT_POINTS_SYSTEM } from '../../data/pointsSystems';
 
 const initialState: UiState = {
   activeTab: 'tables',
   mobileView: 'grid', // Default mobile view shows the race grid
   showOfficialResults: true, // Default to showing official results
   selectedDriver: null,
-  selectedRace: null
+  selectedRace: null,
+  selectedPointsSystem: DEFAULT_POINTS_SYSTEM
 };
 
 export const uiSlice = createSlice({
@@ -42,6 +44,12 @@ export const uiSlice = createSlice({
       state.selectedRace = action.payload;
     },
     
+    selectPointsSystem: (state, action: PayloadAction<string>) => {
+      state.selectedPointsSystem = action.payload;
+      // Store the preference in localStorage
+      localStorage.setItem('selected-points-system', action.payload);
+    },
+    
     // Initialize UI state from localStorage
     initializeUiState: (state) => {
       // Load official results preference from localStorage
@@ -55,6 +63,12 @@ export const uiSlice = createSlice({
       if (savedMobileView && ['grid', 'standings'].includes(savedMobileView)) {
         state.mobileView = savedMobileView;
       }
+      
+      // Load points system preference from localStorage
+      const savedPointsSystem = localStorage.getItem('selected-points-system');
+      if (savedPointsSystem) {
+        state.selectedPointsSystem = savedPointsSystem;
+      }
     }
   }
 });
@@ -64,7 +78,8 @@ export const {
   setMobileView,
   toggleOfficialResults, 
   selectDriver, 
-  selectRace, 
+  selectRace,
+  selectPointsSystem,
   initializeUiState
 } = uiSlice.actions;
 

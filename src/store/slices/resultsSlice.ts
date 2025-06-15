@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { ResultsState, DriverStanding, TeamStanding, PointsHistory, TeamPointsHistory } from '../../types';
 import { RootState } from '../index';
-import { getPointsForPosition } from '../../data/points';
+import { getPointsForPositionWithSystem } from '../../data/pointsSystems';
 // Data is managed through Redux store, no need to import directly
 
 const initialState: ResultsState = {
@@ -36,6 +36,7 @@ const state = getState() as RootState;
 const { positions } = state.grid; // Fastest lap points are not awarded in the 2025 season
 const allDrivers = state.drivers.list;
 const allRaces = state.races.list;
+const selectedPointsSystem = state.ui.selectedPointsSystem;
 
 // Initialize data structures for calculations
 const driverPoints: Record<string, number> = {};
@@ -78,7 +79,7 @@ if (position.driverId) {
 const driver = allDrivers.find(d => d.id === position.driverId);
 if (driver) {
 // Award position points
-const pointsForPosition = getPointsForPosition(position.position, race.isSprint);
+const pointsForPosition = getPointsForPositionWithSystem(position.position, race.isSprint, selectedPointsSystem);
 
 // Initialize driver points if needed
 if (!driverPoints[driver.id]) {
