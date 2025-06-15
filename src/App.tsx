@@ -21,6 +21,7 @@ const App: React.FC = () => {
   // Call useRaceResults but don't use the loading state
   useRaceResults();
   const mobileView = useSelector((state: RootState) => state.ui.mobileView);
+  const selectedPointsSystem = useSelector((state: RootState) => state.ui.selectedPointsSystem);
   const { isMobile } = useWindowSize();
 
   useEffect(() => {
@@ -30,6 +31,11 @@ const App: React.FC = () => {
     // Calculate initial results
     dispatch(calculateResults());
   }, [dispatch]);
+  
+  // Recalculate results when points system changes
+  useEffect(() => {
+    dispatch(calculateResults());
+  }, [dispatch, selectedPointsSystem]);
   
   // Auto-update layout when window is resized
   useEffect(() => {

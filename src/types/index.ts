@@ -91,6 +91,7 @@ export interface UiState {
   showOfficialResults: boolean;
   selectedDriver: string | null;
   selectedRace: string | null;
+  selectedPointsSystem: string;
 }
 
 export interface ResultsState {
