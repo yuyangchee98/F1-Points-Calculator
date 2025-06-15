@@ -18,9 +18,9 @@ const PointsReference: React.FC = () => {
   const pointsToShow = useSprintPoints ? selectedSystem.sprint : selectedSystem.regular;
   
   // Get positions that actually have points
-  const scoringPositions = Object.entries(pointsToShow)
+  const scoringPositions = pointsToShow ? Object.entries(pointsToShow)
     .filter(([_, points]) => points > 0)
-    .map(([position, points]) => ({ position: parseInt(position), points }));
+    .map(([position, points]) => ({ position: parseInt(position), points })) : [];
 
   return (
     <div className="points-reference mb-4">
