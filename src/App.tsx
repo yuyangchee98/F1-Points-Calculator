@@ -16,6 +16,7 @@ import DriverSelection from './components/drivers/DriverSelection';
 import FAQ from './components/common/FAQ';
 import useAppDispatch from './hooks/useAppDispatch';
 import useWindowSize from './hooks/useWindowSize';
+import { trackBuyCoffeeClick } from './utils/analytics';
 
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -73,6 +74,7 @@ const App: React.FC = () => {
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="inline-block py-2 sm:py-3 px-4 sm:px-6 bg-red-600 text-white font-bold rounded-md shadow-lg hover:bg-red-700 transition-colors duration-200"
+                  onClick={trackBuyCoffeeClick}
                 >
                   <span className="mr-2">🔴</span> Buy Chyuang a soft tyre
                 </a>

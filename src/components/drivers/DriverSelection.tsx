@@ -6,6 +6,7 @@ import DriverCard from './DriverCard';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import useWindowSize from '../../hooks/useWindowSize';
 import { getDriversForRace } from '../../utils/driverHelper';
+import { GA_EVENTS, trackEvent } from '../../utils/analytics';
 
 interface DriverSelectionProps {
   forceExpanded?: boolean;
@@ -40,6 +41,7 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({ forceExpanded = false
       dispatch(selectDriver(null));
     } else {
       dispatch(selectDriver(driverId));
+      trackEvent(GA_EVENTS.DRIVER_ACTIONS.SELECT_DRIVER, 'Driver Selection', driverId);
     }
     
     // On mobile, collapse the selection panel after choosing
