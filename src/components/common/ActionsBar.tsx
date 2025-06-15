@@ -6,6 +6,7 @@ import { calculateResults } from '../../store/slices/resultsSlice';
 import { RootState } from '../../store';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import PointsSystemSelector from './PointsSystemSelector';
+import PointsReference from './PointsReference';
 
 const ActionsBar: React.FC = () => {
   const dispatch = useAppDispatch(); // Use typed dispatch
@@ -30,7 +31,7 @@ const ActionsBar: React.FC = () => {
   return (
     <div className="mb-6">
       {/* Basic action buttons */}
-      <div className="flex flex-wrap gap-4 items-center">
+      <div className="flex flex-wrap gap-4 items-center mb-4">
         <button
           onClick={handleReset}
           className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md shadow transition"
@@ -52,6 +53,9 @@ const ActionsBar: React.FC = () => {
           <PointsSystemSelector />
         </div>
       </div>
+      
+      {/* Points Reference */}
+      <PointsReference />
     </div>
   );
 };
