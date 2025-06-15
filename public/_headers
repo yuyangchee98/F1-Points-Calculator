@@ -2,14 +2,44 @@
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   Referrer-Policy: no-referrer-when-downgrade
+  Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()
+
+# Cache static assets for 1 year
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
   
+# Cache images for 1 month  
+/flags/*
+  Cache-Control: public, max-age=2592000
+/logo.svg
+  Cache-Control: public, max-age=2592000
+/og-image.jpg
+  Cache-Control: public, max-age=2592000
+
+# Service worker and manifest
+/manifest.json
+  Cache-Control: no-cache
+  Content-Type: application/manifest+json
+
+# Prevent *.pages.dev from being indexed
+https://:project.pages.dev/*
+  X-Robots-Tag: noindex
+
+# JavaScript files
 /*.js
   Content-Type: application/javascript
+  Cache-Control: public, max-age=31536000, immutable
 /*.jsx
   Content-Type: application/javascript
+  Cache-Control: public, max-age=31536000, immutable
 /*.ts
   Content-Type: application/javascript
+  Cache-Control: public, max-age=31536000, immutable
 /*.tsx
   Content-Type: application/javascript
+  Cache-Control: public, max-age=31536000, immutable
+  
+# CSS files
 /*.css
   Content-Type: text/css
+  Cache-Control: public, max-age=31536000, immutable
