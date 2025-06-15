@@ -21,6 +21,8 @@ export interface Race {
   countryCode: string;
   order: number; // Race order in the calendar
   completed: boolean;
+  date?: string; // ISO date string from API
+  round?: string; // Round number from API
 }
 
 export interface GridPosition {

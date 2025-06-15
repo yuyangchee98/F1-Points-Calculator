@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { TeamStanding } from '../../types';
 import { teamById } from '../../data/teams';
 import { useStandingsAnimation } from '../../hooks/useStandingsAnimation';
@@ -8,10 +8,13 @@ interface TeamStandingsTableProps {
 }
 
 const TeamStandingsTable: React.FC<TeamStandingsTableProps> = ({ standings }) => {
+  // Memoize animation options to prevent recreating functions on each render
+  const animationOptions = useMemo(() => ({
+    getItemId: (standing: TeamStanding) => standing.teamId
+  }), []);
+  
   // Use custom hook for animations
-  const animatedTeams = useStandingsAnimation(standings, {
-    getItemId: (standing) => standing.teamId
-  });
+  const animatedTeams = useStandingsAnimation(standings, animationOptions);
 
   return (
     <div className="overflow-hidden rounded-lg">
