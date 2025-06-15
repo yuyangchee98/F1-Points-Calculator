@@ -2,7 +2,8 @@ import React from 'react';
 import { Driver } from '../../types';
 import { teamById } from '../../data/teams';
 import { useDriverDrag } from '../../hooks/useDriverDragDrop';
-// formatDriverName not needed here
+import { getDriverDisplayName } from '../../utils/driverHelper';
+import { normalizeTeamId } from '../../utils/teamHelper';
 
 interface DriverCardProps {
   driver: Driver;
@@ -23,7 +24,7 @@ const DriverCard: React.FC<DriverCardProps> = ({
   position,
   hideCode = false
 }) => {
-  const team = teamById[driver.team.toLowerCase().replace(/\s/g, '-')];
+  const team = teamById[normalizeTeamId(driver.team)];
   
   // Set up drag source if we're in a grid position
   const { drag, isDragging } = useDriverDrag(driver.id, raceId, position);
@@ -58,9 +59,7 @@ const DriverCard: React.FC<DriverCardProps> = ({
       {/* Driver name and team */}
       <div className="flex flex-col ml-3 flex-grow">
         <span className="text-sm font-bold">
-          {driver.id.includes('tsunoda') ? driver.name.split(' ')[0] :
-           driver.id.includes('lawson') ? driver.name.split(' ')[0] :
-           driver.name.split(' ')[1]?.toUpperCase() || driver.name}
+          {getDriverDisplayName(driver)}
         </span>
         <span className="text-xs text-gray-600" style={{ color: team?.color || '#555' }}>
           {team?.name || driver.team}
