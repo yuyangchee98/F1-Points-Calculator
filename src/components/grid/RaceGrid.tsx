@@ -4,7 +4,6 @@ import { RootState } from '../../store';
 import { POINTS_MAP } from '../../data/points';
 import PositionColumn from './PositionColumn';
 import RaceColumn from './RaceColumn';
-import PointsColumn from './PointsColumn';
 import useWindowSize from '../../hooks/useWindowSize';
 
 const RaceGrid: React.FC = () => {
@@ -25,7 +24,7 @@ const RaceGrid: React.FC = () => {
         id="race-grid"
         className="race-grid" 
         style={{ 
-          gridTemplateColumns: `80px repeat(${races.length}, minmax(${getMinColumnWidth()}, 1fr)) 80px`,
+          gridTemplateColumns: `80px repeat(${races.length}, minmax(${getMinColumnWidth()}, 1fr))`,
           gridAutoRows: 'minmax(40px, auto)'
         }}
       >
@@ -52,8 +51,6 @@ const RaceGrid: React.FC = () => {
           </div>
         ))}
         
-        {/* Points header */}
-        <div className="position-header">Points</div>
         
         {/* Grid rows - 20 positions */}
         {Array.from({ length: 20 }, (_, i) => i + 1).map(position => (
@@ -73,12 +70,6 @@ const RaceGrid: React.FC = () => {
                   position={position}
                 />
               ))}
-              
-              {/* Points column */}
-              <PointsColumn 
-                points={POINTS_MAP[position] || 0} 
-                selectedRace={selectedRace}
-              />
             </div>
           </React.Fragment>
         ))}
