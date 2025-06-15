@@ -79,10 +79,10 @@ const DriverStandingsTable: React.FC<DriverStandingsTableProps> = ({ standings }
     return result;
   }, [standings]);
   
-  // Use custom hook for animations with special comparison logic for Tsunoda and Lawson
-  const animatedDrivers = useStandingsAnimation(consolidatedStandings, {
-    getItemId: (standing) => standing.driverId,
-    compareItems: (current, prev) => {
+  // Memoize animation options to prevent recreating functions on each render
+  const animationOptions = useMemo(() => ({
+    getItemId: (standing: typeof consolidatedStandings[0]) => standing.driverId,
+    compareItems: (current: typeof consolidatedStandings[0], prev: typeof consolidatedStandings[0]) => {
       // Special handling for Tsunoda and Lawson who have team changes
       const currentBase = current.driverId.includes('tsunoda') ? 'tsunoda' : 
                          current.driverId.includes('lawson') ? 'lawson' : 
@@ -92,7 +92,10 @@ const DriverStandingsTable: React.FC<DriverStandingsTableProps> = ({ standings }
                       prev.driverId;
       return currentBase === prevBase;
     }
-  });
+  }), []);
+  
+  // Use custom hook for animations with special comparison logic for Tsunoda and Lawson
+  const animatedDrivers = useStandingsAnimation(consolidatedStandings, animationOptions);
   
   return (
     <div className="overflow-hidden rounded-lg">

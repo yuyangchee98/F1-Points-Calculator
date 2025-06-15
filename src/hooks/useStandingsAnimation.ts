@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export type AnimationState = 'up' | 'down' | 'none';
 
 interface StandingItem {
   position: number;
+  points: number;
+  [key: string]: any;
 }
 
 interface UseStandingsAnimationOptions<T> {
@@ -18,26 +20,54 @@ export function useStandingsAnimation<T extends StandingItem>(
 ) {
   const { 
     getItemId, 
-    compareItems = (current, prev) => getItemId(current) === getItemId(prev),
+    compareItems,
     animationDuration = 1000 
   } = options;
 
-  const [prevStandings, setPrevStandings] = useState<T[]>([]);
+  const prevStandingsRef = useRef<T[]>([]);
+  const optionsRef = useRef(options);
   const [animatedItems, setAnimatedItems] = useState<Record<string, AnimationState>>({});
 
+  // Update options ref when they change
   useEffect(() => {
-    if (standings.length > 0 && prevStandings.length > 0) {
+    optionsRef.current = options;
+  }, [options]);
+
+  useEffect(() => {
+    const prevStandings = prevStandingsRef.current;
+    const { getItemId: getId, compareItems: compare } = optionsRef.current;
+    const compareItemsFn = compare || ((current, prev) => getId(current) === getId(prev));
+    
+    // Check if standings have actually changed by comparing content
+    const standingsKey = JSON.stringify(standings.map(s => ({
+      id: getId(s),
+      position: s.position,
+      points: s.points
+    })));
+    
+    const prevStandingsKey = JSON.stringify(prevStandings.map(s => ({
+      id: getId(s),
+      position: s.position,
+      points: s.points
+    })));
+    
+    const standingsChanged = standingsKey !== prevStandingsKey;
+    
+    if (standings.length > 0 && prevStandings.length > 0 && standingsChanged) {
       const animations: Record<string, AnimationState> = {};
+      let hasChanges = false;
 
       standings.forEach(standing => {
-        const itemId = getItemId(standing);
-        const prevStanding = prevStandings.find(ps => compareItems(standing, ps));
+        const itemId = getId(standing);
+        const prevStanding = prevStandings.find(ps => compareItemsFn(standing, ps));
 
         if (prevStanding) {
           if (prevStanding.position > standing.position) {
             animations[itemId] = 'up';
+            hasChanges = true;
           } else if (prevStanding.position < standing.position) {
             animations[itemId] = 'down';
+            hasChanges = true;
           } else {
             animations[itemId] = 'none';
           }
@@ -46,17 +76,22 @@ export function useStandingsAnimation<T extends StandingItem>(
         }
       });
 
-      setAnimatedItems(animations);
+      if (hasChanges) {
+        setAnimatedItems(animations);
 
-      const timer = setTimeout(() => {
-        setAnimatedItems({});
-      }, animationDuration);
+        const timer = setTimeout(() => {
+          setAnimatedItems({});
+        }, animationDuration);
 
-      return () => clearTimeout(timer);
+        return () => clearTimeout(timer);
+      }
     }
 
-    setPrevStandings(standings);
-  }, [standings, prevStandings, getItemId, compareItems, animationDuration]);
+    // Only update ref if standings actually changed
+    if (standingsChanged || prevStandings.length === 0) {
+      prevStandingsRef.current = [...standings];
+    }
+  }, [standings, animationDuration]);
 
   return animatedItems;
 }
