@@ -33,7 +33,7 @@ const StandingsSidebar: React.FC = () => {
     <div className="h-full overflow-hidden flex flex-col bg-gray-50 pb-4">
       {/* Mobile title - only visible on mobile */}
       <div className="sm:hidden py-4 bg-red-600 text-white border-b border-red-700">
-        <h1 className="text-xl font-bold text-center">Standings</h1>
+        <h2 className="text-xl font-bold text-center">Championship Standings</h2>
       </div>
       
       {/* Top decorative stripe */}
@@ -41,7 +41,7 @@ const StandingsSidebar: React.FC = () => {
       
       {/* Standings header */}
       <div className="hidden sm:flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-white">
-        <h1 className="text-2xl font-bold text-gray-800">Standings</h1>
+        <h2 className="text-2xl font-bold text-gray-800">Championship Standings</h2>
         <div className="flex items-center text-sm text-gray-500">
           <span className="mr-2">Updated</span>
           <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Live</span>
