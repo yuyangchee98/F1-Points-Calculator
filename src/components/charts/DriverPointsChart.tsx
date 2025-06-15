@@ -7,6 +7,7 @@ import { selectDriverPointsForCharts, selectTopDrivers } from '../../store/selec
 import { driverById } from '../../data/drivers';
 import { teamById } from '../../data/teams';
 import { races } from '../../data/races';
+import { normalizeTeamId } from '../../utils/teamHelper';
 
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
@@ -41,7 +42,7 @@ const DriverPointsChart: React.FC = () => {
     const driver = driverById[standing.driverId];
     if (!driver) return null;
     
-    const team = teamById[driver.team.toLowerCase().replace(/\s/g, '-')];
+    const team = teamById[normalizeTeamId(driver.team)];
     const color = team?.color || '#ccc';
     
     // Get data points corresponding to the filtered races

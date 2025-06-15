@@ -26,6 +26,16 @@ export const formatDriverName = (driverId: string): string => {
 };
 
 /**
+ * Get the display name for a driver (last name in uppercase for most drivers, first name for Tsunoda/Lawson)
+ */
+export const getDriverDisplayName = (driver: Driver): string => {
+  if (driver.id.includes('tsunoda') || driver.id.includes('lawson')) {
+    return driver.name.split(' ')[0];
+  }
+  return driver.name.split(' ')[1]?.toUpperCase() || driver.name;
+};
+
+/**
  * Get the appropriate drivers to show for a specific race based on team changes
  * For races before Japan, show pre-Japan team versions
  * For Japan and later, show post-change versions
