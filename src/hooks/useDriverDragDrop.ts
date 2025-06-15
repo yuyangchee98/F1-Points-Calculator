@@ -9,6 +9,7 @@ import { toastService } from '../components/common/ToastContainer';
 import { driverById } from '../data/drivers';
 import { teamById } from '../data/teams';
 import useAppDispatch from './useAppDispatch';
+import { trackDriverDrop, GA_EVENTS, trackEvent } from '../utils/analytics';
 
 interface UseDriverDropParams {
   raceId: string;
@@ -138,6 +139,9 @@ export function useDriverDrop({ raceId, position }: UseDriverDropParams) {
       fromPosition: sourcePosition
     }));
     
+    // Track the drop event
+    trackDriverDrop(driverId, raceId, position, sourcePosition);
+    
     // Recalculate results
     dispatch(calculateResults());
     
@@ -173,6 +177,12 @@ export function useDriverDrag(driverId: string, raceId?: string, position?: numb
     collect: monitor => ({
       isDragging: monitor.isDragging(),
     }),
+    end: (_item, monitor) => {
+      if (monitor.didDrop()) {
+        // Track drag start when drag ends successfully
+        trackEvent(GA_EVENTS.DRIVER_ACTIONS.DRAG_START, 'Driver Predictions', driverId);
+      }
+    },
   }), [driverId, raceId, position]);
   
   return {
