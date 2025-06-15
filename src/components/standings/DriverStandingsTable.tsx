@@ -1,18 +1,15 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { DriverStanding } from '../../types';
 import { driverById } from '../../data/drivers';
 import { teamById } from '../../data/teams';
-// formatDriverName not needed here
+import { useStandingsAnimation } from '../../hooks/useStandingsAnimation';
+import { normalizeTeamId } from '../../utils/teamHelper';
 
 interface DriverStandingsTableProps {
   standings: DriverStanding[];
 }
 
 const DriverStandingsTable: React.FC<DriverStandingsTableProps> = ({ standings }) => {
-  // Track previous standings for animation
-  const [prevStandings, setPrevStandings] = useState<DriverStanding[]>([]);
-  const [animatedDrivers, setAnimatedDrivers] = useState<Record<string, 'up' | 'down' | 'none'>>({});
-  
   // Consolidate points for drivers with team changes (Tsunoda and Lawson)
   const consolidatedStandings = useMemo(() => {
     // Create a map to group by base driver (without team)
@@ -82,53 +79,20 @@ const DriverStandingsTable: React.FC<DriverStandingsTableProps> = ({ standings }
     return result;
   }, [standings]);
   
-  // Detect position changes and set animations
-  useEffect(() => {
-    if (consolidatedStandings.length > 0 && prevStandings.length > 0) {
-      const animations: Record<string, 'up' | 'down' | 'none'> = {};
-      
-      consolidatedStandings.forEach(standing => {
-        // For Tsunoda and Lawson, find previous standings by base driver ID
-        let baseDriverId = standing.driverId;
-        if (standing.driverId.includes('tsunoda')) baseDriverId = 'tsunoda';
-        if (standing.driverId.includes('lawson')) baseDriverId = 'lawson';
-        
-        const prevStanding = prevStandings.find(ps => {
-          if (ps.driverId.includes('tsunoda') && baseDriverId === 'tsunoda') return true;
-          if (ps.driverId.includes('lawson') && baseDriverId === 'lawson') return true;
-          return ps.driverId === standing.driverId;
-        });
-        
-        if (prevStanding) {
-          if (prevStanding.position > standing.position) {
-            // Driver moved up
-            animations[standing.driverId] = 'up';
-          } else if (prevStanding.position < standing.position) {
-            // Driver moved down
-            animations[standing.driverId] = 'down';
-          } else {
-            // Position unchanged
-            animations[standing.driverId] = 'none';
-          }
-        } else {
-          // New driver in standings
-          animations[standing.driverId] = 'none';
-        }
-      });
-      
-      setAnimatedDrivers(animations);
-      
-      // Clear animations after they play
-      const timer = setTimeout(() => {
-        setAnimatedDrivers({});
-      }, 1000);
-      
-      return () => clearTimeout(timer);
+  // Use custom hook for animations with special comparison logic for Tsunoda and Lawson
+  const animatedDrivers = useStandingsAnimation(consolidatedStandings, {
+    getItemId: (standing) => standing.driverId,
+    compareItems: (current, prev) => {
+      // Special handling for Tsunoda and Lawson who have team changes
+      const currentBase = current.driverId.includes('tsunoda') ? 'tsunoda' : 
+                         current.driverId.includes('lawson') ? 'lawson' : 
+                         current.driverId;
+      const prevBase = prev.driverId.includes('tsunoda') ? 'tsunoda' : 
+                      prev.driverId.includes('lawson') ? 'lawson' : 
+                      prev.driverId;
+      return currentBase === prevBase;
     }
-    
-    // Update previous standings for next comparison
-    setPrevStandings(consolidatedStandings);
-  }, [consolidatedStandings]);
+  });
   
   return (
     <div className="overflow-hidden rounded-lg">
@@ -156,15 +120,15 @@ const DriverStandingsTable: React.FC<DriverStandingsTableProps> = ({ standings }
               // Get the team colors to display
               const teamColors = hasMultipleTeams
                 ? standing.teams.map(team => {
-                    const teamId = team.toLowerCase().replace(/\s/g, '-');
+                    const teamId = normalizeTeamId(team);
                     return teamById[teamId]?.color || '#ccc';
                   })
-                : [teamById[driver.team.toLowerCase().replace(/\s/g, '-')]?.color || '#ccc'];
+                : [teamById[normalizeTeamId(driver.team)]?.color || '#ccc'];
               
-              // Display name handling for Tsunoda and Lawson
-              const displayName = driver.id.includes('tsunoda') ? 'Tsunoda' :
-                                  driver.id.includes('lawson') ? 'Lawson' :
-                                  driver.name;
+              // Get display name - for standings table, show first name only for Tsunoda/Lawson
+              const displayName = (driver.id.includes('tsunoda') || driver.id.includes('lawson')) 
+                                  ? driver.name.split(' ')[0]
+                                  : driver.name;
               
               // Team display for multi-team drivers
               const teamDisplay = hasMultipleTeams

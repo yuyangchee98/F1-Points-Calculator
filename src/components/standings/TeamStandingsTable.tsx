@@ -1,54 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { TeamStanding } from '../../types';
 import { teamById } from '../../data/teams';
+import { useStandingsAnimation } from '../../hooks/useStandingsAnimation';
 
 interface TeamStandingsTableProps {
   standings: TeamStanding[];
 }
 
 const TeamStandingsTable: React.FC<TeamStandingsTableProps> = ({ standings }) => {
-  // Track previous standings for animation
-  const [prevStandings, setPrevStandings] = useState<TeamStanding[]>([]);
-  const [animatedTeams, setAnimatedTeams] = useState<Record<string, 'up' | 'down' | 'none'>>({});
-  
-  // Detect position changes and set animations
-  useEffect(() => {
-    if (standings.length > 0 && prevStandings.length > 0) {
-      const animations: Record<string, 'up' | 'down' | 'none'> = {};
-      
-      standings.forEach(standing => {
-        const prevStanding = prevStandings.find(ps => ps.teamId === standing.teamId);
-        
-        if (prevStanding) {
-          if (prevStanding.position > standing.position) {
-            // Team moved up
-            animations[standing.teamId] = 'up';
-          } else if (prevStanding.position < standing.position) {
-            // Team moved down
-            animations[standing.teamId] = 'down';
-          } else {
-            // Position unchanged
-            animations[standing.teamId] = 'none';
-          }
-        } else {
-          // New team in standings
-          animations[standing.teamId] = 'none';
-        }
-      });
-      
-      setAnimatedTeams(animations);
-      
-      // Clear animations after they play
-      const timer = setTimeout(() => {
-        setAnimatedTeams({});
-      }, 1000);
-      
-      return () => clearTimeout(timer);
-    }
-    
-    // Update previous standings for next comparison
-    setPrevStandings(standings);
-  }, [standings]);
+  // Use custom hook for animations
+  const animatedTeams = useStandingsAnimation(standings, {
+    getItemId: (standing) => standing.teamId
+  });
 
   return (
     <div className="overflow-hidden rounded-lg">
