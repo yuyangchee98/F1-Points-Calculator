@@ -243,5 +243,27 @@ export const pastRaceResults: PastRaceResult = {
     "Antonelli",
     "Albon",
     "Stroll"
-  ]
+  ],
+  "Canada": [
+  "Russell",
+  "Verstappen",
+  "Antonelli",
+  "Piastri",
+  "Leclerc",
+  "Hamilton",
+  "Alonso",
+  "Hülkenberg",
+  "Ocon",
+  "Sainz",
+  "Bearman",
+  "Tsunoda (RBR)",
+  "Colapinto",
+  "Bortoleto",
+  "Gasly",
+  "Hadjar",
+  "Stroll",
+  "Norris",
+  "Lawson (RB)",
+  "Albon"
+]
 };
