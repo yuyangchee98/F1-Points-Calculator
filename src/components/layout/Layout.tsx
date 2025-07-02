@@ -131,6 +131,16 @@ const Layout: React.FC<LayoutProps> = ({ sidebar, content }) => {
                   <li><a href="https://f1calendar.com/" className="text-gray-300 hover:text-white" target="_blank" rel="noopener noreferrer">F1 Calendar</a></li>
                 </ul>
               </div>
+
+              <div>
+                <h3 className="text-lg font-medium mb-3">Other Projects</h3>
+                <ul className="text-sm text-gray-400 space-y-1">
+                  <li><a href="https://chyuang.com/" className="text-gray-300 hover:text-white" target="_blank" rel="noopener noreferrer">Chyuang</a></li>
+                  <li><a href="https://solvethisoaforme.chyuang.com/" className="text-gray-300 hover:text-white" target="_blank" rel="noopener noreferrer">Solve This OA For Me</a></li>
+                  <li><a href="https://japanese-patent-attorney-rankings.chyuang.com/" className="text-gray-300 hover:text-white" target="_blank" rel="noopener noreferrer">Japanese Patent Attorney Rankings</a></li>
+                  <li><a href="https://try-pro-tools-for-google-patents-by-readpatents.chyuang.com/" className="text-gray-300 hover:text-white" target="_blank" rel="noopener noreferrer">Pro Tools for Google Patents</a></li>
+                </ul>
+              </div>
             </div>
           </footer>
         </main>
