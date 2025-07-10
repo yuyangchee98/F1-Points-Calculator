@@ -5,7 +5,11 @@ import PositionColumn from './PositionColumn';
 import RaceColumn from './RaceColumn';
 import useWindowSize from '../../hooks/useWindowSize';
 
-const RaceGrid: React.FC = () => {
+interface RaceGridProps {
+  scrollRef?: React.RefObject<HTMLDivElement>;
+}
+
+const RaceGrid: React.FC<RaceGridProps> = ({ scrollRef }) => {
   const races = useSelector((state: RootState) => state.races.list);
   const { isMobile, isTablet } = useWindowSize();
   
@@ -17,7 +21,7 @@ const RaceGrid: React.FC = () => {
   };
   
   return (
-    <div className="overflow-x-auto pb-4 shadow-md rounded-lg border border-gray-200">
+    <div ref={scrollRef} className="overflow-x-auto pb-4 shadow-md rounded-lg border border-gray-200">
       <div 
         id="race-grid"
         className="race-grid" 
