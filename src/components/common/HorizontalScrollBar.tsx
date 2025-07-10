@@ -12,6 +12,7 @@ const HorizontalScrollBar: React.FC<HorizontalScrollBarProps> = ({ scrollContain
   const [isDragging, setIsDragging] = useState(false);
   const [dragStartX, setDragStartX] = useState(0);
   const [scrollStartX, setScrollStartX] = useState(0);
+  const [dragThumbPosition, setDragThumbPosition] = useState<number | null>(null);
 
   useEffect(() => {
     const scrollContainer = scrollContainerRef.current;
@@ -50,19 +51,39 @@ const HorizontalScrollBar: React.FC<HorizontalScrollBarProps> = ({ scrollContain
     if (!scrollContainerRef.current || !scrollBarRef.current || e.target === thumbRef.current) return;
     
     const scrollBar = scrollBarRef.current;
+    const scrollContainer = scrollContainerRef.current;
     const rect = scrollBar.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
-    const percentage = (clickX / rect.width) * 100;
     
-    const scrollContainer = scrollContainerRef.current;
+    // Calculate thumb width based on viewport ratio
+    const viewportRatio = scrollContainer.clientWidth / scrollContainer.scrollWidth;
+    const thumbWidth = Math.max(0.2, Math.min(0.9, viewportRatio)) * scrollBar.clientWidth;
+    
+    // Center the thumb on the click position
+    let targetThumbPosition = clickX - (thumbWidth / 2);
+    
+    // Clamp thumb position to valid range
+    const maxThumbPosition = scrollBar.clientWidth - thumbWidth;
+    targetThumbPosition = Math.max(0, Math.min(maxThumbPosition, targetThumbPosition));
+    
+    // Convert thumb position to scroll position
+    const thumbPercentage = targetThumbPosition / maxThumbPosition;
     const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
-    scrollContainer.scrollLeft = (percentage / 100) * maxScroll;
+    scrollContainer.scrollLeft = thumbPercentage * maxScroll;
   };
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     setIsDragging(true);
     setDragStartX(e.clientX);
     setScrollStartX(scrollContainerRef.current?.scrollLeft || 0);
+    
+    // Calculate initial thumb position
+    if (scrollBarRef.current && scrollContainerRef.current) {
+      const rect = scrollBarRef.current.getBoundingClientRect();
+      const initialPosition = e.clientX - rect.left;
+      setDragThumbPosition(initialPosition);
+    }
+    
     e.preventDefault();
   };
 
@@ -70,16 +91,34 @@ const HorizontalScrollBar: React.FC<HorizontalScrollBarProps> = ({ scrollContain
     const handleMouseMove = (e: MouseEvent) => {
       if (!isDragging || !scrollContainerRef.current || !scrollBarRef.current) return;
       
-      const deltaX = e.clientX - dragStartX;
       const scrollBar = scrollBarRef.current;
       const scrollContainer = scrollContainerRef.current;
+      const rect = scrollBar.getBoundingClientRect();
       
-      const scrollRatio = scrollContainer.scrollWidth / scrollBar.clientWidth;
-      scrollContainer.scrollLeft = scrollStartX + (deltaX * scrollRatio);
+      // Calculate thumb width based on viewport ratio
+      const viewportRatio = scrollContainer.clientWidth / scrollContainer.scrollWidth;
+      const thumbWidthPercent = Math.max(20, Math.min(90, viewportRatio * 100));
+      const thumbWidth = (thumbWidthPercent / 100) * scrollBar.clientWidth;
+      
+      // Update thumb position directly based on mouse position
+      const mouseX = e.clientX - rect.left;
+      const halfThumbWidth = thumbWidth / 2;
+      let newThumbPosition = mouseX - halfThumbWidth;
+      
+      // Clamp thumb position
+      const maxThumbPosition = scrollBar.clientWidth - thumbWidth;
+      newThumbPosition = Math.max(0, Math.min(maxThumbPosition, newThumbPosition));
+      setDragThumbPosition(newThumbPosition + halfThumbWidth);
+      
+      // Convert thumb position to scroll position
+      const thumbPercentage = newThumbPosition / maxThumbPosition;
+      const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+      scrollContainer.scrollLeft = thumbPercentage * maxScroll;
     };
 
     const handleMouseUp = () => {
       setIsDragging(false);
+      setDragThumbPosition(null);
     };
 
     if (isDragging) {
@@ -109,42 +148,35 @@ const HorizontalScrollBar: React.FC<HorizontalScrollBarProps> = ({ scrollContain
 
   // Calculate thumb position
   const maxThumbTravel = 100 - thumbWidthPercentage;
-  const thumbPosition = (scrollPercentage / 100) * maxThumbTravel;
+  let thumbPosition = (scrollPercentage / 100) * maxThumbTravel;
+  
+  // Override with drag position if dragging
+  if (isDragging && dragThumbPosition !== null && scrollBarRef.current) {
+    const thumbWidthPx = (thumbWidthPercentage / 100) * scrollBarRef.current.clientWidth;
+    const thumbCenterPercent = (dragThumbPosition / scrollBarRef.current.clientWidth) * 100;
+    thumbPosition = thumbCenterPercent - (thumbWidthPercentage / 2);
+  }
 
   return (
-    <div className="w-full my-3 px-2">
-      <div 
-        ref={scrollBarRef}
-        className="relative w-full h-2 bg-gray-100 rounded-full cursor-pointer shadow-inner"
-        onClick={handleScrollBarClick}
-      >
-        {/* Track with subtle pattern */}
-        <div className="absolute inset-0 rounded-full overflow-hidden">
-          <div className="h-full w-full bg-gradient-to-r from-gray-100 via-gray-200 to-gray-100" />
-        </div>
-        
-        {/* Thumb */}
+    <div className="w-full py-2 px-4">
+      <div className="bg-white rounded-md p-2 shadow-sm border border-gray-200">
         <div 
-          ref={thumbRef}
-          className={`absolute top-1/2 -translate-y-1/2 h-4 bg-gradient-to-r from-red-500 to-red-600 rounded-full shadow-md transition-all ${isDragging ? '' : 'duration-150'} cursor-grab active:cursor-grabbing hover:shadow-lg hover:scale-y-110`}
-          style={{ 
-            width: `${thumbWidthPercentage}%`,
-            left: `${thumbPosition}%`
-          }}
-          onMouseDown={handleMouseDown}
+          ref={scrollBarRef}
+          className="relative w-full h-2.5 bg-gray-200 rounded-full cursor-pointer"
+          onClick={handleScrollBarClick}
         >
-          {/* Inner highlight for depth */}
-          <div className="absolute inset-x-1 top-1 h-1 bg-white/30 rounded-full" />
+          {/* Thumb */}
+          <div 
+            ref={thumbRef}
+            className={`absolute top-0 h-full bg-gradient-to-r from-red-500 to-red-600 rounded-full shadow transition-all ${isDragging ? '' : 'duration-200'} cursor-grab active:cursor-grabbing hover:shadow-md`}
+            style={{ 
+              width: `${thumbWidthPercentage}%`,
+              left: `${thumbPosition}%`
+            }}
+            onMouseDown={handleMouseDown}
+          />
         </div>
       </div>
-      
-      {/* Optional: Visual hint when at edges */}
-      {scrollPercentage > 95 && (
-        <div className="text-right text-xs text-gray-400 mt-1">End</div>
-      )}
-      {scrollPercentage < 5 && (
-        <div className="text-left text-xs text-gray-400 mt-1">Start</div>
-      )}
     </div>
   );
 };
