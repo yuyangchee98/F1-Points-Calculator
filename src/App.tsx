@@ -13,6 +13,7 @@ import ActionsBar from './components/common/ActionsBar';
 import InfoBanner from './components/common/InfoBanner';
 import ToastContainer from './components/common/ToastContainer';
 import DriverSelection from './components/drivers/DriverSelection';
+import HorizontalScrollBar from './components/common/HorizontalScrollBar';
 import FAQ from './components/common/FAQ';
 import useAppDispatch from './hooks/useAppDispatch';
 import useWindowSize from './hooks/useWindowSize';
@@ -25,6 +26,7 @@ const App: React.FC = () => {
   const mobileView = useSelector((state: RootState) => state.ui.mobileView);
   const selectedPointsSystem = useSelector((state: RootState) => state.ui.selectedPointsSystem);
   const { isMobile } = useWindowSize();
+  const raceGridScrollRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Initialize UI state from localStorage/URL
@@ -102,7 +104,8 @@ const App: React.FC = () => {
               {/* Always show driver selection and grid when in grid view */}
               <div className={`${(mobileView === 'grid' || !isMobile) ? 'block' : 'hidden'}`}>
                 <DriverSelection />
-                <RaceGrid />
+                <HorizontalScrollBar scrollContainerRef={raceGridScrollRef} />
+                <RaceGrid scrollRef={raceGridScrollRef} />
               </div>
               
               {/* FAQ Section for SEO */}
