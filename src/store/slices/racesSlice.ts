@@ -14,7 +14,6 @@ export const fetchPastRaceResults = createAsyncThunk(
   async (_) => {
     try {
       const results = await fetchFromAPI();
-      console.log('Fetched race results from API:', results);
       return results;
     } catch (error) {
       console.error('Failed to fetch past race results:', error);
@@ -50,7 +49,6 @@ export const racesSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(fetchPastRaceResults.fulfilled, (state, action) => {
-      console.log('Redux: Updating pastResults with:', action.payload);
       state.pastResults = { ...state.pastResults, ...action.payload };
       
       // Update the completed status for races
@@ -58,7 +56,6 @@ export const racesSlice = createSlice({
         // Convert race name to API format (lowercase, hyphenated)
         const apiRaceName = race.name.toLowerCase().replace(/\s+/g, '-');
         const isCompleted = !!state.pastResults[apiRaceName];
-        console.log(`Race ${race.name} -> ${apiRaceName}: ${isCompleted ? 'completed' : 'not completed'}`);
         return { ...race, completed: isCompleted };
       });
     });

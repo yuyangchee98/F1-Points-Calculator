@@ -23,7 +23,6 @@ export const useRaceResults = () => {
   // When pastResults are loaded, update the grid
   useEffect(() => {
     if (Object.keys(pastResults).length > 0) {
-      console.log('useRaceResults: pastResults loaded, updating grid', pastResults);
       // Make sure official results are displayed based on user preference
       const showOfficialResults = localStorage.getItem('hide-official-results') !== 'true';
       dispatch(toggleOfficialResults({ show: showOfficialResults, pastResults }));
