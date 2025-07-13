@@ -152,7 +152,7 @@ function getHardcodedRaces(): Race[] {
     'Canada': 'ca',
     'Spain': 'es',
     'Austria': 'at',
-    'United Kingdom': 'gb',
+    'United Kingdom': 'uk',
     'Hungary': 'hu',
     'Belgium': 'be',
     'Netherlands': 'nl',

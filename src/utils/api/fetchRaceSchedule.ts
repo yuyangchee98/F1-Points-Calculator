@@ -100,7 +100,7 @@ export function getRaceCountryCode(race: Race): string {
     'Spain': 'ES',
     'Canada': 'CA',
     'Austria': 'AT',
-    'UK': 'GB',
+    'UK': 'UK',
     'Hungary': 'HU',
     'Belgium': 'BE',
     'Netherlands': 'NL',
