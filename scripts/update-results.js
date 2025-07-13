@@ -113,9 +113,6 @@ export default pastRaceResults;`;
       // Check if this race already exists
       const raceExists = new RegExp(`"${raceCode}":`).test(existingResults);
       if (raceExists) {
-        console.log(
-          `Race ${raceCode} already exists in data file, skipping...`,
-        );
         return;
       }
 
@@ -139,7 +136,6 @@ export default pastRaceResults;`;
       }
 
       await fs.writeFile(filePath, updatedContent);
-      console.log(`Appended data for ${raceCode}`);
     } catch (error) {
       console.error("Error updating data file:", error);
     }
@@ -151,20 +147,16 @@ export default pastRaceResults;`;
       await this.initializeDataFileIfEmpty();
 
       const races = await this.fetchRaceSchedule();
-      console.log(`Found ${races.length} races`);
 
       for (const race of races) {
         try {
-          console.log(`Processing race: ${race.raceName}`);
           const results = await this.fetchRaceResult(race.round);
           const raceCode = this.getRaceCode(race.raceName);
           const formattedResults = this.formatResults(results);
 
           if (formattedResults && raceCode) {
-            console.log(`Updating results for ${raceCode}`);
             await this.updateDataFile(raceCode, formattedResults);
           } else {
-            console.log(`Skipping ${race.raceName} - missing data or unknown race code`);
           }
 
           // Respect API rate limits
@@ -173,7 +165,6 @@ export default pastRaceResults;`;
           console.error(`Error processing race ${race.raceName}:`, error);
         }
       }
-      console.log("Completed updating all race results");
     } catch (error) {
       console.error("Error updating results:", error);
     }
