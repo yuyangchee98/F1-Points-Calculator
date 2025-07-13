@@ -158,7 +158,7 @@ const HorizontalScrollBar: React.FC<HorizontalScrollBarProps> = ({ scrollContain
   }
 
   return (
-    <div className="w-full py-2 px-4">
+    <div className="w-full py-2 px-4 hidden sm:block">
       <div className="bg-white rounded-md p-2 shadow-sm border border-gray-200">
         <div 
           ref={scrollBarRef}
