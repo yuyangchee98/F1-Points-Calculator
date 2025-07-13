@@ -17,7 +17,7 @@ import HorizontalScrollBar from './components/common/HorizontalScrollBar';
 import FAQ from './components/common/FAQ';
 import useAppDispatch from './hooks/useAppDispatch';
 import useWindowSize from './hooks/useWindowSize';
-import { trackBuyCoffeeClick } from './utils/analytics';
+import { trackBuyCoffeeClick, trackFeedbackClick } from './utils/analytics';
 
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -70,7 +70,7 @@ const App: React.FC = () => {
               </h1>
               
               {/* Buy me a coffee link at top */}
-              <div className="mb-8">
+              <div className="mb-8 flex flex-wrap gap-4">
                 <a 
                   href="https://buymeacoffee.com/yaang" 
                   target="_blank" 
@@ -79,6 +79,16 @@ const App: React.FC = () => {
                   onClick={trackBuyCoffeeClick}
                 >
                   <span className="mr-2">🔴</span> Buy Chyuang a soft tyre
+                </a>
+                
+                <a 
+                  href="https://github.com/yuyangchee98/F1-Points-Calculator/issues" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-block py-2 sm:py-3 px-4 sm:px-6 bg-gray-700 text-white font-bold rounded-md shadow-lg hover:bg-gray-800 transition-colors duration-200"
+                  onClick={trackFeedbackClick}
+                >
+                  <span className="mr-2">💬</span> Feature Requests / Report Bugs
                 </a>
               </div>
               

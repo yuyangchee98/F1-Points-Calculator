@@ -43,6 +43,7 @@ export const GA_EVENTS = {
     BUY_COFFEE_CLICK: 'buy_coffee_click',
     SESSION_DURATION: 'session_duration',
     PREDICTIONS_COMPLETED: 'predictions_completed',
+    FEEDBACK_CLICK: 'feedback_click',
   },
 } as const;
 
@@ -81,5 +82,13 @@ export const trackBuyCoffeeClick = () => {
     GA_EVENTS.ENGAGEMENT.BUY_COFFEE_CLICK,
     'Engagement',
     'header_button'
+  );
+};
+
+export const trackFeedbackClick = () => {
+  trackEvent(
+    GA_EVENTS.ENGAGEMENT.FEEDBACK_CLICK,
+    'Engagement',
+    'github_issues'
   );
 };
