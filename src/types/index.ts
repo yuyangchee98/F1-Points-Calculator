@@ -63,9 +63,15 @@ export interface FastestLap {
   driverId: string | null;
 }
 
-// API related types - ensure backward compatibility
+// New structure for race results with driver-team pairs
+export interface RaceResult {
+  driverId: string;  // Clean driver ID without team suffix (e.g., "tsunoda", "lawson")
+  teamId: string;    // Team ID at the time of the race (e.g., "red-bull", "racing-bulls")
+  position: number;
+}
+
 export interface PastRaceResult {
-  [race: string]: string[];
+  [race: string]: RaceResult[];
 }
 
 // State types
@@ -76,7 +82,7 @@ export interface DriversState {
 
 export interface RacesState {
   list: Race[];
-  pastResults: Record<string, string[]>;
+  pastResults: Record<string, RaceResult[]>;
 }
 
 export interface GridState {

@@ -12,11 +12,10 @@ races.forEach(race => {
     let driverId: string | null = null;
     let isOfficialResult = false;
     
-    if (pastRaceResults[race.name] && pastRaceResults[race.name][position - 1]) {
-      const driverName = pastRaceResults[race.name][position - 1];
-      const driver = drivers.find(d => d.name === driverName);
-      if (driver) {
-        driverId = driver.id;
+    if (pastRaceResults[race.name]) {
+      const raceResult = pastRaceResults[race.name].find(r => r.position === position);
+      if (raceResult) {
+        driverId = raceResult.driverId;
         isOfficialResult = true;
       }
     }
@@ -202,14 +201,13 @@ export const gridSlice = createSlice({
             const raceName = races[raceIndex].name;
             const pastResult = pastRaceResults[raceName];
             
-            if (pastResult && pastResult[position.position - 1]) {
-              const driverName = pastResult[position.position - 1];
-              const driver = drivers.find(d => d.name === driverName);
+            if (pastResult) {
+              const raceResult = pastResult.find(r => r.position === position.position);
               
-              if (driver) {
+              if (raceResult) {
                 return {
                   ...position,
-                  driverId: driver.id,
+                  driverId: raceResult.driverId,
                   isOfficialResult: true
                 };
               }

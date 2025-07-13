@@ -152,7 +152,6 @@ const HorizontalScrollBar: React.FC<HorizontalScrollBarProps> = ({ scrollContain
   
   // Override with drag position if dragging
   if (isDragging && dragThumbPosition !== null && scrollBarRef.current) {
-    const thumbWidthPx = (thumbWidthPercentage / 100) * scrollBarRef.current.clientWidth;
     const thumbCenterPercent = (dragThumbPosition / scrollBarRef.current.clientWidth) * 100;
     thumbPosition = thumbCenterPercent - (thumbWidthPercentage / 2);
   }
