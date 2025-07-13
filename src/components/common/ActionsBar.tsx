@@ -12,6 +12,7 @@ import { GA_EVENTS, trackEvent } from '../../utils/analytics';
 const ActionsBar: React.FC = () => {
   const dispatch = useAppDispatch(); // Use typed dispatch
   const showOfficialResults = useSelector((state: RootState) => state.ui.showOfficialResults);
+  const pastResults = useSelector((state: RootState) => state.races.pastResults);
 
   // Handle grid reset
   const handleReset = () => {
@@ -26,7 +27,7 @@ const ActionsBar: React.FC = () => {
   const handleToggleOfficialResults = () => {
     const newValue = !showOfficialResults;
     dispatch(toggleOfficialResultsUI(newValue));
-    dispatch(toggleOfficialResults({ show: newValue }));
+    dispatch(toggleOfficialResults({ show: newValue, pastResults }));
     dispatch(calculateResults());
     trackEvent(
       GA_EVENTS.GRID_ACTIONS.TOGGLE_OFFICIAL, 
