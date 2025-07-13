@@ -1,8 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { GridState, GridPosition } from '../../types';
+import { GridState, GridPosition, PastRaceResult } from '../../types';
 import { races } from '../../data/races';
 import { drivers } from '../../data/drivers';
-import { pastRaceResults } from '../../data/pastResults';
 
 // Initialize grid positions with empty slots for all races and positions
 const initialPositions: GridPosition[] = [];
@@ -12,13 +11,8 @@ races.forEach(race => {
     let driverId: string | null = null;
     let isOfficialResult = false;
     
-    if (pastRaceResults[race.name]) {
-      const raceResult = pastRaceResults[race.name].find(r => r.position === position);
-      if (raceResult) {
-        driverId = raceResult.driverId;
-        isOfficialResult = true;
-      }
-    }
+    // Don't initialize with past results here - they'll be loaded from API
+    // and populated via toggleOfficialResults
     
     initialPositions.push({
       raceId: race.id,
@@ -187,8 +181,8 @@ export const gridSlice = createSlice({
       state.fastestLaps[raceId] = driverId;
     },
     
-    toggleOfficialResults: (state, action: PayloadAction<{ show: boolean }>) => {
-      const { show } = action.payload;
+    toggleOfficialResults: (state, action: PayloadAction<{ show: boolean; pastResults?: PastRaceResult }>) => {
+      const { show, pastResults } = action.payload;
       
       if (show) {
         // Restore official results
@@ -199,7 +193,9 @@ export const gridSlice = createSlice({
           
           if (raceIndex !== -1) {
             const raceName = races[raceIndex].name;
-            const pastResult = pastRaceResults[raceName];
+            // Convert race name to API format
+            const apiRaceName = raceName.toLowerCase().replace(/\s+/g, '-');
+            const pastResult = pastResults ? pastResults[apiRaceName] : null;
             
             if (pastResult) {
               const raceResult = pastResult.find(r => r.position === position.position);

@@ -1,5 +1,4 @@
 import { Race } from '../types';
-import { pastRaceResults } from './pastResults';
 import { fetchRaceSchedule, getRaceCountryCode, isSprintRace, Race as ApiRace } from '../utils/api/fetchRaceSchedule';
 
 // Cache for race data
@@ -42,7 +41,7 @@ function convertApiRace(apiRace: ApiRace, index: number): Race[] {
   // Add sprint race if it exists
   if (isSprintRace(apiRace)) {
     const sprintName = `${baseDisplayName} Sprint`;
-    const isCompleted = Object.keys(pastRaceResults).includes(sprintName);
+    const isCompleted = false; // Will be updated when API data loads
     
     races.push({
       id: sprintName.toLowerCase().replace(/\s/g, '-'),
@@ -58,7 +57,7 @@ function convertApiRace(apiRace: ApiRace, index: number): Race[] {
   }
   
   // Add main race
-  const isCompleted = Object.keys(pastRaceResults).includes(baseDisplayName);
+  const isCompleted = false; // Will be updated when API data loads
   
   races.push({
     id: baseDisplayName.toLowerCase().replace(/\s/g, '-'),
@@ -108,74 +107,74 @@ export async function getRacesForYear(year: number): Promise<Race[]> {
 // Hardcoded fallback data for 2025 season
 function getHardcodedRaces(): Race[] {
   const raceNames = [
-    "Australia",
-    "China Sprint",
-    "China",
-    "Japan",
-    "Bahrain",
-    "Saudi Arabia",
-    "Miami Sprint",
-    "Miami",
-    "Imola",
-    "Monaco",
-    "Spain",
-    "Canada",
-    "Austria",
-    "United Kingdom",
-    "Hungary",
-    "Belgium Sprint",
-    "Belgium",
-    "Netherlands",
-    "Italy",
-    "Azerbaijan",
-    "Singapore",
-    "Austin Sprint",
-    "Austin",
-    "Mexico",
-    "Sao Paulo Sprint",
-    "Sao Paulo",
-    "Las Vegas",
-    "Qatar Sprint",
-    "Qatar",
-    "Abu Dhabi",
+    "australian",
+    "chinese-sprint",
+    "chinese",
+    "japanese",
+    "bahrain",
+    "saudi-arabian",
+    "miami-sprint",
+    "miami",
+    "emilia-romagna",
+    "monaco",
+    "spanish",
+    "canadian",
+    "austrian",
+    "british",
+    "hungarian",
+    "belgian-sprint",
+    "belgian",
+    "dutch",
+    "italian",
+    "azerbaijan",
+    "singapore",
+    "united-states-sprint",
+    "united-states",
+    "mexico-city",
+    "são-paulo-sprint",
+    "são-paulo",
+    "las-vegas",
+    "qatar-sprint",
+    "qatar",
+    "abu-dhabi",
   ];
   
   const raceCountryMap: Record<string, string> = {
-    'Australia': 'au',
-    'China': 'cn',
-    'Japan': 'jp',
-    'Bahrain': 'bh',
-    'Saudi Arabia': 'sa',
-    'Miami': 'us',
-    'Imola': 'it',
-    'Monaco': 'mc',
-    'Canada': 'ca',
-    'Spain': 'es',
-    'Austria': 'at',
-    'United Kingdom': 'uk',
-    'Hungary': 'hu',
-    'Belgium': 'be',
-    'Netherlands': 'nl',
-    'Italy': 'it',
-    'Azerbaijan': 'az',
-    'Singapore': 'sg',
-    'Austin': 'us',
-    'Mexico': 'mx',
-    'Sao Paulo': 'br',
-    'Las Vegas': 'us',
-    'Qatar': 'qa',
-    'Abu Dhabi': 'ae'
+    'australian': 'au',
+    'chinese': 'cn',
+    'japanese': 'jp',
+    'bahrain': 'bh',
+    'saudi-arabian': 'sa',
+    'miami': 'us',
+    'emilia-romagna': 'it',
+    'monaco': 'mc',
+    'canadian': 'ca',
+    'spanish': 'es',
+    'austrian': 'at',
+    'british': 'uk',
+    'hungarian': 'hu',
+    'belgian': 'be',
+    'dutch': 'nl',
+    'italian': 'it',
+    'azerbaijan': 'az',
+    'singapore': 'sg',
+    'united-states': 'us',
+    'mexico-city': 'mx',
+    'são-paulo': 'br',
+    'las-vegas': 'us',
+    'qatar': 'qa',
+    'abu-dhabi': 'ae'
   };
   
   const getBaseRaceName = (raceName: string): string => {
-    return raceName.replace(' Sprint', '');
+    return raceName.replace('-sprint', '');
   };
   
   return raceNames.map((name, index) => {
-    const isSprint = name.includes('Sprint');
+    const isSprint = name.includes('-sprint');
     const baseRaceName = getBaseRaceName(name);
     const countryCode = raceCountryMap[baseRaceName] || '';
-    const isCompleted = Object.keys(pastRaceResults).includes(name);
+    const isCompleted = false; // Will be updated when API data loads
     
     return {
       id: name.toLowerCase().replace(/\s/g, '-'),

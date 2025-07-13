@@ -1,119 +1,29 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { RacesState, PastRaceResult } from '../../types';
 import { races } from '../../data/races';
-import { pastRaceResults } from '../../data/pastResults';
+import { fetchPastRaceResults as fetchFromAPI } from '../../api/fetchPastRaceResults';
 
 const initialState: RacesState = {
   list: races,
-  pastResults: pastRaceResults
+  pastResults: {} // Start with empty results, will be populated from API
 };
 
-// Async thunk for fetching past race results
-// This maintains compatibility with the existing API
+// Async thunk for fetching past race results from our API
 export const fetchPastRaceResults = createAsyncThunk(
   'races/fetchPastRaceResults',
-  async (_, { rejectWithValue }) => {
+  async (_) => {
     try {
-      // Using the same API endpoint as in the original project
-      const response = await fetch('https://api.jolpi.ca/ergast/f1/2025');
-      if (!response.ok) {
-        throw new Error('Failed to fetch race schedule');
-      }
-      
-      const data = await response.json();
-      const races = data.MRData.RaceTable.Races;
-      
-      const pastResults: PastRaceResult = {};
-      
-      // Process each race
-      for (const race of races) {
-        try {
-          const round = race.round;
-          const resultResponse = await fetch(`https://api.jolpi.ca/ergast/f1/2025/${round}/results`);
-          
-          if (!resultResponse.ok) {
-            console.warn(`Failed to fetch results for round ${round}`);
-            continue;
-          }
-          
-          const resultData = await resultResponse.json();
-          const results = resultData.MRData.RaceTable.Races[0]?.Results;
-          
-          if (!results) {
-            console.warn(`No results available for round ${round}`);
-            continue;
-          }
-          
-          // Format the results similar to the original project
-          const formattedResults = results.map((result: any) => result.Driver.familyName);
-          
-          // Map the race name to our format
-          const raceName = mapRaceNameToOurFormat(race.raceName);
-          if (raceName) {
-            pastResults[raceName] = formattedResults;
-          }
-        } catch (error) {
-          console.error(`Error fetching results for race`, error);
-        }
-        
-        // Respect API rate limits
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-      }
-      
-      return pastResults;
+      const results = await fetchFromAPI();
+      console.log('Fetched race results from API:', results);
+      return results;
     } catch (error) {
-      return rejectWithValue('Failed to fetch race results');
+      console.error('Failed to fetch past race results:', error);
+      // Return empty results if API fails
+      return {};
     }
   }
 );
 
-// Helper function to map API race names to our format
-function mapRaceNameToOurFormat(raceName: string): string | null {
-  // Map API race names to our race names (same as in the original project)
-  const raceMap: Record<string, string> = {
-    Australian: "Australia",
-    Chinese: "China",
-    Japanese: "Japan",
-    Bahrain: "Bahrain",
-    "Saudi Arabian": "Saudi Arabia",
-    Miami: "Miami",
-    "Emilia Romagna": "Imola",
-    Monaco: "Monaco",
-    Canadian: "Canada",
-    Spanish: "Spain",
-    Austrian: "Austria",
-    British: "United Kingdom",
-    Hungarian: "Hungary",
-    Belgian: "Belgium",
-    Dutch: "Netherlands",
-    Italian: "Italy",
-    Azerbaijan: "Azerbaijan",
-    Singapore: "Singapore",
-    "United States": "Austin",
-    "Mexico City": "Mexico",
-    "São Paulo": "Sao Paulo",
-    "Las Vegas": "Las Vegas",
-    Qatar: "Qatar",
-    "Abu Dhabi": "Abu Dhabi",
-  };
-
-  // Handle sprint races
-  let isSprint = raceName.toLowerCase().includes('sprint');
-
-  // Find the base race name
-  let baseName = "";
-  for (const [apiName, ourName] of Object.entries(raceMap)) {
-    if (raceName.includes(apiName)) {
-      baseName = ourName;
-      break;
-    }
-  }
-
-  if (!baseName) return null;
-
-  // Return full name with Sprint if applicable
-  return isSprint ? `${baseName} Sprint` : baseName;
-}
 
 export const racesSlice = createSlice({
   name: 'races',
@@ -124,7 +34,9 @@ export const racesSlice = createSlice({
       
       // Update the completed status for races
       state.list = state.list.map(race => {
-        const isCompleted = !!state.pastResults[race.name];
+        // Convert race name to API format (lowercase, hyphenated)
+        const apiRaceName = race.name.toLowerCase().replace(/\s+/g, '-');
+        const isCompleted = !!state.pastResults[apiRaceName];
         return { ...race, completed: isCompleted };
       });
     },
@@ -138,11 +50,15 @@ export const racesSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(fetchPastRaceResults.fulfilled, (state, action) => {
+      console.log('Redux: Updating pastResults with:', action.payload);
       state.pastResults = { ...state.pastResults, ...action.payload };
       
       // Update the completed status for races
       state.list = state.list.map(race => {
-        const isCompleted = !!state.pastResults[race.name];
+        // Convert race name to API format (lowercase, hyphenated)
+        const apiRaceName = race.name.toLowerCase().replace(/\s+/g, '-');
+        const isCompleted = !!state.pastResults[apiRaceName];
+        console.log(`Race ${race.name} -> ${apiRaceName}: ${isCompleted ? 'completed' : 'not completed'}`);
         return { ...race, completed: isCompleted };
       });
     });
