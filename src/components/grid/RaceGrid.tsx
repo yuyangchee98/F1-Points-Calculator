@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import PositionColumn from './PositionColumn';
@@ -19,6 +19,38 @@ const RaceGrid: React.FC<RaceGridProps> = ({ scrollRef }) => {
     if (isTablet) return '110px';
     return '120px';
   };
+  
+  // Auto-scroll to first non-completed race on mount
+  useEffect(() => {
+    if (!scrollRef?.current || races.length === 0) return;
+    
+    // Find the first non-completed race index
+    const firstUpcomingRaceIndex = races.findIndex(race => !race.completed);
+    
+    // If all races are completed or no upcoming races, don't scroll
+    if (firstUpcomingRaceIndex === -1) return;
+    
+    // Small delay to ensure the grid is fully rendered
+    setTimeout(() => {
+      if (!scrollRef.current) return;
+      
+      // Calculate the base column width based on screen size
+      const columnWidth = isMobile ? 100 : isTablet ? 110 : 120;
+      
+      // Account for the position column (80px) and some padding
+      const positionColumnWidth = 80;
+      
+      // Calculate scroll position
+      // We want to show the upcoming race with some context (previous race visible)
+      const scrollPosition = positionColumnWidth + (Math.max(0, firstUpcomingRaceIndex - 1) * columnWidth);
+      
+      // Perform the scroll
+      scrollRef.current.scrollTo({
+        left: scrollPosition,
+        behavior: 'smooth'
+      });
+    }, 100);
+  }, [races, scrollRef, isMobile, isTablet]);
   
   return (
     <div ref={scrollRef} className="overflow-x-auto pb-4 shadow-md rounded-lg border border-gray-200">
