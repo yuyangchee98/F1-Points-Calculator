@@ -11,45 +11,6 @@ const raceIdToNameMap = races.reduce<Record<string, string>>((map, race) => {
   return map;
 }, {});
 
-// Race names that come after the Japan GP (where driver swap occurred)
-// This is specifically for handling the Tsunoda/Lawson team swap
-const JAPAN_RACE_INDEX = races.findIndex(race => race.name === 'Japan');
-const postJapanRaces = races
-  .filter((_, index) => index > JAPAN_RACE_INDEX)
-  .map(race => race.name);
-
-/**
- * Normalize driver name for API compatibility
- * This handles the special case of Tsunoda and Lawson who swapped teams
- * @param driverName The raw driver name (with team in parentheses)
- * @returns The normalized driver name for API
- */
-export const normalizeDriverName = (driverName: string): string => {
-  if (driverName.includes('Tsunoda')) return 'Tsunoda';
-  if (driverName.includes('Lawson')) return 'Lawson';
-  return driverName;
-};
-
-/**
- * Determine the correct driver name version based on race timing
- * @param driverName Basic driver name
- * @param raceName Race name to check timing
- * @returns The correct driver name with team context
- */
-export const getDriverNameWithTeam = (driverName: string, raceName: string): string => {
-  const isPostJapan = postJapanRaces.includes(raceName);
-  
-  if (driverName === 'Tsunoda') {
-    return isPostJapan ? 'Tsunoda (RBR)' : 'Tsunoda (RB)';
-  }
-  
-  if (driverName === 'Lawson') {
-    return isPostJapan ? 'Lawson (RB)' : 'Lawson (RBR)';
-  }
-  
-  return driverName;
-};
-
 /**
  * Convert the Redux grid state to the API prediction format
  * @param gridState The Redux grid state
@@ -76,8 +37,8 @@ export const gridStateToApiFormat = (gridState: GridState): Record<string, Recor
       predictions[raceName] = {};
     }
     
-    // Store the normalized driver name (without team parentheses)
-    predictions[raceName][position.position.toString()] = normalizeDriverName(driver.name);
+    // Store the driver name
+    predictions[raceName][position.position.toString()] = driver.name;
   });
   
   return predictions;
@@ -108,11 +69,8 @@ export const apiFormatToGridPositions = (
       const position = parseInt(positionStr);
       if (isNaN(position)) return;
       
-      // Account for the Tsunoda/Lawson team swap based on race timing
-      const driverNameWithTeam = getDriverNameWithTeam(driverName, raceName);
-      
       // Find the driver ID
-      const driver = Object.values(driverById).find(d => d.name === driverNameWithTeam);
+      const driver = Object.values(driverById).find(d => d.name === driverName);
       if (!driver) return;
       
       // Find and update the position in our grid

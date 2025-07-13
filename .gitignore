@@ -5,3 +5,4 @@
 automatic-updates/*
 .vite
 dist/*
+.claude

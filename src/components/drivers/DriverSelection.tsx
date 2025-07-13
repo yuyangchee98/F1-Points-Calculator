@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { selectDriver } from '../../store/slices/uiSlice';
 import DriverCard from './DriverCard';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import useWindowSize from '../../hooks/useWindowSize';
-import { getDriversForRace } from '../../utils/driverHelper';
 import { GA_EVENTS, trackEvent } from '../../utils/analytics';
 
 interface DriverSelectionProps {
@@ -16,19 +15,11 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({ forceExpanded = false
   const dispatch = useAppDispatch();
   const allDrivers = useSelector((state: RootState) => state.drivers.list);
   const selectedDriverId = useSelector((state: RootState) => state.ui.selectedDriver);
-  const selectedRaceId = useSelector((state: RootState) => state.ui.selectedRace);
   const [isExpanded, setIsExpanded] = useState(forceExpanded);
   const { isMobile } = useWindowSize();
   
-  // Filter drivers based on the currently selected race
-  // This ensures we only show the correct version of Tsunoda and Lawson for each race
-  const drivers = useMemo(() => {
-    if (!selectedRaceId) {
-      // If no race is selected, show all drivers
-      return allDrivers;
-    }
-    return getDriversForRace(selectedRaceId, allDrivers);
-  }, [selectedRaceId, allDrivers]);
+  // Use all drivers
+  const drivers = allDrivers;
   
   // Update expanded state when forceExpanded prop changes
   useEffect(() => {
