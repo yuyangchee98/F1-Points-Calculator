@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { ResultsState, DriverStanding, TeamStanding, PointsHistory, TeamPointsHistory } from '../../types';
 import { RootState } from '../index';
 import { getPointsForPositionWithSystem } from '../../data/pointsSystems';
-// Data is managed through Redux store, no need to import directly
 
 const initialState: ResultsState = {
   driverStandings: [],
@@ -57,13 +56,6 @@ teamPoints[normalizedTeamName] = 0;
 }
 });
 
-// Helper function to get base driver ID for Tsunoda and Lawson (for consolidated standings)
-const getBaseDriverId = (driverId: string): string => {
-if (driverId.includes('tsunoda')) return 'tsunoda';
-if (driverId.includes('lawson')) return 'lawson';
-return driverId;
-};
-
 // Process races in order
 allRaces.forEach(race => {
 // Get all positions for this race
@@ -73,127 +65,110 @@ const racePositions = positions.filter(p => p.raceId === race.id);
 const raceDriverPoints: Record<string, number> = {};
 const raceTeamPoints: Record<string, number> = {};
 
+// Get past results for this race to determine which team each driver was racing for
+const raceResults = state.races.pastResults[race.name] || [];
+
 // Calculate points for each position
 racePositions.forEach(position => {
 if (position.driverId) {
-const driver = allDrivers.find(d => d.id === position.driverId);
-if (driver) {
 // Award position points
 const pointsForPosition = getPointsForPositionWithSystem(position.position, race.isSprint, selectedPointsSystem);
 
 // Initialize driver points if needed
-if (!driverPoints[driver.id]) {
-  driverPoints[driver.id] = 0;
+if (!driverPoints[position.driverId]) {
+  driverPoints[position.driverId] = 0;
 }
-if (!raceDriverPoints[driver.id]) {
-  raceDriverPoints[driver.id] = 0;
+if (!raceDriverPoints[position.driverId]) {
+  raceDriverPoints[position.driverId] = 0;
 }
 
 // Add points
-driverPoints[driver.id] += pointsForPosition;
-raceDriverPoints[driver.id] += pointsForPosition;
+driverPoints[position.driverId] += pointsForPosition;
+raceDriverPoints[position.driverId] += pointsForPosition;
 
-// For Tsunoda and Lawson, add to base driver totals as well
-// This will be used for displaying consolidated driver standings
-const baseDriverId = getBaseDriverId(driver.id);
-if (baseDriverId !== driver.id) {
-    if (!driverPoints[baseDriverId]) {
-        driverPoints[baseDriverId] = 0;
-        }
-              if (!raceDriverPoints[baseDriverId]) {
-                raceDriverPoints[baseDriverId] = 0;
-              }
-              driverPoints[baseDriverId] += pointsForPosition;
-              raceDriverPoints[baseDriverId] += pointsForPosition;
-            }
-            
-            // Add to team points - using the team that the driver was with at the time of this race
-            const normalizedTeamName = normalizeTeamName(driver.team);
-            if (!teamPoints[normalizedTeamName]) {
-              teamPoints[normalizedTeamName] = 0;
-            }
-            if (!raceTeamPoints[normalizedTeamName]) {
-              raceTeamPoints[normalizedTeamName] = 0;
-            }
-            
-            teamPoints[normalizedTeamName] += pointsForPosition;
-            raceTeamPoints[normalizedTeamName] += pointsForPosition;
-          }
-        }
-      });
-      
-      // Fastest lap points are not awarded in the 2025 season
-      
-      // Record point history for this race
-      Object.entries(raceDriverPoints).forEach(([driverId, points]) => {
-        driverHistories.push({
-          raceId: race.id,
-          driverId,
-          points,
-          cumulativePoints: driverPoints[driverId]
-        });
-      });
-      
-      Object.entries(raceTeamPoints).forEach(([teamId, points]) => {
-        teamHistories.push({
-          raceId: race.id,
-          teamId,
-          points,
-          cumulativePoints: teamPoints[teamId]
-        });
-      });
-    });
-    
-    // Create driver standings
-    const driverStandings: DriverStanding[] = Object.entries(driverPoints)
-      .filter(([driverId]) => {
-        // Filter out the consolidated base drivers to avoid duplicates in main standings
-        // Their points are already tracked in the individual team driver entries
-        if (driverId === 'tsunoda' || driverId === 'lawson') {
-          return false;
-        }
-        return true;
-      })
-      .map(([driverId, points]) => ({
-        driverId,
-        points,
-        position: 0 // Will be updated below
-      }))
-      .sort((a, b) => b.points - a.points)
-      .map((standing, index) => ({
-        ...standing,
-        position: index + 1
-      }));
-    
-    // Create team standings
-    const teamStandings: TeamStanding[] = Object.entries(teamPoints)
-      .map(([teamId, points]) => ({
-        teamId,
-        points,
-        position: 0 // Will be updated below
-      }))
-      .sort((a, b) => b.points - a.points)
-      .map((standing, index) => ({
-        ...standing,
-        position: index + 1
-      }));
-    
-    // Dispatch the calculated results to the store
-    dispatch(setResults({
-      driverStandings,
-      teamStandings,
-      pointsHistory: driverHistories,
-      teamPointsHistory: teamHistories
-    }));
-    
-    // Return the data (will be available in the fulfilled action)
-    return {
-      driverStandings,
-      teamStandings,
-      pointsHistory: driverHistories,
-      teamPointsHistory: teamHistories
-    };
+// Find the team the driver was racing for in this specific race
+const raceResult = raceResults.find(r => r.driverId === position.driverId);
+if (raceResult) {
+  // Use the team from the race result
+  const teamId = raceResult.teamId;
+  
+  if (!teamPoints[teamId]) {
+    teamPoints[teamId] = 0;
   }
+  if (!raceTeamPoints[teamId]) {
+    raceTeamPoints[teamId] = 0;
+  }
+  
+  teamPoints[teamId] += pointsForPosition;
+  raceTeamPoints[teamId] += pointsForPosition;
+}
+}
+});
+
+// Fastest lap points are not awarded in the 2025 season
+
+// Record point history for this race
+Object.entries(raceDriverPoints).forEach(([driverId, points]) => {
+  driverHistories.push({
+    raceId: race.id,
+    driverId,
+    points,
+    cumulativePoints: driverPoints[driverId]
+  });
+});
+
+Object.entries(raceTeamPoints).forEach(([teamId, points]) => {
+  teamHistories.push({
+    raceId: race.id,
+    teamId,
+    points,
+    cumulativePoints: teamPoints[teamId]
+  });
+});
+});
+
+// Create driver standings
+const driverStandings: DriverStanding[] = Object.entries(driverPoints)
+  .map(([driverId, points]) => ({
+    driverId,
+    points,
+    position: 0 // Will be updated below
+  }))
+  .sort((a, b) => b.points - a.points)
+  .map((standing, index) => ({
+    ...standing,
+    position: index + 1
+  }));
+
+// Create team standings
+const teamStandings: TeamStanding[] = Object.entries(teamPoints)
+  .map(([teamId, points]) => ({
+    teamId,
+    points,
+    position: 0 // Will be updated below
+  }))
+  .sort((a, b) => b.points - a.points)
+  .map((standing, index) => ({
+    ...standing,
+    position: index + 1
+  }));
+
+// Dispatch the calculated results to the store
+dispatch(setResults({
+  driverStandings,
+  teamStandings,
+  pointsHistory: driverHistories,
+  teamPointsHistory: teamHistories
+}));
+
+// Return the data (will be available in the fulfilled action)
+return {
+  driverStandings,
+  teamStandings,
+  pointsHistory: driverHistories,
+  teamPointsHistory: teamHistories
+};
+}
 );
 
 export default resultsSlice.reducer;

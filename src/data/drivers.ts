@@ -1,6 +1,6 @@
 import { Driver } from '../types';
 
-// Driver names from the original project
+// Driver names - single entry per driver
 export const driverNames = [
   "Verstappen",
   "Norris",
@@ -12,22 +12,20 @@ export const driverNames = [
   "Alonso",
   "Gasly",
   "Hulkenberg",
-  "Tsunoda (RB)",  // Racing Bulls Tsunoda (pre-Japan)
-  "Tsunoda (RBR)", // Red Bull Tsunoda (Japan onwards)
+  "Tsunoda",
   "Stroll",
   "Ocon",
   "Albon",
   "Bearman",
   "Antonelli",
-  "Lawson (RBR)",  // Red Bull Lawson (pre-Japan)
-  "Lawson (RB)",   // Racing Bulls Lawson (Japan onwards)
+  "Lawson",
   "Doohan",
   "Colapinto",
   "Bortoleto",
   "Hadjar",
 ];
 
-// Driver teams mapping from the original project
+// Current driver teams (as of end of season)
 export const driverTeamMapping = {
   Hamilton: "Ferrari",
   Russell: "Mercedes",
@@ -42,10 +40,8 @@ export const driverTeamMapping = {
   Gasly: "Alpine",
   Sainz: "Williams",
   Antonelli: "Mercedes",
-  "Tsunoda (RB)": "Racing Bulls",
-  "Tsunoda (RBR)": "Red Bull",
-  "Lawson (RBR)": "Red Bull",
-  "Lawson (RB)": "Racing Bulls",
+  Tsunoda: "Red Bull",  // Current team after swap
+  Lawson: "Racing Bulls",  // Current team after swap
   Albon: "Williams",
   Bearman: "Haas",
   Hulkenberg: "Sauber",
