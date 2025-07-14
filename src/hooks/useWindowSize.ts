@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { BREAKPOINTS } from '../utils/constants';
 
 interface WindowSize {
   width: number;
@@ -29,9 +30,9 @@ const useWindowSize = (): WindowSize => {
       // Mobile: < 640px (sm)
       // Tablet: 640px - 1023px (sm to lg)
       // Desktop: >= 1024px (lg and up)
-      const isMobile = width < 640;
-      const isTablet = width >= 640 && width < 1024;
-      const isDesktop = width >= 1024;
+      const isMobile = width < BREAKPOINTS.mobile;
+      const isTablet = width >= BREAKPOINTS.mobile && width < BREAKPOINTS.tablet;
+      const isDesktop = width >= BREAKPOINTS.tablet;
       
       setWindowSize({
         width,
