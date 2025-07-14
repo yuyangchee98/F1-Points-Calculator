@@ -4,6 +4,7 @@ import { RootState } from '../../store';
 import { selectPointsSystem } from '../../store/slices/uiSlice';
 import { POINTS_SYSTEMS } from '../../data/pointsSystems';
 import { trackPointsSystemChange } from '../../utils/analytics';
+import { BREAKPOINTS } from '../../utils/constants';
 
 const PointsSystemSelector: React.FC = () => {
   const dispatch = useDispatch();
@@ -147,8 +148,8 @@ const PointsSystemSelector: React.FC = () => {
              style={{ 
                width: 'min(24rem, calc(100vw - 2rem))',
                maxWidth: '100vw',
-               right: window.innerWidth < 640 ? '50%' : 'auto',
-               transform: window.innerWidth < 640 ? 'translateX(50%)' : 'none'
+               right: window.innerWidth < BREAKPOINTS.mobile ? '50%' : 'auto',
+               transform: window.innerWidth < BREAKPOINTS.mobile ? 'translateX(50%)' : 'none'
              }}>
           {/* Search input */}
           <div className="p-3 border-b border-gray-200">

@@ -18,6 +18,7 @@ import FAQ from './components/common/FAQ';
 import useAppDispatch from './hooks/useAppDispatch';
 import useWindowSize from './hooks/useWindowSize';
 import { trackBuyCoffeeClick, trackFeedbackClick } from './utils/analytics';
+import { CURRENT_SEASON } from './utils/constants';
 
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -66,7 +67,7 @@ const App: React.FC = () => {
                   <span className="bg-red-600 text-white px-3 py-1 mr-3 rounded-md">F1</span>
                   Championship Calculator
                 </span>
-                <span className="text-base sm:text-lg text-gray-500 ml-0 sm:ml-3 font-normal">2025 Season Predictor</span>
+                <span className="text-base sm:text-lg text-gray-500 ml-0 sm:ml-3 font-normal">{CURRENT_SEASON} Season Predictor</span>
               </h1>
               
               {/* Buy me a coffee link at top */}
@@ -97,15 +98,15 @@ const App: React.FC = () => {
               {/* Introduction section for better word count and SEO */}
               <div className="mb-6 p-4 bg-white rounded-lg shadow-sm">
                 <p className="text-gray-700 leading-relaxed">
-                  Welcome to the F1 Points Calculator 2025 - your ultimate tool for predicting Formula 1 championship outcomes. 
-                  This interactive calculator allows you to simulate race results for the entire 2025 F1 season by simply dragging 
+                  Welcome to the F1 Points Calculator {CURRENT_SEASON} - your ultimate tool for predicting Formula 1 championship outcomes. 
+                  This interactive calculator allows you to simulate race results for the entire {CURRENT_SEASON} F1 season by simply dragging 
                   and dropping drivers into their finishing positions. Watch as the championship standings update in real-time, 
                   helping you analyze different scenarios and predict who might become the next F1 World Champion.
                 </p>
                 <p className="text-gray-700 leading-relaxed mt-3">
                   Perfect for F1 fans who want to explore &quot;what-if&quot; scenarios, track their favorite drivers&apos; championship chances, 
                   or make predictions for upcoming races. The calculator uses the official F1 points system (25-18-15-12-10-8-6-4-2-1) 
-                  and includes all drivers and teams from the 2025 Formula 1 season.
+                  and includes all drivers and teams from the {CURRENT_SEASON} Formula 1 season.
                 </p>
               </div>
               
