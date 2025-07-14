@@ -1,11 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { GridState, GridPosition, PastRaceResult } from '../../types';
 import { races } from '../../data/races';
+import { MAX_GRID_POSITIONS } from '../../utils/constants';
 
 // Initialize grid positions with empty slots for all races and positions
 const initialPositions: GridPosition[] = [];
 races.forEach(race => {
-  for (let position = 1; position <= 20; position++) {
+  for (let position = 1; position <= MAX_GRID_POSITIONS; position++) {
     // Check if there's an official result for this race and position
     const driverId: string | null = null;
     const isOfficialResult = false;

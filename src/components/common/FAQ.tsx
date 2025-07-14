@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { CURRENT_SEASON } from '../../utils/constants';
 
 interface FAQItem {
   question: string;
@@ -15,8 +16,8 @@ const faqData: FAQItem[] = [
     answer: "An F1 championship calculator is a tool that simulates Formula 1 season standings by allowing you to predict race results. It calculates driver and constructor points based on your predictions, helping you visualize different championship scenarios."
   },
   {
-    question: "How are F1 points calculated in 2025?",
-    answer: "In 2025, F1 points are awarded to the top 10 finishers: 1st place gets 25 points, 2nd gets 18, 3rd gets 15, then 12, 10, 8, 6, 4, 2, and 1 point for 10th place. Sprint races award approximately 1/3 of regular race points to the top 8 finishers."
+    question: `How are F1 points calculated in ${CURRENT_SEASON}?`,
+    answer: `In ${CURRENT_SEASON}, F1 points are awarded to the top 10 finishers: 1st place gets 25 points, 2nd gets 18, 3rd gets 15, then 12, 10, 8, 6, 4, 2, and 1 point for 10th place. Sprint races award approximately 1/3 of regular race points to the top 8 finishers.`
   },
   {
     question: "Can I simulate different F1 points systems?",
