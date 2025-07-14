@@ -1,7 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { GridState, GridPosition, PastRaceResult } from '../../types';
 import { races } from '../../data/races';
-import { drivers } from '../../data/drivers';
 
 // Initialize grid positions with empty slots for all races and positions
 const initialPositions: GridPosition[] = [];
@@ -225,58 +224,6 @@ export const gridSlice = createSlice({
           return position;
         });
       }
-    },
-    
-    loadPredictions: (state, action: PayloadAction<Record<string, Record<string, string>>>) => {
-      const predictions = action.payload;
-      
-      // Clear grid first (non-official results and non-completed races)
-      state.positions = state.positions.map(position => {
-        const race = races.find(r => r.id === position.raceId);
-        const isCompleted = race?.completed || false;
-        
-        // If it's an official result or from a completed race, preserve it
-        if (position.isOfficialResult || isCompleted) {
-          return position;
-        } else {
-          return {
-            ...position,
-            driverId: null
-          };
-        }
-      });
-      
-      // Load predictions into grid, but only for non-completed races
-      Object.entries(predictions).forEach(([raceName, positions]) => {
-        // Find the race ID from the name
-        const race = races.find(r => r.name === raceName);
-        if (!race) return;
-        
-        // Skip completed races when loading predictions
-        if (race.completed) return;
-        
-        Object.entries(positions).forEach(([positionStr, driverName]) => {
-          const position = parseInt(positionStr);
-          if (isNaN(position)) return;
-          
-          // Find the driver ID from the name
-          const driver = drivers.find(d => d.name === driverName);
-          if (!driver) return;
-          
-          // Update the position
-          const positionIndex = state.positions.findIndex(
-            p => p.raceId === race.id && p.position === position
-          );
-          
-          if (positionIndex !== -1) {
-            state.positions[positionIndex] = {
-              ...state.positions[positionIndex],
-              driverId: driver.id,
-              isOfficialResult: false
-            };
-          }
-        });
-      });
     }
   }
 });
@@ -288,8 +235,7 @@ export const {
   swapPositions, 
   resetGrid, 
   setFastestLap, 
-  toggleOfficialResults,
-  loadPredictions
+  toggleOfficialResults
 } = gridSlice.actions;
 
 export default gridSlice.reducer;
