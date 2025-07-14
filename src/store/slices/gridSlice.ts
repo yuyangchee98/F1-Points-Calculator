@@ -8,8 +8,8 @@ const initialPositions: GridPosition[] = [];
 races.forEach(race => {
   for (let position = 1; position <= 20; position++) {
     // Check if there's an official result for this race and position
-    let driverId: string | null = null;
-    let isOfficialResult = false;
+    const driverId: string | null = null;
+    const isOfficialResult = false;
     
     // Don't initialize with past results here - they'll be loaded from API
     // and populated via toggleOfficialResults

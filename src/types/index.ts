@@ -112,5 +112,6 @@ export interface ResultsState {
 // Utility type for sortablejs
 export interface SortableItem {
   id: string;
-  [key: string]: any;
+  name?: string;
+  data?: unknown;
 }
