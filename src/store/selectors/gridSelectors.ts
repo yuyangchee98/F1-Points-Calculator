@@ -5,9 +5,6 @@ import { GridPosition } from '../../types';
 // Select all grid positions
 export const selectGridPositions = (state: RootState) => state.grid.positions;
 
-// Select fastest laps
-export const selectFastestLaps = (state: RootState) => state.grid.fastestLaps;
-
 // Create a more specific key for the race-position combination
 // Using '::' as a separator to avoid conflicts with race IDs that contain dashes
 export const selectRacePositionKey = (_: RootState, raceId: string, position: number) => `${raceId}::${position}`;

@@ -4,10 +4,6 @@ export interface PointsSystem {
   description: string;
   regular: Record<number, number>;
   sprint?: Record<number, number>;
-  fastestLap?: number;
-  rules?: {
-    fastestLapRequiresTop10?: boolean;
-  };
 }
 
 export const POINTS_SYSTEMS: Record<string, PointsSystem> = {
@@ -58,10 +54,6 @@ export const POINTS_SYSTEMS: Record<string, PointsSystem> = {
       18: 0,
       19: 0,
       20: 0,
-    },
-    fastestLap: 1,
-    rules: {
-      fastestLapRequiresTop10: true
     }
   },
   '2003-2009': {
@@ -398,8 +390,7 @@ export const POINTS_SYSTEMS: Record<string, PointsSystem> = {
       18: 0,
       19: 0,
       20: 0,
-    },
-    fastestLap: 1
+    }
   },
   'exponential': {
     id: 'exponential',
