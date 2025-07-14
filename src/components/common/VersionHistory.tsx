@@ -132,7 +132,7 @@ const VersionHistory: React.FC<VersionHistoryProps> = ({ onClose, onLoadVersion 
           </div>
         </div>
 
-        <div className="overflow-y-auto">
+        <div className="overflow-y-auto max-h-[calc(80vh-80px)]">
           {loading ? (
             <div className="p-8 text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
