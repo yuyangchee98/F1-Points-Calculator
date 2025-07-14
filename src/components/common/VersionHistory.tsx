@@ -66,7 +66,15 @@ const VersionHistory: React.FC<VersionHistoryProps> = ({ onClose, onLoadVersion 
     // Just show which races were edited - simple!
     if (version.races && version.races.length > 0) {
       const raceNames = version.races
-        .map(raceId => races.find(r => r.id === raceId)?.name || raceId)
+        .map(raceId => {
+          const race = races.find(r => r.id === raceId);
+          const name = race?.name || raceId;
+          // Format the name: capitalize and replace hyphens with spaces
+          return name
+            .split('-')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+        })
         .slice(0, 2)
         .join(', ');
       
