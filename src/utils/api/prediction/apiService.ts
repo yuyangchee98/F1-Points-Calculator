@@ -12,7 +12,9 @@ const COMMUNITY_PREDICTIONS_ENDPOINT = `${API_BASE_URL}/community/predictions`;
 interface PredictionResponse {
   success: boolean;
   id: string;
-  [key: string]: any;
+  message?: string;
+  error?: string;
+  data?: unknown;
 }
 
 interface CommunityPredictionResponse {
@@ -39,7 +41,7 @@ interface CommunityPredictionResponse {
 export const savePrediction = async (
   userId: string,
   predictions: Record<string, Record<string, string>>,
-  metadata?: Record<string, any>
+  metadata?: Record<string, string | number | boolean>
 ): Promise<string> => {
   try {
     const response = await fetch(PREDICTIONS_ENDPOINT, {
@@ -78,7 +80,7 @@ export const savePrediction = async (
  */
 export const loadPrediction = async (id: string): Promise<{
   predictions: Record<string, Record<string, string>>;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, string | number | boolean>;
 }> => {
   try {
     const response = await fetch(`${PREDICTIONS_ENDPOINT}/${id}`);

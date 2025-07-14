@@ -95,7 +95,7 @@ export const apiFormatToGridPositions = (
  * Generate metadata for saving predictions
  * @returns Metadata object
  */
-export const generatePredictionMetadata = (): Record<string, any> => {
+export const generatePredictionMetadata = (): Record<string, string | number | boolean> => {
   return {
     hideOfficialResults: localStorage.getItem('hide-official-results') === 'true',
     appVersion: '2.0' // Mark this as from the new app version

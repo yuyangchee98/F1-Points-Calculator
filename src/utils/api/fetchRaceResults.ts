@@ -1,5 +1,17 @@
 import { PastRaceResult } from '../../types';
 
+interface ErgastDriver {
+  familyName: string;
+  givenName: string;
+  driverId: string;
+}
+
+interface ErgastRaceResult {
+  Driver: ErgastDriver;
+  position: string;
+  status: string;
+}
+
 /**
  * Fetches past race results from the Ergast API
  * This maintains compatibility with the original project's update script
@@ -38,7 +50,7 @@ export const fetchPastRaceResults = async (): Promise<PastRaceResult> => {
         }
         
         // Format the results (extract driver names)
-        const formattedResults = results.map((result: any) => result.Driver.familyName);
+        const formattedResults = results.map((result: ErgastRaceResult) => result.Driver.familyName);
         
         // Map the race name to our format
         const raceName = mapRaceNameToOurFormat(race.raceName);
@@ -95,7 +107,7 @@ function mapRaceNameToOurFormat(raceName: string): string | null {
   };
 
   // Handle sprint races
-  let isSprint = raceName.toLowerCase().includes('sprint');
+  const isSprint = raceName.toLowerCase().includes('sprint');
 
   // Find the base race name
   let baseName = "";

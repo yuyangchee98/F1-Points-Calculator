@@ -198,7 +198,7 @@ const PointsSystemSelector: React.FC = () => {
               </div>
             ) : (
               <div className="px-4 py-8 text-center text-sm text-gray-500">
-                No points systems match "{searchQuery}"
+                No points systems match &quot;{searchQuery}&quot;
               </div>
             )}
           </div>

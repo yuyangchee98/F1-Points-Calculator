@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ChartDataset, TooltipItem } from 'chart.js';
 import { RootState } from '../../store';
 import { selectDriverPointsForCharts, selectTopDrivers } from '../../store/selectors/resultsSelectors';
 import { driverById } from '../../data/drivers';
@@ -60,7 +60,7 @@ const DriverPointsChart: React.FC = () => {
       tension: 0.1,
       pointRadius: 3,
     };
-  }).filter(Boolean) as any[]; // Type assertion to fix TypeScript error
+  }).filter(Boolean) as ChartDataset<'line', number[]>[];
   
   const chartData = { 
     labels: raceLabels, 
@@ -74,7 +74,7 @@ const DriverPointsChart: React.FC = () => {
       legend: { position: 'top' as const },
       tooltip: {
         callbacks: {
-          label: function(context: any) {
+          label: function(context: TooltipItem<'line'>) {
             return `${context.dataset.label}: ${context.raw} pts`;
           }
         }

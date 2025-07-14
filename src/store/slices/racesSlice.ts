@@ -11,7 +11,7 @@ const initialState: RacesState = {
 // Async thunk for fetching past race results from our API
 export const fetchPastRaceResults = createAsyncThunk(
   'races/fetchPastRaceResults',
-  async (_) => {
+  async () => {
     try {
       const results = await fetchFromAPI();
       return results;

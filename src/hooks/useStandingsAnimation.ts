@@ -5,7 +5,6 @@ export type AnimationState = 'up' | 'down' | 'none';
 interface StandingItem {
   position: number;
   points: number;
-  [key: string]: any;
 }
 
 interface UseStandingsAnimationOptions<T> {
