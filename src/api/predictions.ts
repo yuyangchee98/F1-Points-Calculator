@@ -6,6 +6,7 @@ export interface PredictionVersion {
   timestamp: string;
   grid: GridPosition[];
   pointsSystem: string;
+  schemaVersion?: number; // Optional to handle old saves without schema version
 }
 
 export interface SaveResponse {
