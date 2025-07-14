@@ -4,7 +4,7 @@ import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ChartDataset, TooltipItem } from 'chart.js';
 import { RootState } from '../../store';
 import { selectDriverPointsForCharts, selectTopDrivers } from '../../store/selectors/resultsSelectors';
-import { driverById } from '../../data/drivers';
+import { driverById, getDriverLastName } from '../../data/drivers';
 import { teamById } from '../../data/teams';
 import { races } from '../../data/races';
 import { normalizeTeamId } from '../../utils/teamHelper';
@@ -53,7 +53,7 @@ const DriverPointsChart: React.FC = () => {
     });
     
     return {
-      label: driver.name,
+      label: getDriverLastName(driver.id),
       data: filteredData,
       borderColor: color,
       backgroundColor: color,

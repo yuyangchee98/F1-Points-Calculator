@@ -4,6 +4,7 @@ import { teamById } from '../../data/teams';
 import { useDriverDrag } from '../../hooks/useDriverDragDrop';
 import { getDriverDisplayName } from '../../utils/driverHelper';
 import { normalizeTeamId } from '../../utils/teamHelper';
+import { getDriverLastName } from '../../data/drivers';
 
 interface DriverCardProps {
   driver: Driver;
@@ -76,7 +77,7 @@ const DriverCard: React.FC<DriverCardProps> = ({
             textAlign: 'center'
           }}
         >
-          {driver.name.slice(0, 3).toUpperCase()}
+          {getDriverLastName(driver.id).slice(0, 3).toUpperCase()}
         </div>
       )}
 

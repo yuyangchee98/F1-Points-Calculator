@@ -4,7 +4,7 @@ import { Race } from '../../types';
 import { RootState } from '../../store';
 import { selectDriverAtPosition } from '../../store/selectors/gridSelectors';
 import DriverCard from '../drivers/DriverCard';
-import { driverById } from '../../data/drivers';
+import { driverById, getDriverLastName } from '../../data/drivers';
 import { selectDriver } from '../../store/slices/uiSlice';
 import { placeDriver } from '../../store/slices/gridSlice';
 import { calculateResults } from '../../store/slices/resultsSlice';
@@ -99,7 +99,7 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
       onClick={handleSlotClick}
       ref={drop}
       role="button"
-      aria-label={driver ? `Position ${position}: ${driver.name}` : `Empty position ${position}`}
+      aria-label={driver ? `Position ${position}: ${getDriverLastName(driver.id)}` : `Empty position ${position}`}
       tabIndex={0}
     >
       {driver && (
