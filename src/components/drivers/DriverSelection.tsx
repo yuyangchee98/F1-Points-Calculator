@@ -6,6 +6,7 @@ import DriverCard from './DriverCard';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import useWindowSize from '../../hooks/useWindowSize';
 import { GA_EVENTS, trackEvent } from '../../utils/analytics';
+import { getDriverLastName } from '../../data/drivers';
 
 interface DriverSelectionProps {
   forceExpanded?: boolean;
@@ -100,7 +101,7 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({ forceExpanded = false
             <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6z" />
           </svg>
           <span className="selected-driver-name font-medium">
-            {drivers.find(d => d.id === selectedDriverId)?.name || ''}
+            {selectedDriverId ? getDriverLastName(selectedDriverId) : ''}
           </span>
           <span className="text-sm ml-2 text-gray-100">Tap blue grid slots to place</span>
           <button 
