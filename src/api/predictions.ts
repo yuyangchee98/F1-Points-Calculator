@@ -114,3 +114,61 @@ export async function getSharedPrediction(shareId: string): Promise<PredictionVe
     return null;
   }
 }
+
+export interface DriverChange {
+  driverId: string;
+  raceId: string;
+  position: number;
+}
+
+export interface VersionSummary {
+  version: string;
+  timestamp: string;
+  changeCount: number;
+  races: string[];
+  changes?: DriverChange[];
+}
+
+export async function getVersionHistory(
+  fingerprint: string,
+  limit?: number
+): Promise<VersionSummary[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/predictions/history`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        fingerprint,
+        limit,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to get version history');
+    }
+
+    const data = await response.json();
+    return data.versions || [];
+  } catch (error) {
+    console.error('Error getting version history:', error);
+    return [];
+  }
+}
+
+export async function deleteAllHistory(fingerprint: string): Promise<boolean> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/predictions/delete-history`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ fingerprint }),
+    });
+    return response.ok;
+  } catch (error) {
+    console.error('Error deleting history:', error);
+    return false;
+  }
+}
