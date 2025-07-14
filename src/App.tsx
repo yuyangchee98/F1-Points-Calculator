@@ -11,6 +11,7 @@ import StandingsSidebar from './components/standings/StandingsSidebar';
 import RaceGrid from './components/grid/RaceGrid';
 import ActionsBar from './components/common/ActionsBar';
 import InfoBanner from './components/common/InfoBanner';
+import IntroductionSection from './components/common/IntroductionSection';
 import ToastContainer from './components/common/ToastContainer';
 import DriverSelection from './components/drivers/DriverSelection';
 import HorizontalScrollBar from './components/common/HorizontalScrollBar';
@@ -93,23 +94,6 @@ const App: React.FC = () => {
                 </a>
               </div>
               
-              <InfoBanner />
-              
-              {/* Introduction section for better word count and SEO */}
-              <div className="mb-6 p-4 bg-white rounded-lg shadow-sm">
-                <p className="text-gray-700 leading-relaxed">
-                  Welcome to the F1 Points Calculator {CURRENT_SEASON} - your ultimate tool for predicting Formula 1 championship outcomes. 
-                  This interactive calculator allows you to simulate race results for the entire {CURRENT_SEASON} F1 season by simply dragging 
-                  and dropping drivers into their finishing positions. Watch as the championship standings update in real-time, 
-                  helping you analyze different scenarios and predict who might become the next F1 World Champion.
-                </p>
-                <p className="text-gray-700 leading-relaxed mt-3">
-                  Perfect for F1 fans who want to explore &quot;what-if&quot; scenarios, track their favorite drivers&apos; championship chances, 
-                  or make predictions for upcoming races. The calculator uses the official F1 points system (25-18-15-12-10-8-6-4-2-1) 
-                  and includes all drivers and teams from the {CURRENT_SEASON} Formula 1 season.
-                </p>
-              </div>
-              
               <ActionsBar />
               
               {/* Always show driver selection and grid when in grid view */}
@@ -118,6 +102,10 @@ const App: React.FC = () => {
                 <HorizontalScrollBar scrollContainerRef={raceGridScrollRef} />
                 <RaceGrid scrollRef={raceGridScrollRef} />
               </div>
+              
+              <InfoBanner />
+              
+              <IntroductionSection />
               
               {/* FAQ Section for SEO */}
               <FAQ />

@@ -32,7 +32,7 @@ export const calculateResults = createAsyncThunk(
 'results/calculateResults',
 async (_, { dispatch, getState }) => {
 const state = getState() as RootState;
-const { positions } = state.grid; // Fastest lap points are not awarded in the 2025 season
+const { positions } = state.grid;
 const allDrivers = state.drivers.list;
 const allRaces = state.races.list;
 const selectedPointsSystem = state.ui.selectedPointsSystem;
@@ -104,8 +104,6 @@ if (raceResult) {
 }
 }
 });
-
-// Fastest lap points are not awarded in the 2025 season
 
 // Record point history for this race
 Object.entries(raceDriverPoints).forEach(([driverId, points]) => {

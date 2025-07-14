@@ -57,7 +57,7 @@ The application uses Redux Toolkit with five main slices:
 - **Purpose**: Manages race schedule and integrates official results from F1 API
 
 #### 3. **gridSlice** (`src/store/slices/gridSlice.ts`)
-- **State**: Grid positions (driver placements) and fastest lap selections
+- **State**: Grid positions (driver placements)
 - **Key Actions**: `moveDriver`, `placeDriver`, `clearPosition`, `swapPositions`, `resetGrid`, `toggleOfficialResults`, `loadPredictions`
 - **Purpose**: Core drag-and-drop state management
 - **Key Features**:
@@ -180,7 +180,7 @@ The application uses Redux Toolkit with five main slices:
 - Historical F1 systems (1950s-present)
 - Other motorsports (MotoGP, IndyCar, Formula E)
 - Mathematical variations (linear, exponential, Fibonacci)
-- Custom rules for fastest lap bonuses
+- Creative scoring systems (winner-takes-all, underdog, etc.)
 
 **pastResults.ts**
 - Hardcoded results for completed races

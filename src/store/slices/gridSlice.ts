@@ -24,8 +24,7 @@ races.forEach(race => {
 });
 
 const initialState: GridState = {
-  positions: initialPositions,
-  fastestLaps: {} // Initialize with empty fastest laps
+  positions: initialPositions
 };
 
 export const gridSlice = createSlice({
@@ -168,17 +167,6 @@ export const gridSlice = createSlice({
           };
         }
       });
-      
-      // Clear fastest laps that aren't part of official results
-      Object.keys(state.fastestLaps).forEach(raceId => {
-        // We would need to check if it's an official fastest lap, but for simplicity, clear all
-        state.fastestLaps[raceId] = null;
-      });
-    },
-    
-    setFastestLap: (state, action: PayloadAction<{ raceId: string; driverId: string | null }>) => {
-      const { raceId, driverId } = action.payload;
-      state.fastestLaps[raceId] = driverId;
     },
     
     toggleOfficialResults: (state, action: PayloadAction<{ show: boolean; pastResults?: PastRaceResult }>) => {
@@ -235,7 +223,6 @@ export const {
   clearPosition, 
   swapPositions, 
   resetGrid, 
-  setFastestLap, 
   toggleOfficialResults
 } = gridSlice.actions;
 
