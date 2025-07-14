@@ -6,6 +6,8 @@ import { initializeUiState, setMobileView } from './store/slices/uiSlice';
 import { RootState } from './store';
 import { calculateResults } from './store/slices/resultsSlice';
 import useRaceResults from './hooks/useRaceResults';
+import { useAutoSave } from './hooks/useAutoSave';
+import { useLoadPredictions } from './hooks/useLoadPredictions';
 import Layout from './components/layout/Layout';
 import StandingsSidebar from './components/standings/StandingsSidebar';
 import RaceGrid from './components/grid/RaceGrid';
@@ -13,6 +15,7 @@ import ActionsBar from './components/common/ActionsBar';
 import InfoBanner from './components/common/InfoBanner';
 import IntroductionSection from './components/common/IntroductionSection';
 import ToastContainer from './components/common/ToastContainer';
+import SaveStatus from './components/common/SaveStatus';
 import DriverSelection from './components/drivers/DriverSelection';
 import HorizontalScrollBar from './components/common/HorizontalScrollBar';
 import FAQ from './components/common/FAQ';
@@ -25,6 +28,10 @@ const App: React.FC = () => {
   const dispatch = useAppDispatch();
   // Call useRaceResults but don't use the loading state
   useRaceResults();
+  // Enable auto-save
+  useAutoSave();
+  // Load saved predictions only after fingerprint is initialized
+  const { isLoading: isLoadingPredictions } = useLoadPredictions();
   const mobileView = useSelector((state: RootState) => state.ui.mobileView);
   const selectedPointsSystem = useSelector((state: RootState) => state.ui.selectedPointsSystem);
   const { isMobile } = useWindowSize();
@@ -58,6 +65,7 @@ const App: React.FC = () => {
     <DndProvider backend={HTML5Backend}>
       <div className="app min-h-screen">
         <ToastContainer />
+        <SaveStatus />
         
         <Layout
           sidebar={<StandingsSidebar />}
@@ -95,6 +103,13 @@ const App: React.FC = () => {
               </div>
               
               <ActionsBar />
+              
+              {/* Show loading state if predictions are being loaded */}
+              {isLoadingPredictions && (
+                <div className="text-center py-4 text-gray-600">
+                  <span className="animate-pulse">Loading your saved predictions...</span>
+                </div>
+              )}
               
               {/* Always show driver selection and grid when in grid view */}
               <div className={`${(mobileView === 'grid' || !isMobile) ? 'block' : 'hidden'}`}>

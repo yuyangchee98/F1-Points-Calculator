@@ -4,6 +4,8 @@ import racesReducer from './slices/racesSlice';
 import gridReducer from './slices/gridSlice';
 import uiReducer from './slices/uiSlice';
 import resultsReducer from './slices/resultsSlice';
+import predictionReducer from './slices/predictionSlice';
+import { predictionMiddleware } from './middleware/predictionMiddleware';
 
 export const store = configureStore({
   reducer: {
@@ -12,7 +14,10 @@ export const store = configureStore({
     grid: gridReducer,
     ui: uiReducer,
     results: resultsReducer,
+    predictions: predictionReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(predictionMiddleware),
 });
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
