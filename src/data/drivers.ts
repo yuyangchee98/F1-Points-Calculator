@@ -50,6 +50,14 @@ export const driverTeamMapping = {
   bortoleto: "sauber",
 };
 
+// Function to get last name only from driver ID
+export const getDriverLastName = (driverId: string): string => {
+  // If ID contains underscore, take the part after the last underscore
+  const parts = driverId.split('_');
+  const lastName = parts[parts.length - 1];
+  return lastName.charAt(0).toUpperCase() + lastName.slice(1);
+};
+
 // Driver data with IDs for Redux
 export const drivers: Driver[] = driverNames.map(name => ({
   id: name,

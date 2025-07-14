@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { DriverStanding } from '../../types';
-import { driverById } from '../../data/drivers';
+import { driverById, getDriverLastName } from '../../data/drivers';
 import { teamById } from '../../data/teams';
 import { useStandingsAnimation } from '../../hooks/useStandingsAnimation';
 import { normalizeTeamId } from '../../utils/teamHelper';
@@ -64,7 +64,7 @@ const DriverStandingsTable: React.FC<DriverStandingsTableProps> = ({ standings }
                         style={{ backgroundColor: teamColor }}
                       />
                       <div>
-                        <div className="font-medium text-gray-800">{driver.name}</div>
+                        <div className="font-medium text-gray-800">{getDriverLastName(driver.id)}</div>
                       </div>
                     </div>
                   </td>
