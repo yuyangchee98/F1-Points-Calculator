@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { resetGrid, toggleOfficialResults } from '../../store/slices/gridSlice';
 import { toggleOfficialResults as toggleOfficialResultsUI } from '../../store/slices/uiSlice';
@@ -7,12 +7,16 @@ import { RootState } from '../../store';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import PointsSystemSelector from './PointsSystemSelector';
 import PointsReference from './PointsReference';
+import VersionHistory from './VersionHistory';
 import { GA_EVENTS, trackEvent } from '../../utils/analytics';
+import { loadPrediction } from '../../api/predictions';
 
 const ActionsBar: React.FC = () => {
   const dispatch = useAppDispatch(); // Use typed dispatch
   const showOfficialResults = useSelector((state: RootState) => state.ui.showOfficialResults);
   const pastResults = useSelector((state: RootState) => state.races.pastResults);
+  const { fingerprint } = useSelector((state: RootState) => state.predictions);
+  const [showHistory, setShowHistory] = useState(false);
 
   // Handle grid reset
   const handleReset = () => {
@@ -36,6 +40,39 @@ const ActionsBar: React.FC = () => {
     );
   };
 
+  // Handle loading a specific version
+  const handleLoadVersion = async (version: string) => {
+    if (!fingerprint) return;
+    
+    try {
+      const prediction = await loadPrediction(fingerprint, version);
+      if (prediction && prediction.grid) {
+        // Clear current grid
+        dispatch(resetGrid());
+        
+        // Load the version
+        const { moveDriver } = await import('../../store/slices/gridSlice');
+        prediction.grid.forEach(pos => {
+          if (pos.driverId && !pos.isOfficialResult) {
+            dispatch(moveDriver({
+              driverId: pos.driverId,
+              toRaceId: pos.raceId,
+              toPosition: pos.position
+            }));
+          }
+        });
+        
+        // Recalculate results
+        dispatch(calculateResults());
+        
+        // Close history modal
+        setShowHistory(false);
+      }
+    } catch (error) {
+      console.error('Error loading version:', error);
+    }
+  };
+
   return (
     <div className="mb-6">
       {/* Basic action buttons */}
@@ -56,6 +93,16 @@ const ActionsBar: React.FC = () => {
           {showOfficialResults ? 'Hide Official Results' : 'Show Official Results'}
         </button>
         
+        <button
+          onClick={() => setShowHistory(true)}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md shadow transition flex items-center gap-2"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          History
+        </button>
+        
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-600">Points System:</span>
           <PointsSystemSelector />
@@ -64,6 +111,14 @@ const ActionsBar: React.FC = () => {
       
       {/* Points Reference */}
       <PointsReference />
+      
+      {/* Version History Modal */}
+      {showHistory && (
+        <VersionHistory
+          onClose={() => setShowHistory(false)}
+          onLoadVersion={handleLoadVersion}
+        />
+      )}
     </div>
   );
 };

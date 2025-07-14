@@ -78,7 +78,12 @@ const RaceGrid: React.FC<RaceGridProps> = ({ scrollRef }) => {
                 className="flag"
               />
             )}
-            <span className={`${isMobile ? 'text-xs' : 'text-sm'}`}>{race.name}</span>
+            <span className={`${isMobile ? 'text-xs' : 'text-sm'}`}>
+              {race.name
+                .split('-')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ')}
+            </span>
             {race.completed && (
               <span className="completed-indicator" title="Completed Race">✓</span>
             )}
