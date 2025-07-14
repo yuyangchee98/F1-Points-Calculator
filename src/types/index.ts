@@ -58,11 +58,6 @@ export interface TeamPointsHistory {
   cumulativePoints: number;
 }
 
-export interface FastestLap {
-  raceId: string;
-  driverId: string | null;
-}
-
 // New structure for race results with driver-team pairs
 export interface RaceResult {
   driverId: string;  // Clean driver ID without team suffix (e.g., "tsunoda", "lawson")
@@ -87,7 +82,6 @@ export interface RacesState {
 
 export interface GridState {
   positions: GridPosition[];
-  fastestLaps: Record<string, string | null>;
 }
 
 export type StandingsTab = 'tables' | 'charts';

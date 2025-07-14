@@ -82,7 +82,7 @@ const PointsSystemSelector: React.FC = () => {
       case 'indycar':
         return 'American open-wheel style where everyone scores. All 20 positions get points, starting from 50 and decreasing gradually. Makes every position worth fighting for and rewards finishing races.';
       case 'formula-e':
-        return 'Electric racing series system. Same as current F1 (25-18-15...) but traditionally includes bonus points for pole position and fastest lap. Clean, modern scoring for sustainable racing.';
+        return 'Electric racing series system. Same as current F1 (25-18-15...) with additional bonus points in the real series. Clean, modern scoring for sustainable racing.';
       case 'exponential':
         return 'Mathematical system where points halve each position: 32-16-8-4-2-1... Creates massive gaps between positions. Winning is hugely valuable, but even small improvements matter.';
       case 'olympic':
