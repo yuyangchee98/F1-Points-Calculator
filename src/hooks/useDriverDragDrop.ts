@@ -140,7 +140,7 @@ export function useDriverDrop({ raceId, position }: UseDriverDropParams) {
     }));
     
     // Track the drop event
-    trackDriverDrop(driverId, raceId, position, sourcePosition);
+    trackDriverDrop(driverId, raceId, position);
     
     // Recalculate results
     dispatch(calculateResults());

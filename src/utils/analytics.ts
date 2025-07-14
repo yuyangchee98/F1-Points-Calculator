@@ -3,7 +3,7 @@ declare global {
     gtag: (
       command: string,
       target: string,
-      config?: Record<string, any>
+      config?: Record<string, string | number | boolean | undefined>
     ) => void;
   }
 }
@@ -50,8 +50,7 @@ export const GA_EVENTS = {
 export const trackDriverDrop = (
   driverId: string,
   raceId: string,
-  position: number,
-  _fromPosition?: number
+  position: number
 ) => {
   trackEvent(
     GA_EVENTS.DRIVER_ACTIONS.DROP_COMPLETE,

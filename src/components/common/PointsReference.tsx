@@ -19,7 +19,7 @@ const PointsReference: React.FC = () => {
   
   // Get positions that actually have points
   const scoringPositions = pointsToShow ? Object.entries(pointsToShow)
-    .filter(([_, points]) => points > 0)
+    .filter(([, points]) => points > 0)
     .map(([position, points]) => ({ position: parseInt(position), points })) : [];
 
   return (
