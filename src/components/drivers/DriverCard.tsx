@@ -14,6 +14,7 @@ interface DriverCardProps {
   raceId?: string;
   position?: number;
   hideCode?: boolean;
+  overrideTeamId?: string | null; // Team ID from race results (historical)
 }
 
 const DriverCard: React.FC<DriverCardProps> = ({ 
@@ -23,9 +24,12 @@ const DriverCard: React.FC<DriverCardProps> = ({
   onClick,
   raceId,
   position,
-  hideCode = false
+  hideCode = false,
+  overrideTeamId
 }) => {
-  const team = teamById[normalizeTeamId(driver.team)];
+  // Use override team if provided (for historical accuracy), otherwise use driver's current team
+  const teamId = overrideTeamId || driver.team;
+  const team = teamById[normalizeTeamId(teamId)];
   
   // Set up drag source if we're in a grid position
   const { drag, isDragging } = useDriverDrag(driver.id, raceId, position);

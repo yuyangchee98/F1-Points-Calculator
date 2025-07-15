@@ -29,6 +29,7 @@ export interface GridPosition {
   raceId: string;
   position: number;
   driverId: string | null;
+  teamId?: string | null; // Team at the time of this race (for historical accuracy)
   isOfficialResult: boolean;
 }
 

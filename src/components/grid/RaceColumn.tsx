@@ -110,6 +110,7 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
             raceId={race.id}
             position={position}
             hideCode={true}
+            overrideTeamId={gridPosition?.teamId}
           />
         </div>
       )}
