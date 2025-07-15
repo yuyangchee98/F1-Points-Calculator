@@ -70,7 +70,6 @@ export async function loadPrediction(
 
     return response.json();
   } catch (error) {
-    console.error('Error loading prediction:', error);
     return null;
   }
 }
@@ -111,7 +110,6 @@ export async function getSharedPrediction(shareId: string): Promise<PredictionVe
 
     return response.json();
   } catch (error) {
-    console.error('Error getting shared prediction:', error);
     return null;
   }
 }
@@ -153,7 +151,6 @@ export async function getVersionHistory(
     const data = await response.json();
     return data.versions || [];
   } catch (error) {
-    console.error('Error getting version history:', error);
     return [];
   }
 }
@@ -169,7 +166,6 @@ export async function deleteAllHistory(fingerprint: string): Promise<boolean> {
     });
     return response.ok;
   } catch (error) {
-    console.error('Error deleting history:', error);
     return false;
   }
 }
