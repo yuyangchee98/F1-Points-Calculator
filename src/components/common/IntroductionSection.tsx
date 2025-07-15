@@ -51,7 +51,7 @@ const IntroductionSection: React.FC = () => {
             helping you analyze different scenarios and predict who might become the next F1 World Champion.
           </p>
           <p className="text-gray-700 leading-relaxed mt-3">
-            Perfect for F1 fans who want to explore "what-if" scenarios, track their favorite drivers' championship chances, 
+            Perfect for F1 fans who want to explore &ldquo;what-if&rdquo; scenarios, track their favorite drivers&apos; championship chances, 
             or make predictions for upcoming races. The calculator uses the official F1 points system (25-18-15-12-10-8-6-4-2-1) 
             and includes all drivers and teams from the {CURRENT_SEASON} Formula 1 season.
           </p>

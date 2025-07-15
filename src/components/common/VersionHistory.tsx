@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { getVersionHistory, deleteAllHistory, VersionSummary } from '../../api/predictions';
 import { races } from '../../data/races';
-import { driverById } from '../../data/drivers';
 
 interface VersionHistoryProps {
   onClose: () => void;
