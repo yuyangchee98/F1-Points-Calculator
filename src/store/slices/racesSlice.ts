@@ -16,7 +16,6 @@ export const fetchPastRaceResults = createAsyncThunk(
       const results = await fetchFromAPI();
       return results;
     } catch (error) {
-      console.error('Failed to fetch past race results:', error);
       // Return empty results if API fails
       return {};
     }

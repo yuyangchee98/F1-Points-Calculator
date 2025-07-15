@@ -69,7 +69,6 @@ export async function fetchRaceSchedule(year: number): Promise<Race[]> {
     const data: RaceScheduleResponse = await response.json();
     return data.MRData.RaceTable.Races;
   } catch (error) {
-    console.error('Error fetching race schedule:', error);
     throw error;
   }
 }

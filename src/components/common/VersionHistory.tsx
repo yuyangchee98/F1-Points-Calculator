@@ -101,10 +101,10 @@ const VersionHistory: React.FC<VersionHistoryProps> = ({ onClose, onLoadVersion 
         setShowDeleteConfirm(false);
         onClose();
       } else {
-        console.error('Failed to delete history');
+        // Failed to delete history
       }
     } catch (error) {
-      console.error('Error deleting history:', error);
+      // Error deleting history
     } finally {
       setIsDeleting(false);
     }

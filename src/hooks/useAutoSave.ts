@@ -24,7 +24,7 @@ export const useAutoSave = () => {
         dispatch(setFingerprint(fp));
         setIsInitialized(true);
       } catch (error) {
-        console.error('Error initializing fingerprint:', error);
+        // Error initializing fingerprint
       }
     };
 
@@ -53,7 +53,6 @@ export const useAutoSave = () => {
         lastSavedDataRef.current = currentData;
       }
     } catch (error) {
-      console.error('Error saving prediction:', error);
       dispatch(setSaveStatus('error'));
     }
   }, [fingerprint, positions, selectedPointsSystem, isDirty, dispatch]);
