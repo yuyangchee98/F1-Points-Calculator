@@ -13,7 +13,6 @@ export async function fetchPastRaceResults(): Promise<PastRaceResult> {
     const data = await response.json();
     return data as PastRaceResult;
   } catch (error) {
-    console.error('Error fetching past race results:', error);
     throw error;
   }
 }

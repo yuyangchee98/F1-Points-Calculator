@@ -98,7 +98,6 @@ export async function getRacesForYear(year: number): Promise<Race[]> {
     
     return races;
   } catch (error) {
-    console.error('Failed to fetch races from API, falling back to hardcoded data', error);
     // Fall back to hardcoded data for 2025 if API fails
     return getHardcodedRaces();
   }

@@ -69,7 +69,7 @@ const ActionsBar: React.FC = () => {
         setShowHistory(false);
       }
     } catch (error) {
-      console.error('Error loading version:', error);
+      // Error loading version
     }
   };
 
