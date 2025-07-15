@@ -192,6 +192,7 @@ export const gridSlice = createSlice({
                 return {
                   ...position,
                   driverId: raceResult.driverId,
+                  teamId: raceResult.teamId, // Preserve historical team data
                   isOfficialResult: true
                 };
               }
@@ -207,6 +208,7 @@ export const gridSlice = createSlice({
             return {
               ...position,
               driverId: null,
+              teamId: null, // Clear team data when hiding results
               isOfficialResult: false
             };
           }
