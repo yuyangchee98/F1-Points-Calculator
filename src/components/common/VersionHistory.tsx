@@ -192,11 +192,6 @@ const VersionHistory: React.FC<VersionHistoryProps> = ({ onClose, onLoadVersion 
                               </span>
                             </div>
                             
-                            <div className="text-sm text-gray-600">
-                              {version.races.length > 0 && (
-                                <span className="text-gray-500">{getRaceNames(version.races)}</span>
-                              )}
-                            </div>
                           </div>
                           
                           {!isLatest && (
