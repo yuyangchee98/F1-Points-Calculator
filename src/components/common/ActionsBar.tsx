@@ -8,7 +8,7 @@ import useAppDispatch from '../../hooks/useAppDispatch';
 import PointsSystemSelector from './PointsSystemSelector';
 import PointsReference from './PointsReference';
 import VersionHistory from './VersionHistory';
-import { GA_EVENTS, trackEvent } from '../../utils/analytics';
+import { GA_EVENTS, trackEvent, trackVersionHistoryAction } from '../../utils/analytics';
 import { loadPrediction } from '../../api/predictions';
 
 const ActionsBar: React.FC = () => {
@@ -94,7 +94,10 @@ const ActionsBar: React.FC = () => {
         </button>
         
         <button
-          onClick={() => setShowHistory(true)}
+          onClick={() => {
+            setShowHistory(true);
+            trackVersionHistoryAction('OPEN_HISTORY');
+          }}
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md shadow transition flex items-center gap-2"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store';
 import { selectPointsSystem } from '../../store/slices/uiSlice';
 import { POINTS_SYSTEMS } from '../../data/pointsSystems';
-import { trackPointsSystemChange } from '../../utils/analytics';
+import { trackPointsSystemChange, trackUIAction } from '../../utils/analytics';
 import { BREAKPOINTS } from '../../utils/constants';
 
 const PointsSystemSelector: React.FC = () => {
@@ -126,7 +126,10 @@ const PointsSystemSelector: React.FC = () => {
   return (
     <div className="points-system-selector relative" ref={dropdownRef}>
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          setIsOpen(!isOpen);
+          trackUIAction('DROPDOWN_TOGGLE', `points_system_${isOpen ? 'close' : 'open'}`);
+        }}
         className="flex items-center gap-2 px-4 py-2 text-sm bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-500"
         aria-expanded={isOpen}
         aria-haspopup="true"
