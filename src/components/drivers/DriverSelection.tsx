@@ -49,7 +49,14 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({ forceExpanded = false
         <button
           id="driver-toggle-button"
           className="sm:hidden bg-red-600 hover:bg-red-700 text-white px-5 py-3 rounded-md shadow-lg transition-all duration-200 flex items-center"
-          onClick={() => setIsExpanded(!isExpanded)}
+          onClick={() => {
+            setIsExpanded(!isExpanded);
+            trackEvent(
+              GA_EVENTS.DRIVER_ACTIONS.TOGGLE_DRIVER_VISIBILITY,
+              'Driver Selection',
+              isExpanded ? 'hide' : 'show'
+            );
+          }}
         >
           {isExpanded ? (
             <>
@@ -107,7 +114,14 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({ forceExpanded = false
           <button 
             className="cancel-selection ml-2 bg-white bg-opacity-20 rounded-full w-7 h-7 
                     flex items-center justify-center transition-all hover:bg-opacity-30"
-            onClick={() => dispatch(selectDriver(null))}
+            onClick={() => {
+              dispatch(selectDriver(null));
+              trackEvent(
+                GA_EVENTS.DRIVER_ACTIONS.CANCEL_SELECTION,
+                'Driver Selection',
+                selectedDriverId || 'unknown'
+              );
+            }}
             aria-label="Cancel selection"
           >
             ×

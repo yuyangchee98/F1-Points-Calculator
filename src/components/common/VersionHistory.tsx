@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { getVersionHistory, deleteAllHistory, VersionSummary } from '../../api/predictions';
 import { races } from '../../data/races';
+import { trackVersionHistoryAction } from '../../utils/analytics';
 
 interface VersionHistoryProps {
   onClose: () => void;
@@ -81,6 +82,7 @@ const VersionHistory: React.FC<VersionHistoryProps> = ({ onClose, onLoadVersion 
   const handleLoadVersion = async (version: string) => {
     setSelectedVersion(version);
     onLoadVersion(version);
+    trackVersionHistoryAction('LOAD_VERSION', version);
   };
 
   const handleDeleteAll = async () => {
@@ -93,6 +95,7 @@ const VersionHistory: React.FC<VersionHistoryProps> = ({ onClose, onLoadVersion 
       if (success) {
         setVersions([]);
         setShowDeleteConfirm(false);
+        trackVersionHistoryAction('DELETE_ALL_VERSIONS', 'success');
         onClose();
       } else {
         // Failed to delete history
@@ -121,7 +124,10 @@ const VersionHistory: React.FC<VersionHistoryProps> = ({ onClose, onLoadVersion 
                 </button>
               )}
               <button
-                onClick={onClose}
+                onClick={() => {
+                  trackVersionHistoryAction('CLOSE_HISTORY');
+                  onClose();
+                }}
                 className="text-gray-400 hover:text-gray-600 transition-colors"
                 aria-label="Close"
               >

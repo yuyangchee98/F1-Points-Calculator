@@ -8,6 +8,7 @@ import TeamStandingsTable from './TeamStandingsTable';
 import DriverPointsChart from '../charts/DriverPointsChart';
 import TeamPointsChart from '../charts/TeamPointsChart';
 import useAppDispatch from '../../hooks/useAppDispatch';
+import { trackStandingsTabChange } from '../../utils/analytics';
 
 const StandingsSidebar: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -22,6 +23,7 @@ const StandingsSidebar: React.FC = () => {
   const handleTabChange = (tab: 'tables' | 'charts') => {
     setActiveTabState(tab);
     dispatch(setActiveTab(tab));
+    trackStandingsTabChange(tab);
   };
 
   // Use the tab from Redux when it changes
