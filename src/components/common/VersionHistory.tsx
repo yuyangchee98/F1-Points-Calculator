@@ -49,12 +49,6 @@ const VersionHistory: React.FC<VersionHistoryProps> = ({ onClose, onLoadVersion 
     }
   };
 
-  const getRaceNames = (raceIds: string[]) => {
-    return raceIds
-      .map(id => races.find(r => r.id === id)?.name || id)
-      .slice(0, 3)
-      .join(', ') + (raceIds.length > 3 ? ` +${raceIds.length - 3} more` : '');
-  };
 
   const getVersionTitle = (version: VersionSummary, index: number): string => {
     // First version
