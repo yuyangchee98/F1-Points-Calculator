@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { trackUIAction } from '../../utils/analytics';
 
 interface ToastProps {
   message: string;
@@ -96,6 +97,7 @@ const Toast: React.FC<ToastProps> = ({
         <button 
           onClick={() => {
             setIsLeaving(true);
+            trackUIAction('CLOSE_TOAST', type);
             setTimeout(() => {
               setIsVisible(false);
               if (onClose) onClose();

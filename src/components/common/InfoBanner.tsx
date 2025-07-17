@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { trackInfoToggle } from '../../utils/analytics';
 
 const InfoBanner: React.FC = () => {
   // Start collapsed by default, but respect user preference
@@ -16,6 +17,7 @@ const InfoBanner: React.FC = () => {
     const newState = !isExpanded;
     setIsExpanded(newState);
     localStorage.setItem('infoBannerExpanded', newState.toString());
+    trackInfoToggle('TOGGLE_HOW_TO_USE', newState);
   };
 
   return (
