@@ -5,6 +5,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { initializeUiState, setMobileView } from './store/slices/uiSlice';
 import { RootState } from './store';
 import { calculateResults } from './store/slices/resultsSlice';
+import { moveDriver } from './store/slices/gridSlice';
 import useRaceResults from './hooks/useRaceResults';
 import { useAutoSave } from './hooks/useAutoSave';
 import { useLoadPredictions } from './hooks/useLoadPredictions';
@@ -114,6 +115,49 @@ const App: React.FC = () => {
               {/* Always show driver selection and grid when in grid view */}
               <div className={`${(mobileView === 'grid' || !isMobile) ? 'block' : 'hidden'}`}>
                 <DriverSelection />
+                
+                {/* JSON Placement Input */}
+                <div className="mb-4 p-4 bg-gray-100 rounded-lg">
+                  <h3 className="text-sm font-semibold mb-2">JSON Placement (Experimental)</h3>
+                  <textarea
+                    id="json-input"
+                    className="w-full p-2 border border-gray-300 rounded text-sm font-mono"
+                    placeholder='Paste JSON here, e.g.: [{"driverId":"verstappen","toRaceId":"las-vegas","toPosition":1}]'
+                    rows={3}
+                  />
+                  <div className="mt-2 flex items-center gap-2">
+                    <button
+                      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-semibold"
+                      onClick={() => {
+                        const textarea = document.getElementById('json-input') as HTMLTextAreaElement;
+                        const json = textarea.value;
+                        try {
+                          const placements = JSON.parse(json);
+                          if (Array.isArray(placements)) {
+                            placements.forEach(p => {
+                              dispatch(moveDriver({
+                                driverId: p.driverId,
+                                toRaceId: p.toRaceId,
+                                toPosition: p.toPosition,
+                                fromRaceId: p.fromRaceId,
+                                fromPosition: p.fromPosition
+                              }));
+                            });
+                            dispatch(calculateResults());
+                            textarea.value = '';
+                          }
+                        } catch (err) {
+                          console.error('Invalid JSON:', err);
+                          alert('Invalid JSON format');
+                        }
+                      }}
+                    >
+                      Apply Placements
+                    </button>
+                    <p className="text-xs text-gray-600">Or press Ctrl+Enter</p>
+                  </div>
+                </div>
+                
                 <HorizontalScrollBar scrollContainerRef={raceGridScrollRef} />
                 <RaceGrid scrollRef={raceGridScrollRef} />
               </div>
