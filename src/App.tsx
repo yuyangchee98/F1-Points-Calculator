@@ -6,6 +6,7 @@ import { initializeUiState, setMobileView } from './store/slices/uiSlice';
 import { RootState } from './store';
 import { calculateResults } from './store/slices/resultsSlice';
 import { moveDriver } from './store/slices/gridSlice';
+import { parseNaturalLanguage } from './api/naturalLanguage';
 import useRaceResults from './hooks/useRaceResults';
 import { useAutoSave } from './hooks/useAutoSave';
 import { useLoadPredictions } from './hooks/useLoadPredictions';
@@ -116,45 +117,47 @@ const App: React.FC = () => {
               <div className={`${(mobileView === 'grid' || !isMobile) ? 'block' : 'hidden'}`}>
                 <DriverSelection />
                 
-                {/* JSON Placement Input */}
+                {/* Natural Language Placement Input */}
                 <div className="mb-4 p-4 bg-gray-100 rounded-lg">
-                  <h3 className="text-sm font-semibold mb-2">JSON Placement (Experimental)</h3>
+                  <h3 className="text-sm font-semibold mb-2">Natural Language Predictions (Experimental)</h3>
                   <textarea
-                    id="json-input"
-                    className="w-full p-2 border border-gray-300 rounded text-sm font-mono"
-                    placeholder='Paste JSON here, e.g.: [{"driverId":"verstappen","toRaceId":"las-vegas","toPosition":1}]'
+                    id="nl-input"
+                    className="w-full p-2 border border-gray-300 rounded text-sm"
+                    placeholder='Try: "Put Max in P1 at Vegas, Hamilton P2, Leclerc P3"'
                     rows={3}
                   />
                   <div className="mt-2 flex items-center gap-2">
                     <button
                       className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-semibold"
-                      onClick={() => {
-                        const textarea = document.getElementById('json-input') as HTMLTextAreaElement;
-                        const json = textarea.value;
+                      onClick={async () => {
+                        const textarea = document.getElementById('nl-input') as HTMLTextAreaElement;
+                        const text = textarea.value.trim();
+                        
+                        if (!text) return;
+                        
                         try {
-                          const placements = JSON.parse(json);
-                          if (Array.isArray(placements)) {
-                            placements.forEach(p => {
+                          const response = await parseNaturalLanguage(text);
+                          
+                          if (response.placements && Array.isArray(response.placements)) {
+                            response.placements.forEach(p => {
                               dispatch(moveDriver({
                                 driverId: p.driverId,
                                 toRaceId: p.toRaceId,
-                                toPosition: p.toPosition,
-                                fromRaceId: p.fromRaceId,
-                                fromPosition: p.fromPosition
+                                toPosition: p.toPosition
                               }));
                             });
                             dispatch(calculateResults());
                             textarea.value = '';
                           }
                         } catch (err) {
-                          console.error('Invalid JSON:', err);
-                          alert('Invalid JSON format');
+                          console.error('Error parsing natural language:', err);
+                          alert('Failed to understand the input. Try something like: "Max P1 at Vegas"');
                         }
                       }}
                     >
-                      Apply Placements
+                      Apply Predictions
                     </button>
-                    <p className="text-xs text-gray-600">Or press Ctrl+Enter</p>
+                    <span className="text-xs text-gray-600">Powered by AI</span>
                   </div>
                 </div>
                 
