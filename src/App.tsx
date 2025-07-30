@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { initializeUiState, setMobileView } from './store/slices/uiSlice';
-import { RootState } from './store';
+import { RootState, store } from './store';
 import { calculateResults } from './store/slices/resultsSlice';
 import { moveDriver } from './store/slices/gridSlice';
 import { parseNaturalLanguage } from './api/naturalLanguage';
@@ -123,7 +123,7 @@ const App: React.FC = () => {
                   <textarea
                     id="nl-input"
                     className="w-full p-2 border border-gray-300 rounded text-sm"
-                    placeholder='Try: "Put Max in P1 at Vegas, Hamilton P2, Leclerc P3"'
+                    placeholder='Try: "Max wins next 3 races" or "Championship leader P1 for all remaining races"'
                     rows={3}
                   />
                   <div className="mt-2 flex items-center gap-2">
@@ -136,7 +136,45 @@ const App: React.FC = () => {
                         if (!text) return;
                         
                         try {
-                          const response = await parseNaturalLanguage(text);
+                          // Gather context from Redux store
+                          const state = store.getState();
+                          
+                          // Build race context
+                          const races = state.races.list.map(race => ({
+                            raceId: race.id,
+                            completed: race.completed,
+                            order: race.order,
+                            isSprint: race.isSprint
+                          }));
+                          
+                          // Build predictions map (only user predictions, not official results)
+                          const predictions: Record<string, Record<string, string>> = {};
+                          state.grid.positions.forEach(pos => {
+                            if (pos.driverId && !pos.isOfficialResult) {
+                              if (!predictions[pos.raceId]) {
+                                predictions[pos.raceId] = {};
+                              }
+                              predictions[pos.raceId][pos.position.toString()] = pos.driverId;
+                            }
+                          });
+                          
+                          // Get standings
+                          const standings = {
+                            drivers: state.results.driverStandings,
+                            teams: state.results.teamStandings
+                          };
+                          
+                          // Get driver teams
+                          const driverTeams = state.drivers.driverTeams;
+                          
+                          const context = {
+                            races,
+                            predictions,
+                            standings,
+                            driverTeams
+                          };
+                          
+                          const response = await parseNaturalLanguage(text, context);
                           
                           if (response.placements && Array.isArray(response.placements)) {
                             response.placements.forEach(p => {
