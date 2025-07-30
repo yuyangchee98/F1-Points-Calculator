@@ -118,17 +118,24 @@ const App: React.FC = () => {
                 <DriverSelection />
                 
                 {/* Natural Language Placement Input */}
-                <div className="mb-4 p-4 bg-gray-100 rounded-lg">
-                  <h3 className="text-sm font-semibold mb-2">Natural Language Predictions (Experimental)</h3>
+                <div className="mb-6 p-4 bg-gray-50 rounded-lg shadow-sm border border-gray-200">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
+                    <h3 className="text-2xl font-bold">SMART INPUT</h3>
+                    <p className="text-sm text-gray-600 mt-2 sm:mt-0">
+                      Type commands like "Max P1 at Monza" or "Hamilton wins next 3 races" and they'll be placed on the grid instantly
+                    </p>
+                  </div>
                   <textarea
                     id="nl-input"
-                    className="w-full p-2 border border-gray-300 rounded text-sm"
+                    className="w-full p-3 bg-white border border-gray-300 rounded-md shadow-sm 
+                              focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
+                              transition duration-150 ease-in-out text-sm hover:border-gray-400"
                     placeholder='Try: "Max wins next 3 races" or "Championship leader P1 for all remaining races"'
                     rows={3}
                   />
-                  <div className="mt-2 flex items-center gap-2">
+                  <div className="mt-4">
                     <button
-                      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-semibold"
+                      className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md shadow transition font-semibold"
                       onClick={async () => {
                         const textarea = document.getElementById('nl-input') as HTMLTextAreaElement;
                         const text = textarea.value.trim();
@@ -195,7 +202,6 @@ const App: React.FC = () => {
                     >
                       Apply Predictions
                     </button>
-                    <span className="text-xs text-gray-600">Powered by AI</span>
                   </div>
                 </div>
                 
