@@ -10,6 +10,7 @@ import { parseNaturalLanguage } from './api/naturalLanguage';
 import useRaceResults from './hooks/useRaceResults';
 import { useAutoSave } from './hooks/useAutoSave';
 import { useLoadPredictions } from './hooks/useLoadPredictions';
+import { useSubscription } from './hooks/useSubscription';
 import Layout from './components/layout/Layout';
 import StandingsSidebar from './components/standings/StandingsSidebar';
 import RaceGrid from './components/grid/RaceGrid';
@@ -21,6 +22,7 @@ import SaveStatus from './components/common/SaveStatus';
 import DriverSelection from './components/drivers/DriverSelection';
 import HorizontalScrollBar from './components/common/HorizontalScrollBar';
 import FAQ from './components/common/FAQ';
+import TypingAnimation from './components/common/TypingAnimation';
 import useAppDispatch from './hooks/useAppDispatch';
 import useWindowSize from './hooks/useWindowSize';
 import { trackBuyCoffeeClick, trackFeedbackClick } from './utils/analytics';
@@ -38,6 +40,26 @@ const App: React.FC = () => {
   const selectedPointsSystem = useSelector((state: RootState) => state.ui.selectedPointsSystem);
   const { isMobile } = useWindowSize();
   const raceGridScrollRef = React.useRef<HTMLDivElement>(null);
+  const { isSubscribed } = useSubscription();
+
+  // Example commands for typing animation
+  const exampleCommands = [
+    "Max wins at Monza",
+    "Hamilton P1 next 3 races",
+    "Verstappen wins all remaining races",
+    "Norris podium at Silverstone",
+    "Ferrari 1-2 at Italian GP",
+    "Russell P5 at Hungary",
+    "Championship leader wins Monaco",
+    "Alonso points at Spanish GP",
+    "Red Bull 1-2 next sprint",
+    "Mercedes double podium Vegas",
+    "Leclerc pole to win at home",
+    "Top 3 stays same at Suzuka",
+    "McLaren outscores Ferrari today",
+    "Sainz beats teammate next race",
+    "Rookie scores first points"
+  ];
 
   useEffect(() => {
     // Initialize UI state from localStorage/URL
@@ -118,91 +140,125 @@ const App: React.FC = () => {
                 <DriverSelection />
                 
                 {/* Natural Language Placement Input */}
-                <div className="mb-6 p-4 bg-gray-50 rounded-lg shadow-sm border border-gray-200">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
-                    <h3 className="text-2xl font-bold">SMART INPUT</h3>
-                    <p className="text-sm text-gray-600 mt-2 sm:mt-0">
-                      Type commands like "Max P1 at Monza" or "Hamilton wins next 3 races" and they'll be placed on the grid instantly
-                    </p>
-                  </div>
-                  <textarea
-                    id="nl-input"
-                    className="w-full p-3 bg-white border border-gray-300 rounded-md shadow-sm 
-                              focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
-                              transition duration-150 ease-in-out text-sm hover:border-gray-400"
-                    placeholder='Try: "Max wins next 3 races" or "Championship leader P1 for all remaining races"'
-                    rows={3}
-                  />
-                  <div className="mt-4">
-                    <button
-                      className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md shadow transition font-semibold"
-                      onClick={async () => {
-                        const textarea = document.getElementById('nl-input') as HTMLTextAreaElement;
-                        const text = textarea.value.trim();
-                        
-                        if (!text) return;
-                        
-                        try {
-                          // Gather context from Redux store
-                          const state = store.getState();
-                          
-                          // Build race context
-                          const races = state.races.list.map(race => ({
-                            raceId: race.id,
-                            completed: race.completed,
-                            order: race.order,
-                            isSprint: race.isSprint
-                          }));
-                          
-                          // Build predictions map (only user predictions, not official results)
-                          const predictions: Record<string, Record<string, string>> = {};
-                          state.grid.positions.forEach(pos => {
-                            if (pos.driverId && !pos.isOfficialResult) {
-                              if (!predictions[pos.raceId]) {
-                                predictions[pos.raceId] = {};
-                              }
-                              predictions[pos.raceId][pos.position.toString()] = pos.driverId;
-                            }
-                          });
-                          
-                          // Get standings
-                          const standings = {
-                            drivers: state.results.driverStandings,
-                            teams: state.results.teamStandings
-                          };
-                          
-                          // Get driver teams
-                          const driverTeams = state.drivers.driverTeams;
-                          
-                          const context = {
-                            races,
-                            predictions,
-                            standings,
-                            driverTeams
-                          };
-                          
-                          const response = await parseNaturalLanguage(text, context);
-                          
-                          if (response.placements && Array.isArray(response.placements)) {
-                            response.placements.forEach(p => {
-                              dispatch(moveDriver({
-                                driverId: p.driverId,
-                                toRaceId: p.toRaceId,
-                                toPosition: p.toPosition
+                <div className="mb-6 p-4 bg-gray-50 rounded-lg shadow-sm border border-gray-200 relative">
+                  {isSubscribed && (
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
+                      <h3 className="text-2xl font-bold">SMART INPUT</h3>
+                      <p className="text-sm text-gray-600 mt-2 sm:mt-0">
+                        Type commands like "Max P1 at Monza" or "Hamilton wins next 3 races" and they'll be placed on the grid instantly
+                      </p>
+                    </div>
+                  )}
+                  
+                  {isSubscribed ? (
+                    <>
+                      <textarea
+                        id="nl-input"
+                        className="w-full p-3 bg-white border border-gray-300 rounded-md shadow-sm 
+                                  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
+                                  transition duration-150 ease-in-out text-sm hover:border-gray-400"
+                        placeholder='Try: "Max wins next 3 races" or "Championship leader P1 for all remaining races"'
+                        rows={3}
+                      />
+                      <div className="mt-4">
+                        <button
+                          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md shadow transition font-semibold"
+                          onClick={async () => {
+                            const textarea = document.getElementById('nl-input') as HTMLTextAreaElement;
+                            const text = textarea.value.trim();
+                            
+                            if (!text) return;
+                            
+                            try {
+                              // Gather context from Redux store
+                              const state = store.getState();
+                              
+                              // Build race context
+                              const races = state.races.list.map(race => ({
+                                raceId: race.id,
+                                completed: race.completed,
+                                order: race.order,
+                                isSprint: race.isSprint
                               }));
-                            });
-                            dispatch(calculateResults());
-                            textarea.value = '';
-                          }
-                        } catch (err) {
-                          console.error('Error parsing natural language:', err);
-                          alert('Failed to understand the input. Try something like: "Max P1 at Vegas"');
-                        }
-                      }}
-                    >
-                      Apply Predictions
-                    </button>
-                  </div>
+                              
+                              // Build predictions map (only user predictions, not official results)
+                              const predictions: Record<string, Record<string, string>> = {};
+                              state.grid.positions.forEach(pos => {
+                                if (pos.driverId && !pos.isOfficialResult) {
+                                  if (!predictions[pos.raceId]) {
+                                    predictions[pos.raceId] = {};
+                                  }
+                                  predictions[pos.raceId][pos.position.toString()] = pos.driverId;
+                                }
+                              });
+                              
+                              // Get standings
+                              const standings = {
+                                drivers: state.results.driverStandings,
+                                teams: state.results.teamStandings
+                              };
+                              
+                              // Get driver teams
+                              const driverTeams = state.drivers.driverTeams;
+                              
+                              const context = {
+                                races,
+                                predictions,
+                                standings,
+                                driverTeams
+                              };
+                              
+                              const response = await parseNaturalLanguage(text, context);
+                              
+                              if (response.placements && Array.isArray(response.placements)) {
+                                response.placements.forEach(p => {
+                                  dispatch(moveDriver({
+                                    driverId: p.driverId,
+                                    toRaceId: p.toRaceId,
+                                    toPosition: p.toPosition
+                                  }));
+                                });
+                                dispatch(calculateResults());
+                                textarea.value = '';
+                              }
+                            } catch (err) {
+                              console.error('Error parsing natural language:', err);
+                              alert('Failed to understand the input. Try something like: "Max P1 at Vegas"');
+                            }
+                          }}
+                        >
+                          Apply Predictions
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="bg-white rounded-md p-6 border border-gray-200">
+                      <div className="flex flex-col md:flex-row md:items-center md:gap-8">
+                        {/* Left side - Description */}
+                        <div className="flex-1 mb-6 md:mb-0 text-center md:text-left">
+                          <h4 className="text-xl font-bold mb-3">What is Smart Input?</h4>
+                          <p className="text-sm text-gray-600 mb-4">
+                            Type natural commands like "Max wins at Monza" or "Hamilton P1 next 3 races" 
+                            and watch as drivers are instantly placed on the grid. No more clicking through 
+                            hundreds of positions - just type what you want and it happens.
+                          </p>
+                          <div className="flex justify-center md:justify-start">
+                            <TypingAnimation examples={exampleCommands} />
+                          </div>
+                        </div>
+                        
+                        {/* Right side - Pricing */}
+                        <div className="text-center">
+                          <h4 className="text-xl font-bold mb-2">Unlock Smart Input</h4>
+                          <p className="text-4xl font-bold text-red-600 mb-1">$4.99</p>
+                          <p className="text-sm text-gray-600 mb-4">per month</p>
+                          <button className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-md shadow-lg transition font-semibold text-lg">
+                            Subscribe Now
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 
                 <HorizontalScrollBar scrollContainerRef={raceGridScrollRef} />
