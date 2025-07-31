@@ -26,6 +26,7 @@ const API_BASE_URL = 'http://localhost:8787';
 
 export async function parseNaturalLanguage(
   text: string, 
+  fingerprint: string,
   context?: NaturalLanguageContext
 ): Promise<NaturalLanguageResponse> {
   const response = await fetch(`${API_BASE_URL}/api/predictions/parse-natural-language`, {
@@ -33,10 +34,14 @@ export async function parseNaturalLanguage(
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ text, context }),
+    body: JSON.stringify({ text, fingerprint, context }),
   });
 
   if (!response.ok) {
+    const data = await response.json();
+    if (data.requiresSubscription) {
+      throw new Error('SUBSCRIPTION_REQUIRED');
+    }
     throw new Error('Failed to parse natural language');
   }
 
