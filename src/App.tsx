@@ -7,6 +7,7 @@ import { RootState, store } from './store';
 import { calculateResults } from './store/slices/resultsSlice';
 import { moveDriver } from './store/slices/gridSlice';
 import { parseNaturalLanguage } from './api/naturalLanguage';
+import { createCheckoutSession } from './api/subscription';
 import useRaceResults from './hooks/useRaceResults';
 import { useAutoSave } from './hooks/useAutoSave';
 import { useLoadPredictions } from './hooks/useLoadPredictions';
@@ -41,6 +42,7 @@ const App: React.FC = () => {
   const { isMobile } = useWindowSize();
   const raceGridScrollRef = React.useRef<HTMLDivElement>(null);
   const { isSubscribed } = useSubscription();
+  const fingerprint = useSelector((state: RootState) => state.predictions.fingerprint);
 
   // Example commands for typing animation
   const exampleCommands = [
@@ -208,7 +210,7 @@ const App: React.FC = () => {
                                 driverTeams
                               };
                               
-                              const response = await parseNaturalLanguage(text, context);
+                              const response = await parseNaturalLanguage(text, fingerprint || '', context);
                               
                               if (response.placements && Array.isArray(response.placements)) {
                                 response.placements.forEach(p => {
@@ -223,7 +225,20 @@ const App: React.FC = () => {
                               }
                             } catch (err) {
                               console.error('Error parsing natural language:', err);
-                              alert('Failed to understand the input. Try something like: "Max P1 at Vegas"');
+                              if (err instanceof Error && err.message === 'SUBSCRIPTION_REQUIRED') {
+                                // User needs to subscribe
+                                if (window.confirm('Smart Input requires a subscription. Would you like to subscribe now?')) {
+                                  try {
+                                    const session = await createCheckoutSession(fingerprint || '');
+                                    window.location.href = session.url;
+                                  } catch (checkoutError) {
+                                    console.error('Error creating checkout session:', checkoutError);
+                                    alert('Failed to start checkout process. Please try again.');
+                                  }
+                                }
+                              } else {
+                                alert('Failed to understand the input. Try something like: "Max P1 at Vegas"');
+                              }
                             }
                           }}
                         >
@@ -252,7 +267,24 @@ const App: React.FC = () => {
                           <h4 className="text-xl font-bold mb-2">Unlock Smart Input</h4>
                           <p className="text-4xl font-bold text-red-600 mb-1">$4.99</p>
                           <p className="text-sm text-gray-600 mb-4">per month</p>
-                          <button className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-md shadow-lg transition font-semibold text-lg">
+                          <button 
+                            className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-md shadow-lg transition font-semibold text-lg"
+                            onClick={async () => {
+                              if (!fingerprint) {
+                                alert('Please wait for the app to initialize');
+                                return;
+                              }
+                              
+                              try {
+                                const session = await createCheckoutSession(fingerprint);
+                                // Redirect to Stripe Checkout
+                                window.location.href = session.url;
+                              } catch (error) {
+                                console.error('Error creating checkout session:', error);
+                                alert('Failed to start checkout process. Please try again.');
+                              }
+                            }}
+                          >
                             Subscribe Now
                           </button>
                         </div>
