@@ -49,3 +49,22 @@ export async function createCheckoutSession(email: string): Promise<CheckoutSess
 
   return response.json();
 }
+
+export async function createPortalSession(email: string): Promise<{ url: string }> {
+  const response = await fetch(`${API_BASE_URL}/api/subscription/create-portal`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      email,
+      returnUrl: window.location.origin,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to create portal session');
+  }
+
+  return response.json();
+}

@@ -7,7 +7,7 @@ import { RootState, store } from './store';
 import { calculateResults } from './store/slices/resultsSlice';
 import { moveDriver } from './store/slices/gridSlice';
 import { parseNaturalLanguage } from './api/naturalLanguage';
-import { createCheckoutSession } from './api/subscription';
+import { createCheckoutSession, createPortalSession } from './api/subscription';
 import useRaceResults from './hooks/useRaceResults';
 import { useAutoSave } from './hooks/useAutoSave';
 import { useLoadPredictions } from './hooks/useLoadPredictions';
@@ -153,11 +153,6 @@ const App: React.FC = () => {
                         <p className="text-sm text-gray-600 mt-2 sm:mt-0">
                           Type commands like "Max P1 at Monza" or "Hamilton wins next 3 races" and they'll be placed on the grid instantly
                         </p>
-                        {email && (
-                          <span className="text-xs text-green-600 font-medium whitespace-nowrap">
-                            ✓ Subscribed as {email}
-                          </span>
-                        )}
                       </div>
                     </div>
                   )}
@@ -374,6 +369,26 @@ const App: React.FC = () => {
           email={email}
           onEmailChange={saveEmail}
         />
+        
+        {/* Manage Subscription Link - only show if subscribed */}
+        {isSubscribed && email && (
+          <div className="fixed bottom-4 right-4 z-40">
+            <button
+              className="text-xs text-gray-500 hover:text-gray-700 underline"
+              onClick={async () => {
+                try {
+                  const session = await createPortalSession(email);
+                  window.location.href = session.url;
+                } catch (error) {
+                  console.error('Error creating portal session:', error);
+                  alert('Failed to open subscription management. Please try again.');
+                }
+              }}
+            >
+              Manage subscription
+            </button>
+          </div>
+        )}
       </div>
     </DndProvider>
   );
