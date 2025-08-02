@@ -21,12 +21,12 @@ interface NaturalLanguageContext {
   driverTeams?: Record<string, string>;
 }
 
-// Hardcoded to local for testing
-const API_BASE_URL = 'http://localhost:8787';
+// Use production URL for Smart Input
+const API_BASE_URL = 'https://f1-points-calculator-api.yuyangchee98.workers.dev';
 
 export async function parseNaturalLanguage(
   text: string, 
-  fingerprint: string,
+  email: string,
   context?: NaturalLanguageContext
 ): Promise<NaturalLanguageResponse> {
   const response = await fetch(`${API_BASE_URL}/api/predictions/parse-natural-language`, {
@@ -34,7 +34,7 @@ export async function parseNaturalLanguage(
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ text, fingerprint, context }),
+    body: JSON.stringify({ text, email, context }),
   });
 
   if (!response.ok) {
