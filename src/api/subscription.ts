@@ -1,5 +1,5 @@
-// Hardcoded to local for testing
-const API_BASE_URL = 'http://localhost:8787';
+// Use production URL for Stripe subscription
+const API_BASE_URL = 'https://f1-points-calculator-api.yuyangchee98.workers.dev';
 
 interface SubscriptionStatus {
   isActive: boolean;
@@ -14,13 +14,13 @@ interface CheckoutSession {
   url: string;
 }
 
-export async function checkSubscriptionStatus(fingerprint: string): Promise<SubscriptionStatus> {
+export async function checkSubscriptionStatus(email: string): Promise<SubscriptionStatus> {
   const response = await fetch(`${API_BASE_URL}/api/subscription/check`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ fingerprint }),
+    body: JSON.stringify({ email }),
   });
 
   if (!response.ok) {
@@ -30,14 +30,13 @@ export async function checkSubscriptionStatus(fingerprint: string): Promise<Subs
   return response.json();
 }
 
-export async function createCheckoutSession(fingerprint: string, email?: string): Promise<CheckoutSession> {
+export async function createCheckoutSession(email: string): Promise<CheckoutSession> {
   const response = await fetch(`${API_BASE_URL}/api/subscription/create-checkout`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      fingerprint,
       email,
       successUrl: `${window.location.origin}?subscription=success`,
       cancelUrl: `${window.location.origin}?subscription=cancelled`,
