@@ -1,0 +1,27 @@
+import { useState, useEffect } from 'react';
+
+const EMAIL_STORAGE_KEY = 'f1_user_email';
+
+export const useUserEmail = () => {
+  const [email, setEmail] = useState<string>('');
+
+  useEffect(() => {
+    // Load email from localStorage on mount
+    const savedEmail = localStorage.getItem(EMAIL_STORAGE_KEY);
+    if (savedEmail) {
+      setEmail(savedEmail);
+    }
+  }, []);
+
+  const saveEmail = (newEmail: string) => {
+    setEmail(newEmail);
+    localStorage.setItem(EMAIL_STORAGE_KEY, newEmail);
+  };
+
+  const clearEmail = () => {
+    setEmail('');
+    localStorage.removeItem(EMAIL_STORAGE_KEY);
+  };
+
+  return { email, saveEmail, clearEmail };
+};

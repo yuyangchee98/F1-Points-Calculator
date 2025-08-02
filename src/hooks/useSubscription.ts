@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from '../store';
 import { checkSubscriptionStatus } from '../api/subscription';
+import { useUserEmail } from './useUserEmail';
 
 const SUBSCRIPTION_KEY = 'f1_smart_input_subscription';
 const SUBSCRIPTION_CHECK_INTERVAL = 1000 * 60 * 60; // Check every hour
@@ -9,19 +8,21 @@ const SUBSCRIPTION_CHECK_INTERVAL = 1000 * 60 * 60; // Check every hour
 export const useSubscription = () => {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const fingerprint = useSelector((state: RootState) => state.predictions.fingerprint);
+  const { email } = useUserEmail();
 
   useEffect(() => {
     const checkStatus = async () => {
-      if (!fingerprint) {
+      if (!email) {
         setIsLoading(false);
+        setIsSubscribed(false);
         return;
       }
 
       try {
-        // Check cached status first
-        const cachedStatus = localStorage.getItem(SUBSCRIPTION_KEY);
-        const lastCheck = localStorage.getItem(`${SUBSCRIPTION_KEY}_lastCheck`);
+        // Check cached status first for this email
+        const cacheKey = `${SUBSCRIPTION_KEY}_${email}`;
+        const cachedStatus = localStorage.getItem(cacheKey);
+        const lastCheck = localStorage.getItem(`${cacheKey}_lastCheck`);
         const now = Date.now();
 
         if (cachedStatus && lastCheck) {
@@ -34,18 +35,19 @@ export const useSubscription = () => {
         }
 
         // Check with API
-        const status = await checkSubscriptionStatus(fingerprint);
+        const status = await checkSubscriptionStatus(email);
         const isActive = status.isActive;
         
-        // Cache the result
-        localStorage.setItem(SUBSCRIPTION_KEY, isActive ? 'active' : 'inactive');
-        localStorage.setItem(`${SUBSCRIPTION_KEY}_lastCheck`, now.toString());
+        // Cache the result for this email
+        localStorage.setItem(cacheKey, isActive ? 'active' : 'inactive');
+        localStorage.setItem(`${cacheKey}_lastCheck`, now.toString());
         
         setIsSubscribed(isActive);
       } catch (error) {
         console.error('Error checking subscription status:', error);
         // Fall back to cached status if available
-        const cachedStatus = localStorage.getItem(SUBSCRIPTION_KEY);
+        const cacheKey = `${SUBSCRIPTION_KEY}_${email}`;
+        const cachedStatus = localStorage.getItem(cacheKey);
         setIsSubscribed(cachedStatus === 'active');
       } finally {
         setIsLoading(false);
@@ -64,23 +66,27 @@ export const useSubscription = () => {
       
       // Re-check subscription status after a short delay
       setTimeout(() => {
-        localStorage.removeItem(`${SUBSCRIPTION_KEY}_lastCheck`);
-        checkStatus();
+        if (email) {
+          const cacheKey = `${SUBSCRIPTION_KEY}_${email}`;
+          localStorage.removeItem(`${cacheKey}_lastCheck`);
+          checkStatus();
+        }
       }, 2000);
     }
-  }, [fingerprint]);
+  }, [email]);
 
   const refreshStatus = async () => {
-    if (fingerprint) {
-      localStorage.removeItem(`${SUBSCRIPTION_KEY}_lastCheck`);
+    if (email) {
+      const cacheKey = `${SUBSCRIPTION_KEY}_${email}`;
+      localStorage.removeItem(`${cacheKey}_lastCheck`);
       setIsLoading(true);
       
       try {
-        const status = await checkSubscriptionStatus(fingerprint);
+        const status = await checkSubscriptionStatus(email);
         const isActive = status.isActive;
         
-        localStorage.setItem(SUBSCRIPTION_KEY, isActive ? 'active' : 'inactive');
-        localStorage.setItem(`${SUBSCRIPTION_KEY}_lastCheck`, Date.now().toString());
+        localStorage.setItem(cacheKey, isActive ? 'active' : 'inactive');
+        localStorage.setItem(`${cacheKey}_lastCheck`, Date.now().toString());
         
         setIsSubscribed(isActive);
       } catch (error) {
