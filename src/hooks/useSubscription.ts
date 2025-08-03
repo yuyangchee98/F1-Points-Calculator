@@ -55,29 +55,68 @@ export const useSubscription = () => {
       }
     };
 
-    checkStatus();
-
-    // Check for subscription parameter in URL (for redirect from Stripe)
+    // Check for subscription parameter in URL BEFORE checking status
     const urlParams = new URLSearchParams(window.location.search);
     const subscriptionParam = urlParams.get('subscription');
     
     if (subscriptionParam === 'success') {
       trackSmartInputAction('SUBSCRIPTION_SUCCESS', email || 'unknown');
+      
+      // Clear ALL cached subscription data for ALL emails
+      const keys = Object.keys(localStorage);
+      keys.forEach(key => {
+        if (key.startsWith(SUBSCRIPTION_KEY)) {
+          localStorage.removeItem(key);
+        }
+      });
+      
       // Clear the parameter from URL
       window.history.replaceState({}, document.title, window.location.pathname);
       
-      // Re-check subscription status after a short delay
-      setTimeout(() => {
-        if (email) {
-          const cacheKey = `${SUBSCRIPTION_KEY}_${email}`;
-          localStorage.removeItem(`${cacheKey}_lastCheck`);
-          checkStatus();
-        }
-      }, 2000);
+      // Force immediate check with retries
+      if (email) {
+        setIsLoading(true);
+        let retries = 0;
+        const maxRetries = 5;
+        
+        const checkWithRetry = async () => {
+          try {
+            const status = await checkSubscriptionStatus(email);
+            if (status.isActive || retries >= maxRetries) {
+              setIsSubscribed(status.isActive);
+              setIsLoading(false);
+              
+              // Cache the result
+              const cacheKey = `${SUBSCRIPTION_KEY}_${email}`;
+              localStorage.setItem(cacheKey, status.isActive ? 'active' : 'inactive');
+              localStorage.setItem(`${cacheKey}_lastCheck`, Date.now().toString());
+            } else {
+              // Retry after a delay
+              retries++;
+              setTimeout(checkWithRetry, 2000);
+            }
+          } catch (error) {
+            console.error('Error checking subscription after success:', error);
+            if (retries < maxRetries) {
+              retries++;
+              setTimeout(checkWithRetry, 2000);
+            } else {
+              setIsLoading(false);
+            }
+          }
+        };
+        
+        // Start checking immediately
+        checkWithRetry();
+      }
     } else if (subscriptionParam === 'cancelled') {
       trackSmartInputAction('SUBSCRIPTION_CANCEL', email || 'unknown');
       // Clear the parameter from URL
       window.history.replaceState({}, document.title, window.location.pathname);
+      checkStatus();
+    } else {
+      // Normal status check
+      checkStatus();
     }
   }, [email]);
 

@@ -68,3 +68,19 @@ export async function createPortalSession(email: string): Promise<{ url: string 
 
   return response.json();
 }
+
+export async function checkSessionStatus(sessionId: string): Promise<{ completed: boolean; email?: string }> {
+  const response = await fetch(`${API_BASE_URL}/api/subscription/check-session`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ sessionId }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to check session status');
+  }
+
+  return response.json();
+}
