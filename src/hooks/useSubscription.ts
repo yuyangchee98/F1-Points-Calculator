@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { checkSubscriptionStatus } from '../api/subscription';
 import { useUserEmail } from './useUserEmail';
+import { trackSmartInputAction } from '../utils/analytics';
 
 const SUBSCRIPTION_KEY = 'f1_smart_input_subscription';
 const SUBSCRIPTION_CHECK_INTERVAL = 1000 * 60 * 60; // Check every hour
@@ -61,6 +62,7 @@ export const useSubscription = () => {
     const subscriptionParam = urlParams.get('subscription');
     
     if (subscriptionParam === 'success') {
+      trackSmartInputAction('SUBSCRIPTION_SUCCESS', email || 'unknown');
       // Clear the parameter from URL
       window.history.replaceState({}, document.title, window.location.pathname);
       
@@ -72,6 +74,10 @@ export const useSubscription = () => {
           checkStatus();
         }
       }, 2000);
+    } else if (subscriptionParam === 'cancelled') {
+      trackSmartInputAction('SUBSCRIPTION_CANCEL', email || 'unknown');
+      // Clear the parameter from URL
+      window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, [email]);
 

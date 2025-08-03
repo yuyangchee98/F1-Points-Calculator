@@ -66,6 +66,20 @@ export const GA_EVENTS = {
     SCROLL_HORIZONTAL: 'horizontal_scroll',
     DROPDOWN_TOGGLE: 'dropdown_toggle',
   },
+  SMART_INPUT: {
+    VIEW_FEATURE: 'smart_input_view',
+    CLICK_TRY_NOW: 'smart_input_try_now',
+    OPEN_SUBSCRIPTION_MODAL: 'smart_input_open_modal',
+    CLOSE_SUBSCRIPTION_MODAL: 'smart_input_close_modal',
+    CLICK_SUBSCRIBE: 'smart_input_subscribe_click',
+    SUBSCRIPTION_SUCCESS: 'smart_input_subscription_success',
+    SUBSCRIPTION_CANCEL: 'smart_input_subscription_cancel',
+    ENTER_EMAIL: 'smart_input_enter_email',
+    USE_COMMAND: 'smart_input_use_command',
+    COMMAND_SUCCESS: 'smart_input_command_success',
+    COMMAND_FAIL: 'smart_input_command_fail',
+    MANAGE_SUBSCRIPTION: 'smart_input_manage_subscription',
+  },
 } as const;
 
 export const trackDriverDrop = (
@@ -150,5 +164,23 @@ export const trackUIAction = (action: keyof typeof GA_EVENTS.UI_ACTIONS, details
     GA_EVENTS.UI_ACTIONS[action],
     'UI Actions',
     details
+  );
+};
+
+export const trackSmartInputAction = (action: keyof typeof GA_EVENTS.SMART_INPUT, details?: string, value?: number) => {
+  trackEvent(
+    GA_EVENTS.SMART_INPUT[action],
+    'Smart Input',
+    details,
+    value
+  );
+};
+
+export const trackSmartInputCommand = (command: string, success: boolean, placementCount?: number) => {
+  trackEvent(
+    success ? GA_EVENTS.SMART_INPUT.COMMAND_SUCCESS : GA_EVENTS.SMART_INPUT.COMMAND_FAIL,
+    'Smart Input',
+    command.substring(0, 50), // Truncate long commands
+    placementCount
   );
 };
