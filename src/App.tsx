@@ -28,7 +28,7 @@ import TypingAnimation from './components/common/TypingAnimation';
 import SubscriptionModal from './components/common/SubscriptionModal';
 import useAppDispatch from './hooks/useAppDispatch';
 import useWindowSize from './hooks/useWindowSize';
-import { trackBuyCoffeeClick, trackFeedbackClick } from './utils/analytics';
+import { trackBuyCoffeeClick, trackFeedbackClick, trackSmartInputAction, trackSmartInputCommand } from './utils/analytics';
 import { CURRENT_SEASON } from './utils/constants';
 
 const App: React.FC = () => {
@@ -177,6 +177,8 @@ const App: React.FC = () => {
                             
                             if (!text) return;
                             
+                            trackSmartInputAction('USE_COMMAND', text.substring(0, 50));
+                            
                             try {
                               // Gather context from Redux store
                               const state = store.getState();
@@ -228,9 +230,11 @@ const App: React.FC = () => {
                                 });
                                 dispatch(calculateResults());
                                 textarea.value = '';
+                                trackSmartInputCommand(text, true, response.placements.length);
                               }
                             } catch (err) {
                               console.error('Error parsing natural language:', err);
+                              trackSmartInputCommand(text, false);
                               if (err instanceof Error && err.message === 'SUBSCRIPTION_REQUIRED') {
                                 // User needs to subscribe
                                 setShowSubscriptionModal(true);
@@ -249,6 +253,7 @@ const App: React.FC = () => {
                           <button
                             className="text-xs text-gray-500 hover:text-gray-700 underline"
                             onClick={async () => {
+                              trackSmartInputAction('MANAGE_SUBSCRIPTION', email);
                               try {
                                 const session = await createPortalSession(email);
                                 window.location.href = session.url;
@@ -291,7 +296,10 @@ const App: React.FC = () => {
                           <div className="hidden md:block">
                             <button 
                               className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-md shadow-lg transition font-semibold text-lg"
-                              onClick={() => setShowSubscriptionModal(true)}
+                              onClick={() => {
+                                trackSmartInputAction('CLICK_TRY_NOW');
+                                setShowSubscriptionModal(true);
+                              }}
                             >
                               Try Now
                             </button>
@@ -314,6 +322,7 @@ const App: React.FC = () => {
                                     if (e.key === 'Enter') {
                                       const input = e.target as HTMLInputElement;
                                       if (input.value && input.value.includes('@')) {
+                                        trackSmartInputAction('ENTER_EMAIL', input.value);
                                         saveEmail(input.value);
                                       }
                                     }
@@ -335,6 +344,8 @@ const App: React.FC = () => {
                                   alert('Please enter your email first');
                                   return;
                                 }
+                                
+                                trackSmartInputAction('CLICK_SUBSCRIBE', email);
                                 
                                 try {
                                   const session = await createCheckoutSession(email);

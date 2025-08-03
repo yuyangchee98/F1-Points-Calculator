@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createCheckoutSession } from '../../api/subscription';
+import { trackSmartInputAction } from '../../utils/analytics';
 
 interface SubscriptionModalProps {
   isOpen: boolean;
@@ -17,6 +18,12 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
   const [localEmail, setLocalEmail] = useState(email);
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {
+    if (isOpen) {
+      trackSmartInputAction('OPEN_SUBSCRIPTION_MODAL');
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const handleSubmit = async () => {
@@ -25,6 +32,7 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
       return;
     }
 
+    trackSmartInputAction('CLICK_SUBSCRIBE', localEmail);
     setIsLoading(true);
     try {
       onEmailChange(localEmail);
@@ -81,7 +89,10 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
 
           <div className="flex gap-3">
             <button
-              onClick={onClose}
+              onClick={() => {
+                trackSmartInputAction('CLOSE_SUBSCRIPTION_MODAL', 'cancel_button');
+                onClose();
+              }}
               className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition"
             >
               Cancel
