@@ -243,6 +243,25 @@ const App: React.FC = () => {
                           Apply Predictions
                         </button>
                       </div>
+                      {/* Manage Subscription Link */}
+                      {email && (
+                        <div className="absolute bottom-2 right-2">
+                          <button
+                            className="text-xs text-gray-500 hover:text-gray-700 underline"
+                            onClick={async () => {
+                              try {
+                                const session = await createPortalSession(email);
+                                window.location.href = session.url;
+                              } catch (error) {
+                                console.error('Error creating portal session:', error);
+                                alert('Failed to open subscription management. Please try again.');
+                              }
+                            }}
+                          >
+                            Manage subscription
+                          </button>
+                        </div>
+                      )}
                     </>
                   ) : (
                     <div className="text-center py-8">
@@ -369,26 +388,6 @@ const App: React.FC = () => {
           email={email}
           onEmailChange={saveEmail}
         />
-        
-        {/* Manage Subscription Link - only show if subscribed */}
-        {isSubscribed && email && (
-          <div className="fixed bottom-4 right-4 z-40">
-            <button
-              className="text-xs text-gray-500 hover:text-gray-700 underline"
-              onClick={async () => {
-                try {
-                  const session = await createPortalSession(email);
-                  window.location.href = session.url;
-                } catch (error) {
-                  console.error('Error creating portal session:', error);
-                  alert('Failed to open subscription management. Please try again.');
-                }
-              }}
-            >
-              Manage subscription
-            </button>
-          </div>
-        )}
       </div>
     </DndProvider>
   );
