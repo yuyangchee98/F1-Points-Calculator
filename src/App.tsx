@@ -7,7 +7,7 @@ import { RootState, store } from './store';
 import { calculateResults } from './store/slices/resultsSlice';
 import { moveDriver } from './store/slices/gridSlice';
 import { parseNaturalLanguage } from './api/naturalLanguage';
-import { createCheckoutSession, createPortalSession, checkSessionStatus } from './api/subscription';
+import { createCheckoutSession, createPortalSession } from './api/subscription';
 import useRaceResults from './hooks/useRaceResults';
 import { useAutoSave } from './hooks/useAutoSave';
 import { useLoadPredictions } from './hooks/useLoadPredictions';
@@ -43,7 +43,7 @@ const App: React.FC = () => {
   const selectedPointsSystem = useSelector((state: RootState) => state.ui.selectedPointsSystem);
   const { isMobile } = useWindowSize();
   const raceGridScrollRef = React.useRef<HTMLDivElement>(null);
-  const { isSubscribed } = useSubscription();
+  const { isSubscribed, verificationMessage } = useSubscription();
   const { email, saveEmail } = useUserEmail();
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
 
@@ -137,6 +137,15 @@ const App: React.FC = () => {
               {isLoadingPredictions && (
                 <div className="text-center py-4 text-gray-600">
                   <span className="animate-pulse">Loading your saved predictions...</span>
+                </div>
+              )}
+              
+              {/* Show verification message */}
+              {verificationMessage && (
+                <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-center text-blue-700 font-medium animate-pulse">
+                    {verificationMessage}
+                  </p>
                 </div>
               )}
               
@@ -296,14 +305,41 @@ const App: React.FC = () => {
                           <div className="hidden md:block">
                             <button 
                               className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-md shadow-lg transition font-semibold text-lg"
-                              onClick={() => {
-                                trackSmartInputAction('CLICK_TRY_NOW');
-                                setShowSubscriptionModal(true);
+                              onClick={async () => {
+                                // Check if user has subscription data in localStorage
+                                const hasSubscriptionData = email && localStorage.getItem(`f1_smart_input_subscription_${email}`);
+                                
+                                trackSmartInputAction(hasSubscriptionData ? 'CONFIRM_SUBSCRIPTION' : 'CLICK_TRY_NOW');
+                                
+                                // If email exists, check subscription status first
+                                if (email) {
+                                  try {
+                                    // Clear cache to force fresh check
+                                    Object.keys(localStorage).forEach(key => {
+                                      if (key.includes('f1_smart_input_subscription')) {
+                                        localStorage.removeItem(key);
+                                      }
+                                    });
+                                    
+                                    // Force reload to check subscription
+                                    window.location.reload();
+                                  } catch (error) {
+                                    console.error('Error checking subscription:', error);
+                                  }
+                                } else {
+                                  setShowSubscriptionModal(true);
+                                }
                               }}
                             >
-                              Try Now
+                              {email && localStorage.getItem(`f1_smart_input_subscription_${email}`) 
+                                ? 'Confirm Subscription' 
+                                : 'Try Now'}
                             </button>
-                            <p className="text-xs text-gray-500 mt-2">$4.99/month • Cancel anytime</p>
+                            <p className="text-xs text-gray-500 mt-2">
+                              {email && localStorage.getItem(`f1_smart_input_subscription_${email}`)
+                                ? 'May take up to several minutes to confirm'
+                                : '$4.99/month • Cancel anytime'}
+                            </p>
                           </div>
                           
                           {/* Mobile view - keep the original inline flow */}
@@ -349,31 +385,6 @@ const App: React.FC = () => {
                                 
                                 try {
                                   const session = await createCheckoutSession(email);
-                                  
-                                  // Start polling for session completion
-                                  const pollInterval = setInterval(async () => {
-                                    try {
-                                      const status = await checkSessionStatus(session.sessionId);
-                                      if (status.completed) {
-                                        clearInterval(pollInterval);
-                                        // Clear all subscription cache
-                                        Object.keys(localStorage).forEach(key => {
-                                          if (key.includes('f1_smart_input_subscription')) {
-                                            localStorage.removeItem(key);
-                                          }
-                                        });
-                                        // Reload to refresh subscription status
-                                        window.location.reload();
-                                      }
-                                    } catch (err) {
-                                      // Continue polling
-                                    }
-                                  }, 2000); // Check every 2 seconds
-                                  
-                                  // Stop polling after 10 minutes
-                                  setTimeout(() => clearInterval(pollInterval), 600000);
-                                  
-                                  // Redirect to Stripe
                                   window.location.href = session.url;
                                 } catch (error) {
                                   console.error('Error creating checkout session:', error);
