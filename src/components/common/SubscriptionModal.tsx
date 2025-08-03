@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { createCheckoutSession } from '../../api/subscription';
+import { createCheckoutSession, checkSessionStatus } from '../../api/subscription';
 import { trackSmartInputAction } from '../../utils/analytics';
 
 interface SubscriptionModalProps {
@@ -37,6 +37,31 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
     try {
       onEmailChange(localEmail);
       const session = await createCheckoutSession(localEmail);
+      
+      // Start polling for session completion
+      const pollInterval = setInterval(async () => {
+        try {
+          const status = await checkSessionStatus(session.sessionId);
+          if (status.completed) {
+            clearInterval(pollInterval);
+            // Clear all subscription cache
+            Object.keys(localStorage).forEach(key => {
+              if (key.includes('f1_smart_input_subscription')) {
+                localStorage.removeItem(key);
+              }
+            });
+            // Reload to refresh subscription status
+            window.location.reload();
+          }
+        } catch (err) {
+          // Continue polling
+        }
+      }, 2000); // Check every 2 seconds
+      
+      // Stop polling after 10 minutes
+      setTimeout(() => clearInterval(pollInterval), 600000);
+      
+      // Redirect to Stripe
       window.location.href = session.url;
     } catch (error) {
       console.error('Error creating checkout session:', error);
