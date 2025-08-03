@@ -9,6 +9,7 @@ const SUBSCRIPTION_CHECK_INTERVAL = 1000 * 60 * 60; // Check every hour
 export const useSubscription = () => {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [verificationMessage, setVerificationMessage] = useState('');
   const { email } = useUserEmail();
 
   useEffect(() => {
@@ -73,41 +74,56 @@ export const useSubscription = () => {
       // Clear the parameter from URL
       window.history.replaceState({}, document.title, window.location.pathname);
       
-      // Force immediate check with retries
+      // Show verification message and wait before checking
       if (email) {
         setIsLoading(true);
-        let retries = 0;
-        const maxRetries = 5;
+        setVerificationMessage('🎉 Payment successful! Verifying your subscription...');
         
-        const checkWithRetry = async () => {
-          try {
-            const status = await checkSubscriptionStatus(email);
-            if (status.isActive || retries >= maxRetries) {
-              setIsSubscribed(status.isActive);
-              setIsLoading(false);
-              
-              // Cache the result
-              const cacheKey = `${SUBSCRIPTION_KEY}_${email}`;
-              localStorage.setItem(cacheKey, status.isActive ? 'active' : 'inactive');
-              localStorage.setItem(`${cacheKey}_lastCheck`, Date.now().toString());
-            } else {
-              // Retry after a delay
-              retries++;
-              setTimeout(checkWithRetry, 2000);
+        // Wait 5 seconds to let Stripe process
+        setTimeout(() => {
+          setVerificationMessage('Almost there, finalizing your access...');
+          
+          let retries = 0;
+          const maxRetries = 3;
+          
+          const checkWithRetry = async () => {
+            try {
+              const status = await checkSubscriptionStatus(email);
+              if (status.isActive) {
+                setIsSubscribed(true);
+                setIsLoading(false);
+                setVerificationMessage('');
+                
+                // Cache the result
+                const cacheKey = `${SUBSCRIPTION_KEY}_${email}`;
+                localStorage.setItem(cacheKey, 'active');
+                localStorage.setItem(`${cacheKey}_lastCheck`, Date.now().toString());
+              } else if (retries >= maxRetries) {
+                setIsLoading(false);
+                setVerificationMessage('');
+                // Show a helpful message
+                alert('Subscription is still processing. Please click "Try Now" in a moment to refresh.');
+              } else {
+                // Retry after a delay
+                retries++;
+                setVerificationMessage(`Checking subscription status... (${retries}/${maxRetries})`);
+                setTimeout(checkWithRetry, 3000);
+              }
+            } catch (error) {
+              console.error('Error checking subscription after success:', error);
+              if (retries < maxRetries) {
+                retries++;
+                setTimeout(checkWithRetry, 3000);
+              } else {
+                setIsLoading(false);
+                setVerificationMessage('');
+                alert('Unable to verify subscription. Please try refreshing the page.');
+              }
             }
-          } catch (error) {
-            console.error('Error checking subscription after success:', error);
-            if (retries < maxRetries) {
-              retries++;
-              setTimeout(checkWithRetry, 2000);
-            } else {
-              setIsLoading(false);
-            }
-          }
-        };
-        
-        // Start checking immediately
-        checkWithRetry();
+          };
+          
+          checkWithRetry();
+        }, 5000); // Wait 5 seconds before first check
       }
     } else if (subscriptionParam === 'cancelled') {
       trackSmartInputAction('SUBSCRIPTION_CANCEL', email || 'unknown');
@@ -142,5 +158,5 @@ export const useSubscription = () => {
     }
   };
 
-  return { isSubscribed, isLoading, refreshStatus };
+  return { isSubscribed, isLoading, refreshStatus, verificationMessage };
 };
