@@ -69,6 +69,7 @@ export const GA_EVENTS = {
   SMART_INPUT: {
     VIEW_FEATURE: 'smart_input_view',
     CLICK_TRY_NOW: 'smart_input_try_now',
+    CONFIRM_SUBSCRIPTION: 'smart_input_confirm_subscription',
     OPEN_SUBSCRIPTION_MODAL: 'smart_input_open_modal',
     CLOSE_SUBSCRIPTION_MODAL: 'smart_input_close_modal',
     CLICK_SUBSCRIBE: 'smart_input_subscribe_click',
