@@ -7,7 +7,7 @@ import { RootState, store } from './store';
 import { calculateResults } from './store/slices/resultsSlice';
 import { moveDriver } from './store/slices/gridSlice';
 import { parseNaturalLanguage } from './api/naturalLanguage';
-import { createCheckoutSession, createPortalSession } from './api/subscription';
+import { createCheckoutSession, createPortalSession, checkSessionStatus } from './api/subscription';
 import useRaceResults from './hooks/useRaceResults';
 import { useAutoSave } from './hooks/useAutoSave';
 import { useLoadPredictions } from './hooks/useLoadPredictions';
@@ -349,6 +349,31 @@ const App: React.FC = () => {
                                 
                                 try {
                                   const session = await createCheckoutSession(email);
+                                  
+                                  // Start polling for session completion
+                                  const pollInterval = setInterval(async () => {
+                                    try {
+                                      const status = await checkSessionStatus(session.sessionId);
+                                      if (status.completed) {
+                                        clearInterval(pollInterval);
+                                        // Clear all subscription cache
+                                        Object.keys(localStorage).forEach(key => {
+                                          if (key.includes('f1_smart_input_subscription')) {
+                                            localStorage.removeItem(key);
+                                          }
+                                        });
+                                        // Reload to refresh subscription status
+                                        window.location.reload();
+                                      }
+                                    } catch (err) {
+                                      // Continue polling
+                                    }
+                                  }, 2000); // Check every 2 seconds
+                                  
+                                  // Stop polling after 10 minutes
+                                  setTimeout(() => clearInterval(pollInterval), 600000);
+                                  
+                                  // Redirect to Stripe
                                   window.location.href = session.url;
                                 } catch (error) {
                                   console.error('Error creating checkout session:', error);
