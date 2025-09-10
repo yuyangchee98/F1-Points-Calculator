@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { selectDriverStandings, selectTeamStandings } from '../../store/selectors/resultsSelectors';
 import { setActiveTab } from '../../store/slices/uiSlice';
 import DriverStandingsTable from './DriverStandingsTable';
 import TeamStandingsTable from './TeamStandingsTable';
-import DriverPointsChart from '../charts/DriverPointsChart';
-import TeamPointsChart from '../charts/TeamPointsChart';
+import { DriverPointsChart, TeamPointsChart } from '../charts/LazyCharts';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { trackStandingsTabChange } from '../../utils/analytics';
 
@@ -104,7 +103,13 @@ const StandingsSidebar: React.FC = () => {
                 Driver Championship
               </h3>
               <div className="p-3">
-                <DriverPointsChart />
+                <Suspense fallback={
+                  <div className="h-64 flex items-center justify-center">
+                    <div className="text-gray-500">Loading chart...</div>
+                  </div>
+                }>
+                  <DriverPointsChart />
+                </Suspense>
               </div>
             </div>
             
@@ -114,7 +119,13 @@ const StandingsSidebar: React.FC = () => {
                 Constructor Championship
               </h3>
               <div className="p-3">
-                <TeamPointsChart />
+                <Suspense fallback={
+                  <div className="h-64 flex items-center justify-center">
+                    <div className="text-gray-500">Loading chart...</div>
+                  </div>
+                }>
+                  <TeamPointsChart />
+                </Suspense>
               </div>
             </div>
           </div>
