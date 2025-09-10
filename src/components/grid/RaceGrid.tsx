@@ -53,10 +53,11 @@ const RaceGrid: React.FC<RaceGridProps> = ({ scrollRef }) => {
   }, [races, scrollRef, isMobile, isTablet]);
   
   return (
-    <div ref={scrollRef} className="overflow-x-auto pb-4 shadow-md rounded-lg border border-gray-200">
+    <div className="shadow-md rounded-lg border border-gray-200">
       <div 
+        ref={scrollRef}
         id="race-grid"
-        className="race-grid" 
+        className="race-grid overflow-x-auto pb-4" 
         style={{ 
           gridTemplateColumns: `80px repeat(${races.length}, minmax(${getMinColumnWidth()}, 1fr))`,
           gridAutoRows: 'minmax(40px, auto)'
