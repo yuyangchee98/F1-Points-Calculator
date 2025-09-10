@@ -1,17 +1,25 @@
 import React, { useState, useEffect } from 'react';
+import { DemoConfig } from './demos/FerrariItalianDemo';
+import { FerrariItalianDemo } from './demos/FerrariItalianDemo';
+import { NorrisRemainingDemo } from './demos/NorrisRemainingDemo';
+
+const demos: DemoConfig[] = [
+  FerrariItalianDemo,
+  NorrisRemainingDemo
+];
 
 const SmartInputDemo: React.FC = () => {
   const [typedText, setTypedText] = useState('');
   const [showCursor, setShowCursor] = useState(false);
   const [driversVisible, setDriversVisible] = useState(false);
   
-  const command = "Ferrari 1-2 at Italian GP";
+  // Randomly select a demo on mount
+  const [currentDemo] = useState(() => {
+    const randomIndex = Math.floor(Math.random() * demos.length);
+    return demos[randomIndex];
+  });
   
-  // Driver data matching EXACTLY the webapp
-  const drivers = {
-    HAM: { name: 'HAMILTON', team: 'Ferrari', color: '#DC0000' },
-    LEC: { name: 'LECLERC', team: 'Ferrari', color: '#DC0000' },
-  };
+  const command = currentDemo.command;
   
   useEffect(() => {
     // Start typing after a short delay
@@ -67,7 +75,7 @@ const SmartInputDemo: React.FC = () => {
       clearTimeout(startDelay);
       clearInterval(resetInterval);
     };
-  }, []);
+  }, [command]);
   
   // Cursor blink effect
   const [cursorVisible, setCursorVisible] = useState(true);
@@ -78,9 +86,9 @@ const SmartInputDemo: React.FC = () => {
     return () => clearInterval(blinkInterval);
   }, []);
   
-  // EXACT driver card from the video/webapp
-  const renderDriverCard = (driverCode: string, opacity: number = 1) => {
-    const driver = drivers[driverCode as keyof typeof drivers];
+  // Render driver card based on position
+  const renderDriverCard = (position: string, raceIndex: number) => {
+    const driver = currentDemo.drivers[position];
     if (!driver) return null;
 
     return (
@@ -102,7 +110,7 @@ const SmartInputDemo: React.FC = () => {
             ? 'scale(1)' 
             : 'scale(0.95)',
           transition: 'all 0.4s ease-out',
-          transitionDelay: opacity === 1 ? '0ms' : '100ms',
+          transitionDelay: `${raceIndex * 100}ms`,
           boxSizing: 'border-box',
         }}>
         {/* Team color gradient overlay - matching webapp exactly */}
@@ -146,9 +154,13 @@ const SmartInputDemo: React.FC = () => {
     );
   };
   
+  // Calculate grid dimensions based on demo
+  const gridColumns = currentDemo.races.length;
+  const gridRows = currentDemo.positions.length;
+  
   return (
     <div style={{ width: '380px', maxWidth: '100%', margin: '0 auto' }}>
-      {/* Input Box - EXACT from video */}
+      {/* Input Box */}
       <div style={{ position: 'relative', marginBottom: '15px', height: '38px' }}>
         <div
           style={{
@@ -186,13 +198,13 @@ const SmartInputDemo: React.FC = () => {
         
       </div>
 
-      {/* Race Grid - EXACT from video */}
+      {/* Race Grid */}
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: '70px repeat(3, 105px)',
+          gridTemplateColumns: `70px repeat(${gridColumns}, 105px)`,
           gap: '8px',
-          gridTemplateRows: 'auto auto auto',
+          gridTemplateRows: `auto repeat(${gridRows}, auto)`,
         }}
       >
         {/* Headers */}
@@ -208,52 +220,32 @@ const SmartInputDemo: React.FC = () => {
           Position
         </div>
         
-        {/* Previous races headers - blurred */}
-        {[
-          { name: 'Dutch', code: 'NED' },
-          { name: 'Belgian', code: 'BEL' },
-        ].map((race) => (
+        {/* Race headers */}
+        {currentDemo.races.map((race) => (
           <div 
             key={race.code}
             style={{
-              backgroundColor: '#6b7280',
+              backgroundColor: race.blur ? '#6b7280' : '#374151',
               color: 'white',
               padding: '8px',
               borderRadius: '6px',
               display: 'flex',
-              flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: 'bold',
-              opacity: 0.5,
-              filter: 'blur(8px)',
+              fontSize: '11px',
+              opacity: race.blur ? 0.5 : 1,
+              filter: race.blur ? 'blur(8px)' : 'none',
             }}
           >
-            <div style={{ fontSize: '12px' }}>{race.code}</div>
-            <div style={{ fontSize: '10px', opacity: 0.8 }}>{race.name}</div>
+            {race.flag && `${race.flag} `}{race.name}
           </div>
         ))}
         
-        {/* Italian GP header */}
-        <div style={{
-          backgroundColor: '#DC0000',
-          color: 'white',
-          padding: '8px',
-          borderRadius: '6px',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontWeight: 'bold',
-        }}>
-          <div style={{ fontSize: '12px' }}>ITA</div>
-          <div style={{ fontSize: '10px', opacity: 0.9 }}>Italian</div>
-        </div>
-        
-        {/* P1 and P2 rows */}
-        {[1, 2].map((position) => {
-          const italianDriver = position === 1 ? 'HAM' : 'LEC';
-
+        {/* Position rows */}
+        {currentDemo.positions.map((position, posIndex) => {
+          const posNumber = parseInt(position.replace('P', ''));
+          
           return (
             <React.Fragment key={position}>
               {/* Position number */}
@@ -268,60 +260,37 @@ const SmartInputDemo: React.FC = () => {
                 justifyContent: 'center',
                 color: '#374151',
               }}>
-                {position}
+                {posNumber}
               </div>
               
-              {/* Dutch position - empty/blurred cells */}
-              <div
-                style={{
-                  backgroundColor: 'white',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '6px',
-                  minHeight: '45px',
-                  padding: '8px',
-                  filter: 'blur(10px)',
-                  opacity: 0.3,
-                }}
-              >
-                <div style={{
-                  backgroundColor: '#f3f4f6',
-                  height: '100%',
-                  borderRadius: '4px',
-                }} />
-              </div>
-
-              {/* Belgian position - empty/blurred cells */}
-              <div
-                style={{
-                  backgroundColor: 'white',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '6px',
-                  minHeight: '45px',
-                  padding: '8px',
-                  filter: 'blur(10px)',
-                  opacity: 0.3,
-                }}
-              >
-                <div style={{
-                  backgroundColor: '#f3f4f6',
-                  height: '100%',
-                  borderRadius: '4px',
-                }} />
-              </div>
-              
-              {/* Italian position - starts empty, then Ferrari drivers appear */}
-              <div style={{
-                backgroundColor: 'white',
-                border: '1px solid #e5e7eb',
-                borderRadius: '6px',
-                height: '48px',
-                padding: '3px',
-                position: 'relative',
-                overflow: 'hidden',
-                boxSizing: 'border-box',
-              }}>
-                {renderDriverCard(italianDriver, position === 1 ? 1 : 0.9)}
-              </div>
+              {/* Race cells */}
+              {currentDemo.races.map((race, raceIndex) => (
+                <div
+                  key={`${race.code}-${position}`}
+                  style={{
+                    backgroundColor: 'white',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '6px',
+                    height: '48px',
+                    padding: race.blur ? '8px' : '3px',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    boxSizing: 'border-box',
+                    filter: race.blur ? 'blur(10px)' : 'none',
+                    opacity: race.blur ? 0.3 : 1,
+                  }}
+                >
+                  {race.blur ? (
+                    <div style={{
+                      backgroundColor: '#f3f4f6',
+                      height: '100%',
+                      borderRadius: '4px',
+                    }} />
+                  ) : (
+                    renderDriverCard(position, raceIndex)
+                  )}
+                </div>
+              ))}
             </React.Fragment>
           );
         })}
