@@ -26,6 +26,7 @@ import HorizontalScrollBar from './components/common/HorizontalScrollBar';
 import FAQ from './components/common/FAQ';
 import TypingAnimation from './components/common/TypingAnimation';
 import SubscriptionModal from './components/common/SubscriptionModal';
+import SmartInputDemo from './components/common/SmartInputDemo';
 import useAppDispatch from './hooks/useAppDispatch';
 import useWindowSize from './hooks/useWindowSize';
 import { trackBuyCoffeeClick, trackFeedbackClick, trackSmartInputAction, trackSmartInputCommand } from './utils/analytics';
@@ -174,7 +175,7 @@ const App: React.FC = () => {
                           className="w-full p-3 bg-white border border-gray-300 rounded-md shadow-sm 
                                     focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
                                     transition duration-150 ease-in-out text-sm hover:border-gray-400"
-                          placeholder='Try: "Max wins next 3 races" or "Championship leader P1 for all remaining races"'
+                          placeholder='"Max wins next 3 races" or "Championship leader P1 for all remaining races"'
                           rows={3}
                         />
                         <div className="mt-4">
@@ -287,33 +288,17 @@ const App: React.FC = () => {
                     <div className="bg-white rounded-md p-6 border border-gray-200">
                       <div className="flex flex-col md:flex-row md:items-center md:gap-8">
                         {/* Left side - Description */}
-                        <div className="flex-1 mb-6 md:mb-0 text-center md:text-left">
-                          <h4 className="text-xl font-bold mb-3">What is Smart Input?</h4>
-                          <p className="text-sm text-gray-600 mb-4">
-                            Type natural commands like "Max wins at Monza" or "Hamilton P1 next 3 races" 
-                            and watch as drivers are instantly placed on the grid. No more clicking through 
-                            hundreds of positions - just type what you want and it happens.
-                          </p>
+                        <div className="flex-1 mb-6 md:mb-0 text-center">
+                          <h4 className="text-xl font-bold mb-3">Try Smart Input: <span className="font-normal text-sm text-gray-600">Type what you want to happen and watch the grid update instantly. <span className="text-xs text-gray-500">Watch demo ↓</span></span></h4>
                           
-                          {/* Video Demo */}
-                          <div className="mb-4">
-                            <video 
-                              autoPlay 
-                              loop 
-                              muted 
-                              playsInline
-                              className="w-full max-w-md mx-auto md:mx-0 rounded-lg shadow-lg"
-                              style={{ maxHeight: '300px' }}
-                            >
-                              <source src="/smart-input-demo.webm" type="video/webm" />
-                              Your browser does not support the video tag.
-                            </video>
-                          </div>
-                          
-                          <div className="flex justify-center md:justify-start">
-                            <TypingAnimation examples={exampleCommands} />
+                          {/* Interactive Demo */}
+                          <div className="mb-4 p-4 border-2 border-gray-200 rounded-xl bg-gradient-to-br from-gray-50 to-white">
+                            <SmartInputDemo />
                           </div>
                         </div>
+                        
+                        {/* Vertical divider - only on desktop */}
+                        <div className="hidden md:block w-px bg-gray-200 self-stretch mx-4"></div>
                         
                         {/* Right side - CTA */}
                         <div className="text-center">
