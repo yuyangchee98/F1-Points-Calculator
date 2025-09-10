@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ChartDataset, TooltipItem } from 'chart.js';
@@ -8,10 +8,11 @@ import { teamById } from '../../data/teams';
 import { races } from '../../data/races';
 import './responsive-chart.css';
 
-// Register Chart.js components (if not already registered)
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
-
 const TeamPointsChart: React.FC = () => {
+  // Register Chart.js components on mount
+  useEffect(() => {
+    ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+  }, []);
   // Get top 5 teams and their points history for the chart
   const topTeams = useSelector((state: RootState) => selectTopTeams(state, 5));
   const teamPoints = useSelector((state: RootState) => selectTeamPointsForCharts(state, 5));

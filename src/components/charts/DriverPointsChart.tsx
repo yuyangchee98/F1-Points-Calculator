@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ChartDataset, TooltipItem } from 'chart.js';
@@ -9,10 +9,11 @@ import { teamById } from '../../data/teams';
 import { races } from '../../data/races';
 import { normalizeTeamId } from '../../utils/teamHelper';
 
-// Register Chart.js components
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
-
 const DriverPointsChart: React.FC = () => {
+  // Register Chart.js components on mount
+  useEffect(() => {
+    ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+  }, []);
   // Get top 5 drivers and their points history for the chart
   const topDrivers = useSelector((state: RootState) => selectTopDrivers(state, 5));
   const driverPoints = useSelector((state: RootState) => selectDriverPointsForCharts(state, 5));
