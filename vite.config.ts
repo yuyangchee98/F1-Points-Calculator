@@ -39,13 +39,11 @@ export default defineConfig({
           if (id.includes('chart.js') || id.includes('react-chartjs-2')) {
             return undefined;
           }
-          if (id.includes('react') && !id.includes('react-chartjs') && !id.includes('react-dnd')) {
+          // Include react-dnd with React to ensure proper load order
+          if (id.includes('react')) {
             return 'react-vendor';
           }
-          if (id.includes('react-dnd')) {
-            return 'dnd';
-          }
-          if (id.includes('@reduxjs/toolkit')) {
+          if (id.includes('@reduxjs/toolkit') || id.includes('redux')) {
             return 'redux';
           }
         }
