@@ -52,8 +52,8 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
           <h2 className="text-2xl font-bold mb-4">Unlock Smart Input</h2>
           
           <div className="mb-6">
-            <p className="text-4xl font-bold text-red-600 mb-2">$4.99</p>
-            <p className="text-gray-600">per month</p>
+            <p className="text-4xl font-bold text-red-600 mb-2">$0.49</p>
+            <p className="text-gray-600">for 24 hours of usage</p>
           </div>
 
           <div className="mb-6 text-left">

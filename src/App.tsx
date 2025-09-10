@@ -338,15 +338,15 @@ const App: React.FC = () => {
                             <p className="text-xs text-gray-500 mt-2">
                               {email && localStorage.getItem(`f1_smart_input_subscription_${email}`)
                                 ? 'May take up to several minutes to confirm'
-                                : '$4.99/month • Cancel anytime'}
+                                : '$0.49 for 24 hours of usage • Cancel anytime'}
                             </p>
                           </div>
                           
                           {/* Mobile view - keep the original inline flow */}
                           <div className="md:hidden">
                             <h4 className="text-xl font-bold mb-2">Unlock Smart Input</h4>
-                            <p className="text-4xl font-bold text-red-600 mb-1">$4.99</p>
-                            <p className="text-sm text-gray-600 mb-4">per month</p>
+                            <p className="text-4xl font-bold text-red-600 mb-1">$0.49</p>
+                            <p className="text-sm text-gray-600 mb-4">for 24 hours of usage</p>
                             
                             {!email && (
                               <div className="mb-4">
