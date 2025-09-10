@@ -34,11 +34,20 @@ export default defineConfig({
         chunkFileNames: 'assets/[name].[hash].js',
         assetFileNames: 'assets/[name].[hash].[ext]',
         // Manual chunks for better caching
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom', 'react-redux'],
-          'dnd': ['react-dnd', 'react-dnd-html5-backend'],
-          'charts': ['chart.js', 'react-chartjs-2'],
-          'redux': ['@reduxjs/toolkit']
+        manualChunks: (id) => {
+          // Don't manually chunk chart.js - let it be lazy loaded
+          if (id.includes('chart.js') || id.includes('react-chartjs-2')) {
+            return undefined;
+          }
+          if (id.includes('react') && !id.includes('react-chartjs') && !id.includes('react-dnd')) {
+            return 'react-vendor';
+          }
+          if (id.includes('react-dnd')) {
+            return 'dnd';
+          }
+          if (id.includes('@reduxjs/toolkit')) {
+            return 'redux';
+          }
         }
       }
     }
