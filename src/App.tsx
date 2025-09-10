@@ -294,6 +294,22 @@ const App: React.FC = () => {
                             and watch as drivers are instantly placed on the grid. No more clicking through 
                             hundreds of positions - just type what you want and it happens.
                           </p>
+                          
+                          {/* Video Demo */}
+                          <div className="mb-4">
+                            <video 
+                              autoPlay 
+                              loop 
+                              muted 
+                              playsInline
+                              className="w-full max-w-md mx-auto md:mx-0 rounded-lg shadow-lg"
+                              style={{ maxHeight: '300px' }}
+                            >
+                              <source src="/smart-input-demo.webm" type="video/webm" />
+                              Your browser does not support the video tag.
+                            </video>
+                          </div>
+                          
                           <div className="flex justify-center md:justify-start">
                             <TypingAnimation examples={exampleCommands} />
                           </div>
