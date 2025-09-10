@@ -21,10 +21,8 @@ import InfoBanner from './components/common/InfoBanner';
 import IntroductionSection from './components/common/IntroductionSection';
 import ToastContainer from './components/common/ToastContainer';
 import SaveStatus from './components/common/SaveStatus';
-import DriverSelection from './components/drivers/DriverSelection';
 import HorizontalScrollBar from './components/common/HorizontalScrollBar';
 import FAQ from './components/common/FAQ';
-import TypingAnimation from './components/common/TypingAnimation';
 import SubscriptionModal from './components/common/SubscriptionModal';
 import InputSections from './components/common/InputSections';
 const SmartInputDemo = React.lazy(() => import('./components/common/SmartInputDemo'));
@@ -58,24 +56,6 @@ const App: React.FC = () => {
     localStorage.setItem('f1_input_order', newValue ? 'smart-first' : 'drivers-first');
   };
 
-  // Example commands for typing animation
-  const exampleCommands = [
-    "Max wins at Monza",
-    "Hamilton P1 next 3 races",
-    "Verstappen wins all remaining races",
-    "Norris podium at Silverstone",
-    "Ferrari 1-2 at Italian GP",
-    "Russell P5 at Hungary",
-    "Championship leader wins Monaco",
-    "Alonso points at Spanish GP",
-    "Red Bull 1-2 next sprint",
-    "Mercedes double podium Vegas",
-    "Leclerc pole to win at home",
-    "Top 3 stays same at Suzuka",
-    "McLaren outscores Ferrari today",
-    "Sainz beats teammate next race",
-    "Rookie scores first points"
-  ];
 
   useEffect(() => {
     // Initialize UI state from localStorage/URL

@@ -329,7 +329,7 @@ const SmartInputDemo: React.FC = () => {
         ))}
         
         {/* Position rows */}
-        {currentDemo.positions.map((position, posIndex) => {
+        {currentDemo.positions.map((position) => {
           const posNumber = parseInt(position.replace('P', ''));
           
           return (

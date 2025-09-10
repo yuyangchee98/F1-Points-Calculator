@@ -13,14 +13,14 @@ const PositionColumn: React.FC<PositionColumnProps> = ({ position, mode = 'posit
   // In standings mode, find the driver at this championship position
   const standingDriver = mode === 'standings' && standings[position - 1];
   const driver = standingDriver ? driverById[standingDriver.driverId] : null;
-  const team = driver ? teamById[driver.teamId] : null;
+  const team = driver ? teamById[driver.team] : null;
   const teamColor = team?.color || '#666666';
   
   return (
     <div 
       className="position sticky left-0 z-10 flex items-center justify-center" 
       data-position={position}
-      title={mode === 'standings' && driver ? `${driver.name} - ${standingDriver.points} pts` : `Position ${position}`}
+      title={mode === 'standings' && driver && standingDriver ? `${driver.name} - ${standingDriver.points} pts` : `Position ${position}`}
     >
       {mode === 'position' ? (
         <span className="font-bold text-gray-700">{position}</span>
@@ -36,7 +36,7 @@ const PositionColumn: React.FC<PositionColumnProps> = ({ position, mode = 'posit
                 {getDriverLastName(driver.id).slice(0, 3).toUpperCase()}
               </span>
               <span className="text-[10px] font-semibold text-gray-600">
-                {standingDriver.points}
+                {standingDriver && standingDriver.points}
               </span>
             </>
           )}
