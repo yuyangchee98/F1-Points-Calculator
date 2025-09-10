@@ -296,14 +296,14 @@ const App: React.FC = () => {
                     </div>
                   )
                   ) : (
-                    <div className="bg-white rounded-md p-6 border border-gray-200">
+                    <div className="bg-white rounded-md p-6 border border-red-300 shadow-lg">
                       <div className="flex flex-col md:flex-row md:items-center md:gap-8">
                         {/* Left side - Description */}
                         <div className="flex-1 mb-6 md:mb-0 text-center">
                           <h4 className="text-xl font-bold mb-3">Try Smart Input: <span className="font-normal text-sm text-gray-600">Type what you want to happen and watch the grid update instantly. <span className="text-xs text-gray-500">Watch demo ↓</span></span></h4>
                           
                           {/* Interactive Demo */}
-                          <div className="mb-4 p-4 bg-blue-50 rounded-lg ring-1 ring-blue-100">
+                          <div className="mb-4">
                             <React.Suspense fallback={<div style={{ height: '280px' }}></div>}>
                               <SmartInputDemo />
                             </React.Suspense>
