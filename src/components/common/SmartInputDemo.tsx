@@ -2,10 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { DemoConfig } from './demos/FerrariItalianDemo';
 import { FerrariItalianDemo } from './demos/FerrariItalianDemo';
 import { NorrisRemainingDemo } from './demos/NorrisRemainingDemo';
+import { MaxNext3Demo } from './demos/MaxNext3Demo';
+import { McLarenSprintsDemo } from './demos/McLarenSprintsDemo';
+import { AlonsoSpainDemo } from './demos/AlonsoSpainDemo';
+import { ColapintoPointsDemo } from './demos/ColapintoPointsDemo';
 
 const demos: DemoConfig[] = [
   FerrariItalianDemo,
-  NorrisRemainingDemo
+  NorrisRemainingDemo,
+  MaxNext3Demo,
+  McLarenSprintsDemo,
+  AlonsoSpainDemo,
+  ColapintoPointsDemo
 ];
 
 const SmartInputDemo: React.FC = () => {
@@ -88,7 +96,10 @@ const SmartInputDemo: React.FC = () => {
   
   // Render driver card based on position
   const renderDriverCard = (position: string, raceIndex: number) => {
-    const driver = currentDemo.drivers[position];
+    const race = currentDemo.races[raceIndex];
+    // Check for race-specific driver first
+    const raceSpecificKey = `${race.code}-${position}`;
+    const driver = currentDemo.drivers[raceSpecificKey] || currentDemo.drivers[position];
     if (!driver) return null;
 
     return (

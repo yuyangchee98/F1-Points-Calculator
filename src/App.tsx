@@ -304,7 +304,12 @@ const App: React.FC = () => {
                           
                           {/* Interactive Demo */}
                           <div className="mb-4">
-                            <React.Suspense fallback={<div style={{ height: '280px' }}></div>}>
+                            <React.Suspense fallback={
+                              <div style={{ width: '380px', maxWidth: '100%', margin: '0 auto' }}>
+                                <div style={{ height: '38px', marginBottom: '15px' }}></div>
+                                <div style={{ height: '150px' }}></div>
+                              </div>
+                            }>
                               <SmartInputDemo />
                             </React.Suspense>
                           </div>
