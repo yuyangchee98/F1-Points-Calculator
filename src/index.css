@@ -47,6 +47,11 @@
   100% { transform: translateY(0); opacity: 1; }
 }
 
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
 @keyframes pulseGlow {
   0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
   70% { box-shadow: 0 0 0 8px rgba(59, 130, 246, 0); }
@@ -151,6 +156,13 @@ body {
     box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.2), 0 4px 6px -4px rgba(59, 130, 246, 0.2);
   }
   
+  /* Skeleton Loader */
+  .skeleton-shimmer {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite;
+  }
+
   /* Race Grid Components */
   .race-grid {
     @apply grid p-6 rounded-lg min-w-full gap-2;
