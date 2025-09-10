@@ -5,6 +5,7 @@ import { selectDriverStandings, selectTeamStandings } from '../../store/selector
 import { setActiveTab } from '../../store/slices/uiSlice';
 import DriverStandingsTable from './DriverStandingsTable';
 import TeamStandingsTable from './TeamStandingsTable';
+import TableSkeleton from '../common/TableSkeleton';
 import { DriverPointsChart, TeamPointsChart } from '../charts/LazyCharts';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { trackStandingsTabChange } from '../../utils/analytics';
@@ -81,7 +82,11 @@ const StandingsSidebar: React.FC = () => {
                 Driver Standings
               </h2>
               <div className="overflow-x-auto">
-                <DriverStandingsTable standings={driverStandings} />
+                {driverStandings.length === 0 ? (
+                  <TableSkeleton rows={20} type="driver" />
+                ) : (
+                  <DriverStandingsTable standings={driverStandings} />
+                )}
               </div>
             </div>
             
@@ -91,7 +96,11 @@ const StandingsSidebar: React.FC = () => {
                 Constructor Standings
               </h2>
               <div className="overflow-x-auto">
-                <TeamStandingsTable standings={teamStandings} />
+                {teamStandings.length === 0 ? (
+                  <TableSkeleton rows={10} type="team" />
+                ) : (
+                  <TeamStandingsTable standings={teamStandings} />
+                )}
               </div>
             </div>
           </div>
@@ -104,7 +113,7 @@ const StandingsSidebar: React.FC = () => {
               </h3>
               <div className="p-3">
                 <Suspense fallback={
-                  <div className="h-64 flex items-center justify-center">
+                  <div className="h-[250px] flex items-center justify-center">
                     <div className="text-gray-500">Loading chart...</div>
                   </div>
                 }>
@@ -120,7 +129,7 @@ const StandingsSidebar: React.FC = () => {
               </h3>
               <div className="p-3">
                 <Suspense fallback={
-                  <div className="h-64 flex items-center justify-center">
+                  <div className="h-[250px] flex items-center justify-center">
                     <div className="text-gray-500">Loading chart...</div>
                   </div>
                 }>
