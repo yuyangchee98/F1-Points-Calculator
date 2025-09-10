@@ -26,7 +26,8 @@ import HorizontalScrollBar from './components/common/HorizontalScrollBar';
 import FAQ from './components/common/FAQ';
 import TypingAnimation from './components/common/TypingAnimation';
 import SubscriptionModal from './components/common/SubscriptionModal';
-import SmartInputDemo from './components/common/SmartInputDemo';
+import InputSections from './components/common/InputSections';
+const SmartInputDemo = React.lazy(() => import('./components/common/SmartInputDemo'));
 import useAppDispatch from './hooks/useAppDispatch';
 import useWindowSize from './hooks/useWindowSize';
 import { trackBuyCoffeeClick, trackFeedbackClick, trackSmartInputAction, trackSmartInputCommand } from './utils/analytics';
@@ -47,6 +48,15 @@ const App: React.FC = () => {
   const { isSubscribed, verificationMessage } = useSubscription();
   const { email, saveEmail } = useUserEmail();
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+  const [smartInputFirst, setSmartInputFirst] = useState(() => {
+    return localStorage.getItem('f1_input_order') === 'smart-first';
+  });
+
+  const handleSwapInputs = () => {
+    const newValue = !smartInputFirst;
+    setSmartInputFirst(newValue);
+    localStorage.setItem('f1_input_order', newValue ? 'smart-first' : 'drivers-first');
+  };
 
   // Example commands for typing animation
   const exampleCommands = [
@@ -152,10 +162,11 @@ const App: React.FC = () => {
               
               {/* Always show driver selection and grid when in grid view */}
               <div className={`${(mobileView === 'grid' || !isMobile) ? 'block' : 'hidden'}`}>
-                <DriverSelection />
-                
-                {/* Natural Language Placement Input */}
-                <div className="mb-6 p-4 bg-gray-50 rounded-lg shadow-sm border border-gray-200 relative">
+                <InputSections 
+                  smartInputFirst={smartInputFirst}
+                  onSwap={handleSwapInputs}
+                  smartInputContent={
+                    <>
                   {isSubscribed && (
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
                       <h3 className="text-2xl font-bold">SMART INPUT</h3>
@@ -292,8 +303,10 @@ const App: React.FC = () => {
                           <h4 className="text-xl font-bold mb-3">Try Smart Input: <span className="font-normal text-sm text-gray-600">Type what you want to happen and watch the grid update instantly. <span className="text-xs text-gray-500">Watch demo ↓</span></span></h4>
                           
                           {/* Interactive Demo */}
-                          <div className="mb-4 p-4 border-2 border-gray-200 rounded-xl bg-gradient-to-br from-gray-50 to-white">
-                            <SmartInputDemo />
+                          <div className="mb-4 p-4 bg-blue-50 rounded-lg ring-1 ring-blue-100">
+                            <React.Suspense fallback={<div style={{ height: '280px' }}></div>}>
+                              <SmartInputDemo />
+                            </React.Suspense>
                           </div>
                         </div>
                         
@@ -413,7 +426,9 @@ const App: React.FC = () => {
                       </div>
                     </div>
                   )}
-                </div>
+                    </>
+                  }
+                />
                 
                 <HorizontalScrollBar scrollContainerRef={raceGridScrollRef} />
                 <RaceGrid scrollRef={raceGridScrollRef} />
