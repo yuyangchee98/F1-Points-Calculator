@@ -20,6 +20,19 @@ const SmartInputDemo: React.FC = () => {
   const [typedText, setTypedText] = useState('');
   const [showCursor, setShowCursor] = useState(false);
   const [driversVisible, setDriversVisible] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [scrollPosition, setScrollPosition] = useState(0);
+  const [isAutoScrolling, setIsAutoScrolling] = useState(false);
+  
+  // Detect mobile viewport
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   
   // Randomly select a demo on mount
   const [currentDemo] = useState(() => {
@@ -59,6 +72,8 @@ const SmartInputDemo: React.FC = () => {
       setTypedText('');
       setShowCursor(false);
       setDriversVisible(false);
+      // Don't reset scroll if we're auto-scrolling on mobile
+      // Let it continue its ping-pong motion
       
       // Restart animation after brief pause
       setTimeout(() => {
@@ -148,14 +163,14 @@ const SmartInputDemo: React.FC = () => {
           textAlign: 'left',
         }}>
           <span style={{ 
-            fontSize: '11px',
+            fontSize: isMobile ? '10px' : '11px',
             fontWeight: 'bold',
             color: '#111827',
           }}>
             {driver.name}
           </span>
           <span style={{ 
-            fontSize: '9px',
+            fontSize: isMobile ? '8px' : '9px',
             color: driver.color,
           }}>
             {driver.team}
@@ -168,9 +183,59 @@ const SmartInputDemo: React.FC = () => {
   // Calculate grid dimensions based on demo
   const gridColumns = currentDemo.races.length;
   const gridRows = currentDemo.positions.length;
+  const shouldAutoScroll = isMobile && gridColumns > 1;
+  
+  // Show all races now, not just filtered
+  const visibleRaces = currentDemo.races;
+  
+  // Auto-scroll effect for mobile
+  useEffect(() => {
+    if (!shouldAutoScroll) {
+      setScrollPosition(0);
+      setIsAutoScrolling(false);
+      return;
+    }
+    
+    // Only start scrolling once, not every time driversVisible changes
+    if (isAutoScrolling) return;
+    
+    // Start auto-scrolling (only happens once on mobile)
+    const scrollDelay = setTimeout(() => {
+      setIsAutoScrolling(true);
+      
+      let position = 0;
+      let direction = 1; // 1 for right, -1 for left
+      const scrollInterval = setInterval(() => {
+        position += direction * 2; // Speed of scroll
+        
+        // Calculate max scroll (90px per column on mobile + gap)
+        const maxScroll = (gridColumns - 1) * 96;
+        
+        // Change direction at boundaries
+        if (position >= maxScroll) {
+          position = maxScroll;
+          direction = -1; // Start scrolling left
+        } else if (position <= 0) {
+          position = 0;
+          direction = 1; // Start scrolling right
+        }
+        
+        setScrollPosition(position);
+      }, 30); // Smooth 30fps scrolling
+      
+      return () => clearInterval(scrollInterval);
+    }, 1500); // Wait a bit after component mounts
+    
+    return () => clearTimeout(scrollDelay);
+  }, [shouldAutoScroll, isAutoScrolling, gridColumns]);
   
   return (
-    <div style={{ width: '380px', maxWidth: '100%', margin: '0 auto' }}>
+    <div style={{ 
+      width: isMobile ? '100%' : '380px', 
+      maxWidth: '100%', 
+      margin: '0 auto',
+      padding: isMobile ? '0 10px' : '0'
+    }}>
       {/* Input Box */}
       <div style={{ position: 'relative', marginBottom: '15px', height: '38px' }}>
         <div
@@ -210,41 +275,51 @@ const SmartInputDemo: React.FC = () => {
       </div>
 
       {/* Race Grid */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: `70px repeat(${gridColumns}, 105px)`,
-          gap: '8px',
-          gridTemplateRows: `auto repeat(${gridRows}, auto)`,
-        }}
-      >
+      <div style={{
+        overflowX: shouldAutoScroll ? 'hidden' : 'visible',
+        width: '100%',
+        position: 'relative',
+      }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: isMobile 
+              ? `60px repeat(${gridColumns}, 90px)`
+              : `70px repeat(${gridColumns}, 105px)`,
+            gap: isMobile ? '6px' : '8px',
+            gridTemplateRows: `auto repeat(${gridRows}, auto)`,
+            width: isMobile ? 'max-content' : '100%',
+            transform: shouldAutoScroll ? `translateX(-${scrollPosition}px)` : 'none',
+            transition: isAutoScrolling ? 'none' : 'transform 0.3s ease-out',
+          }}
+        >
         {/* Headers */}
         <div style={{
           backgroundColor: '#374151',
           color: 'white',
-          padding: '8px',
+          padding: isMobile ? '6px' : '8px',
           borderRadius: '6px',
           textAlign: 'center',
           fontWeight: 'bold',
-          fontSize: '11px',
+          fontSize: isMobile ? '10px' : '11px',
         }}>
           Position
         </div>
         
         {/* Race headers */}
-        {currentDemo.races.map((race) => (
+        {visibleRaces.map((race) => (
           <div 
             key={race.code}
             style={{
               backgroundColor: race.blur ? '#6b7280' : '#374151',
               color: 'white',
-              padding: '8px',
+              padding: isMobile ? '6px' : '8px',
               borderRadius: '6px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: 'bold',
-              fontSize: '11px',
+              fontSize: isMobile ? '10px' : '11px',
               opacity: race.blur ? 0.5 : 1,
               filter: race.blur ? 'blur(8px)' : 'none',
             }}
@@ -262,10 +337,10 @@ const SmartInputDemo: React.FC = () => {
               {/* Position number */}
               <div style={{
                 backgroundColor: '#f3f4f6',
-                padding: '8px',
+                padding: isMobile ? '6px' : '8px',
                 borderRadius: '6px',
                 fontWeight: 'bold',
-                fontSize: '14px',
+                fontSize: isMobile ? '12px' : '14px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -275,14 +350,14 @@ const SmartInputDemo: React.FC = () => {
               </div>
               
               {/* Race cells */}
-              {currentDemo.races.map((race, raceIndex) => (
+              {visibleRaces.map((race, raceIndex) => (
                 <div
                   key={`${race.code}-${position}`}
                   style={{
                     backgroundColor: 'white',
                     border: '1px solid #e5e7eb',
                     borderRadius: '6px',
-                    height: '48px',
+                    height: isMobile ? '42px' : '48px',
                     padding: race.blur ? '8px' : '3px',
                     position: 'relative',
                     overflow: 'hidden',
@@ -305,6 +380,7 @@ const SmartInputDemo: React.FC = () => {
             </React.Fragment>
           );
         })}
+        </div>
       </div>
     </div>
   );
