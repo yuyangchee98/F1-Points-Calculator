@@ -4,13 +4,18 @@ import { RootState } from '../../store';
 import PositionColumn from './PositionColumn';
 import RaceColumn from './RaceColumn';
 import useWindowSize from '../../hooks/useWindowSize';
+import { togglePositionColumnMode } from '../../store/slices/uiSlice';
+import useAppDispatch from '../../hooks/useAppDispatch';
 
 interface RaceGridProps {
   scrollRef?: React.RefObject<HTMLDivElement>;
 }
 
 const RaceGrid: React.FC<RaceGridProps> = ({ scrollRef }) => {
+  const dispatch = useAppDispatch();
   const races = useSelector((state: RootState) => state.races.list);
+  const positionColumnMode = useSelector((state: RootState) => state.ui.positionColumnMode);
+  const driverStandings = useSelector((state: RootState) => state.results.driverStandings);
   const { isMobile, isTablet } = useWindowSize();
   
   // Determine column width based on screen size
@@ -63,8 +68,27 @@ const RaceGrid: React.FC<RaceGridProps> = ({ scrollRef }) => {
           gridAutoRows: 'minmax(40px, auto)'
         }}
       >
-        {/* Position header */}
-        <div className="position-header sticky left-0 z-10">Position</div>
+        {/* Position header with toggle */}
+        <div 
+          className="position-header sticky left-0 z-10 cursor-pointer hover:bg-gray-800 transition-all duration-200 flex flex-col items-center justify-center gap-0.5 group"
+          onClick={() => dispatch(togglePositionColumnMode())}
+          title={`Click to switch to ${positionColumnMode === 'position' ? 'championship standings' : 'grid positions'} view`}
+        >
+          <span className="text-[11px] font-bold">
+            {positionColumnMode === 'position' ? 'Grid' : 'Driver'}
+          </span>
+          <span className="text-[9px] opacity-80">
+            {positionColumnMode === 'position' ? 'Position' : 'Standings'}
+          </span>
+          <svg 
+            className="w-3 h-3 opacity-60 group-hover:opacity-100 transition-opacity" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+          </svg>
+        </div>
         
         {/* Race headers */}
         {races.map(race => (
@@ -100,7 +124,11 @@ const RaceGrid: React.FC<RaceGridProps> = ({ scrollRef }) => {
               className={`contents animate-grid-entry grid-row-${Math.min(position, 10)} ${position % 2 === 0 ? 'even-row' : ''}`}
             >
               {/* Position column */}
-              <PositionColumn position={position} />
+              <PositionColumn 
+                position={position} 
+                mode={positionColumnMode}
+                standings={driverStandings}
+              />
               
               {/* Race slots for this position */}
               {races.map(race => (

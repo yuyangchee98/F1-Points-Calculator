@@ -95,6 +95,7 @@ export interface UiState {
   selectedDriver: string | null;
   selectedRace: string | null;
   selectedPointsSystem: string;
+  positionColumnMode: 'position' | 'standings';
 }
 
 export interface ResultsState {

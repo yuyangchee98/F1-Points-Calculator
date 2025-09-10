@@ -8,7 +8,8 @@ const initialState: UiState = {
   showOfficialResults: true, // Default to showing official results
   selectedDriver: null,
   selectedRace: null,
-  selectedPointsSystem: DEFAULT_POINTS_SYSTEM
+  selectedPointsSystem: DEFAULT_POINTS_SYSTEM,
+  positionColumnMode: 'position' // 'position' or 'standings'
 };
 
 export const uiSlice = createSlice({
@@ -50,6 +51,12 @@ export const uiSlice = createSlice({
       localStorage.setItem('selected-points-system', action.payload);
     },
     
+    togglePositionColumnMode: (state) => {
+      state.positionColumnMode = state.positionColumnMode === 'position' ? 'standings' : 'position';
+      // Store the preference in localStorage
+      localStorage.setItem('position-column-mode', state.positionColumnMode);
+    },
+    
     // Initialize UI state from localStorage
     initializeUiState: (state) => {
       // Load official results preference from localStorage
@@ -69,6 +76,12 @@ export const uiSlice = createSlice({
       if (savedPointsSystem) {
         state.selectedPointsSystem = savedPointsSystem;
       }
+      
+      // Load position column mode preference from localStorage
+      const savedPositionMode = localStorage.getItem('position-column-mode');
+      if (savedPositionMode === 'position' || savedPositionMode === 'standings') {
+        state.positionColumnMode = savedPositionMode;
+      }
     }
   }
 });
@@ -80,6 +93,7 @@ export const {
   selectDriver, 
   selectRace,
   selectPointsSystem,
+  togglePositionColumnMode,
   initializeUiState
 } = uiSlice.actions;
 

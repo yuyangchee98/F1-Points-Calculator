@@ -289,9 +289,22 @@ body {
   }
   
   .position-header {
-    @apply bg-gray-700 text-white font-bold text-center p-3 rounded-md;
+    @apply text-white font-bold text-center p-3 rounded-md;
+    background: #4a5568;
+    border: 1px solid #2d3748;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
     transition: all 0.2s ease;
+    user-select: none;
+  }
+  
+  .position-header:hover {
+    background: #2d3748;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 8px -1px rgba(0, 0, 0, 0.15), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
+  }
+  
+  .position-header:active {
+    transform: translateY(0);
   }
   
   .race-header {
@@ -301,8 +314,10 @@ body {
   }
   
   .position {
-    @apply sticky left-0 z-10 bg-gray-100 flex items-center justify-center font-bold text-gray-700 rounded-md;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    @apply sticky left-0 z-10 flex items-center justify-center font-bold rounded-md;
+    background: #f0f4f8;
+    border: 1px solid #cbd5e1;
+    box-shadow: 2px 0 6px -2px rgba(0, 0, 0, 0.1);
     transition: all 0.2s ease;
   }
   
