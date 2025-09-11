@@ -6,7 +6,7 @@ export const ColapintoPointsDemo: DemoConfig = {
     { code: 'SIN', name: 'Singapore', flag: '🇸🇬' },
   ],
   drivers: {
-    P8: { name: 'COLAPINTO', team: 'Williams', color: '#005AFF' },
+    P8: { name: 'COLAPINTO', team: 'Alpine', color: '#0090FF' },
   },
   positions: ['P8']
 };
