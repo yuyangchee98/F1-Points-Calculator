@@ -39,8 +39,8 @@ export async function parseNaturalLanguage(
 
   if (!response.ok) {
     const data = await response.json();
-    if (data.requiresSubscription) {
-      throw new Error('SUBSCRIPTION_REQUIRED');
+    if (data.requiresAccess) {
+      throw new Error('ACCESS_REQUIRED');
     }
     throw new Error('Failed to parse natural language');
   }

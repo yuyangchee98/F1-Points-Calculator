@@ -1,12 +1,11 @@
 // Use production URL for Stripe subscription
 const API_BASE_URL = 'https://f1-points-calculator-api.yuyangchee98.workers.dev';
 
-interface SubscriptionStatus {
+interface DayAccessStatus {
   isActive: boolean;
   customerId?: string;
-  subscriptionId?: string;
-  status?: string;
-  currentPeriodEnd?: number;
+  purchaseTime?: number;
+  expiresAt?: number;
 }
 
 interface CheckoutSession {
@@ -14,7 +13,7 @@ interface CheckoutSession {
   url: string;
 }
 
-export async function checkSubscriptionStatus(email: string): Promise<SubscriptionStatus> {
+export async function checkDayAccessStatus(email: string): Promise<DayAccessStatus> {
   const response = await fetch(`${API_BASE_URL}/api/subscription/check`, {
     method: 'POST',
     headers: {
@@ -24,7 +23,7 @@ export async function checkSubscriptionStatus(email: string): Promise<Subscripti
   });
 
   if (!response.ok) {
-    throw new Error('Failed to check subscription status');
+    throw new Error('Failed to check day access status');
   }
 
   return response.json();
@@ -38,8 +37,8 @@ export async function createCheckoutSession(email: string): Promise<CheckoutSess
     },
     body: JSON.stringify({
       email,
-      successUrl: `${window.location.origin}?subscription=success`,
-      cancelUrl: `${window.location.origin}?subscription=cancelled`,
+      successUrl: `${window.location.origin}?payment=success`,
+      cancelUrl: `${window.location.origin}?payment=cancelled`,
     }),
   });
 
@@ -50,21 +49,3 @@ export async function createCheckoutSession(email: string): Promise<CheckoutSess
   return response.json();
 }
 
-export async function createPortalSession(email: string): Promise<{ url: string }> {
-  const response = await fetch(`${API_BASE_URL}/api/subscription/create-portal`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      email,
-      returnUrl: window.location.origin,
-    }),
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to create portal session');
-  }
-
-  return response.json();
-}
