@@ -7,11 +7,11 @@ import { RootState, store } from './store';
 import { calculateResults } from './store/slices/resultsSlice';
 import { moveDriver } from './store/slices/gridSlice';
 import { parseNaturalLanguage } from './api/naturalLanguage';
-import { createCheckoutSession, createPortalSession } from './api/subscription';
+import { createCheckoutSession } from './api/subscription';
 import useRaceResults from './hooks/useRaceResults';
 import { useAutoSave } from './hooks/useAutoSave';
 import { useLoadPredictions } from './hooks/useLoadPredictions';
-import { useSubscription } from './hooks/useSubscription';
+import { useDayAccess } from './hooks/useSubscription';
 import { useUserEmail } from './hooks/useUserEmail';
 import Layout from './components/layout/Layout';
 import StandingsSidebar from './components/standings/StandingsSidebar';
@@ -43,7 +43,7 @@ const App: React.FC = () => {
   const selectedPointsSystem = useSelector((state: RootState) => state.ui.selectedPointsSystem);
   const { isMobile } = useWindowSize();
   const raceGridScrollRef = React.useRef<HTMLDivElement>(null);
-  const { isSubscribed, verificationMessage } = useSubscription();
+  const { hasAccess, statusMessage } = useDayAccess();
   const { email, saveEmail } = useUserEmail();
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const [smartInputFirst, setSmartInputFirst] = useState(() => {
@@ -131,11 +131,11 @@ const App: React.FC = () => {
                 </div>
               )}
               
-              {/* Show verification message */}
-              {verificationMessage && (
+              {/* Show status message */}
+              {statusMessage && (
                 <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <p className="text-center text-blue-700 font-medium animate-pulse">
-                    {verificationMessage}
+                  <p className="text-center text-blue-700 font-medium">
+                    {statusMessage}
                   </p>
                 </div>
               )}
@@ -147,7 +147,7 @@ const App: React.FC = () => {
                   onSwap={handleSwapInputs}
                   smartInputContent={
                     <>
-                  {isSubscribed && (
+                  {hasAccess && (
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
                       <h3 className="text-2xl font-bold">SMART INPUT</h3>
                       <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
@@ -158,7 +158,7 @@ const App: React.FC = () => {
                     </div>
                   )}
                   
-                  {isSubscribed ? (
+                  {hasAccess ? (
                     email ? (
                       <>
                         <textarea
@@ -236,8 +236,8 @@ const App: React.FC = () => {
                             } catch (err) {
                               console.error('Error parsing natural language:', err);
                               trackSmartInputCommand(text, false);
-                              if (err instanceof Error && err.message === 'SUBSCRIPTION_REQUIRED') {
-                                // User needs to subscribe
+                              if (err instanceof Error && err.message === 'ACCESS_REQUIRED') {
+                                // User needs to get access
                                 setShowSubscriptionModal(true);
                               } else {
                                 alert('Failed to understand the input. Try something like: "Max P1 at Vegas"');
@@ -248,31 +248,11 @@ const App: React.FC = () => {
                           Apply Predictions
                         </button>
                       </div>
-                      {/* Manage Subscription Link */}
-                      {email && (
-                        <div className="absolute bottom-2 right-2">
-                          <button
-                            className="text-xs text-gray-500 hover:text-gray-700 underline"
-                            onClick={async () => {
-                              trackSmartInputAction('MANAGE_SUBSCRIPTION', email);
-                              try {
-                                const session = await createPortalSession(email);
-                                window.location.href = session.url;
-                              } catch (error) {
-                                console.error('Error creating portal session:', error);
-                                alert('Failed to open subscription management. Please try again.');
-                              }
-                            }}
-                          >
-                            Manage subscription
-                          </button>
-                        </div>
-                      )}
                     </>
                   ) : (
                     <div className="text-center py-8">
                       <p className="text-gray-600 mb-2">⚠️ Email required for Smart Input</p>
-                      <p className="text-sm text-gray-500">Your subscription is tied to your email address</p>
+                      <p className="text-sm text-gray-500">Your 24-hour access is tied to your email address</p>
                     </div>
                   )
                   ) : (
@@ -305,47 +285,47 @@ const App: React.FC = () => {
                             <button 
                               className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-md shadow-lg transition font-semibold text-lg"
                               onClick={async () => {
-                                // Check if user has subscription data in localStorage
-                                const hasSubscriptionData = email && localStorage.getItem(`f1_smart_input_subscription_${email}`);
+                                // Check if user has access data in localStorage
+                                const hasAccessData = email && localStorage.getItem(`f1_smart_input_access_${email}`);
                                 
-                                trackSmartInputAction(hasSubscriptionData ? 'CONFIRM_SUBSCRIPTION' : 'CLICK_TRY_NOW');
-                                
-                                // If email exists, check subscription status first
+                                trackSmartInputAction(hasAccessData ? 'CONFIRM_ACCESS' : 'CLICK_TRY_NOW');
+
+                                // If email exists, check access status first
                                 if (email) {
                                   try {
                                     // Clear cache to force fresh check
                                     Object.keys(localStorage).forEach(key => {
-                                      if (key.includes('f1_smart_input_subscription')) {
+                                      if (key.includes('f1_smart_input_access')) {
                                         localStorage.removeItem(key);
                                       }
                                     });
-                                    
-                                    // Force reload to check subscription
+
+                                    // Force reload to check access
                                     window.location.reload();
                                   } catch (error) {
-                                    console.error('Error checking subscription:', error);
+                                    console.error('Error checking access:', error);
                                   }
                                 } else {
                                   setShowSubscriptionModal(true);
                                 }
                               }}
                             >
-                              {email && localStorage.getItem(`f1_smart_input_subscription_${email}`) 
-                                ? 'Confirm Subscription' 
+                              {email && localStorage.getItem(`f1_smart_input_access_${email}`)
+                                ? 'Confirm Access'
                                 : 'Try Now'}
                             </button>
                             <p className="text-xs text-gray-500 mt-2">
-                              {email && localStorage.getItem(`f1_smart_input_subscription_${email}`)
+                              {email && localStorage.getItem(`f1_smart_input_access_${email}`)
                                 ? 'May take up to several minutes to confirm'
-                                : '$0.49 for 24 hours of usage • Cancel anytime'}
+                                : '$0.99 • One-time payment • Exactly 24 hours'}
                             </p>
                           </div>
                           
                           {/* Mobile view - keep the original inline flow */}
                           <div className="md:hidden">
-                            <h4 className="text-xl font-bold mb-2">Unlock Smart Input</h4>
-                            <p className="text-4xl font-bold text-red-600 mb-1">$0.49</p>
-                            <p className="text-sm text-gray-600 mb-4">for 24 hours of usage</p>
+                            <h4 className="text-xl font-bold mb-2">Get 24-Hour Access</h4>
+                            <p className="text-4xl font-bold text-red-600 mb-1">$0.99</p>
+                            <p className="text-sm text-gray-600 mb-4">One-time payment • Exactly 24 hours</p>
                             
                             {!email && (
                               <div className="mb-4">
@@ -391,7 +371,7 @@ const App: React.FC = () => {
                                 }
                               }}
                             >
-                              Subscribe Now
+                              Get Access
                             </button>
                             
                             {email && (
