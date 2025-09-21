@@ -16,7 +16,7 @@ export const useDayAccess = () => {
     const checkStatus = async () => {
       if (!email) {
         setIsLoading(false);
-        setIsSubscribed(false);
+        setHasAccess(false);
         return;
       }
 
