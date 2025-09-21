@@ -284,40 +284,15 @@ const App: React.FC = () => {
                           <div className="hidden md:block">
                             <button 
                               className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-md shadow-lg transition font-semibold text-lg"
-                              onClick={async () => {
-                                // Check if user has access data in localStorage
-                                const hasAccessData = email && localStorage.getItem(`f1_smart_input_access_${email}`);
-                                
-                                trackSmartInputAction(hasAccessData ? 'CONFIRM_ACCESS' : 'CLICK_TRY_NOW');
-
-                                // If email exists, check access status first
-                                if (email) {
-                                  try {
-                                    // Clear cache to force fresh check
-                                    Object.keys(localStorage).forEach(key => {
-                                      if (key.includes('f1_smart_input_access')) {
-                                        localStorage.removeItem(key);
-                                      }
-                                    });
-
-                                    // Force reload to check access
-                                    window.location.reload();
-                                  } catch (error) {
-                                    console.error('Error checking access:', error);
-                                  }
-                                } else {
-                                  setShowSubscriptionModal(true);
-                                }
+                              onClick={() => {
+                                trackSmartInputAction('CLICK_TRY_NOW');
+                                setShowSubscriptionModal(true);
                               }}
                             >
-                              {email && localStorage.getItem(`f1_smart_input_access_${email}`)
-                                ? 'Confirm Access'
-                                : 'Try Now'}
+                              Try Now
                             </button>
                             <p className="text-xs text-gray-500 mt-2">
-                              {email && localStorage.getItem(`f1_smart_input_access_${email}`)
-                                ? 'May take up to several minutes to confirm'
-                                : '$0.99 • One-time payment • Exactly 24 hours'}
+                              $0.99 • One-time payment • Exactly 24 hours
                             </p>
                           </div>
                           
