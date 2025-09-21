@@ -49,11 +49,11 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
         <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Unlock Smart Input</h2>
-          
+          <h2 className="text-2xl font-bold mb-4">Get 24-Hour Access</h2>
+
           <div className="mb-6">
-            <p className="text-4xl font-bold text-red-600 mb-2">$0.49</p>
-            <p className="text-gray-600">for 24 hours of usage</p>
+            <p className="text-4xl font-bold text-red-600 mb-2">$0.99</p>
+            <p className="text-gray-600">One-time payment • Exactly 24 hours</p>
           </div>
 
           <div className="mb-6 text-left">
@@ -83,7 +83,7 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
               }}
             />
             <p className="text-xs text-gray-500 mt-1">
-              Your subscription will be tied to this email
+              Your 24-hour access will be tied to this email
             </p>
           </div>
 
@@ -106,7 +106,7 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                   : 'bg-red-600 text-white hover:bg-red-700'
               }`}
             >
-              {isLoading ? 'Processing...' : 'Subscribe'}
+              {isLoading ? 'Processing...' : 'Get Access'}
             </button>
           </div>
         </div>
