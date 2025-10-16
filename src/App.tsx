@@ -25,6 +25,7 @@ import HorizontalScrollBar from './components/common/HorizontalScrollBar';
 import FAQ from './components/common/FAQ';
 import SubscriptionModal from './components/common/SubscriptionModal';
 import InputSections from './components/common/InputSections';
+import RacendoPromo from './components/common/RacendoPromo';
 const SmartInputDemo = React.lazy(() => import('./components/common/SmartInputDemo'));
 import useAppDispatch from './hooks/useAppDispatch';
 import useWindowSize from './hooks/useWindowSize';
@@ -91,13 +92,16 @@ const App: React.FC = () => {
           sidebar={<StandingsSidebar />}
           content={
             <div className="px-4 py-6 max-w-5xl mx-auto">
-              <h1 className="text-3xl sm:text-4xl font-bold mb-6 text-gray-800 flex flex-wrap sm:flex-nowrap items-center">
-                <span className="whitespace-nowrap">
-                  <span className="bg-red-600 text-white px-3 py-1 mr-3 rounded-md">F1</span>
-                  Championship Calculator
-                </span>
-                <span className="text-base sm:text-lg text-gray-500 ml-0 sm:ml-3 font-normal">{CURRENT_SEASON} Season Predictor</span>
-              </h1>
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+                <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 flex flex-wrap sm:flex-nowrap items-center">
+                  <span className="whitespace-nowrap">
+                    <span className="bg-red-600 text-white px-3 py-1 mr-3 rounded-md">F1</span>
+                    Championship Calculator
+                  </span>
+                  <span className="text-base sm:text-lg text-gray-500 ml-0 sm:ml-3 font-normal">{CURRENT_SEASON} Season Predictor</span>
+                </h1>
+                <RacendoPromo className="self-start sm:self-center" />
+              </div>
               
               {/* Buy me a coffee link at top */}
               <div className="mb-8 flex flex-wrap gap-4">
