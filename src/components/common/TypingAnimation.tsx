@@ -53,10 +53,10 @@ const TypingAnimation: React.FC<TypingAnimationProps> = ({
 
   return (
     <div className="flex items-center">
-      <span className="text-gray-600 text-sm">Try: "</span>
+      <span className="text-gray-600 text-sm">Try: {'"'}</span>
       <span className="text-blue-600 text-sm font-medium">{currentText}</span>
       <span className="animate-pulse text-blue-600">|</span>
-      <span className="text-gray-600 text-sm">"</span>
+      <span className="text-gray-600 text-sm">{'"'}</span>
     </div>
   );
 };
