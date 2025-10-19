@@ -156,7 +156,7 @@ const App: React.FC = () => {
                       <h3 className="text-2xl font-bold">SMART INPUT</h3>
                       <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
                         <p className="text-sm text-gray-600 mt-2 sm:mt-0">
-                          Type commands like "Max P1 at Monza" or "Hamilton wins next 3 races" and they'll be placed on the grid instantly
+                          Type commands like {'"'}Max P1 at Monza{'"'} or {'"'}Hamilton wins next 3 races{'"'} and they{"'"}ll be placed on the grid instantly
                         </p>
                       </div>
                     </div>
