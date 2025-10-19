@@ -59,18 +59,14 @@ export interface RaceScheduleResponse {
 
 export async function fetchRaceSchedule(year: number): Promise<Race[]> {
   const url = `https://api.jolpi.ca/ergast/f1/${year}/races.json`;
-  
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch race schedule: ${response.statusText}`);
-    }
-    
-    const data: RaceScheduleResponse = await response.json();
-    return data.MRData.RaceTable.Races;
-  } catch (error) {
-    throw error;
+
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch race schedule: ${response.statusText}`);
   }
+
+  const data: RaceScheduleResponse = await response.json();
+  return data.MRData.RaceTable.Races;
 }
 
 export function getRaceDisplayName(race: Race): string {
