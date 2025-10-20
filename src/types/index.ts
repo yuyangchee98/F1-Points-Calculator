@@ -104,10 +104,3 @@ export interface ResultsState {
   pointsHistory: PointsHistory[];
   teamPointsHistory: TeamPointsHistory[];
 }
-
-// Utility type for sortablejs
-export interface SortableItem {
-  id: string;
-  name?: string;
-  data?: unknown;
-}
