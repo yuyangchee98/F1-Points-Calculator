@@ -14,8 +14,6 @@ export const predictionMiddleware: Middleware = (store) => (next) => (action) =>
   const gridActions = [
     'grid/moveDriver',
     'grid/placeDriver',
-    'grid/clearPosition',
-    'grid/swapPositions',
     'grid/resetGrid'
   ];
   

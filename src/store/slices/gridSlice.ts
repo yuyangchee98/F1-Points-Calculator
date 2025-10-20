@@ -116,45 +116,7 @@ export const gridSlice = createSlice({
         }
       });
     },
-    
-    clearPosition: (state, action: PayloadAction<{ raceId: string; position: number }>) => {
-      const { raceId, position } = action.payload;
-      
-      const positionIndex = state.positions.findIndex(
-        p => p.raceId === raceId && p.position === position
-      );
-      
-      if (positionIndex !== -1) {
-        // Clear the driver while preserving the official status flag for styling
-        state.positions[positionIndex].driverId = null;
-      }
-    },
-    
-    swapPositions: (state, action: PayloadAction<{ 
-      raceId: string; 
-      position1: number; 
-      position2: number 
-    }>) => {
-      const { raceId, position1, position2 } = action.payload;
-      
-      const pos1Index = state.positions.findIndex(
-        p => p.raceId === raceId && p.position === position1
-      );
-      
-      const pos2Index = state.positions.findIndex(
-        p => p.raceId === raceId && p.position === position2
-      );
-      
-      if (pos1Index !== -1 && pos2Index !== -1) {
-        const driver1 = state.positions[pos1Index].driverId;
-        const driver2 = state.positions[pos2Index].driverId;
-        
-        // Swap drivers while preserving the official status for styling
-        state.positions[pos1Index].driverId = driver2;
-        state.positions[pos2Index].driverId = driver1;
-      }
-    },
-    
+
     resetGrid: (state) => {
       // Reset all non-official positions
       state.positions = state.positions.map(position => {
@@ -219,12 +181,10 @@ export const gridSlice = createSlice({
   }
 });
 
-export const { 
+export const {
   moveDriver,
-  placeDriver, 
-  clearPosition, 
-  swapPositions, 
-  resetGrid, 
+  placeDriver,
+  resetGrid,
   toggleOfficialResults
 } = gridSlice.actions;
 
