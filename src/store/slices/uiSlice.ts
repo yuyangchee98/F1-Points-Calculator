@@ -40,11 +40,7 @@ export const uiSlice = createSlice({
     selectDriver: (state, action: PayloadAction<string | null>) => {
       state.selectedDriver = action.payload;
     },
-    
-    selectRace: (state, action: PayloadAction<string | null>) => {
-      state.selectedRace = action.payload;
-    },
-    
+
     selectPointsSystem: (state, action: PayloadAction<string>) => {
       state.selectedPointsSystem = action.payload;
       // Store the preference in localStorage
@@ -86,12 +82,11 @@ export const uiSlice = createSlice({
   }
 });
 
-export const { 
-  setActiveTab, 
+export const {
+  setActiveTab,
   setMobileView,
-  toggleOfficialResults, 
-  selectDriver, 
-  selectRace,
+  toggleOfficialResults,
+  selectDriver,
   selectPointsSystem,
   togglePositionColumnMode,
   initializeUiState
