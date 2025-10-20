@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
-import { RacesState, PastRaceResult } from '../../types';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { RacesState } from '../../types';
 import { races } from '../../data/races';
 import { fetchPastRaceResults as fetchFromAPI } from '../../api/fetchPastRaceResults';
 
@@ -26,19 +26,7 @@ export const fetchPastRaceResults = createAsyncThunk(
 export const racesSlice = createSlice({
   name: 'races',
   initialState,
-  reducers: {
-    updatePastResults: (state, action: PayloadAction<PastRaceResult>) => {
-      state.pastResults = { ...state.pastResults, ...action.payload };
-
-      // Update the completed status for races
-      state.list = state.list.map(race => {
-        // Convert race name to API format (lowercase, hyphenated)
-        const apiRaceName = race.name.toLowerCase().replace(/\s+/g, '-');
-        const isCompleted = !!state.pastResults[apiRaceName];
-        return { ...race, completed: isCompleted };
-      });
-    }
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder.addCase(fetchPastRaceResults.fulfilled, (state, action) => {
       state.pastResults = { ...state.pastResults, ...action.payload };
@@ -53,7 +41,5 @@ export const racesSlice = createSlice({
     });
   }
 });
-
-export const { updatePastResults } = racesSlice.actions;
 
 export default racesSlice.reducer;
