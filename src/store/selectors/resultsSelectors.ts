@@ -1,6 +1,6 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../index';
-import { DriverStanding, TeamStanding, PointsHistory, TeamPointsHistory } from '../../types';
+import { DriverStanding, TeamStanding } from '../../types';
 import { races } from '../../data/races';
 
 // Basic selectors
@@ -22,38 +22,6 @@ export const selectTopTeams = createSelector(
   [selectTeamStandings, (_: RootState, count: number) => count],
   (standings, count): TeamStanding[] => {
     return standings.slice(0, count);
-  }
-);
-
-// Select standings for a specific driver
-export const selectDriverStanding = createSelector(
-  [selectDriverStandings, (_: RootState, driverId: string) => driverId],
-  (standings, driverId): DriverStanding | undefined => {
-    return standings.find(standing => standing.driverId === driverId);
-  }
-);
-
-// Select standings for a specific team
-export const selectTeamStanding = createSelector(
-  [selectTeamStandings, (_: RootState, teamId: string) => teamId],
-  (standings, teamId): TeamStanding | undefined => {
-    return standings.find(standing => standing.teamId === teamId);
-  }
-);
-
-// Select points history for a specific driver
-export const selectDriverPointsHistory = createSelector(
-  [selectPointsHistory, (_: RootState, driverId: string) => driverId],
-  (history, driverId): PointsHistory[] => {
-    return history.filter(entry => entry.driverId === driverId);
-  }
-);
-
-// Select points history for a specific team
-export const selectTeamPointsHistoryByTeam = createSelector(
-  [selectTeamPointsHistory, (_: RootState, teamId: string) => teamId],
-  (history, teamId): TeamPointsHistory[] => {
-    return history.filter(entry => entry.teamId === teamId);
   }
 );
 
