@@ -29,7 +29,7 @@ export const racesSlice = createSlice({
   reducers: {
     updatePastResults: (state, action: PayloadAction<PastRaceResult>) => {
       state.pastResults = { ...state.pastResults, ...action.payload };
-      
+
       // Update the completed status for races
       state.list = state.list.map(race => {
         // Convert race name to API format (lowercase, hyphenated)
@@ -37,13 +37,6 @@ export const racesSlice = createSlice({
         const isCompleted = !!state.pastResults[apiRaceName];
         return { ...race, completed: isCompleted };
       });
-    },
-    
-    markRaceAsCompleted: (state, action: PayloadAction<{ raceId: string }>) => {
-      const race = state.list.find(r => r.id === action.payload.raceId);
-      if (race) {
-        race.completed = true;
-      }
     }
   },
   extraReducers: (builder) => {
@@ -61,6 +54,6 @@ export const racesSlice = createSlice({
   }
 });
 
-export const { updatePastResults, markRaceAsCompleted } = racesSlice.actions;
+export const { updatePastResults } = racesSlice.actions;
 
 export default racesSlice.reducer;
