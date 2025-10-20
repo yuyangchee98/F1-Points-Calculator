@@ -11,6 +11,3 @@ export const BREAKPOINTS = {
   mobile: 640,  // < 640px
   tablet: 1024, // 640px - 1024px
 } as const;
-
-// Animation constants
-export const ANIMATION_DISTANCE = 40; // px for translateY animations

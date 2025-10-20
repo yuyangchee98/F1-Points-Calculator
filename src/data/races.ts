@@ -193,9 +193,3 @@ export const races: Race[] = getHardcodedRaces();
 
 // Export the old raceNames for backward compatibility
 export const raceNames = races.map(race => race.name);
-
-// Create a lookup for races by ID
-export const raceById = races.reduce<Record<string, Race>>((acc, race) => {
-  acc[race.id] = race;
-  return acc;
-}, {});

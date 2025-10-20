@@ -69,14 +69,6 @@ export async function fetchRaceSchedule(year: number): Promise<Race[]> {
   return data.MRData.RaceTable.Races;
 }
 
-export function getRaceDisplayName(race: Race): string {
-  // Format race name for display, handling sprints
-  if (race.Sprint) {
-    return race.raceName;
-  }
-  return race.raceName;
-}
-
 export function isSprintRace(race: Race): boolean {
   return !!race.Sprint;
 }
