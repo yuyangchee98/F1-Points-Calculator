@@ -7,7 +7,6 @@ const initialState: UiState = {
   mobileView: 'grid', // Default mobile view shows the race grid
   showOfficialResults: true, // Default to showing official results
   selectedDriver: null,
-  selectedRace: null,
   selectedPointsSystem: DEFAULT_POINTS_SYSTEM,
   positionColumnMode: 'position' // 'position' or 'standings'
 };
