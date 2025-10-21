@@ -15,11 +15,6 @@ export interface SaveResponse {
   timestamp: string;
 }
 
-export interface ShareResponse {
-  shareId: string;
-  url: string;
-}
-
 export async function savePrediction(
   fingerprint: string,
   grid: GridPosition[],
@@ -66,46 +61,6 @@ export async function loadPrediction(
 
     if (!response.ok) {
       throw new Error('Failed to load prediction');
-    }
-
-    return response.json();
-  } catch (error) {
-    return null;
-  }
-}
-
-export async function sharePrediction(
-  fingerprint: string,
-  version?: string
-): Promise<ShareResponse> {
-  const response = await fetch(`${API_BASE_URL}/api/predictions/share`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      fingerprint,
-      version,
-    }),
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to share prediction');
-  }
-
-  return response.json();
-}
-
-export async function getSharedPrediction(shareId: string): Promise<PredictionVersion | null> {
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/p/${shareId}`);
-    
-    if (response.status === 404) {
-      return null;
-    }
-
-    if (!response.ok) {
-      throw new Error('Failed to get shared prediction');
     }
 
     return response.json();
