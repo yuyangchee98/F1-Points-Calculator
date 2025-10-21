@@ -93,7 +93,6 @@ export interface UiState {
   mobileView: MobileView;
   showOfficialResults: boolean;
   selectedDriver: string | null;
-  selectedRace: string | null;
   selectedPointsSystem: string;
   positionColumnMode: 'position' | 'standings';
 }
