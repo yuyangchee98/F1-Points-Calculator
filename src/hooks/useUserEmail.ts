@@ -18,10 +18,5 @@ export const useUserEmail = () => {
     localStorage.setItem(EMAIL_STORAGE_KEY, newEmail);
   };
 
-  const clearEmail = () => {
-    setEmail('');
-    localStorage.removeItem(EMAIL_STORAGE_KEY);
-  };
-
-  return { email, saveEmail, clearEmail };
+  return { email, saveEmail };
 };
