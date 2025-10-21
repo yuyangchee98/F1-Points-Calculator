@@ -9,7 +9,6 @@ export const useLoadPredictions = () => {
   const { fingerprint } = useSelector((state: RootState) => state.predictions);
   const [isLoading, setIsLoading] = useState(false);
   const [hasLoaded, setHasLoaded] = useState(false);
-  const [, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!fingerprint || hasLoaded) return;
@@ -54,7 +53,7 @@ export const useLoadPredictions = () => {
         
         setHasLoaded(true);
       } catch (error) {
-        setError('Failed to load predictions');
+        console.error('Failed to load predictions:', error);
       } finally {
         setIsLoading(false);
       }
