@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { ResultsState, DriverStanding, TeamStanding, PointsHistory, TeamPointsHistory } from '../../types';
 import { RootState } from '../index';
 import { getPointsForPositionWithSystem } from '../../data/pointsSystems';
+import { normalizeTeamId } from '../../utils/teamHelper';
 
 const initialState: ResultsState = {
   driverStandings: [],
@@ -43,14 +44,9 @@ const teamPoints: Record<string, number> = {};
 const driverHistories: PointsHistory[] = [];
 const teamHistories: TeamPointsHistory[] = [];
 
-// Helper function to normalize team name to match team IDs
-const normalizeTeamName = (teamName: string): string => {
-return teamName.toLowerCase().replace(/\s/g, '-');
-};
-
 // Initialize teams
 allDrivers.forEach(driver => {
-const normalizedTeamName = normalizeTeamName(driver.team);
+const normalizedTeamName = normalizeTeamId(driver.team);
 if (!teamPoints[normalizedTeamName]) {
 teamPoints[normalizedTeamName] = 0;
 }
