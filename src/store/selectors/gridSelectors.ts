@@ -8,12 +8,6 @@ export const selectGridPositions = (state: RootState) => state.grid.positions;
 // Using '::' as a separator to avoid conflicts with race IDs that contain dashes
 export const selectRacePositionKey = (_: RootState, raceId: string, position: number) => `${raceId}::${position}`;
 
-// Select positions for a specific race
-export const selectRacePositions = createSelector(
-  [selectGridPositions, (_: RootState, raceId: string) => raceId],
-  (positions, raceId) => positions.filter(position => position.raceId === raceId)
-);
-
 // Select driver at a specific position - fixed to avoid creating new objects
 export const selectDriverAtPosition = createSelector(
   [selectGridPositions, selectRacePositionKey],
