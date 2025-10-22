@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { getVersionHistory, deleteAllHistory, VersionSummary } from '../../api/predictions';
-import { races } from '../../data/races';
 import { trackVersionHistoryAction } from '../../utils/analytics';
 
 interface VersionHistoryProps {
@@ -12,6 +11,7 @@ interface VersionHistoryProps {
 
 const VersionHistory: React.FC<VersionHistoryProps> = ({ onClose, onLoadVersion }) => {
   const { fingerprint } = useSelector((state: RootState) => state.predictions);
+  const races = useSelector((state: RootState) => state.races.list);
   const [versions, setVersions] = useState<VersionSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedVersion, setSelectedVersion] = useState<string | null>(null);
