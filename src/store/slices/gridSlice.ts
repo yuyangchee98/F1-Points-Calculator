@@ -93,7 +93,6 @@ export const gridSlice = createSlice({
       }
     },
 
-    // Legacy actions kept for backward compatibility
     placeDriver: (state, action: PayloadAction<{ raceId: string; position: number; driverId: string }>) => {
       const { raceId, position, driverId } = action.payload;
       
