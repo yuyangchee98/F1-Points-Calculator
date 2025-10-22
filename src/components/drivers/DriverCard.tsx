@@ -35,7 +35,7 @@ const DriverCard: React.FC<DriverCardProps> = ({
   const { drag, isDragging } = useDriverDrag(driver.id, raceId, position);
   
   return (
-    <div 
+    <div
       ref={drag}
       className={`
         driver-card flex items-center justify-between rounded-md overflow-hidden
@@ -46,7 +46,6 @@ const DriverCard: React.FC<DriverCardProps> = ({
       data-driver-id={driver.id}
       data-driver-name={driver.name}
       data-team={driver.team}
-      data-official-result={isOfficialResult ? 'true' : 'false'}
       onClick={onClick}
       style={{
         borderLeft: `4px solid ${team?.color || '#ccc'}`,

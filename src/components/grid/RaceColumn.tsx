@@ -90,12 +90,11 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
   ].filter(Boolean).join(' ');
 
   return (
-    <div 
+    <div
       className={slotClasses}
       data-testid="race-slot"
       data-race-id={race.id}
       data-position={position}
-      data-official-result={isOfficialResult ? 'true' : 'false'}
       onClick={handleSlotClick}
       ref={drop}
       role="button"
