@@ -1,6 +1,6 @@
 import { PastRaceResult } from '../types';
 
-const API_BASE_URL = 'https://f1-points-calculator-api.yuyangchee98.workers.dev';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://f1-points-calculator-api.yuyangchee98.workers.dev';
 
 export async function fetchPastRaceResults(): Promise<PastRaceResult> {
   const response = await fetch(`${API_BASE_URL}/api/race-results`);

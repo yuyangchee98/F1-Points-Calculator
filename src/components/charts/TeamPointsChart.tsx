@@ -5,14 +5,14 @@ import { ChartDataset, TooltipItem } from 'chart.js';
 import { RootState } from '../../store';
 import { selectTeamPointsForCharts, selectTopTeams } from '../../store/selectors/resultsSelectors';
 import { teamById } from '../../data/teams';
-import { races } from '../../data/races';
 import './responsive-chart.css';
 
 const TeamPointsChart: React.FC = () => {
   // Get top 5 teams and their points history for the chart
   const topTeams = useSelector((state: RootState) => selectTopTeams(state, 5));
   const teamPoints = useSelector((state: RootState) => selectTeamPointsForCharts(state, 5));
-  
+  const races = useSelector((state: RootState) => state.races.list);
+
   // Get races with data and sort them by calendar order
   const racesWithData = races
     .filter(race => {

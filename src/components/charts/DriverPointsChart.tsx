@@ -6,14 +6,14 @@ import { RootState } from '../../store';
 import { selectDriverPointsForCharts, selectTopDrivers } from '../../store/selectors/resultsSelectors';
 import { driverById, getDriverLastName } from '../../data/drivers';
 import { teamById } from '../../data/teams';
-import { races } from '../../data/races';
 import { normalizeTeamId } from '../../utils/teamHelper';
 
 const DriverPointsChart: React.FC = () => {
   // Get top 5 drivers and their points history for the chart
   const topDrivers = useSelector((state: RootState) => selectTopDrivers(state, 5));
   const driverPoints = useSelector((state: RootState) => selectDriverPointsForCharts(state, 5));
-  
+  const races = useSelector((state: RootState) => state.races.list);
+
   // Get races with data and sort them by calendar order
   const racesWithData = races
     .filter(race => {

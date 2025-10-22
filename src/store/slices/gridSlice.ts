@@ -1,30 +1,26 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { GridState, GridPosition, PastRaceResult } from '../../types';
-import { races } from '../../data/races';
+import { GridState, GridPosition, PastRaceResult, Race } from '../../types';
 import { MAX_GRID_POSITIONS } from '../../utils/constants';
+import { fetchSeasonData } from './racesSlice';
 
-// Initialize grid positions with empty slots for all races and positions
-const initialPositions: GridPosition[] = [];
-races.forEach(race => {
-  for (let position = 1; position <= MAX_GRID_POSITIONS; position++) {
-    // Check if there's an official result for this race and position
-    const driverId: string | null = null;
-    const isOfficialResult = false;
-    
-    // Don't initialize with past results here - they'll be loaded from API
-    // and populated via toggleOfficialResults
-    
-    initialPositions.push({
-      raceId: race.id,
-      position,
-      driverId,
-      isOfficialResult
-    });
-  }
-});
+// Helper function to initialize grid positions for races
+const initializeGridPositions = (races: Race[]): GridPosition[] => {
+  const positions: GridPosition[] = [];
+  races.forEach(race => {
+    for (let position = 1; position <= MAX_GRID_POSITIONS; position++) {
+      positions.push({
+        raceId: race.id,
+        position,
+        driverId: null,
+        isOfficialResult: false
+      });
+    }
+  });
+  return positions;
+};
 
 const initialState: GridState = {
-  positions: initialPositions
+  positions: [] // Will be populated when season data is loaded
 };
 
 export const gridSlice = createSlice({
@@ -132,34 +128,27 @@ export const gridSlice = createSlice({
     
     toggleOfficialResults: (state, action: PayloadAction<{ show: boolean; pastResults?: PastRaceResult }>) => {
       const { show, pastResults } = action.payload;
-      
+
       if (show) {
         // Restore official results
         state.positions = state.positions.map(position => {
-          // Find the official result for this race and position
+          // Use raceId directly to look up results (already in correct format)
           const raceId = position.raceId;
-          const raceIndex = races.findIndex(r => r.id === raceId);
-          
-          if (raceIndex !== -1) {
-            const raceName = races[raceIndex].name;
-            // Convert race name to API format
-            const apiRaceName = raceName.toLowerCase().replace(/\s+/g, '-');
-            const pastResult = pastResults ? pastResults[apiRaceName] : null;
-            
-            if (pastResult) {
-              const raceResult = pastResult.find(r => r.position === position.position);
-              
-              if (raceResult) {
-                return {
-                  ...position,
-                  driverId: raceResult.driverId,
-                  teamId: raceResult.teamId, // Preserve historical team data
-                  isOfficialResult: true
-                };
-              }
+          const pastResult = pastResults ? pastResults[raceId] : null;
+
+          if (pastResult) {
+            const raceResult = pastResult.find((r) => r.position === position.position);
+
+            if (raceResult) {
+              return {
+                ...position,
+                driverId: raceResult.driverId,
+                teamId: raceResult.teamId, // Preserve historical team data
+                isOfficialResult: true
+              };
             }
           }
-          
+
           return position;
         });
       } else {
@@ -177,6 +166,17 @@ export const gridSlice = createSlice({
         });
       }
     }
+  },
+  extraReducers: (builder) => {
+    // Initialize grid when season data is loaded
+    builder.addCase(fetchSeasonData.fulfilled, (state, action) => {
+      const { schedule } = action.payload;
+
+      // Only initialize if grid is empty (first load)
+      if (state.positions.length === 0) {
+        state.positions = initializeGridPositions(schedule);
+      }
+    });
   }
 });
 
