@@ -5,10 +5,12 @@ import { ChartDataset, TooltipItem } from 'chart.js';
 import { RootState } from '../../store';
 import { selectDriverPointsForCharts, selectTopDrivers } from '../../store/selectors/resultsSelectors';
 import { driverById, getDriverLastName } from '../../data/drivers';
-import { teamById } from '../../data/teams';
-import { normalizeTeamId } from '../../utils/teamHelper';
+import { selectTeamsByIdMap } from '../../store/selectors/teamsSelectors';
 
 const DriverPointsChart: React.FC = () => {
+  // Get teams from Redux
+  const teamById = useSelector(selectTeamsByIdMap);
+
   // Get top 5 drivers and their points history for the chart
   const topDrivers = useSelector((state: RootState) => selectTopDrivers(state, 5));
   const driverPoints = useSelector((state: RootState) => selectDriverPointsForCharts(state, 5));
@@ -39,7 +41,7 @@ const DriverPointsChart: React.FC = () => {
     const driver = driverById[standing.driverId];
     if (!driver) return null;
     
-    const team = teamById[normalizeTeamId(driver.team)];
+    const team = teamById[driver.team];
     const color = team?.color || '#ccc';
     
     // Get data points corresponding to the filtered races

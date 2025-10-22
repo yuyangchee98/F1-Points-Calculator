@@ -1,9 +1,9 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import { Driver } from '../../types';
-import { teamById } from '../../data/teams';
+import { selectTeamsByIdMap } from '../../store/selectors/teamsSelectors';
 import { useDriverDrag } from '../../hooks/useDriverDragDrop';
 import { getDriverDisplayName } from '../../utils/driverHelper';
-import { normalizeTeamId } from '../../utils/teamHelper';
 import { getDriverLastName } from '../../data/drivers';
 
 interface DriverCardProps {
@@ -27,9 +27,12 @@ const DriverCard: React.FC<DriverCardProps> = ({
   hideCode = false,
   overrideTeamId
 }) => {
+  // Get teams from Redux
+  const teamById = useSelector(selectTeamsByIdMap);
+
   // Use override team if provided (for historical accuracy), otherwise use driver's current team
   const teamId = overrideTeamId || driver.team;
-  const team = teamById[normalizeTeamId(teamId)];
+  const team = teamById[teamId];
   
   // Set up drag source if we're in a grid position
   const { drag, isDragging } = useDriverDrag(driver.id, raceId, position);

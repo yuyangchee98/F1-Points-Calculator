@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import { TeamStanding } from '../../types';
-import { teamById } from '../../data/teams';
+import { selectTeamsByIdMap } from '../../store/selectors/teamsSelectors';
 import { useStandingsAnimation } from '../../hooks/useStandingsAnimation';
 
 interface TeamStandingsTableProps {
@@ -8,11 +9,14 @@ interface TeamStandingsTableProps {
 }
 
 const TeamStandingsTable: React.FC<TeamStandingsTableProps> = ({ standings }) => {
+  // Get teams from Redux
+  const teamById = useSelector(selectTeamsByIdMap);
+
   // Memoize animation options to prevent recreating functions on each render
   const animationOptions = useMemo(() => ({
     getItemId: (standing: TeamStanding) => standing.teamId
   }), []);
-  
+
   // Use custom hook for animations
   const animatedTeams = useStandingsAnimation(standings, animationOptions);
 
