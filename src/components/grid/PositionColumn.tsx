@@ -1,7 +1,8 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import { DriverStanding } from '../../types';
 import { driverById, getDriverLastName } from '../../data/drivers';
-import { teamById } from '../../data/teams';
+import { selectTeamsByIdMap } from '../../store/selectors/teamsSelectors';
 
 interface PositionColumnProps {
   position: number;
@@ -10,6 +11,9 @@ interface PositionColumnProps {
 }
 
 const PositionColumn: React.FC<PositionColumnProps> = ({ position, mode = 'position', standings = [] }) => {
+  // Get teams from Redux
+  const teamById = useSelector(selectTeamsByIdMap);
+
   // In standings mode, find the driver at this championship position
   const standingDriver = mode === 'standings' && standings[position - 1];
   const driver = standingDriver ? driverById[standingDriver.driverId] : null;
