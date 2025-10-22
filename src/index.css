@@ -233,12 +233,6 @@ body {
     position: relative;
   }
   
-  /* Old official result styling kept for backward compatibility */
-  .race-slot[data-official-result="true"] {
-    @apply border-gray-300 opacity-80;
-    position: relative;
-  }
-  
   /* Add a subtle indicator for official results on mobile, but no lock icon since we allow modifications */
   @media (max-width: 768px) {
     .official-result-styling::after {
