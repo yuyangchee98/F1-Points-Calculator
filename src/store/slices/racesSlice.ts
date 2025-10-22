@@ -1,24 +1,23 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { RacesState } from '../../types';
-import { races } from '../../data/races';
-import { fetchPastRaceResults as fetchFromAPI } from '../../api/fetchPastRaceResults';
+import { fetchPastRaceResults as fetchResultsFromAPI } from '../../api/fetchPastRaceResults';
+import { fetchRaceSchedule } from '../../api/raceSchedule';
 
 const initialState: RacesState = {
-  list: races,
+  list: [], // Will be populated from API
   pastResults: {} // Start with empty results, will be populated from API
 };
 
-// Async thunk for fetching past race results from our API
-export const fetchPastRaceResults = createAsyncThunk(
-  'races/fetchPastRaceResults',
-  async () => {
-    try {
-      const results = await fetchFromAPI();
-      return results;
-    } catch (error) {
-      // Return empty results if API fails
-      return {};
-    }
+// Async thunk for fetching season data (schedule + results)
+export const fetchSeasonData = createAsyncThunk(
+  'races/fetchSeasonData',
+  async (year: number) => {
+    const [schedule, results] = await Promise.all([
+      fetchRaceSchedule(year),
+      fetchResultsFromAPI().catch(() => ({})) // Don't fail if results aren't available
+    ]);
+
+    return { schedule, results };
   }
 );
 
@@ -28,9 +27,15 @@ export const racesSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(fetchPastRaceResults.fulfilled, (state, action) => {
-      state.pastResults = { ...state.pastResults, ...action.payload };
-      
+    builder.addCase(fetchSeasonData.fulfilled, (state, action) => {
+      const { schedule, results } = action.payload;
+
+      // Update schedule
+      state.list = schedule;
+
+      // Update results
+      state.pastResults = { ...state.pastResults, ...results };
+
       // Update the completed status for races
       state.list = state.list.map(race => {
         // Convert race name to API format (lowercase, hyphenated)

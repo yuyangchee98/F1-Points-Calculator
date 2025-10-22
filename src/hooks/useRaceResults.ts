@@ -2,8 +2,9 @@ import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { toggleOfficialResults } from '../store/slices/gridSlice';
 import { calculateResults } from '../store/slices/resultsSlice';
-import { fetchPastRaceResults } from '../store/slices/racesSlice';
+import { fetchSeasonData } from '../store/slices/racesSlice';
 import { RootState } from '../store';
+import { CURRENT_SEASON } from '../utils/constants';
 // Past race results managed by Redux store
 import useAppDispatch from './useAppDispatch';
 
@@ -16,8 +17,8 @@ export const useRaceResults = () => {
 
   // Initialize results on component mount
   useEffect(() => {
-    // Fetch past race results from API
-    dispatch(fetchPastRaceResults());
+    // Fetch season data (schedule + results) from API
+    dispatch(fetchSeasonData(CURRENT_SEASON));
   }, [dispatch]);
 
   // When pastResults are loaded, update the grid
