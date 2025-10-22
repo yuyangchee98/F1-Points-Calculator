@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { ResultsState, DriverStanding, TeamStanding, PointsHistory, TeamPointsHistory } from '../../types';
 import { RootState } from '../index';
 import { getPointsForPositionWithSystem } from '../../data/pointsSystems';
-import { normalizeTeamId } from '../../utils/teamHelper';
 
 const initialState: ResultsState = {
   driverStandings: [],
@@ -44,11 +43,10 @@ const teamPoints: Record<string, number> = {};
 const driverHistories: PointsHistory[] = [];
 const teamHistories: TeamPointsHistory[] = [];
 
-// Initialize teams
+// Initialize teams (team IDs now use hyphens matching API format)
 allDrivers.forEach(driver => {
-const normalizedTeamName = normalizeTeamId(driver.team);
-if (!teamPoints[normalizedTeamName]) {
-teamPoints[normalizedTeamName] = 0;
+if (!teamPoints[driver.team]) {
+teamPoints[driver.team] = 0;
 }
 });
 

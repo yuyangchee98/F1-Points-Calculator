@@ -26,6 +26,7 @@ export const driverNames = [
 ];
 
 // Current driver teams (as of end of season)
+// Team IDs use underscores to match Jolpica API format
 export const driverTeamMapping = {
   hamilton: "ferrari",
   russell: "mercedes",
@@ -40,7 +41,7 @@ export const driverTeamMapping = {
   gasly: "alpine",
   sainz: "williams",
   antonelli: "mercedes",
-  tsunoda: "red_bull",  // Current team after swap
+  tsunoda: "red_bull",  
   lawson: "rb",  // Current team after swap
   albon: "williams",
   bearman: "haas",

@@ -7,7 +7,7 @@ import { moveDriver } from '../store/slices/gridSlice';
 import { calculateResults } from '../store/slices/resultsSlice';
 import { toastService } from '../components/common/ToastContainer';
 import { driverById } from '../data/drivers';
-import { teamById } from '../data/teams';
+import { selectTeamsByIdMap } from '../store/selectors/teamsSelectors';
 import useAppDispatch from './useAppDispatch';
 import { trackDriverDrop, GA_EVENTS, trackEvent } from '../utils/analytics';
 
@@ -18,10 +18,11 @@ interface UseDriverDropParams {
 
 export function useDriverDrop({ raceId, position }: UseDriverDropParams) {
   const dispatch = useAppDispatch();
-  const currentDriverId = useSelector((state: RootState) => 
+  const teamById = useSelector(selectTeamsByIdMap);
+  const currentDriverId = useSelector((state: RootState) =>
     state.grid.positions.find(p => p.raceId === raceId && p.position === position)?.driverId
   );
-  
+
   // Get races from the store
   const races = useSelector((state: RootState) => state.races.list);
   
@@ -49,10 +50,9 @@ export function useDriverDrop({ raceId, position }: UseDriverDropParams) {
     // Get driver objects for better messages
     const currentDriver = currentDriverId ? driverById[currentDriverId] : null;
     const newDriver = driverById[driverId];
-    
-    // Get team color for toast styling
-    const newDriverTeam = newDriver ? newDriver.team.toLowerCase().replace(/\s/g, '-') : '';
-    const teamColor = newDriverTeam ? teamById[newDriverTeam]?.color || '#ccc' : '#ccc';
+
+    // Get team color for toast styling (team IDs now use hyphens matching API format)
+    const teamColor = newDriver ? teamById[newDriver.team]?.color || '#ccc' : '#ccc';
     
     // Get race names for better context in notifications
     const currentRace = races.find(r => r.id === raceId);

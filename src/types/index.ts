@@ -10,6 +10,7 @@ export interface Driver {
 export interface Team {
   id: string;
   name: string;
+  nationality: string;
   color: string;
 }
 
@@ -79,6 +80,10 @@ export interface DriversState {
 export interface RacesState {
   list: Race[];
   pastResults: Record<string, RaceResult[]>;
+}
+
+export interface TeamsState {
+  list: Team[];
 }
 
 export interface GridState {

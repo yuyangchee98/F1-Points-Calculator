@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import driversReducer from './slices/driversSlice';
 import racesReducer from './slices/racesSlice';
+import teamsReducer from './slices/teamsSlice';
 import gridReducer from './slices/gridSlice';
 import uiReducer from './slices/uiSlice';
 import resultsReducer from './slices/resultsSlice';
@@ -11,6 +12,7 @@ export const store = configureStore({
   reducer: {
     drivers: driversReducer,
     races: racesReducer,
+    teams: teamsReducer,
     grid: gridReducer,
     ui: uiReducer,
     results: resultsReducer,

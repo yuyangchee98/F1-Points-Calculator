@@ -4,10 +4,13 @@ import { Line } from 'react-chartjs-2';
 import { ChartDataset, TooltipItem } from 'chart.js';
 import { RootState } from '../../store';
 import { selectTeamPointsForCharts, selectTopTeams } from '../../store/selectors/resultsSelectors';
-import { teamById } from '../../data/teams';
+import { selectTeamsByIdMap } from '../../store/selectors/teamsSelectors';
 import './responsive-chart.css';
 
 const TeamPointsChart: React.FC = () => {
+  // Get teams from Redux
+  const teamById = useSelector(selectTeamsByIdMap);
+
   // Get top 5 teams and their points history for the chart
   const topTeams = useSelector((state: RootState) => selectTopTeams(state, 5));
   const teamPoints = useSelector((state: RootState) => selectTeamPointsForCharts(state, 5));

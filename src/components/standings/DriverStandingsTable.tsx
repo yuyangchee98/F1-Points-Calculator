@@ -1,15 +1,18 @@
 import React, { useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import { DriverStanding } from '../../types';
 import { driverById, getDriverLastName } from '../../data/drivers';
-import { teamById } from '../../data/teams';
+import { selectTeamsByIdMap } from '../../store/selectors/teamsSelectors';
 import { useStandingsAnimation } from '../../hooks/useStandingsAnimation';
-import { normalizeTeamId } from '../../utils/teamHelper';
 
 interface DriverStandingsTableProps {
   standings: DriverStanding[];
 }
 
 const DriverStandingsTable: React.FC<DriverStandingsTableProps> = ({ standings }) => {
+  // Get teams from Redux
+  const teamById = useSelector(selectTeamsByIdMap);
+
   // Memoize animation options to prevent recreating functions on each render
   const animationOptions = useMemo(() => ({
     getItemId: (standing: DriverStanding) => standing.driverId,
@@ -17,7 +20,7 @@ const DriverStandingsTable: React.FC<DriverStandingsTableProps> = ({ standings }
       return current.driverId === prev.driverId;
     }
   }), []);
-  
+
   // Use custom hook for animations
   const animatedDrivers = useStandingsAnimation(standings, animationOptions);
   
@@ -40,10 +43,9 @@ const DriverStandingsTable: React.FC<DriverStandingsTableProps> = ({ standings }
             {standings.map((standing) => {
               const driver = driverById[standing.driverId];
               if (!driver) return null;
-              
-              // Get the team color
-              const teamId = normalizeTeamId(driver.team);
-              const teamColor = teamById[teamId]?.color || '#ccc';
+
+              // Get the team color (team IDs now use hyphens matching API format)
+              const teamColor = teamById[driver.team]?.color || '#ccc';
               
               return (
                 <tr 
