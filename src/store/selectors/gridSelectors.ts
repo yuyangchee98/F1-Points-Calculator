@@ -18,19 +18,3 @@ export const selectDriverAtPosition = createSelector(
     return gridPosition ? gridPosition.driverId : null;
   }
 );
-
-// Select the position of a driver in a specific race
-export const selectDriverPositionInRace = createSelector(
-  [selectGridPositions, (_: RootState, raceId: string, driverId: string) => `${raceId}::${driverId}`],
-  (positions, key) => {
-    const [raceId, driverId] = key.split('::');
-    const gridPosition = positions.find(p => p.raceId === raceId && p.driverId === driverId);
-    return gridPosition ? gridPosition.position : null;
-  }
-);
-
-// Select all positions with official results
-export const selectOfficialResults = createSelector(
-  [selectGridPositions],
-  (positions) => positions.filter(position => position.isOfficialResult === true)
-);
