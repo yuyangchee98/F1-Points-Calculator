@@ -5,21 +5,11 @@
 @tailwind utilities;
 
 /* Animation Keyframes */
-@keyframes fadeIn {
-  0% { opacity: 0; transform: translateY(10px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-
 @keyframes toastIn {
   0% { opacity: 0; transform: translateX(20px); }
   100% { opacity: 1; transform: translateX(0); }
 }
 
-@keyframes replacementHighlight {
-  0% { box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.5); }
-  50% { box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.3); }
-  100% { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); }
-}
 @keyframes cardPlacement {
   0% { transform: scale(1.05); opacity: 0.8; }
   50% { transform: scale(0.95); }
@@ -92,15 +82,7 @@ body {
   .animate-slot-highlight {
     animation: slotHighlight 0.8s ease-out;
   }
-  
-  .animate-replacement-highlight {
-    animation: replacementHighlight 0.8s ease-out;
-  }
-  
-  .animate-fade-in {
-    animation: fadeIn 0.3s ease-out;
-  }
-  
+
   .animate-toast-in {
     animation: toastIn 0.3s ease-out forwards;
   }
@@ -326,29 +308,11 @@ body {
     box-shadow: 2px 0 6px -2px rgba(0, 0, 0, 0.1);
     transition: all 0.2s ease;
   }
-  
-  .points {
-    @apply flex items-center justify-center bg-gray-100 font-bold text-gray-700 rounded-md;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-    transition: all 0.2s ease;
-  }
-  
-  .points[data-points="0"] {
-    @apply text-gray-400;
-  }
-  
-  .sprint-points {
-    @apply bg-gray-100 italic;
-  }
-  
+
   .even-row > * {
     @apply bg-gray-50;
   }
-  
-  .standings-row {
-    @apply flex items-center p-2 border-b border-gray-200;
-  }
-  
+
   /* Grid Card Wrapper */
   .grid-card-wrapper {
     width: 100%;
@@ -372,17 +336,6 @@ body {
   
   .team-color {
     @apply w-3 h-5 rounded-sm mr-2 inline-block;
-  }
-  
-  /* Form Select Styling */
-  .form-select {
-    @apply px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm;
-    @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
-    @apply transition duration-150 ease-in-out;
-  }
-  
-  .form-select:hover {
-    @apply border-gray-400;
   }
 }
 
