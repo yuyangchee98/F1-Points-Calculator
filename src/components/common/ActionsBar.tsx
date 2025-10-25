@@ -14,7 +14,7 @@ import { loadPrediction } from '../../api/predictions';
 const ActionsBar: React.FC = () => {
   const dispatch = useAppDispatch(); // Use typed dispatch
   const showOfficialResults = useSelector((state: RootState) => state.ui.showOfficialResults);
-  const pastResults = useSelector((state: RootState) => state.races.pastResults);
+  const pastResults = useSelector((state: RootState) => state.seasonData.pastResults);
   const { fingerprint } = useSelector((state: RootState) => state.predictions);
   const [showHistory, setShowHistory] = useState(false);
 

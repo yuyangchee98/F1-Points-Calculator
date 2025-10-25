@@ -14,7 +14,7 @@ const TeamPointsChart: React.FC = () => {
   // Get top 5 teams and their points history for the chart
   const topTeams = useSelector((state: RootState) => selectTopTeams(state, 5));
   const teamPoints = useSelector((state: RootState) => selectTeamPointsForCharts(state, 5));
-  const races = useSelector((state: RootState) => state.races.list);
+  const races = useSelector((state: RootState) => state.seasonData.races);
 
   // Get races with data and sort them by calendar order
   const racesWithData = races

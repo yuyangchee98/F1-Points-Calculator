@@ -14,7 +14,7 @@ const DriverPointsChart: React.FC = () => {
   // Get top 5 drivers and their points history for the chart
   const topDrivers = useSelector((state: RootState) => selectTopDrivers(state, 5));
   const driverPoints = useSelector((state: RootState) => selectDriverPointsForCharts(state, 5));
-  const races = useSelector((state: RootState) => state.races.list);
+  const races = useSelector((state: RootState) => state.seasonData.races);
 
   // Get races with data and sort them by calendar order
   const racesWithData = races

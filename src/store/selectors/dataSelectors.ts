@@ -9,7 +9,7 @@ import { Driver, Team } from '../../types';
 /**
  * Select all drivers
  */
-export const selectDrivers = (state: RootState): Driver[] => state.drivers.list;
+export const selectDrivers = (state: RootState): Driver[] => state.seasonData.drivers;
 
 /**
  * Select a driver by ID
@@ -75,7 +75,7 @@ const getDisplayName = (name: string): string => {
 /**
  * Select all teams
  */
-export const selectTeams = (state: RootState): Team[] => state.teams.list;
+export const selectTeams = (state: RootState): Team[] => state.seasonData.teams;
 
 /**
  * Select a team by ID
@@ -140,3 +140,17 @@ export const selectDriverAtPosition = createSelector(
     return gridPosition ? gridPosition.driverId : null;
   }
 );
+
+// ============================================================================
+// SEASON DATA SELECTORS
+// ============================================================================
+
+/**
+ * Select all races
+ */
+export const selectRaces = (state: RootState) => state.seasonData.races;
+
+/**
+ * Select past race results
+ */
+export const selectPastResults = (state: RootState) => state.seasonData.pastResults;

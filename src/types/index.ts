@@ -74,17 +74,11 @@ export interface PastRaceResult {
 }
 
 // State types
-export interface DriversState {
-  list: Driver[];
-}
-
-export interface RacesState {
-  list: Race[];
+export interface SeasonDataState {
+  drivers: Driver[];
+  teams: Team[];
+  races: Race[];
   pastResults: Record<string, RaceResult[]>;
-}
-
-export interface TeamsState {
-  list: Team[];
 }
 
 export interface GridState {

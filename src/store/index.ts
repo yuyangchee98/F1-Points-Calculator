@@ -1,7 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import driversReducer from './slices/driversSlice';
-import racesReducer from './slices/racesSlice';
-import teamsReducer from './slices/teamsSlice';
+import seasonDataReducer from './slices/seasonDataSlice';
 import gridReducer from './slices/gridSlice';
 import uiReducer from './slices/uiSlice';
 import resultsReducer from './slices/resultsSlice';
@@ -10,9 +8,7 @@ import { predictionMiddleware } from './middleware/predictionMiddleware';
 
 export const store = configureStore({
   reducer: {
-    drivers: driversReducer,
-    races: racesReducer,
-    teams: teamsReducer,
+    seasonData: seasonDataReducer,
     grid: gridReducer,
     ui: uiReducer,
     results: resultsReducer,
