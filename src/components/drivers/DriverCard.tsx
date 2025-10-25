@@ -1,10 +1,9 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { Driver } from '../../types';
-import { selectTeamsByIdMap } from '../../store/selectors/teamsSelectors';
+import { selectTeamsByIdMap, getDriverLastName } from '../../store/selectors/dataSelectors';
 import { useDriverDrag } from '../../hooks/useDriverDragDrop';
 import { getDriverDisplayName } from '../../utils/driverHelper';
-import { getDriverLastName } from '../../store/selectors/driversSelectors';
 
 interface DriverCardProps {
   driver: Driver;

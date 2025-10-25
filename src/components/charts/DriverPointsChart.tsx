@@ -4,8 +4,7 @@ import { Line } from 'react-chartjs-2';
 import { ChartDataset, TooltipItem } from 'chart.js';
 import { RootState } from '../../store';
 import { selectDriverPointsForCharts, selectTopDrivers } from '../../store/selectors/resultsSelectors';
-import { selectDriversByIdMap, getDriverLastName } from '../../store/selectors/driversSelectors';
-import { selectTeamsByIdMap } from '../../store/selectors/teamsSelectors';
+import { selectDriversByIdMap, getDriverLastName, selectTeamsByIdMap } from '../../store/selectors/dataSelectors';
 
 const DriverPointsChart: React.FC = () => {
   // Get drivers and teams from Redux

@@ -1,8 +1,7 @@
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { DriverStanding } from '../../types';
-import { selectDriversByIdMap, getDriverLastName } from '../../store/selectors/driversSelectors';
-import { selectTeamsByIdMap } from '../../store/selectors/teamsSelectors';
+import { selectDriversByIdMap, getDriverLastName, selectTeamsByIdMap } from '../../store/selectors/dataSelectors';
 import { useStandingsAnimation } from '../../hooks/useStandingsAnimation';
 
 interface DriverStandingsTableProps {
