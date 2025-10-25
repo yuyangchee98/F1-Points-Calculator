@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { DemoConfig, demos } from '../../data/demoConfigs';
+import { demos } from '../../data/demoConfigs';
 
 const SmartInputDemo: React.FC = () => {
   const [typedText, setTypedText] = useState('');
