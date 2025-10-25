@@ -1,9 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { RacesState } from '../../types';
-import { fetchPastRaceResults as fetchResultsFromAPI } from '../../api/fetchPastRaceResults';
+import { fetchPastRaceResults as fetchResultsFromAPI, fetchTeams, fetchDrivers } from '../../api/dataFetchers';
 import { fetchRaceSchedule } from '../../api/raceSchedule';
-import { fetchTeams } from '../../api/fetchTeams';
-import { fetchDrivers } from '../../api/fetchDrivers';
 
 const initialState: RacesState = {
   list: [], // Will be populated from API
