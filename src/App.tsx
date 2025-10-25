@@ -28,7 +28,7 @@ import SubscriptionModal from './components/common/SubscriptionModal';
 import InputSections from './components/common/InputSections';
 import RacendoPromo from './components/common/RacendoPromo';
 const SmartInputDemo = React.lazy(() => import('./components/common/SmartInputDemo'));
-import useAppDispatch from './hooks/useAppDispatch';
+import { useAppDispatch } from './store';
 import useWindowSize from './hooks/useWindowSize';
 import { trackBuyCoffeeClick, trackFeedbackClick, trackSmartInputAction, trackSmartInputCommand } from './utils/analytics';
 import { CURRENT_SEASON } from './utils/constants';

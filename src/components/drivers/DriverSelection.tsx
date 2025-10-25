@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { selectDriver } from '../../store/slices/uiSlice';
 import DriverCard from './DriverCard';
-import useAppDispatch from '../../hooks/useAppDispatch';
+import { useAppDispatch } from '../../store';
 import useWindowSize from '../../hooks/useWindowSize';
 import { GA_EVENTS, trackEvent } from '../../utils/analytics';
 import { getDriverLastName } from '../../store/selectors/dataSelectors';

@@ -7,7 +7,7 @@ import { moveDriver } from '../store/slices/gridSlice';
 import { calculateResults } from '../store/slices/resultsSlice';
 import { toastService } from '../components/common/ToastContainer';
 import { selectDriversByIdMap, selectTeamsByIdMap } from '../store/selectors/dataSelectors';
-import useAppDispatch from './useAppDispatch';
+import { useAppDispatch } from '../store';
 import { trackDriverDrop, GA_EVENTS, trackEvent } from '../utils/analytics';
 
 interface UseDriverDropParams {
