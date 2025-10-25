@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { TeamStanding } from '../../types';
-import { selectTeamsByIdMap } from '../../store/selectors/teamsSelectors';
+import { selectTeamsByIdMap } from '../../store/selectors/dataSelectors';
 import { useStandingsAnimation } from '../../hooks/useStandingsAnimation';
 
 interface TeamStandingsTableProps {
