@@ -4,11 +4,12 @@ import { Line } from 'react-chartjs-2';
 import { ChartDataset, TooltipItem } from 'chart.js';
 import { RootState } from '../../store';
 import { selectDriverPointsForCharts, selectTopDrivers } from '../../store/selectors/resultsSelectors';
-import { driverById, getDriverLastName } from '../../data/drivers';
+import { selectDriversByIdMap, getDriverLastName } from '../../store/selectors/driversSelectors';
 import { selectTeamsByIdMap } from '../../store/selectors/teamsSelectors';
 
 const DriverPointsChart: React.FC = () => {
-  // Get teams from Redux
+  // Get drivers and teams from Redux
+  const driverById = useSelector(selectDriversByIdMap);
   const teamById = useSelector(selectTeamsByIdMap);
 
   // Get top 5 drivers and their points history for the chart

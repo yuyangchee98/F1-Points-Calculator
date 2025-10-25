@@ -4,7 +4,7 @@ import { Driver } from '../../types';
 import { selectTeamsByIdMap } from '../../store/selectors/teamsSelectors';
 import { useDriverDrag } from '../../hooks/useDriverDragDrop';
 import { getDriverDisplayName } from '../../utils/driverHelper';
-import { getDriverLastName } from '../../data/drivers';
+import { getDriverLastName } from '../../store/selectors/driversSelectors';
 
 interface DriverCardProps {
   driver: Driver;
@@ -47,7 +47,7 @@ const DriverCard: React.FC<DriverCardProps> = ({
         ${isDragging ? 'opacity-50' : 'opacity-100'}
       `}
       data-driver-id={driver.id}
-      data-driver-name={driver.name}
+      data-driver-name={`${driver.givenName} ${driver.familyName}`}
       data-team={driver.team}
       onClick={onClick}
       style={{

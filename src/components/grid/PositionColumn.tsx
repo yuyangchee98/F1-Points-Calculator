@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { DriverStanding } from '../../types';
-import { driverById, getDriverLastName } from '../../data/drivers';
+import { selectDriversByIdMap, getDriverLastName } from '../../store/selectors/driversSelectors';
 import { selectTeamsByIdMap } from '../../store/selectors/teamsSelectors';
 
 interface PositionColumnProps {
@@ -11,7 +11,8 @@ interface PositionColumnProps {
 }
 
 const PositionColumn: React.FC<PositionColumnProps> = ({ position, mode = 'position', standings = [] }) => {
-  // Get teams from Redux
+  // Get drivers and teams from Redux
+  const driverById = useSelector(selectDriversByIdMap);
   const teamById = useSelector(selectTeamsByIdMap);
 
   // In standings mode, find the driver at this championship position
@@ -19,12 +20,12 @@ const PositionColumn: React.FC<PositionColumnProps> = ({ position, mode = 'posit
   const driver = standingDriver ? driverById[standingDriver.driverId] : null;
   const team = driver ? teamById[driver.team] : null;
   const teamColor = team?.color || '#666666';
-  
+
   return (
-    <div 
-      className="position sticky left-0 z-10 flex items-center justify-center" 
+    <div
+      className="position sticky left-0 z-10 flex items-center justify-center"
       data-position={position}
-      title={mode === 'standings' && driver && standingDriver ? `${driver.name} - ${standingDriver.points} pts` : `Position ${position}`}
+      title={mode === 'standings' && driver && standingDriver ? `${driver.givenName} ${driver.familyName} - ${standingDriver.points} pts` : `Position ${position}`}
     >
       {mode === 'position' ? (
         <span className="font-bold text-gray-700">{position}</span>
