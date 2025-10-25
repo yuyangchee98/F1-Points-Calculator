@@ -6,7 +6,7 @@ import DriverCard from './DriverCard';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import useWindowSize from '../../hooks/useWindowSize';
 import { GA_EVENTS, trackEvent } from '../../utils/analytics';
-import { getDriverLastName } from '../../data/drivers';
+import { getDriverLastName } from '../../store/selectors/driversSelectors';
 
 interface DriverSelectionProps {
   forceExpanded?: boolean;

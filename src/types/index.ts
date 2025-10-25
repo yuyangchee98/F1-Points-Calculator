@@ -2,9 +2,11 @@
 
 export interface Driver {
   id: string;
-  name: string;
+  code: string;
+  givenName: string;
+  familyName: string;
+  nationality: string;
   team: string;
-  number?: number; // Optional driver number for display
 }
 
 export interface Team {
@@ -74,7 +76,6 @@ export interface PastRaceResult {
 // State types
 export interface DriversState {
   list: Driver[];
-  driverTeams: Record<string, string>;
 }
 
 export interface RacesState {

@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { DriverStanding } from '../../types';
-import { driverById, getDriverLastName } from '../../data/drivers';
+import { selectDriversByIdMap, getDriverLastName } from '../../store/selectors/driversSelectors';
 import { selectTeamsByIdMap } from '../../store/selectors/teamsSelectors';
 import { useStandingsAnimation } from '../../hooks/useStandingsAnimation';
 
@@ -10,7 +10,8 @@ interface DriverStandingsTableProps {
 }
 
 const DriverStandingsTable: React.FC<DriverStandingsTableProps> = ({ standings }) => {
-  // Get teams from Redux
+  // Get drivers and teams from Redux
+  const driverById = useSelector(selectDriversByIdMap);
   const teamById = useSelector(selectTeamsByIdMap);
 
   // Memoize animation options to prevent recreating functions on each render

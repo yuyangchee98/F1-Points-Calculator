@@ -1,17 +1,20 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { DriversState } from '../../types';
-import { drivers, driverTeamMapping } from '../../data/drivers';
+import { fetchSeasonData } from './racesSlice';
 
 const initialState: DriversState = {
-  list: drivers,
-  driverTeams: driverTeamMapping as Record<string, string>
+  list: [] // Will be populated from API
 };
 
 export const driversSlice = createSlice({
   name: 'drivers',
   initialState,
-  reducers: {
-    // This slice likely won't need many mutations since driver data is mostly static for a season
+  reducers: {},
+  extraReducers: (builder) => {
+    // Listen to fetchSeasonData from racesSlice which fetches drivers
+    builder.addCase(fetchSeasonData.fulfilled, (state, action) => {
+      state.list = action.payload.drivers;
+    });
   }
 });
 
