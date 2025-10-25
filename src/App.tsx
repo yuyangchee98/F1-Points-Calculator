@@ -6,6 +6,7 @@ import { initializeUiState, setMobileView } from './store/slices/uiSlice';
 import { RootState, store } from './store';
 import { calculateResults } from './store/slices/resultsSlice';
 import { moveDriver } from './store/slices/gridSlice';
+import { selectDriverTeamsMap } from './store/selectors/driversSelectors';
 import { parseNaturalLanguage } from './api/naturalLanguage';
 import { createCheckoutSession } from './api/subscription';
 import useRaceResults from './hooks/useRaceResults';
@@ -212,10 +213,10 @@ const App: React.FC = () => {
                                 drivers: state.results.driverStandings,
                                 teams: state.results.teamStandings
                               };
-                              
-                              // Get driver teams
-                              const driverTeams = state.drivers.driverTeams;
-                              
+
+                              // Get driver teams using selector
+                              const driverTeams = selectDriverTeamsMap(state);
+
                               const context = {
                                 races,
                                 predictions,

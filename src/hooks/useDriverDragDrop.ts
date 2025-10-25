@@ -6,7 +6,7 @@ import { DriverDragItem, ItemTypes } from '../types/dragTypes';
 import { moveDriver } from '../store/slices/gridSlice';
 import { calculateResults } from '../store/slices/resultsSlice';
 import { toastService } from '../components/common/ToastContainer';
-import { driverById } from '../data/drivers';
+import { selectDriversByIdMap } from '../store/selectors/driversSelectors';
 import { selectTeamsByIdMap } from '../store/selectors/teamsSelectors';
 import useAppDispatch from './useAppDispatch';
 import { trackDriverDrop, GA_EVENTS, trackEvent } from '../utils/analytics';
@@ -18,6 +18,7 @@ interface UseDriverDropParams {
 
 export function useDriverDrop({ raceId, position }: UseDriverDropParams) {
   const dispatch = useAppDispatch();
+  const driverById = useSelector(selectDriversByIdMap);
   const teamById = useSelector(selectTeamsByIdMap);
   const currentDriverId = useSelector((state: RootState) =>
     state.grid.positions.find(p => p.raceId === raceId && p.position === position)?.driverId
@@ -65,7 +66,7 @@ export function useDriverDrop({ raceId, position }: UseDriverDropParams) {
       // This will be a swap
       if (currentDriver && newDriver) {
         toastService.addToast(
-          `${newDriver.name} swapped with ${currentDriver.name} at P${position} in ${currentRaceName}`,
+          `${newDriver.givenName} ${newDriver.familyName} swapped with ${currentDriver.givenName} ${currentDriver.familyName} at P${position} in ${currentRaceName}`,
           'info',
           3000,
           teamColor
@@ -78,8 +79,8 @@ export function useDriverDrop({ raceId, position }: UseDriverDropParams) {
         if (currentDriverId) {
           // Replacing a driver in a different race
           toastService.addToast(
-            `${newDriver.name} moved from ${sourceRaceName} P${sourcePosition} to ${currentRaceName} P${position}` + 
-            (currentDriver ? `, replacing ${currentDriver.name}` : ''),
+            `${newDriver.givenName} ${newDriver.familyName} moved from ${sourceRaceName} P${sourcePosition} to ${currentRaceName} P${position}` +
+            (currentDriver ? `, replacing ${currentDriver.givenName} ${currentDriver.familyName}` : ''),
             'warning',
             3000,
             teamColor
@@ -87,7 +88,7 @@ export function useDriverDrop({ raceId, position }: UseDriverDropParams) {
         } else {
           // Moving to an empty slot in a different race
           toastService.addToast(
-            `${newDriver.name} moved from ${sourceRaceName} P${sourcePosition} to ${currentRaceName} P${position}`,
+            `${newDriver.givenName} ${newDriver.familyName} moved from ${sourceRaceName} P${sourcePosition} to ${currentRaceName} P${position}`,
             'info',
             3000,
             teamColor
@@ -100,7 +101,7 @@ export function useDriverDrop({ raceId, position }: UseDriverDropParams) {
       if (currentDriver && newDriver) {
         // Show toast notification about the replacement
         toastService.addToast(
-          `${currentDriver.name} was replaced by ${newDriver.name} in ${currentRaceName} P${position}`,
+          `${currentDriver.givenName} ${currentDriver.familyName} was replaced by ${newDriver.givenName} ${newDriver.familyName} in ${currentRaceName} P${position}`,
           'warning',
           3000,
           teamColor
@@ -111,7 +112,7 @@ export function useDriverDrop({ raceId, position }: UseDriverDropParams) {
     else if (!sourceRaceId && !sourcePosition && !currentDriverId) {
       if (newDriver) {
         toastService.addToast(
-          `${newDriver.name} placed in ${currentRaceName} P${position}`,
+          `${newDriver.givenName} ${newDriver.familyName} placed in ${currentRaceName} P${position}`,
           'success',
           3000,
           teamColor
@@ -122,7 +123,7 @@ export function useDriverDrop({ raceId, position }: UseDriverDropParams) {
     else if (sourceRaceId && sourcePosition && sourceRaceId === raceId) {
       if (newDriver) {
         toastService.addToast(
-          `${newDriver.name} was moved from P${sourcePosition} to P${position} in ${currentRaceName}`,
+          `${newDriver.givenName} ${newDriver.familyName} was moved from P${sourcePosition} to P${position} in ${currentRaceName}`,
           'info',
           3000,
           teamColor
@@ -144,9 +145,9 @@ export function useDriverDrop({ raceId, position }: UseDriverDropParams) {
     
     // Recalculate results
     dispatch(calculateResults());
-    
+
     return { driverId, raceId, position };
-  }, [raceId, position, currentDriverId, dispatch, races, recentDropRef]);
+  }, [raceId, position, currentDriverId, dispatch, races, driverById, teamById, recentDropRef]);
   
   const [{ isOver, canDrop }, drop] = useDrop({
     accept: ItemTypes.DRIVER,

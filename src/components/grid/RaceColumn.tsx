@@ -4,7 +4,7 @@ import { Race } from '../../types';
 import { RootState } from '../../store';
 import { selectDriverAtPosition } from '../../store/selectors/gridSelectors';
 import DriverCard from '../drivers/DriverCard';
-import { driverById, getDriverLastName } from '../../data/drivers';
+import { selectDriversByIdMap, getDriverLastName } from '../../store/selectors/driversSelectors';
 import { selectDriver } from '../../store/slices/uiSlice';
 import { placeDriver } from '../../store/slices/gridSlice';
 import { calculateResults } from '../../store/slices/resultsSlice';
@@ -18,22 +18,23 @@ interface RaceColumnProps {
 
 const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
   const dispatch = useAppDispatch();
-  const driverId = useSelector((state: RootState) => 
+  const driverId = useSelector((state: RootState) =>
     selectDriverAtPosition(state, race.id, position)
   );
   const selectedDriverId = useSelector((state: RootState) => state.ui.selectedDriver);
   const positions = useSelector((state: RootState) => state.grid.positions);
-  
+  const driverById = useSelector(selectDriversByIdMap);
+
   // Animation states
   const [isHighlighted, setIsHighlighted] = useState(false);
   const [prevDriverId, setPrevDriverId] = useState<string | null>(null);
-  
+
   // Set up the drop target
   const { drop, isOver, canDrop } = useDriverDrop({
     raceId: race.id,
     position,
   });
-  
+
   // Detect when a driver is placed and trigger animation
   useEffect(() => {
     if (driverId && driverId !== prevDriverId) {
@@ -43,13 +44,13 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
     }
     setPrevDriverId(driverId);
   }, [driverId, prevDriverId]);
-  
+
   // Find the grid position object to determine if it's an official result
-  const gridPosition = positions.find(p => 
+  const gridPosition = positions.find(p =>
     p.raceId === race.id && p.position === position
   );
   const isOfficialResult = gridPosition?.isOfficialResult || false;
-  
+
   // Get the driver object if there's a driver in this position
   const driver = driverId ? driverById[driverId] : null;
 
