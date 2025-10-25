@@ -1,47 +1,53 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { RacesState } from '../../types';
-import { fetchPastRaceResults as fetchResultsFromAPI, fetchTeams, fetchDrivers } from '../../api/dataFetchers';
+import { Driver, Team, Race, RaceResult } from '../../types';
+import { fetchDrivers, fetchTeams, fetchPastRaceResults } from '../../api/dataFetchers';
 import { fetchRaceSchedule } from '../../api/raceSchedule';
 
-const initialState: RacesState = {
-  list: [], // Will be populated from API
-  pastResults: {} // Start with empty results, will be populated from API
+export interface SeasonDataState {
+  drivers: Driver[];
+  teams: Team[];
+  races: Race[];
+  pastResults: Record<string, RaceResult[]>;
+}
+
+const initialState: SeasonDataState = {
+  drivers: [],
+  teams: [],
+  races: [],
+  pastResults: {}
 };
 
-// Async thunk for fetching season data (schedule + results + teams + drivers)
+// Async thunk for fetching all season data (schedule + results + teams + drivers)
 export const fetchSeasonData = createAsyncThunk(
-  'races/fetchSeasonData',
+  'seasonData/fetchSeasonData',
   async (year: number) => {
     const [schedule, results, teams, drivers] = await Promise.all([
       fetchRaceSchedule(year),
-      fetchResultsFromAPI().catch(() => ({})), // Don't fail if results aren't available
+      fetchPastRaceResults().catch(() => ({})), // Don't fail if results aren't available
       fetchTeams(year).catch(() => []), // Don't fail if teams aren't available
       fetchDrivers(year).catch(() => []) // Don't fail if drivers aren't available
     ]);
 
-    // Teams and drivers need to be dispatched to their slices separately since this is racesSlice
-    // We'll return them in the payload for their slices to handle
     return { schedule, results, teams, drivers };
   }
 );
 
-
-export const racesSlice = createSlice({
-  name: 'races',
+export const seasonDataSlice = createSlice({
+  name: 'seasonData',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(fetchSeasonData.fulfilled, (state, action) => {
-      const { schedule, results } = action.payload;
+      const { schedule, results, teams, drivers } = action.payload;
 
-      // Update schedule
-      state.list = schedule;
-
-      // Update results
+      // Update all season data at once
+      state.drivers = drivers;
+      state.teams = teams;
+      state.races = schedule;
       state.pastResults = { ...state.pastResults, ...results };
 
       // Update the completed status for races
-      state.list = state.list.map(race => {
+      state.races = state.races.map(race => {
         // Convert race name to API format (lowercase, hyphenated)
         const apiRaceName = race.name.toLowerCase().replace(/\s+/g, '-');
         const isCompleted = !!state.pastResults[apiRaceName];
@@ -51,4 +57,4 @@ export const racesSlice = createSlice({
   }
 });
 
-export default racesSlice.reducer;
+export default seasonDataSlice.reducer;

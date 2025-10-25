@@ -33,8 +33,8 @@ export const calculateResults = createAsyncThunk(
 async (_, { dispatch, getState }) => {
 const state = getState() as RootState;
 const { positions } = state.grid;
-const allDrivers = state.drivers.list;
-const allRaces = state.races.list;
+const allDrivers = state.seasonData.drivers;
+const allRaces = state.seasonData.races;
 const selectedPointsSystem = state.ui.selectedPointsSystem;
 
 // Initialize data structures for calculations
@@ -60,7 +60,7 @@ const raceDriverPoints: Record<string, number> = {};
 const raceTeamPoints: Record<string, number> = {};
 
 // Get past results for this race to determine which team each driver was racing for
-const raceResults = state.races.pastResults[race.name] || [];
+const raceResults = state.seasonData.pastResults[race.name] || [];
 
 // Calculate points for each position
 racePositions.forEach(position => {

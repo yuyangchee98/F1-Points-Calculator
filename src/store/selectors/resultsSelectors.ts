@@ -1,13 +1,13 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../index';
 import { DriverStanding, TeamStanding } from '../../types';
+import { selectRaces } from './dataSelectors';
 
 // Basic selectors
 export const selectDriverStandings = (state: RootState) => state.results.driverStandings;
 export const selectTeamStandings = (state: RootState) => state.results.teamStandings;
 export const selectPointsHistory = (state: RootState) => state.results.pointsHistory;
 export const selectTeamPointsHistory = (state: RootState) => state.results.teamPointsHistory;
-export const selectRaces = (state: RootState) => state.races.list;
 
 // Select top N drivers in the standings
 export const selectTopDrivers = createSelector(

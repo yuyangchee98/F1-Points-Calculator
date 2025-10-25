@@ -24,7 +24,7 @@ export function useDriverDrop({ raceId, position }: UseDriverDropParams) {
   );
 
   // Get races from the store
-  const races = useSelector((state: RootState) => state.races.list);
+  const races = useSelector((state: RootState) => state.seasonData.races);
   
   // Add a ref to track recent drops to prevent duplicate notifications
   const recentDropRef = useRef<{driverId: string, timestamp: number} | null>(null);
