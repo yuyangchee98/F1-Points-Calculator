@@ -61,6 +61,14 @@ export const getDriverLastName = (driverId: string): string => {
   return lastName.charAt(0).toUpperCase() + lastName.slice(1);
 };
 
+/**
+ * Get the display name for a driver (last name in uppercase)
+ * Takes a Driver object
+ */
+export const getDriverDisplayName = (driver: Driver): string => {
+  return driver.familyName.toUpperCase();
+};
+
 // ============================================================================
 // TEAM SELECTORS
 // ============================================================================
