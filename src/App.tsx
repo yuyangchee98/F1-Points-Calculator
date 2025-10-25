@@ -94,7 +94,7 @@ const App: React.FC = () => {
           content={
             <div className="px-4 py-6 max-w-5xl mx-auto">
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-                <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 flex flex-wrap sm:flex-nowrap items-center">
+                <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-gray-800 flex flex-wrap sm:flex-nowrap items-center">
                   <span className="whitespace-nowrap">
                     <span className="bg-red-600 text-white px-3 py-1 mr-3 rounded-md">F1</span>
                     Championship Calculator
