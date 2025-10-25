@@ -7,7 +7,7 @@ import DriverCard from '../drivers/DriverCard';
 import { selectDriver } from '../../store/slices/uiSlice';
 import { placeDriver } from '../../store/slices/gridSlice';
 import { calculateResults } from '../../store/slices/resultsSlice';
-import useAppDispatch from '../../hooks/useAppDispatch';
+import { useAppDispatch } from '../../store';
 import { useDriverDrop } from '../../hooks/useDriverDragDrop';
 
 interface RaceColumnProps {

@@ -6,7 +6,7 @@ import { fetchSeasonData } from '../store/slices/seasonDataSlice';
 import { RootState } from '../store';
 import { CURRENT_SEASON } from '../utils/constants';
 // Past race results managed by Redux store
-import useAppDispatch from './useAppDispatch';
+import { useAppDispatch } from '../store';
 
 /**
  * Custom hook to handle race results initialization

@@ -4,7 +4,7 @@ import { RootState } from '../../store';
 import MobileNavigation from '../navigation/MobileNavigation';
 import useWindowSize from '../../hooks/useWindowSize';
 import { setMobileView } from '../../store/slices/uiSlice';
-import useAppDispatch from '../../hooks/useAppDispatch';
+import { useAppDispatch } from '../../store';
 import { trackSidebarToggle } from '../../utils/analytics';
 
 interface LayoutProps {

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { loadPrediction } from '../api/predictions';
-import useAppDispatch from './useAppDispatch';
+import { useAppDispatch } from '../store';
 
 export const useLoadPredictions = () => {
   const dispatch = useAppDispatch();

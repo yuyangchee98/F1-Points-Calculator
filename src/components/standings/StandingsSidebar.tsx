@@ -7,7 +7,7 @@ import DriverStandingsTable from './DriverStandingsTable';
 import TeamStandingsTable from './TeamStandingsTable';
 import TableSkeleton from '../common/TableSkeleton';
 import { DriverPointsChart, TeamPointsChart } from '../charts/LazyCharts';
-import useAppDispatch from '../../hooks/useAppDispatch';
+import { useAppDispatch } from '../../store';
 import { trackStandingsTabChange } from '../../utils/analytics';
 
 const StandingsSidebar: React.FC = () => {

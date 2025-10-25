@@ -4,7 +4,7 @@ import { resetGrid, toggleOfficialResults } from '../../store/slices/gridSlice';
 import { toggleOfficialResults as toggleOfficialResultsUI } from '../../store/slices/uiSlice';
 import { calculateResults } from '../../store/slices/resultsSlice';
 import { RootState } from '../../store';
-import useAppDispatch from '../../hooks/useAppDispatch';
+import { useAppDispatch } from '../../store';
 import PointsSystemSelector from './PointsSystemSelector';
 import PointsReference from './PointsReference';
 import VersionHistory from './VersionHistory';

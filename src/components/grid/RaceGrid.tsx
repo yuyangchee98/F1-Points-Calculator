@@ -5,7 +5,7 @@ import PositionColumn from './PositionColumn';
 import RaceColumn from './RaceColumn';
 import useWindowSize from '../../hooks/useWindowSize';
 import { togglePositionColumnMode } from '../../store/slices/uiSlice';
-import useAppDispatch from '../../hooks/useAppDispatch';
+import { useAppDispatch } from '../../store';
 
 interface RaceGridProps {
   scrollRef?: React.RefObject<HTMLDivElement>;

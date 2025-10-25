@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { MobileView } from '../../types';
 import { setMobileView } from '../../store/slices/uiSlice';
-import useAppDispatch from '../../hooks/useAppDispatch';
+import { useAppDispatch } from '../../store';
 import { trackMobileViewChange } from '../../utils/analytics';
 
 const MobileNavigation: React.FC = () => {
