@@ -6,7 +6,7 @@ import { initializeUiState, setMobileView } from './store/slices/uiSlice';
 import { RootState, store } from './store';
 import { calculateResults } from './store/slices/resultsSlice';
 import { moveDriver } from './store/slices/gridSlice';
-import { selectDriverTeamsMap } from './store/selectors/driversSelectors';
+import { selectDriverTeamsMap } from './store/selectors/dataSelectors';
 import { parseNaturalLanguage } from './api/naturalLanguage';
 import { createCheckoutSession } from './api/subscription';
 import useRaceResults from './hooks/useRaceResults';
