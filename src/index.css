@@ -165,7 +165,7 @@ body {
   }
   
   /* Enhanced visual cue for tappable slots on mobile */
-  @media (max-width: 768px) {
+  @screen max-sm {
     .race-slot.highlight-slot {
       @apply relative;
     }
@@ -198,7 +198,7 @@ body {
   }
   
   /* Add a subtle indicator for official results on mobile, but no lock icon since we allow modifications */
-  @media (max-width: 768px) {
+  @screen max-sm {
     .official-result-styling::after {
       content: '\2713'; /* Unicode checkmark symbol */
       @apply absolute top-0 right-0 text-[10px] p-0.5 text-green-600 pointer-events-none;
@@ -292,7 +292,7 @@ body {
 }
 
 /* Chart Responsive Breakpoints */
-@media (min-width: 768px) and (max-width: 1023px) {
+@screen md {
   .chart-container {
     @apply min-h-[250px];
   }
