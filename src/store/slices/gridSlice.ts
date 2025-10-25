@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { GridState, GridPosition, PastRaceResult, Race } from '../../types';
 import { MAX_GRID_POSITIONS } from '../../utils/constants';
-import { fetchSeasonData } from './racesSlice';
+import { fetchSeasonData } from './seasonDataSlice';
 
 // Helper function to initialize grid positions for races
 const initializeGridPositions = (races: Race[]): GridPosition[] => {

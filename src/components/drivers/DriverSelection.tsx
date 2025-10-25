@@ -14,7 +14,7 @@ interface DriverSelectionProps {
 
 const DriverSelection: React.FC<DriverSelectionProps> = ({ forceExpanded = false }) => {
   const dispatch = useAppDispatch();
-  const allDrivers = useSelector((state: RootState) => state.drivers.list);
+  const allDrivers = useSelector((state: RootState) => state.seasonData.drivers);
   const selectedDriverId = useSelector((state: RootState) => state.ui.selectedDriver);
   const [isExpanded, setIsExpanded] = useState(forceExpanded);
   const { isMobile } = useWindowSize();

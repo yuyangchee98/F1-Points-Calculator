@@ -190,7 +190,7 @@ const App: React.FC = () => {
                               const state = store.getState();
                               
                               // Build race context
-                              const races = state.races.list.map(race => ({
+                              const races = state.seasonData.races.map(race => ({
                                 raceId: race.id,
                                 completed: race.completed,
                                 order: race.order,
