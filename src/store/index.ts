@@ -1,4 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
+import { useDispatch } from 'react-redux';
 import seasonDataReducer from './slices/seasonDataSlice';
 import gridReducer from './slices/gridSlice';
 import uiReducer from './slices/uiSlice';
@@ -22,3 +23,6 @@ export const store = configureStore({
 export type RootState = ReturnType<typeof store.getState>;
 // This exports the type of dispatch with thunk support
 export type AppDispatch = typeof store.dispatch;
+
+// Typed dispatch hook - use throughout the app instead of plain useDispatch
+export const useAppDispatch = () => useDispatch<AppDispatch>();

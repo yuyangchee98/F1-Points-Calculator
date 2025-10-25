@@ -4,7 +4,7 @@ import { RootState } from '../store';
 import { getBrowserFingerprint } from '../utils/fingerprint';
 import { savePrediction } from '../api/predictions';
 import { setFingerprint, setSaveStatus, setSaveInfo } from '../store/slices/predictionSlice';
-import useAppDispatch from './useAppDispatch';
+import { useAppDispatch } from '../store';
 
 export const useAutoSave = () => {
   const dispatch = useAppDispatch();
