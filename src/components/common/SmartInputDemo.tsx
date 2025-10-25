@@ -1,20 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { DemoConfig } from './demos/FerrariItalianDemo';
-import { FerrariItalianDemo } from './demos/FerrariItalianDemo';
-import { NorrisRemainingDemo } from './demos/NorrisRemainingDemo';
-import { MaxNext3Demo } from './demos/MaxNext3Demo';
-import { McLarenSprintsDemo } from './demos/McLarenSprintsDemo';
-import { AlonsoSpainDemo } from './demos/AlonsoSpainDemo';
-import { ColapintoPointsDemo } from './demos/ColapintoPointsDemo';
-
-const demos: DemoConfig[] = [
-  FerrariItalianDemo,
-  NorrisRemainingDemo,
-  MaxNext3Demo,
-  McLarenSprintsDemo,
-  AlonsoSpainDemo,
-  ColapintoPointsDemo
-];
+import { DemoConfig, demos } from '../../data/demoConfigs';
 
 const SmartInputDemo: React.FC = () => {
   const [typedText, setTypedText] = useState('');
