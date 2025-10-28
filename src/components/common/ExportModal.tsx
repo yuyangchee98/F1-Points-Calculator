@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { exportPrediction } from '../../api/export';
@@ -28,12 +28,23 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
 
   // Initialize race selection with smart defaults
   // Select: last completed race + races with user predictions
-  const [raceSelection, setRaceSelection] = useState<RaceSelection>(() => {
+  const [raceSelection, setRaceSelection] = useState<RaceSelection>({});
+
+  // Update race selection when races or positions change
+  useEffect(() => {
+    if (races.length === 0) return; // Wait for races to load
+
+    console.log('[ExportModal] Updating race selection');
+    console.log('[ExportModal] Total races:', races.length);
+
     const initial: RaceSelection = {};
 
     // Find the last completed race (races array is already sorted chronologically)
     const completedRaces = races.filter(r => r.completed);
+    console.log('[ExportModal] Completed races:', completedRaces.map(r => ({ id: r.id, name: r.name, order: r.order })));
+
     const lastCompletedRace = completedRaces[completedRaces.length - 1];
+    console.log('[ExportModal] Last completed race:', lastCompletedRace ? { id: lastCompletedRace.id, name: lastCompletedRace.name } : 'none');
 
     races.forEach(race => {
       // Include if: (1) it's the last completed race OR (2) has user predictions
@@ -41,10 +52,22 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
         p => p.raceId === race.id && p.driverId && !p.isOfficialResult
       );
       const isLastCompletedRace = lastCompletedRace && race.id === lastCompletedRace.id;
+
+      if (hasUserPredictions) {
+        console.log(`[ExportModal] Race "${race.name}" has user predictions`);
+      }
+      if (isLastCompletedRace) {
+        console.log(`[ExportModal] Race "${race.name}" is last completed race`);
+      }
+
       initial[race.id] = isLastCompletedRace || hasUserPredictions;
     });
-    return initial;
-  });
+
+    console.log('[ExportModal] Final initial selection:', initial);
+    console.log('[ExportModal] Selected race count:', Object.values(initial).filter(Boolean).length);
+
+    setRaceSelection(initial);
+  }, [races, positions]);
 
   const handleExport = async () => {
     setIsLoading(true);
