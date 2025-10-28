@@ -92,7 +92,7 @@ export function formatExportData(
     position: standing.position,
     driverId: standing.driverId,
     points: standing.points,
-    positionChange: 0, // TODO: Need "before predictions" data for position change
+    positionChange: standing.positionChange,
     pointsGained: standing.predictionPointsGained
   }));
 
