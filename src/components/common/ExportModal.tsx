@@ -14,11 +14,24 @@ interface RaceSelection {
   [raceId: string]: boolean;
 }
 
+// Convert country code to flag emoji
+function countryCodeToFlag(countryCode: string): string {
+  if (!countryCode || countryCode.length !== 2) return '🏁';
+
+  const codePoints = countryCode
+    .toUpperCase()
+    .split('')
+    .map(char => 127397 + char.charCodeAt(0));
+
+  return String.fromCodePoint(...codePoints);
+}
+
 const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [title, setTitle] = useState('F1 CHAMPIONSHIP PREDICTIONS');
   const [subtitle, setSubtitle] = useState('Current predictions and standings');
+  const [selectedDrivers, setSelectedDrivers] = useState<Record<string, boolean>>({});
 
   const races = useSelector((state: RootState) => state.seasonData.races);
   const positions = useSelector((state: RootState) => state.grid.positions);
@@ -69,17 +82,31 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
     setRaceSelection(initial);
   }, [races, positions]);
 
+  // Initialize driver selection with top 3 drivers
+  useEffect(() => {
+    if (results.driverStandings.length === 0) return;
+
+    const initial: Record<string, boolean> = {};
+    // Select top 3 drivers by default
+    results.driverStandings.slice(0, 3).forEach(standing => {
+      initial[standing.driverId] = true;
+    });
+
+    setSelectedDrivers(initial);
+  }, [results.driverStandings]);
+
   const handleExport = async () => {
     setIsLoading(true);
     setError(null);
 
     try {
-      // Format the data with race filtering
+      // Format the data with race and driver filtering
       const exportData = formatExportData(
         { seasonData, grid, results } as RootState,
         title,
         subtitle,
-        raceSelection
+        raceSelection,
+        selectedDrivers
       );
 
       // Call export API
@@ -112,7 +139,66 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
     }));
   };
 
+  const toggleDriver = (driverId: string) => {
+    setSelectedDrivers(prev => ({
+      ...prev,
+      [driverId]: !prev[driverId]
+    }));
+  };
+
+  // Bulk actions for races
+  const selectAllRaces = () => {
+    const all: RaceSelection = {};
+    races.forEach(race => { all[race.id] = true; });
+    setRaceSelection(all);
+  };
+
+  const clearAllRaces = () => {
+    setRaceSelection({});
+  };
+
+  const selectCompletedRaces = () => {
+    const completed: RaceSelection = {};
+    races.forEach(race => {
+      if (race.completed) completed[race.id] = true;
+    });
+    setRaceSelection(completed);
+  };
+
+  const selectPredictedRaces = () => {
+    const predicted: RaceSelection = {};
+    races.forEach(race => {
+      const hasUserPredictions = positions.some(
+        p => p.raceId === race.id && p.driverId && !p.isOfficialResult
+      );
+      if (hasUserPredictions) predicted[race.id] = true;
+    });
+    setRaceSelection(predicted);
+  };
+
+  // Bulk actions for drivers
+  const selectTopDrivers = (count: number) => {
+    const top: Record<string, boolean> = {};
+    results.driverStandings.slice(0, count).forEach(standing => {
+      top[standing.driverId] = true;
+    });
+    setSelectedDrivers(top);
+  };
+
+  const selectAllDrivers = () => {
+    const all: Record<string, boolean> = {};
+    results.driverStandings.forEach(standing => {
+      all[standing.driverId] = true;
+    });
+    setSelectedDrivers(all);
+  };
+
+  const clearAllDrivers = () => {
+    setSelectedDrivers({});
+  };
+
   const selectedRaceCount = Object.values(raceSelection).filter(Boolean).length;
+  const selectedDriverCount = Object.values(selectedDrivers).filter(Boolean).length;
 
   // Generate preview data
   const previewData = useMemo(() => {
@@ -120,9 +206,10 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
       { seasonData, grid, results } as RootState,
       title,
       subtitle,
-      raceSelection
+      raceSelection,
+      selectedDrivers
     );
-  }, [seasonData, grid, results, title, subtitle, raceSelection]);
+  }, [seasonData, grid, results, title, subtitle, raceSelection, selectedDrivers]);
 
   // Early return after all hooks have been called
   if (!isOpen) return null;
@@ -179,35 +266,203 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
 
               {/* Race Selection */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Select Races ({selectedRaceCount} selected)
-                </label>
-                <div className="space-y-2 max-h-96 overflow-y-auto">
+                <div className="flex items-center justify-between mb-3">
+                  <label className="text-sm font-semibold text-gray-900">
+                    Select Races
+                    <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800">
+                      {selectedRaceCount}
+                    </span>
+                  </label>
+                </div>
+
+                {/* Bulk Actions */}
+                <div className="inline-flex rounded-lg shadow-sm mb-3 overflow-hidden border border-gray-300">
+                  <button
+                    onClick={selectAllRaces}
+                    className="px-3 py-1.5 text-xs font-medium bg-white hover:bg-gray-50 border-r border-gray-300 transition-colors"
+                  >
+                    All
+                  </button>
+                  <button
+                    onClick={clearAllRaces}
+                    className="px-3 py-1.5 text-xs font-medium bg-white hover:bg-gray-50 border-r border-gray-300 transition-colors"
+                  >
+                    Clear
+                  </button>
+                  <button
+                    onClick={selectCompletedRaces}
+                    className="px-3 py-1.5 text-xs font-medium bg-white hover:bg-gray-50 border-r border-gray-300 transition-colors"
+                  >
+                    Completed
+                  </button>
+                  <button
+                    onClick={selectPredictedRaces}
+                    className="px-3 py-1.5 text-xs font-medium bg-white hover:bg-gray-50 transition-colors"
+                  >
+                    Predicted
+                  </button>
+                </div>
+
+                <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
                   {races.map(race => {
                     const hasUserPredictions = positions.some(
                       p => p.raceId === race.id && p.driverId && !p.isOfficialResult
                     );
+                    const isSelected = raceSelection[race.id] || false;
                     return (
-                      <label
+                      <div
                         key={race.id}
-                        className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded cursor-pointer"
+                        onClick={() => toggleRace(race.id)}
+                        className={`
+                          relative flex items-center gap-3 p-3 rounded-lg cursor-pointer
+                          transition-all duration-200
+                          ${isSelected
+                            ? 'border-2 border-red-500 bg-red-50/30 shadow-md'
+                            : 'border-2 border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
+                          }
+                        `}
                       >
                         <input
                           type="checkbox"
-                          checked={raceSelection[race.id] || false}
-                          onChange={() => toggleRace(race.id)}
-                          className="w-4 h-4 text-red-600 rounded focus:ring-red-500"
+                          checked={isSelected}
+                          onChange={() => {}}
+                          className="w-5 h-5 text-red-600 rounded focus:ring-2 focus:ring-red-500 cursor-pointer"
                         />
-                        <span className="text-sm flex-1">
-                          {race.name}
-                          {race.completed && (
-                            <span className="ml-2 text-xs text-green-600">✓ Completed</span>
-                          )}
-                          {hasUserPredictions && (
-                            <span className="ml-2 text-xs text-blue-600">★ Predicted</span>
-                          )}
-                        </span>
-                      </label>
+                        <span className="text-2xl">{countryCodeToFlag(race.countryCode)}</span>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-gray-900 text-sm truncate">
+                            {race.name}
+                          </div>
+                          <div className="flex gap-2 mt-1 flex-wrap">
+                            {race.completed && (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                                ✓ Completed
+                              </span>
+                            )}
+                            {hasUserPredictions && (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
+                                ★ Predicted
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Driver Selection */}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <label className="text-sm font-semibold text-gray-900">
+                    Championship Standings
+                    <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800">
+                      {selectedDriverCount}
+                    </span>
+                  </label>
+                </div>
+
+                {/* Bulk Actions */}
+                <div className="inline-flex rounded-lg shadow-sm mb-3 overflow-hidden border border-gray-300">
+                  <button
+                    onClick={clearAllDrivers}
+                    className="px-3 py-1.5 text-xs font-medium bg-white hover:bg-gray-50 border-r border-gray-300 transition-colors"
+                  >
+                    Clear
+                  </button>
+                  <button
+                    onClick={() => selectTopDrivers(3)}
+                    className="px-3 py-1.5 text-xs font-medium bg-white hover:bg-gray-50 border-r border-gray-300 transition-colors"
+                  >
+                    Top 3
+                  </button>
+                  <button
+                    onClick={() => selectTopDrivers(5)}
+                    className="px-3 py-1.5 text-xs font-medium bg-white hover:bg-gray-50 border-r border-gray-300 transition-colors"
+                  >
+                    Top 5
+                  </button>
+                  <button
+                    onClick={() => selectTopDrivers(10)}
+                    className="px-3 py-1.5 text-xs font-medium bg-white hover:bg-gray-50 border-r border-gray-300 transition-colors"
+                  >
+                    Top 10
+                  </button>
+                  <button
+                    onClick={selectAllDrivers}
+                    className="px-3 py-1.5 text-xs font-medium bg-white hover:bg-gray-50 transition-colors"
+                  >
+                    All
+                  </button>
+                </div>
+
+                <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                  {results.driverStandings.map(standing => {
+                    const driver = seasonData.drivers.find(d => d.id === standing.driverId);
+                    if (!driver) return null;
+
+                    const team = seasonData.teams.find(t => t.id === driver.team);
+                    const teamColor = team?.color || '#ccc';
+                    const isSelected = selectedDrivers[standing.driverId] || false;
+
+                    return (
+                      <div
+                        key={standing.driverId}
+                        onClick={() => toggleDriver(standing.driverId)}
+                        className={`
+                          relative flex items-center gap-3 p-3 rounded-lg cursor-pointer
+                          transition-all duration-200
+                          ${isSelected
+                            ? 'border-2 border-red-500 bg-red-50/30 shadow-md'
+                            : 'border-2 border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
+                          }
+                        `}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => {}}
+                          className="w-5 h-5 text-red-600 rounded focus:ring-2 focus:ring-red-500 cursor-pointer"
+                        />
+                        <div
+                          className="w-1 h-12 rounded-full"
+                          style={{ backgroundColor: teamColor }}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex-1 min-w-0">
+                              <div className="font-semibold text-gray-900 text-sm">
+                                {standing.position}. {driver.familyName.toUpperCase()}
+                              </div>
+                              <div className="text-xs text-gray-500 truncate">
+                                {team?.name || 'Unknown Team'}
+                              </div>
+                            </div>
+                            <div className="text-right flex-shrink-0">
+                              <div className="font-bold text-gray-900 text-sm">
+                                {standing.points} pts
+                              </div>
+                              {standing.positionChange !== 0 && (
+                                <span
+                                  className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold mt-1 ${
+                                    standing.positionChange > 0
+                                      ? 'bg-green-100 text-green-700'
+                                      : 'bg-red-100 text-red-700'
+                                  }`}
+                                >
+                                  {standing.positionChange > 0 ? '↑' : '↓'} {Math.abs(standing.positionChange)}
+                                </span>
+                              )}
+                              {standing.predictionPointsGained > 0 && standing.positionChange === 0 && (
+                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 mt-1">
+                                  +{standing.predictionPointsGained}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     );
                   })}
                 </div>
