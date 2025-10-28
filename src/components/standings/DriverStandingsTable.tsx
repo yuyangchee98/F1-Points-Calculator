@@ -57,7 +57,18 @@ const DriverStandingsTable: React.FC<DriverStandingsTableProps> = ({ standings }
                   `}
                 >
                   <td className="py-3 px-2 text-center font-bold text-gray-700 w-12">
-                    {standing.position}
+                    <div className="flex flex-col items-center">
+                      <span>{standing.position}</span>
+                      {standing.positionChange !== 0 && (
+                        <span
+                          className={`text-xs font-bold ${
+                            standing.positionChange > 0 ? 'text-green-600' : 'text-red-600'
+                          }`}
+                        >
+                          {standing.positionChange > 0 ? '↑' : '↓'}{Math.abs(standing.positionChange)}
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="py-3">
                     <div className="flex items-center">
