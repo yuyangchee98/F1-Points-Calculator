@@ -92,8 +92,8 @@ export function formatExportData(
     position: standing.position,
     driverId: standing.driverId,
     points: standing.points,
-    positionChange: 0, // TODO: Need "before predictions" data
-    pointsGained: 0     // TODO: Need to separate prediction points from official results
+    positionChange: 0, // TODO: Need "before predictions" data for position change
+    pointsGained: standing.predictionPointsGained
   }));
 
   // Format all drivers

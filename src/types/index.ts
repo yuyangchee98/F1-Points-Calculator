@@ -40,6 +40,7 @@ export interface DriverStanding {
   driverId: string;
   points: number;
   position: number;
+  predictionPointsGained: number; // Points gained from user predictions only
 }
 
 export interface TeamStanding {
