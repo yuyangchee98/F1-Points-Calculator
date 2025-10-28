@@ -20,9 +20,11 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
   const [title, setTitle] = useState('F1 CHAMPIONSHIP PREDICTIONS');
   const [subtitle, setSubtitle] = useState('Current predictions and standings');
 
-  const state = useSelector((state: RootState) => state);
-  const { races } = state.seasonData;
-  const { positions } = state.grid;
+  const races = useSelector((state: RootState) => state.seasonData.races);
+  const positions = useSelector((state: RootState) => state.grid.positions);
+  const seasonData = useSelector((state: RootState) => state.seasonData);
+  const grid = useSelector((state: RootState) => state.grid);
+  const results = useSelector((state: RootState) => state.results);
 
   // Initialize race selection with smart defaults
   // Select: last completed race + races with user predictions
@@ -51,7 +53,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
     try {
       // Format the data with race filtering
       const exportData = formatExportData(
-        state,
+        { seasonData, grid, results } as RootState,
         title,
         subtitle,
         raceSelection
@@ -91,8 +93,13 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
 
   // Generate preview data
   const previewData = useMemo(() => {
-    return formatExportData(state, title, subtitle, raceSelection);
-  }, [state, title, subtitle, raceSelection]);
+    return formatExportData(
+      { seasonData, grid, results } as RootState,
+      title,
+      subtitle,
+      raceSelection
+    );
+  }, [seasonData, grid, results, title, subtitle, raceSelection]);
 
   // Early return after all hooks have been called
   if (!isOpen) return null;
