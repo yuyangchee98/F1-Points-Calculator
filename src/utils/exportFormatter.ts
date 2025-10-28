@@ -47,7 +47,8 @@ export function formatExportData(
   state: RootState,
   title: string,
   subtitle?: string,
-  raceSelection?: Record<string, boolean>
+  raceSelection?: Record<string, boolean>,
+  driverSelection?: Record<string, boolean>
 ): ExportData {
   const { seasonData, grid, results } = state;
 
@@ -92,14 +93,16 @@ export function formatExportData(
       }
     });
 
-  // Format all standings
-  const standings = results.driverStandings.map(standing => ({
-    position: standing.position,
-    driverId: standing.driverId,
-    points: standing.points,
-    positionChange: standing.positionChange,
-    pointsGained: standing.predictionPointsGained
-  }));
+  // Format standings (filter by driver selection if provided)
+  const standings = results.driverStandings
+    .filter(standing => !driverSelection || driverSelection[standing.driverId])
+    .map(standing => ({
+      position: standing.position,
+      driverId: standing.driverId,
+      points: standing.points,
+      positionChange: standing.positionChange,
+      pointsGained: standing.predictionPointsGained
+    }));
 
   // Format all drivers
   const drivers: Record<string, { name: string; teamId: string }> = {};
