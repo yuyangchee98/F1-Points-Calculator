@@ -8,127 +8,629 @@ interface ExportPreviewProps {
 const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
   const { races, grids, standings, drivers, teams } = data;
 
-  // Get team by ID
-  const getTeamColor = (teamId: string) => teams[teamId]?.color || '#ccc';
-  const getDriverName = (driverId: string) => drivers[driverId]?.name || driverId.toUpperCase();
-
   return (
-    <div className="flex justify-center items-start">
-      {/* Container scaled to fit preview */}
-      <div
-        className="bg-gradient-to-br from-gray-100 to-gray-200 shadow-2xl"
-        style={{
-          width: '400px',
-          height: '400px',
-          transform: 'scale(1)',
-          transformOrigin: 'top center',
-        }}
-      >
-        <div className="p-3 h-full flex flex-col text-[6px]">
-          {/* Title Section */}
-          <div className="mb-2">
-            <h1 className="text-[11px] font-bold text-gray-800 leading-tight">
-              {data.title}
-            </h1>
-            {data.subtitle && (
-              <p className="text-[5px] text-gray-600 mt-0.5">
-                {data.subtitle}
-              </p>
-            )}
-          </div>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', overflow: 'auto' }}>
+      {/* Scale container to fit preview area */}
+      <div style={{ transform: 'scale(0.37)', transformOrigin: 'top center' }}>
+        {/* Exact copy of backend template */}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            width: '1080px',
+            height: '1080px',
+            background: 'linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%)',
+            padding: '28px',
+            fontFamily: 'Inter, sans-serif',
+          }}
+        >
+          {/* Main Layout: Vertical Sections */}
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              flex: 1,
+            }}
+          >
+            {/* Title and Subtitle */}
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                marginBottom: '24px',
+                gap: '6px',
+              }}
+            >
+              <h1
+                style={{
+                  fontSize: '32px',
+                  fontWeight: '700',
+                  color: '#111827',
+                  margin: 0,
+                  lineHeight: 1.1,
+                }}
+              >
+                {data.title || 'My F1 Predictions'}
+              </h1>
+              {data.subtitle && (
+                <p
+                  style={{
+                    fontSize: '14px',
+                    fontWeight: '400',
+                    color: '#6b7280',
+                    margin: 0,
+                    lineHeight: 1.4,
+                  }}
+                >
+                  {data.subtitle}
+                </p>
+              )}
+            </div>
 
-          {/* Race Grid Section */}
-          <div className="flex-1 mb-2 overflow-hidden">
-            <div className="flex gap-1 h-full">
-              {/* Position/Points column */}
-              <div className="flex flex-col w-6 flex-shrink-0">
-                <div className="h-8 mb-1" />
+            {/* Race Grid Section */}
+            <div
+              style={{
+                display: 'flex',
+                gap: '8px',
+              }}
+            >
+              {/* Position/Points Index Column */}
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  width: '50px',
+                }}
+              >
+                {/* Empty header space */}
+                <div
+                  style={{
+                    height: '62px',
+                    marginBottom: '8px',
+                  }}
+                />
+
+                {/* Position/Points rows */}
                 {[
                   { pos: 1, pts: 25 },
                   { pos: 2, pts: 18 },
                   { pos: 3, pts: 15 },
                   { pos: 4, pts: 12 },
                   { pos: 5, pts: 10 },
-                ].map(({ pos, pts }) => (
-                  <div key={pos} className="h-5 mb-1 flex flex-col items-center justify-center bg-gray-300 rounded-sm">
-                    <div className="text-[7px] font-bold text-gray-700">{pos}</div>
-                    <div className="text-[4px] text-gray-500">{pts}</div>
+                ].map((item) => (
+                  <div
+                    key={item.pos}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginBottom: '8px',
+                      height: '80px',
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: '16px',
+                        fontWeight: '700',
+                        color: '#1f2937',
+                      }}
+                    >
+                      {item.pos}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: '9px',
+                        fontWeight: '600',
+                        color: '#9ca3af',
+                      }}
+                    >
+                      {item.pts}pt
+                    </span>
                   </div>
                 ))}
               </div>
 
-              {/* Race columns */}
-              <div className="flex-1 overflow-x-auto">
-                <div className="flex gap-1">
-                  {races.slice(0, 8).map(race => {
-                    const raceGrid = grids[race.raceId] || [];
-                    return (
-                      <div key={race.raceId} className="flex flex-col w-12 flex-shrink-0">
-                        {/* Race header */}
-                        <div className="h-8 mb-1 p-1 bg-white rounded flex flex-col items-center justify-center">
-                          <div className="text-[6px]">{race.flag}</div>
-                          <div className="text-[4px] text-gray-600 text-center leading-tight truncate w-full">
-                            {race.name.split(' ')[0]}
-                          </div>
+              {/* Race Columns */}
+              {(() => {
+                const completedRaces = races.filter(r => r.completed).slice(0, 1);
+                const predictionRaces = races.filter(r => !r.completed).slice(0, 5 - completedRaces.length);
+                return [...completedRaces, ...predictionRaces];
+              })().map((race) => {
+                const raceGrid = grids[race.raceId] || [];
+                const isCompleted = race.completed;
+
+                return (
+                  <div
+                    key={race.raceId}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      flex: 1,
+                      maxWidth: '160px',
+                    }}
+                  >
+                    {/* Race Header */}
+                    <div
+                      style={{
+                        fontWeight: '700',
+                        color: '#ffffff',
+                        background: isCompleted ? '#16a34a' : 'linear-gradient(135deg, #1f2937 0%, #111827 100%)',
+                        padding: '12px 10px',
+                        textAlign: 'center',
+                        borderRadius: '6px',
+                        marginBottom: '8px',
+                        boxShadow: isCompleted ? '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)' : '0 6px 16px rgba(0, 0, 0, 0.25), 0 2px 8px rgba(0, 0, 0, 0.15)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        gap: '4px',
+                        height: '62px',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          fontSize: isCompleted ? '11px' : '12px',
+                        }}
+                      >
+                        {race.flag && <span style={{ fontSize: isCompleted ? '14px' : '16px' }}>{race.flag}</span>}
+                        {race.name}
+                      </div>
+                      {!isCompleted && (
+                        <div
+                          style={{
+                            fontSize: '8px',
+                            fontWeight: '600',
+                            color: 'rgba(255, 255, 255, 0.85)',
+                            letterSpacing: '0.5px',
+                            textTransform: 'uppercase',
+                          }}
+                        >
+                          Prediction
                         </div>
-                        {/* Race positions */}
-                        {[1, 2, 3, 4, 5].map(position => {
-                          const gridPos = raceGrid.find(g => g.position === position);
-                          const teamColor = gridPos ? getTeamColor(drivers[gridPos.driverId]?.teamId) : '#e5e7eb';
+                      )}
+                    </div>
+
+                    {/* Grid Positions */}
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '8px',
+                      }}
+                    >
+                      {[1, 2, 3, 4, 5].map((position) => {
+                        const gridPos = raceGrid.find(gp => gp.position === position);
+
+                        // If no driver for this position, render empty invisible slot
+                        if (!gridPos) {
                           return (
                             <div
                               key={position}
-                              className="h-5 mb-1 rounded-sm flex items-center justify-center"
-                              style={{ backgroundColor: teamColor }}
-                            >
-                              {gridPos && (
-                                <span className="text-[5px] font-semibold text-white truncate px-0.5">
-                                  {getDriverName(gridPos.driverId).substring(0, 3)}
-                                </span>
-                              )}
-                            </div>
+                              style={{
+                                height: '80px',
+                              }}
+                            />
                           );
-                        })}
-                      </div>
-                    );
-                  })}
-                  {races.length > 8 && (
-                    <div className="flex items-center justify-center w-12 text-[5px] text-gray-400">
-                      +{races.length - 8} more
+                        }
+
+                        const driver = drivers[gridPos.driverId];
+                        const team = teams[driver?.teamId];
+                        const teamColor = team?.color || '#9ca3af';
+
+                        return (
+                          <div
+                            key={gridPos.position}
+                            style={{
+                              position: 'relative',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              padding: '8px',
+                              background: isCompleted ? '#f0fdf4' : '#ffffff',
+                              borderRadius: '6px',
+                              border: isCompleted ? '2px solid #86efac' : '1px solid #e5e7eb',
+                              boxShadow: isCompleted ? '0 2px 8px rgba(134, 239, 172, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.5)' : '0 2px 4px rgba(0, 0, 0, 0.08)',
+                              height: '80px',
+                              overflow: 'hidden',
+                              opacity: isCompleted ? 0.4 : 1,
+                              filter: isCompleted ? 'blur(1px)' : 'none',
+                            }}
+                          >
+                            {/* Inner Driver Card */}
+                            <div
+                              style={{
+                                position: 'relative',
+                                display: 'flex',
+                                alignItems: 'center',
+                                width: '100%',
+                                padding: '12px',
+                                background: isCompleted ? '#f0fdf4' : '#ffffff',
+                                borderRadius: '6px',
+                                overflow: 'hidden',
+                                zIndex: 1,
+                              }}
+                            >
+                              {/* Team Color Left Border */}
+                              <div
+                                style={{
+                                  position: 'absolute',
+                                  left: 0,
+                                  top: 0,
+                                  bottom: 0,
+                                  width: '4px',
+                                  background: teamColor,
+                                  display: 'flex',
+                                }}
+                              />
+
+                              {/* Team Color Gradient Overlay */}
+                              <div
+                                style={{
+                                  position: 'absolute',
+                                  left: 0,
+                                  top: 0,
+                                  bottom: 0,
+                                  width: '33%',
+                                  background: `linear-gradient(to right, ${teamColor} 0%, transparent 100%)`,
+                                  opacity: 0.1,
+                                  display: 'flex',
+                                }}
+                              />
+
+                              {/* Content */}
+                              <div
+                                style={{
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  marginLeft: '12px',
+                                  flexGrow: 1,
+                                  position: 'relative',
+                                  zIndex: 1,
+                                }}
+                              >
+                                {/* Driver Name */}
+                                <span
+                                  style={{
+                                    fontSize: '13px',
+                                    fontWeight: '700',
+                                    color: '#000000',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap',
+                                  }}
+                                >
+                                  {driver?.name || gridPos.driverId.toUpperCase()}
+                                </span>
+                                {/* Team Name */}
+                                <span
+                                  style={{
+                                    fontSize: '11px',
+                                    color: teamColor,
+                                    fontWeight: '400',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap',
+                                  }}
+                                >
+                                  {team?.name || ''}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Diagonal Stripe Effect for Completed Races - renders on top */}
+                            {isCompleted && (
+                              <div
+                                style={{
+                                  position: 'absolute',
+                                  inset: 0,
+                                  backgroundImage: 'linear-gradient(-45deg, transparent 0%, transparent 10%, rgba(134, 239, 172, 0.2) 10%, rgba(134, 239, 172, 0.2) 20%, transparent 20%, transparent 30%, rgba(134, 239, 172, 0.2) 30%, rgba(134, 239, 172, 0.2) 40%, transparent 40%, transparent 50%, rgba(134, 239, 172, 0.2) 50%, rgba(134, 239, 172, 0.2) 60%, transparent 60%, transparent 70%, rgba(134, 239, 172, 0.2) 70%, rgba(134, 239, 172, 0.2) 80%, transparent 80%, transparent 90%, rgba(134, 239, 172, 0.2) 90%, rgba(134, 239, 172, 0.2) 100%)',
+                                  borderRadius: '6px',
+                                  pointerEvents: 'none',
+                                  display: 'flex',
+                                  zIndex: 2,
+                                }}
+                              />
+                            )}
+
+                            {/* Points Gained Badge - only for predictions (not completed races) */}
+                            {!isCompleted && gridPos.pointsGained !== undefined && gridPos.pointsGained > 0 && (
+                              <div
+                                style={{
+                                  position: 'absolute',
+                                  top: '6px',
+                                  right: '6px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  padding: '4px 8px',
+                                  background: '#00d084',
+                                  borderRadius: '6px',
+                                  zIndex: 3,
+                                  boxShadow: '0 2px 6px rgba(0, 208, 132, 0.4)',
+                                }}
+                              >
+                                <span
+                                  style={{
+                                    fontSize: '11px',
+                                    fontWeight: '700',
+                                    color: '#ffffff',
+                                    whiteSpace: 'nowrap',
+                                  }}
+                                >
+                                  +{gridPos.pointsGained}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
-                  )}
-                </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Flow Indicator */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginTop: '20px',
+                marginBottom: '20px',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '12px 24px',
+                  background: 'linear-gradient(135deg, #1f2937 0%, #111827 100%)',
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: '16px',
+                    fontWeight: '700',
+                    color: '#ffffff',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1px',
+                  }}
+                >
+                  Results In
+                </span>
+                <span style={{ fontSize: '22px', color: '#ffffff' }}>⬇</span>
               </div>
             </div>
-          </div>
 
-          {/* Championship Standings */}
-          <div className="bg-white rounded shadow-sm p-2">
-            <h2 className="text-[7px] font-bold text-gray-800 mb-1">CHAMPIONSHIP STANDINGS</h2>
-            <div className="space-y-0.5">
-              {standings.slice(0, 10).map(standing => {
-                const teamColor = getTeamColor(drivers[standing.driverId]?.teamId);
+            {/* Championship Standings Section */}
+            {/* Section Header */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                marginBottom: '16px',
+                gap: '8px',
+              }}
+            >
+              <div
+                style={{
+                  width: '4px',
+                  height: '24px',
+                  background: '#dc2626',
+                  borderRadius: '2px',
+                  display: 'flex',
+                }}
+              />
+              <span
+                style={{
+                  fontSize: '14px',
+                  fontWeight: '700',
+                  color: '#1f2937',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                }}
+              >
+                Championship Standings
+              </span>
+            </div>
+
+            {/* Championship Standings Table */}
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                background: '#ffffff',
+                borderRadius: '8px',
+                border: '1px solid #e5e7eb',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)',
+                overflow: 'hidden',
+              }}
+            >
+              {/* Column Headers */}
+              <div
+                style={{
+                  display: 'flex',
+                  padding: '12px 20px',
+                  borderBottom: '2px solid #e5e7eb',
+                  background: '#f9fafb',
+                }}
+              >
+                <div
+                  style={{
+                    width: '60px',
+                    fontSize: '11px',
+                    fontWeight: '600',
+                    color: '#6b7280',
+                    display: 'flex',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
+                  }}
+                >
+                  Pos
+                </div>
+                <div
+                  style={{
+                    flex: 1,
+                    fontSize: '11px',
+                    fontWeight: '600',
+                    color: '#6b7280',
+                    display: 'flex',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
+                  }}
+                >
+                  Driver
+                </div>
+                <div
+                  style={{
+                    width: '100px',
+                    fontSize: '11px',
+                    fontWeight: '600',
+                    color: '#6b7280',
+                    textAlign: 'right',
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
+                  }}
+                >
+                  Points
+                </div>
+              </div>
+
+              {/* Standings Rows */}
+              {standings.slice(0, 3).map((standing, index) => {
+                const driver = drivers[standing.driverId];
+                const team = teams[driver?.teamId];
+                const teamColor = team?.color || '#9ca3af';
+
                 return (
-                  <div key={standing.driverId} className="flex items-center gap-1 text-[5px]">
-                    <div className="w-4 text-center font-bold text-gray-700 flex items-center justify-center gap-0.5">
-                      <span>{standing.position}</span>
-                      {standing.positionChange !== 0 && (
-                        <span className={standing.positionChange > 0 ? 'text-green-600' : 'text-red-600'}>
+                  <div
+                    key={standing.driverId}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: '16px 20px',
+                      borderBottom: index < 2 ? '1px solid #f3f4f6' : 'none',
+                      background: index % 2 === 0 ? '#ffffff' : '#fafbfc',
+                    }}
+                  >
+                    {/* Position with change indicator */}
+                    <div
+                      style={{
+                        width: '60px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: '16px',
+                          fontWeight: '700',
+                          color: '#1f2937',
+                        }}
+                      >
+                        {standing.position}
+                      </span>
+                      {standing.positionChange !== undefined && standing.positionChange !== 0 && (
+                        <span
+                          style={{
+                            fontSize: '11px',
+                            fontWeight: '700',
+                            color: standing.positionChange > 0 ? '#10b981' : '#ef4444',
+                          }}
+                        >
                           {standing.positionChange > 0 ? '↑' : '↓'}{Math.abs(standing.positionChange)}
                         </span>
                       )}
                     </div>
+
+                    {/* Driver with team color bar and name */}
                     <div
-                      className="w-1 h-2 rounded-sm flex-shrink-0"
-                      style={{ backgroundColor: teamColor }}
-                    />
-                    <div className="flex-1 font-medium text-gray-800 truncate">
-                      {getDriverName(standing.driverId)}
+                      style={{
+                        flex: 1,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: '4px',
+                          height: '32px',
+                          background: teamColor,
+                          borderRadius: '2px',
+                          display: 'flex',
+                        }}
+                      />
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '2px',
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontSize: '13px',
+                            fontWeight: '700',
+                            color: '#1f2937',
+                          }}
+                        >
+                          {driver?.name || standing.driverId}
+                        </span>
+                        <span
+                          style={{
+                            fontSize: '10px',
+                            fontWeight: '400',
+                            color: teamColor,
+                          }}
+                        >
+                          {team?.name || ''}
+                        </span>
+                      </div>
                     </div>
-                    <div className="font-bold text-gray-700 flex items-center gap-0.5">
-                      <span>{standing.points}</span>
-                      {standing.pointsGained > 0 && (
-                        <span className="text-green-600 bg-green-100 px-0.5 rounded text-[4px]">
+
+                    {/* Points with gained indicator */}
+                    <div
+                      style={{
+                        width: '100px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'flex-end',
+                        gap: '8px',
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: '18px',
+                          fontWeight: '700',
+                          color: '#1f2937',
+                        }}
+                      >
+                        {standing.points}
+                      </span>
+                      {standing.pointsGained !== undefined && standing.pointsGained > 0 && (
+                        <span
+                          style={{
+                            fontSize: '10px',
+                            fontWeight: '700',
+                            color: '#10b981',
+                            background: '#d1fae5',
+                            padding: '4px 8px',
+                            borderRadius: '4px',
+                          }}
+                        >
                           +{standing.pointsGained}
                         </span>
                       )}
@@ -136,12 +638,20 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                   </div>
                 );
               })}
-              {standings.length > 10 && (
-                <div className="text-center text-[4px] text-gray-400 pt-0.5">
-                  +{standings.length - 10} more drivers
-                </div>
-              )}
             </div>
+          </div>
+
+          {/* Watermark */}
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              marginTop: '14px',
+              fontSize: '11px',
+              color: 'rgba(107, 114, 128, 0.6)',
+            }}
+          >
+            Created with F1 Points Calculator
           </div>
         </div>
       </div>
