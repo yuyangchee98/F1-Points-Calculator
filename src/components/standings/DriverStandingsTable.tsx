@@ -70,10 +70,17 @@ const DriverStandingsTable: React.FC<DriverStandingsTableProps> = ({ standings }
                       </div>
                     </div>
                   </td>
-                  <td 
+                  <td
                     className={`py-3 px-2 font-bold text-right text-gray-800 ${animatedDrivers[standing.driverId] ? 'animate-points-update' : ''}`}
                   >
-                    {standing.points} pts
+                    <div className="flex items-center justify-end gap-2">
+                      <span>{standing.points} pts</span>
+                      {standing.predictionPointsGained > 0 && (
+                        <span className="text-xs font-semibold text-green-600 bg-green-100 px-2 py-1 rounded">
+                          +{standing.predictionPointsGained}
+                        </span>
+                      )}
+                    </div>
                   </td>
                 </tr>
               );
