@@ -46,46 +46,51 @@ export interface ExportData {
 export function formatExportData(
   state: RootState,
   title: string,
-  subtitle?: string
+  subtitle?: string,
+  raceSelection?: Record<string, boolean>
 ): ExportData {
   const { seasonData, grid, results } = state;
 
-  // Format all races
-  const races = seasonData.races.map(race => ({
-    raceId: race.id,
-    name: race.name,
-    completed: race.completed,
-    flag: countryCodeToFlag(race.countryCode)
-  }));
+  // Format races (filter by selection if provided)
+  const races = seasonData.races
+    .filter(race => !raceSelection || raceSelection[race.id])
+    .map(race => ({
+      raceId: race.id,
+      name: race.name,
+      completed: race.completed,
+      flag: countryCodeToFlag(race.countryCode)
+    }));
 
-  // Format grids - all positions grouped by race
+  // Format grids - all positions grouped by race (filter by selection if provided)
   const grids: Record<string, Array<{
     position: number;
     driverId: string;
     pointsGained: number;
   }>> = {};
 
-  seasonData.races.forEach(race => {
-    const racePositions = grid.positions
-      .filter(p => p.raceId === race.id && p.driverId)
-      .map(p => {
-        // Get points from pointsHistory
-        const pointsEntry = results.pointsHistory.find(
-          h => h.raceId === race.id && h.driverId === p.driverId
-        );
-        const pointsGained = pointsEntry?.points || 0;
+  seasonData.races
+    .filter(race => !raceSelection || raceSelection[race.id])
+    .forEach(race => {
+      const racePositions = grid.positions
+        .filter(p => p.raceId === race.id && p.driverId)
+        .map(p => {
+          // Get points from pointsHistory
+          const pointsEntry = results.pointsHistory.find(
+            h => h.raceId === race.id && h.driverId === p.driverId
+          );
+          const pointsGained = pointsEntry?.points || 0;
 
-        return {
-          position: p.position,
-          driverId: p.driverId!,
-          pointsGained
-        };
-      });
+          return {
+            position: p.position,
+            driverId: p.driverId!,
+            pointsGained
+          };
+        });
 
-    if (racePositions.length > 0) {
-      grids[race.id] = racePositions;
-    }
-  });
+      if (racePositions.length > 0) {
+        grids[race.id] = racePositions;
+      }
+    });
 
   // Format all standings
   const standings = results.driverStandings.map(standing => ({
