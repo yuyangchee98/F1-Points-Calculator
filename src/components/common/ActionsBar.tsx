@@ -8,6 +8,7 @@ import { useAppDispatch } from '../../store';
 import PointsSystemSelector from './PointsSystemSelector';
 import PointsReference from './PointsReference';
 import VersionHistory from './VersionHistory';
+import ExportModal from './ExportModal';
 import { GA_EVENTS, trackEvent, trackVersionHistoryAction } from '../../utils/analytics';
 import { loadPrediction } from '../../api/predictions';
 
@@ -17,6 +18,7 @@ const ActionsBar: React.FC = () => {
   const pastResults = useSelector((state: RootState) => state.seasonData.pastResults);
   const { fingerprint } = useSelector((state: RootState) => state.predictions);
   const [showHistory, setShowHistory] = useState(false);
+  const [showExport, setShowExport] = useState(false);
 
   // Handle grid reset
   const handleReset = () => {
@@ -105,7 +107,17 @@ const ActionsBar: React.FC = () => {
           </svg>
           History
         </button>
-        
+
+        <button
+          onClick={() => setShowExport(true)}
+          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md shadow transition flex items-center gap-2"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          Export to Image
+        </button>
+
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-600">Points System:</span>
           <PointsSystemSelector />
@@ -122,6 +134,12 @@ const ActionsBar: React.FC = () => {
           onLoadVersion={handleLoadVersion}
         />
       )}
+
+      {/* Export Modal */}
+      <ExportModal
+        isOpen={showExport}
+        onClose={() => setShowExport(false)}
+      />
     </div>
   );
 };
