@@ -244,25 +244,23 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
 
               {/* Race Selection */}
               <div>
-                <div className="flex items-center justify-between mb-3">
-                  <label className="text-sm font-semibold text-gray-900">
+                <div className="flex items-center justify-between gap-3 mb-3">
+                  <label className="text-sm font-semibold text-gray-900 flex items-center">
                     Select Races
                     <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800">
                       {selectedRaceCount}
                     </span>
                   </label>
-                </div>
 
-                {/* Filter Dropdown */}
-                <div className="mb-3">
+                  {/* Filter Dropdown */}
                   <select
                     value={raceFilter}
                     onChange={(e) => setRaceFilter(e.target.value as any)}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-white"
+                    className="px-3 py-1.5 text-xs text-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-white hover:text-gray-700 transition-colors"
                   >
-                    <option value="all">All Races</option>
-                    <option value="completed">Completed Only</option>
-                    <option value="predicted">Predicted Only</option>
+                    <option value="all">Filter: All</option>
+                    <option value="completed">Filter: Completed</option>
+                    <option value="predicted">Filter: Predicted</option>
                   </select>
                 </div>
 
@@ -317,28 +315,26 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
 
               {/* Driver Selection */}
               <div>
-                <div className="flex items-center justify-between mb-3">
-                  <label className="text-sm font-semibold text-gray-900">
+                <div className="flex items-center justify-between gap-3 mb-3">
+                  <label className="text-sm font-semibold text-gray-900 flex items-center">
                     Championship Standings
                     <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800">
                       {selectedDriverCount}
                     </span>
                   </label>
-                </div>
 
-                {/* Filter Dropdown */}
-                <div className="mb-3">
+                  {/* Filter Dropdown */}
                   <select
                     value={driverFilter}
                     onChange={(e) => setDriverFilter(e.target.value as any)}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-white"
+                    className="px-3 py-1.5 text-xs text-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-white hover:text-gray-700 transition-colors"
                   >
-                    <option value="all">All Drivers</option>
-                    <option value="top3">Top 3</option>
-                    <option value="top5">Top 5</option>
-                    <option value="top10">Top 10</option>
-                    <option value="withPredictions">With Predictions</option>
-                    <option value="positionChanged">Position Changed</option>
+                    <option value="all">Filter: All</option>
+                    <option value="top3">Filter: Top 3</option>
+                    <option value="top5">Filter: Top 5</option>
+                    <option value="top10">Filter: Top 10</option>
+                    <option value="withPredictions">Filter: With Predictions</option>
+                    <option value="positionChanged">Filter: Position Changed</option>
                   </select>
                 </div>
 
