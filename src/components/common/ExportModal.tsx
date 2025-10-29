@@ -562,12 +562,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
 
           {/* Preview Panel */}
           <div className="flex-1 p-6 bg-gray-50 overflow-auto">
-            <div className="text-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-700">Preview</h3>
-              <p className="text-sm text-gray-500">
-                {selectedRaceCount} race{selectedRaceCount !== 1 ? 's' : ''} selected
-              </p>
-            </div>
             {selectedRaceCount > 0 ? (
               <ExportPreview data={previewData} />
             ) : (
