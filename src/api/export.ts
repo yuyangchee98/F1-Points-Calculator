@@ -14,13 +14,22 @@ interface ExportData {
     driverId: string;
     pointsGained: number;
   }>>;
-  standings: Array<{
+  driverStandings?: Array<{
     position: number;
     driverId: string;
     points: number;
     positionChange: number;
     pointsGained: number;
   }>;
+  teamStandings?: Array<{
+    position: number;
+    teamId: string;
+    points: number;
+    positionChange: number;
+    pointsGained: number;
+  }>;
+  showDriverStandings?: boolean;
+  showTeamStandings?: boolean;
   drivers: Record<string, {
     name: string;
     teamId: string;

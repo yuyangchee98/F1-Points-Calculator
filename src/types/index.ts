@@ -48,6 +48,8 @@ export interface TeamStanding {
   teamId: string;
   points: number;
   position: number;
+  predictionPointsGained: number; // Points gained from user predictions only
+  positionChange: number; // Change in championship position (positive = moved up, negative = moved down)
 }
 
 export interface PointsHistory {
