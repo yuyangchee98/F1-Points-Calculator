@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ExportData } from '../../utils/exportFormatter';
 
 interface ExportPreviewProps {
@@ -7,11 +7,63 @@ interface ExportPreviewProps {
 
 const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
   const { races, grids, standings, drivers, teams } = data;
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+
+  // Calculate optimal scale based on container size
+  useEffect(() => {
+    const calculateScale = () => {
+      if (!containerRef.current) return;
+
+      const container = containerRef.current;
+      const availableWidth = container.clientWidth;
+      const availableHeight = container.clientHeight;
+
+      // Canvas dimensions
+      const canvasWidth = 1080;
+      const canvasHeight = 1080;
+
+      // Add padding buffer (40px total - 20px on each side)
+      const paddingBuffer = 40;
+
+      // Calculate scale to fit both dimensions
+      const scaleX = (availableWidth - paddingBuffer) / canvasWidth;
+      const scaleY = (availableHeight - paddingBuffer) / canvasHeight;
+
+      // Use the smaller scale to ensure it fits, and never scale above 1
+      const optimalScale = Math.min(scaleX, scaleY, 1);
+
+      setScale(optimalScale);
+    };
+
+    // Calculate on mount
+    calculateScale();
+
+    // Observe container resize
+    const resizeObserver = new ResizeObserver(() => {
+      calculateScale();
+    });
+
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
+
+    // Also listen to window resize as fallback
+    window.addEventListener('resize', calculateScale);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', calculateScale);
+    };
+  }, []);
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start', width: '100%', height: '100%' }}>
+    <div
+      ref={containerRef}
+      style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}
+    >
       {/* Scale container to fit preview area */}
-      <div style={{ transform: 'scale(1)', transformOrigin: 'top left' }}>
+      <div style={{ transform: `scale(${scale})`, transformOrigin: 'center center' }}>
         {/* Exact copy of backend template */}
         <div
           style={{
