@@ -32,9 +32,9 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
   const [title, setTitle] = useState('F1 CHAMPIONSHIP PREDICTIONS');
   const [subtitle, setSubtitle] = useState('Current predictions and standings');
   const [selectedDrivers, setSelectedDrivers] = useState<Record<string, boolean>>({});
-  const [raceFilter, setRaceFilter] = useState<'all' | 'completed' | 'predicted'>('all');
   const [driverFilter, setDriverFilter] = useState<'all' | 'top3' | 'top5' | 'top10' | 'withPredictions' | 'positionChanged'>('all');
-  const [raceDropdownOpen, setRaceDropdownOpen] = useState(false);
+  const [completedDropdownOpen, setCompletedDropdownOpen] = useState(false);
+  const [upcomingDropdownOpen, setUpcomingDropdownOpen] = useState(false);
   const [driverDropdownOpen, setDriverDropdownOpen] = useState(false);
 
   const races = useSelector((state: RootState) => state.seasonData.races);
@@ -150,17 +150,9 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
     }));
   };
 
-  // Filter races based on selected filter
-  const filteredRaces = useMemo(() => {
-    if (raceFilter === 'all') return races;
-    if (raceFilter === 'completed') return races.filter(r => r.completed);
-    if (raceFilter === 'predicted') {
-      return races.filter(race =>
-        positions.some(p => p.raceId === race.id && p.driverId && !p.isOfficialResult)
-      );
-    }
-    return races;
-  }, [races, raceFilter, positions]);
+  // Separate completed and upcoming races
+  const completedRaces = useMemo(() => races.filter(r => r.completed), [races]);
+  const upcomingRaces = useMemo(() => races.filter(r => !r.completed), [races]);
 
   // Filter drivers based on selected filter
   const filteredDrivers = useMemo(() => {
@@ -261,35 +253,22 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
                 />
               </div>
 
-              {/* Race Selection */}
+              {/* Completed Race Selection */}
               <div className="relative">
-                <div className="flex items-center justify-between gap-3 mb-2">
-                  <label className="text-sm font-semibold text-gray-900">
-                    Select Races
-                  </label>
-
-                  {/* Filter Dropdown */}
-                  <select
-                    value={raceFilter}
-                    onChange={(e) => setRaceFilter(e.target.value as any)}
-                    className="px-3 py-1.5 text-xs text-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-white hover:text-gray-700 transition-colors"
-                  >
-                    <option value="all">Filter: All</option>
-                    <option value="completed">Filter: Completed</option>
-                    <option value="predicted">Filter: Predicted</option>
-                  </select>
-                </div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Select Completed Race
+                </label>
 
                 {/* Dropdown Trigger */}
                 <button
-                  onClick={() => setRaceDropdownOpen(!raceDropdownOpen)}
+                  onClick={() => setCompletedDropdownOpen(!completedDropdownOpen)}
                   className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg bg-white hover:border-gray-400 transition-colors text-left flex items-center justify-between"
                 >
                   <span className="text-sm text-gray-700">
-                    {selectedRaceCount === 0 ? 'No races selected' : `${selectedRaceCount}/5 races selected`}
+                    {selectedCompletedRaces === 0 ? 'No race selected' : `${selectedCompletedRaces} race selected`}
                   </span>
                   <svg
-                    className={`w-5 h-5 text-gray-500 transition-transform ${raceDropdownOpen ? 'rotate-180' : ''}`}
+                    className={`w-5 h-5 text-gray-500 transition-transform ${completedDropdownOpen ? 'rotate-180' : ''}`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -299,127 +278,149 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
                 </button>
 
                 {/* Dropdown Panel */}
-                {raceDropdownOpen && (
+                {completedDropdownOpen && (
                   <div className="absolute z-10 mt-2 w-full bg-white border-2 border-gray-300 rounded-lg shadow-xl p-4 max-h-96 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-red-400 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-red-500">
-                    <div className="space-y-4">
-                  {/* Completed Races Section */}
-                  {filteredRaces.some(r => r.completed) && (
-                    <div>
-                      <div className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-2">
-                        Completed Races ({selectedCompletedRaces}/{MAX_COMPLETED_RACES} max)
-                      </div>
-                      <div className="space-y-1.5">
-                        {filteredRaces.filter(r => r.completed).map(race => {
-                          const hasUserPredictions = positions.some(
-                            p => p.raceId === race.id && p.driverId && !p.isOfficialResult
-                          );
-                          const isSelected = raceSelection[race.id] || false;
-                          const isDisabled = !isSelected && isCompletedLimitReached;
+                    <div className="space-y-1.5">
+                      {completedRaces.map(race => {
+                        const hasUserPredictions = positions.some(
+                          p => p.raceId === race.id && p.driverId && !p.isOfficialResult
+                        );
+                        const isSelected = raceSelection[race.id] || false;
+                        const isDisabled = !isSelected && isCompletedLimitReached;
 
-                          return (
-                            <div
-                              key={race.id}
-                              onClick={() => !isDisabled && toggleRace(race.id)}
-                              className={`
-                                relative flex items-center gap-3 p-3 rounded-lg transition-all duration-200
-                                ${isDisabled
-                                  ? 'opacity-50 cursor-not-allowed border-2 border-gray-200 bg-gray-50'
-                                  : isSelected
-                                    ? 'border-2 border-red-500 bg-red-50/30 shadow-md cursor-pointer'
-                                    : 'border-2 border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm cursor-pointer'
-                                }
-                              `}
-                            >
-                              <input
-                                type="checkbox"
-                                checked={isSelected}
-                                disabled={isDisabled}
-                                onChange={() => {}}
-                                className="w-5 h-5 text-red-600 rounded focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                              />
-                              <span className="text-2xl">{countryCodeToFlag(race.countryCode)}</span>
-                              <div className="flex-1 min-w-0">
-                                <div className="font-medium text-gray-900 text-sm truncate">
-                                  {race.name}
-                                </div>
-                                <div className="flex gap-2 mt-1 flex-wrap">
-                                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-                                    ✓ Completed
+                        return (
+                          <div
+                            key={race.id}
+                            onClick={() => !isDisabled && toggleRace(race.id)}
+                            className={`
+                              relative flex items-center gap-3 p-3 rounded-lg transition-all duration-200
+                              ${isDisabled
+                                ? 'opacity-50 cursor-not-allowed border-2 border-gray-200 bg-gray-50'
+                                : isSelected
+                                  ? 'border-2 border-red-500 bg-red-50/30 shadow-md cursor-pointer'
+                                  : 'border-2 border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm cursor-pointer'
+                              }
+                            `}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              disabled={isDisabled}
+                              onChange={() => {}}
+                              className="w-5 h-5 text-red-600 rounded focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                            />
+                            <span className="text-2xl">{countryCodeToFlag(race.countryCode)}</span>
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-gray-900 text-sm truncate">
+                                {race.name}
+                              </div>
+                              <div className="flex gap-2 mt-1 flex-wrap">
+                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                                  ✓ Completed
+                                </span>
+                                {hasUserPredictions && (
+                                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
+                                    ★ Predicted
                                   </span>
-                                  {hasUserPredictions && (
-                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
-                                      ★ Predicted
-                                    </span>
-                                  )}
-                                </div>
+                                )}
                               </div>
                             </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Upcoming Races Section */}
-                  {filteredRaces.some(r => !r.completed) && (
-                    <div>
-                      <div className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-2">
-                        Upcoming Races ({selectedUpcomingRaces}/{MAX_UPCOMING_RACES} max)
-                      </div>
-                      <div className="space-y-1.5">
-                        {filteredRaces.filter(r => !r.completed).map(race => {
-                          const hasUserPredictions = positions.some(
-                            p => p.raceId === race.id && p.driverId && !p.isOfficialResult
-                          );
-                          const isSelected = raceSelection[race.id] || false;
-                          const isDisabled = !isSelected && isUpcomingLimitReached;
-
-                          return (
-                            <div
-                              key={race.id}
-                              onClick={() => !isDisabled && toggleRace(race.id)}
-                              className={`
-                                relative flex items-center gap-3 p-3 rounded-lg transition-all duration-200
-                                ${isDisabled
-                                  ? 'opacity-50 cursor-not-allowed border-2 border-gray-200 bg-gray-50'
-                                  : isSelected
-                                    ? 'border-2 border-red-500 bg-red-50/30 shadow-md cursor-pointer'
-                                    : 'border-2 border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm cursor-pointer'
-                                }
-                              `}
-                            >
-                              <input
-                                type="checkbox"
-                                checked={isSelected}
-                                disabled={isDisabled}
-                                onChange={() => {}}
-                                className="w-5 h-5 text-red-600 rounded focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                              />
-                              <span className="text-2xl">{countryCodeToFlag(race.countryCode)}</span>
-                              <div className="flex-1 min-w-0">
-                                <div className="font-medium text-gray-900 text-sm truncate">
-                                  {race.name}
-                                </div>
-                                <div className="flex gap-2 mt-1 flex-wrap">
-                                  {hasUserPredictions && (
-                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
-                                      ★ Predicted
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
+                          </div>
+                        );
+                      })}
                     </div>
 
                     {/* Done Button */}
                     <div className="mt-4 pt-3 border-t">
                       <button
-                        onClick={() => setRaceDropdownOpen(false)}
+                        onClick={() => setCompletedDropdownOpen(false)}
+                        className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium text-sm"
+                      >
+                        Done
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Upcoming Races Selection */}
+              <div className="relative">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Select Upcoming Races
+                </label>
+
+                {/* Dropdown Trigger */}
+                <button
+                  onClick={() => setUpcomingDropdownOpen(!upcomingDropdownOpen)}
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg bg-white hover:border-gray-400 transition-colors text-left flex items-center justify-between"
+                >
+                  <span className="text-sm text-gray-700">
+                    {selectedUpcomingRaces === 0 ? 'No races selected' : `${selectedUpcomingRaces}/${MAX_UPCOMING_RACES} races selected`}
+                  </span>
+                  <svg
+                    className={`w-5 h-5 text-gray-500 transition-transform ${upcomingDropdownOpen ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {/* Dropdown Panel */}
+                {upcomingDropdownOpen && (
+                  <div className="absolute z-10 mt-2 w-full bg-white border-2 border-gray-300 rounded-lg shadow-xl p-4 max-h-96 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-red-400 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-red-500">
+                    <div className="space-y-1.5">
+                      {upcomingRaces.map(race => {
+                        const hasUserPredictions = positions.some(
+                          p => p.raceId === race.id && p.driverId && !p.isOfficialResult
+                        );
+                        const isSelected = raceSelection[race.id] || false;
+                        const isDisabled = !isSelected && isUpcomingLimitReached;
+
+                        return (
+                          <div
+                            key={race.id}
+                            onClick={() => !isDisabled && toggleRace(race.id)}
+                            className={`
+                              relative flex items-center gap-3 p-3 rounded-lg transition-all duration-200
+                              ${isDisabled
+                                ? 'opacity-50 cursor-not-allowed border-2 border-gray-200 bg-gray-50'
+                                : isSelected
+                                  ? 'border-2 border-red-500 bg-red-50/30 shadow-md cursor-pointer'
+                                  : 'border-2 border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm cursor-pointer'
+                              }
+                            `}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              disabled={isDisabled}
+                              onChange={() => {}}
+                              className="w-5 h-5 text-red-600 rounded focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                            />
+                            <span className="text-2xl">{countryCodeToFlag(race.countryCode)}</span>
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-gray-900 text-sm truncate">
+                                {race.name}
+                              </div>
+                              <div className="flex gap-2 mt-1 flex-wrap">
+                                {hasUserPredictions && (
+                                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
+                                    ★ Predicted
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Done Button */}
+                    <div className="mt-4 pt-3 border-t">
+                      <button
+                        onClick={() => setUpcomingDropdownOpen(false)}
                         className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium text-sm"
                       >
                         Done
