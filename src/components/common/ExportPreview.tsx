@@ -6,7 +6,7 @@ interface ExportPreviewProps {
 }
 
 const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
-  const { races, grids, driverStandings, drivers, teams } = data;
+  const { races, grids, driverStandings, teamStandings, showDriverStandings, showTeamStandings, drivers, teams } = data;
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
 
@@ -463,234 +463,102 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
               </div>
             </div>
 
-            {/* Championship Standings Section */}
-            {/* Section Header */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                marginBottom: '16px',
-                gap: '8px',
-              }}
-            >
-              <div
-                style={{
-                  width: '4px',
-                  height: '24px',
-                  background: '#dc2626',
-                  borderRadius: '2px',
-                  display: 'flex',
-                }}
-              />
-              <span
-                style={{
-                  fontSize: '14px',
-                  fontWeight: '700',
-                  color: '#1f2937',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px',
-                }}
-              >
-                Championship Standings
-              </span>
-            </div>
-
-            {/* Championship Standings Table */}
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                background: '#ffffff',
-                borderRadius: '8px',
-                border: '1px solid #e5e7eb',
-                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)',
-                overflow: 'hidden',
-              }}
-            >
-              {/* Column Headers */}
-              <div
-                style={{
-                  display: 'flex',
-                  padding: '12px 20px',
-                  borderBottom: '2px solid #e5e7eb',
-                  background: '#f9fafb',
-                }}
-              >
-                <div
-                  style={{
-                    width: '60px',
-                    fontSize: '11px',
-                    fontWeight: '600',
-                    color: '#6b7280',
-                    display: 'flex',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px',
-                  }}
-                >
-                  Pos
-                </div>
-                <div
-                  style={{
-                    flex: 1,
-                    fontSize: '11px',
-                    fontWeight: '600',
-                    color: '#6b7280',
-                    display: 'flex',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px',
-                  }}
-                >
-                  Driver
-                </div>
-                <div
-                  style={{
-                    width: '100px',
-                    fontSize: '11px',
-                    fontWeight: '600',
-                    color: '#6b7280',
-                    textAlign: 'right',
-                    display: 'flex',
-                    justifyContent: 'flex-end',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px',
-                  }}
-                >
-                  Points
-                </div>
-              </div>
-
-              {/* Standings Rows */}
-              {driverStandings?.slice(0, 3).map((standing, index) => {
-                const driver = drivers[standing.driverId];
-                const team = teams[driver?.teamId];
-                const teamColor = team?.color || '#9ca3af';
-
-                return (
-                  <div
-                    key={standing.driverId}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      padding: '16px 20px',
-                      borderBottom: index < 2 ? '1px solid #f3f4f6' : 'none',
-                      background: index % 2 === 0 ? '#ffffff' : '#fafbfc',
-                    }}
-                  >
-                    {/* Position with change indicator */}
-                    <div
-                      style={{
-                        width: '60px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontSize: '16px',
-                          fontWeight: '700',
-                          color: '#1f2937',
-                        }}
-                      >
-                        {standing.position}
-                      </span>
-                      {standing.positionChange !== undefined && standing.positionChange !== 0 && (
-                        <span
-                          style={{
-                            fontSize: '11px',
-                            fontWeight: '700',
-                            color: standing.positionChange > 0 ? '#10b981' : '#ef4444',
-                          }}
-                        >
-                          {standing.positionChange > 0 ? '↑' : '↓'}{Math.abs(standing.positionChange)}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Driver with team color bar and name */}
-                    <div
-                      style={{
-                        flex: 1,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '12px',
-                      }}
-                    >
-                      <div
-                        style={{
-                          width: '4px',
-                          height: '32px',
-                          background: teamColor,
-                          borderRadius: '2px',
-                          display: 'flex',
-                        }}
-                      />
-                      <div
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: '2px',
-                        }}
-                      >
-                        <span
-                          style={{
-                            fontSize: '13px',
-                            fontWeight: '700',
-                            color: '#1f2937',
-                          }}
-                        >
-                          {driver?.name || standing.driverId}
-                        </span>
-                        <span
-                          style={{
-                            fontSize: '10px',
-                            fontWeight: '400',
-                            color: teamColor,
-                          }}
-                        >
-                          {team?.name || ''}
-                        </span>
+            {/* Championship Standings Section - Conditional */}
+            {(showDriverStandings || showTeamStandings) && (
+              <>
+                {/* Both Driver and Team Standings Side-by-Side */}
+                {showDriverStandings && showTeamStandings && driverStandings && teamStandings && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {/* Table Headers Row */}
+                    <div style={{ display: 'flex', gap: '16px' }}>
+                      <div style={{ width: '490px', fontSize: '12px', fontWeight: '700', color: '#1f2937', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        Drivers Championship
+                      </div>
+                      <div style={{ width: '490px', fontSize: '12px', fontWeight: '700', color: '#1f2937', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        Constructors Championship
                       </div>
                     </div>
 
-                    {/* Points with gained indicator */}
-                    <div
-                      style={{
-                        width: '100px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'flex-end',
-                        gap: '8px',
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontSize: '18px',
-                          fontWeight: '700',
-                          color: '#1f2937',
-                        }}
-                      >
-                        {standing.points}
-                      </span>
-                      {standing.pointsGained !== undefined && standing.pointsGained > 0 && (
-                        <span
-                          style={{
-                            fontSize: '10px',
-                            fontWeight: '700',
-                            color: '#10b981',
-                            background: '#d1fae5',
-                            padding: '4px 8px',
-                            borderRadius: '4px',
-                          }}
-                        >
-                          +{standing.pointsGained}
-                        </span>
-                      )}
+                    {/* Tables Row */}
+                    <div style={{ display: 'flex', gap: '16px' }}>
+                      {/* Driver Table */}
+                      <div style={{ width: '490px', display: 'flex', flexDirection: 'column', background: '#ffffff', borderRadius: '8px', border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)', overflow: 'hidden' }}>
+                        <div style={{ display: 'flex', padding: '12px 16px', borderBottom: '2px solid #e5e7eb', background: '#f9fafb' }}>
+                          <div style={{ width: '50px', fontSize: '10px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Pos</div>
+                          <div style={{ flex: 1, fontSize: '10px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Driver</div>
+                          <div style={{ width: '80px', fontSize: '10px', fontWeight: '600', color: '#6b7280', textAlign: 'right', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Points</div>
+                        </div>
+                        {driverStandings.slice(0, 3).map((standing, index) => {
+                          const driver = drivers[standing.driverId];
+                          const team = teams[driver?.teamId];
+                          const teamColor = team?.color || '#9ca3af';
+                          return (
+                            <div key={standing.driverId} style={{ display: 'flex', alignItems: 'center', padding: '12px 16px', borderBottom: index < 2 ? '1px solid #f3f4f6' : 'none', background: index % 2 === 0 ? '#ffffff' : '#fafbfc' }}>
+                              <div style={{ width: '50px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <span style={{ fontSize: '14px', fontWeight: '700', color: '#1f2937' }}>{standing.position}</span>
+                                {standing.positionChange !== undefined && standing.positionChange !== 0 && (
+                                  <span style={{ fontSize: '10px', fontWeight: '700', color: standing.positionChange > 0 ? '#10b981' : '#ef4444' }}>
+                                    {standing.positionChange > 0 ? '↑' : '↓'}{Math.abs(standing.positionChange)}
+                                  </span>
+                                )}
+                              </div>
+                              <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <div style={{ width: '3px', height: '28px', background: teamColor, borderRadius: '2px', display: 'flex' }} />
+                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                  <span style={{ fontSize: '12px', fontWeight: '700', color: '#1f2937' }}>{driver?.name || standing.driverId}</span>
+                                  <span style={{ fontSize: '9px', fontWeight: '400', color: teamColor }}>{team?.name || ''}</span>
+                                </div>
+                              </div>
+                              <div style={{ width: '80px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '6px' }}>
+                                <span style={{ fontSize: '16px', fontWeight: '700', color: '#1f2937' }}>{standing.points}</span>
+                                {standing.pointsGained !== undefined && standing.pointsGained > 0 && (
+                                  <span style={{ fontSize: '9px', fontWeight: '700', color: '#10b981', background: '#d1fae5', padding: '3px 6px', borderRadius: '4px' }}>+{standing.pointsGained}</span>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      {/* Team Table */}
+                      <div style={{ width: '490px', display: 'flex', flexDirection: 'column', background: '#ffffff', borderRadius: '8px', border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)', overflow: 'hidden' }}>
+                        <div style={{ display: 'flex', padding: '12px 16px', borderBottom: '2px solid #e5e7eb', background: '#f9fafb' }}>
+                          <div style={{ width: '50px', fontSize: '10px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Pos</div>
+                          <div style={{ flex: 1, fontSize: '10px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Team</div>
+                          <div style={{ width: '80px', fontSize: '10px', fontWeight: '600', color: '#6b7280', textAlign: 'right', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Points</div>
+                        </div>
+                        {teamStandings.slice(0, 3).map((standing, index) => {
+                          const team = teams[standing.teamId];
+                          const teamColor = team?.color || '#9ca3af';
+                          return (
+                            <div key={standing.teamId} style={{ display: 'flex', alignItems: 'center', padding: '12px 16px', borderBottom: index < 2 ? '1px solid #f3f4f6' : 'none', background: index % 2 === 0 ? '#ffffff' : '#fafbfc' }}>
+                              <div style={{ width: '50px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <span style={{ fontSize: '14px', fontWeight: '700', color: '#1f2937' }}>{standing.position}</span>
+                                {standing.positionChange !== undefined && standing.positionChange !== 0 && (
+                                  <span style={{ fontSize: '10px', fontWeight: '700', color: standing.positionChange > 0 ? '#10b981' : '#ef4444' }}>
+                                    {standing.positionChange > 0 ? '↑' : '↓'}{Math.abs(standing.positionChange)}
+                                  </span>
+                                )}
+                              </div>
+                              <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <div style={{ width: '3px', height: '28px', background: teamColor, borderRadius: '2px', display: 'flex' }} />
+                                <span style={{ fontSize: '12px', fontWeight: '700', color: '#1f2937' }}>{team?.name || standing.teamId}</span>
+                              </div>
+                              <div style={{ width: '80px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '6px' }}>
+                                <span style={{ fontSize: '16px', fontWeight: '700', color: '#1f2937' }}>{standing.points}</span>
+                                {standing.pointsGained !== undefined && standing.pointsGained > 0 && (
+                                  <span style={{ fontSize: '9px', fontWeight: '700', color: '#10b981', background: '#d1fae5', padding: '3px 6px', borderRadius: '4px' }}>+{standing.pointsGained}</span>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
                   </div>
-                );
-              })}
-            </div>
+                )}
+              </>
+            )}
           </div>
 
           {/* Watermark */}
