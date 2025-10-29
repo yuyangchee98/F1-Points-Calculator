@@ -34,6 +34,8 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
   const [selectedDrivers, setSelectedDrivers] = useState<Record<string, boolean>>({});
   const [raceFilter, setRaceFilter] = useState<'all' | 'completed' | 'predicted'>('all');
   const [driverFilter, setDriverFilter] = useState<'all' | 'top3' | 'top5' | 'top10' | 'withPredictions' | 'positionChanged'>('all');
+  const [raceDropdownOpen, setRaceDropdownOpen] = useState(false);
+  const [driverDropdownOpen, setDriverDropdownOpen] = useState(false);
 
   const races = useSelector((state: RootState) => state.seasonData.races);
   const positions = useSelector((state: RootState) => state.grid.positions);
@@ -260,13 +262,10 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
               </div>
 
               {/* Race Selection */}
-              <div>
+              <div className="relative">
                 <div className="flex items-center justify-between gap-3 mb-2">
-                  <label className="text-sm font-semibold text-gray-900 flex items-center">
+                  <label className="text-sm font-semibold text-gray-900">
                     Select Races
-                    <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800">
-                      {selectedRaceCount}/5
-                    </span>
                   </label>
 
                   {/* Filter Dropdown */}
@@ -281,7 +280,28 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
                   </select>
                 </div>
 
-                <div className="space-y-4 max-h-96 overflow-y-auto pr-1 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-red-400 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-red-500">
+                {/* Dropdown Trigger */}
+                <button
+                  onClick={() => setRaceDropdownOpen(!raceDropdownOpen)}
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg bg-white hover:border-gray-400 transition-colors text-left flex items-center justify-between"
+                >
+                  <span className="text-sm text-gray-700">
+                    {selectedRaceCount === 0 ? 'No races selected' : `${selectedRaceCount}/5 races selected`}
+                  </span>
+                  <svg
+                    className={`w-5 h-5 text-gray-500 transition-transform ${raceDropdownOpen ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {/* Dropdown Panel */}
+                {raceDropdownOpen && (
+                  <div className="absolute z-10 mt-2 w-full bg-white border-2 border-gray-300 rounded-lg shadow-xl p-4 max-h-96 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-red-400 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-red-500">
+                    <div className="space-y-4">
                   {/* Completed Races Section */}
                   {filteredRaces.some(r => r.completed) && (
                     <div>
@@ -394,17 +414,26 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
                       </div>
                     </div>
                   )}
-                </div>
+                    </div>
+
+                    {/* Done Button */}
+                    <div className="mt-4 pt-3 border-t">
+                      <button
+                        onClick={() => setRaceDropdownOpen(false)}
+                        className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium text-sm"
+                      >
+                        Done
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Driver Selection */}
-              <div>
-                <div className="flex items-center justify-between gap-3 mb-3">
-                  <label className="text-sm font-semibold text-gray-900 flex items-center">
+              <div className="relative">
+                <div className="flex items-center justify-between gap-3 mb-2">
+                  <label className="text-sm font-semibold text-gray-900">
                     Championship Standings
-                    <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800">
-                      {selectedDriverCount}/{MAX_DRIVERS}
-                    </span>
                   </label>
 
                   {/* Filter Dropdown */}
@@ -422,7 +451,28 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
                   </select>
                 </div>
 
-                <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-red-400 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-red-500">
+                {/* Dropdown Trigger */}
+                <button
+                  onClick={() => setDriverDropdownOpen(!driverDropdownOpen)}
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg bg-white hover:border-gray-400 transition-colors text-left flex items-center justify-between"
+                >
+                  <span className="text-sm text-gray-700">
+                    {selectedDriverCount === 0 ? 'No drivers selected' : `${selectedDriverCount}/${MAX_DRIVERS} drivers selected`}
+                  </span>
+                  <svg
+                    className={`w-5 h-5 text-gray-500 transition-transform ${driverDropdownOpen ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {/* Dropdown Panel */}
+                {driverDropdownOpen && (
+                  <div className="absolute z-10 mt-2 w-full bg-white border-2 border-gray-300 rounded-lg shadow-xl p-4 max-h-96 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-red-400 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-red-500">
+                    <div className="space-y-1.5">
                   {filteredDrivers.map(standing => {
                     const driver = seasonData.drivers.find(d => d.id === standing.driverId);
                     if (!driver) return null;
@@ -493,7 +543,19 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
                       </div>
                     );
                   })}
-                </div>
+                    </div>
+
+                    {/* Done Button */}
+                    <div className="mt-4 pt-3 border-t">
+                      <button
+                        onClick={() => setDriverDropdownOpen(false)}
+                        className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium text-sm"
+                      >
+                        Done
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
