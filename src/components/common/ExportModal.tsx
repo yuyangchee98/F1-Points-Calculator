@@ -32,6 +32,8 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
   const [title, setTitle] = useState('F1 CHAMPIONSHIP PREDICTIONS');
   const [subtitle, setSubtitle] = useState('Current predictions and standings');
   const [selectedDrivers, setSelectedDrivers] = useState<Record<string, boolean>>({});
+  const [raceFilter, setRaceFilter] = useState<'all' | 'completed' | 'predicted'>('all');
+  const [driverFilter, setDriverFilter] = useState<'all' | 'top3' | 'top5' | 'top10' | 'withPredictions' | 'positionChanged'>('all');
 
   const races = useSelector((state: RootState) => state.seasonData.races);
   const positions = useSelector((state: RootState) => state.grid.positions);
@@ -146,56 +148,32 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
     }));
   };
 
-  // Bulk actions for races
-  const selectAllRaces = () => {
-    const all: RaceSelection = {};
-    races.forEach(race => { all[race.id] = true; });
-    setRaceSelection(all);
-  };
-
-  const clearAllRaces = () => {
-    setRaceSelection({});
-  };
-
-  const selectCompletedRaces = () => {
-    const completed: RaceSelection = {};
-    races.forEach(race => {
-      if (race.completed) completed[race.id] = true;
-    });
-    setRaceSelection(completed);
-  };
-
-  const selectPredictedRaces = () => {
-    const predicted: RaceSelection = {};
-    races.forEach(race => {
-      const hasUserPredictions = positions.some(
-        p => p.raceId === race.id && p.driverId && !p.isOfficialResult
+  // Filter races based on selected filter
+  const filteredRaces = useMemo(() => {
+    if (raceFilter === 'all') return races;
+    if (raceFilter === 'completed') return races.filter(r => r.completed);
+    if (raceFilter === 'predicted') {
+      return races.filter(race =>
+        positions.some(p => p.raceId === race.id && p.driverId && !p.isOfficialResult)
       );
-      if (hasUserPredictions) predicted[race.id] = true;
-    });
-    setRaceSelection(predicted);
-  };
+    }
+    return races;
+  }, [races, raceFilter, positions]);
 
-  // Bulk actions for drivers
-  const selectTopDrivers = (count: number) => {
-    const top: Record<string, boolean> = {};
-    results.driverStandings.slice(0, count).forEach(standing => {
-      top[standing.driverId] = true;
-    });
-    setSelectedDrivers(top);
-  };
-
-  const selectAllDrivers = () => {
-    const all: Record<string, boolean> = {};
-    results.driverStandings.forEach(standing => {
-      all[standing.driverId] = true;
-    });
-    setSelectedDrivers(all);
-  };
-
-  const clearAllDrivers = () => {
-    setSelectedDrivers({});
-  };
+  // Filter drivers based on selected filter
+  const filteredDrivers = useMemo(() => {
+    if (driverFilter === 'all') return results.driverStandings;
+    if (driverFilter === 'top3') return results.driverStandings.slice(0, 3);
+    if (driverFilter === 'top5') return results.driverStandings.slice(0, 5);
+    if (driverFilter === 'top10') return results.driverStandings.slice(0, 10);
+    if (driverFilter === 'withPredictions') {
+      return results.driverStandings.filter(s => s.predictionPointsGained > 0);
+    }
+    if (driverFilter === 'positionChanged') {
+      return results.driverStandings.filter(s => s.positionChange !== 0);
+    }
+    return results.driverStandings;
+  }, [results.driverStandings, driverFilter]);
 
   const selectedRaceCount = Object.values(raceSelection).filter(Boolean).length;
   const selectedDriverCount = Object.values(selectedDrivers).filter(Boolean).length;
@@ -234,7 +212,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
         {/* Main Content: Settings + Preview */}
         <div className="flex-1 flex overflow-hidden">
           {/* Settings Panel */}
-          <div className="w-80 border-r p-6 overflow-y-auto">
+          <div className="w-96 border-r p-6 overflow-y-auto">
             <div className="space-y-6">
               {/* Title Input */}
               <div>
@@ -275,36 +253,21 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
                   </label>
                 </div>
 
-                {/* Bulk Actions */}
-                <div className="inline-flex rounded-lg shadow-sm mb-3 overflow-hidden border border-gray-300">
-                  <button
-                    onClick={selectAllRaces}
-                    className="px-3 py-1.5 text-xs font-medium bg-white hover:bg-gray-50 border-r border-gray-300 transition-colors"
+                {/* Filter Dropdown */}
+                <div className="mb-3">
+                  <select
+                    value={raceFilter}
+                    onChange={(e) => setRaceFilter(e.target.value as any)}
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-white"
                   >
-                    All
-                  </button>
-                  <button
-                    onClick={clearAllRaces}
-                    className="px-3 py-1.5 text-xs font-medium bg-white hover:bg-gray-50 border-r border-gray-300 transition-colors"
-                  >
-                    Clear
-                  </button>
-                  <button
-                    onClick={selectCompletedRaces}
-                    className="px-3 py-1.5 text-xs font-medium bg-white hover:bg-gray-50 border-r border-gray-300 transition-colors"
-                  >
-                    Completed
-                  </button>
-                  <button
-                    onClick={selectPredictedRaces}
-                    className="px-3 py-1.5 text-xs font-medium bg-white hover:bg-gray-50 transition-colors"
-                  >
-                    Predicted
-                  </button>
+                    <option value="all">All Races</option>
+                    <option value="completed">Completed Only</option>
+                    <option value="predicted">Predicted Only</option>
+                  </select>
                 </div>
 
-                <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
-                  {races.map(race => {
+                <div className="space-y-1.5 max-h-96 overflow-y-auto pr-1 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-red-400 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-red-500">
+                  {filteredRaces.map(race => {
                     const hasUserPredictions = positions.some(
                       p => p.raceId === race.id && p.driverId && !p.isOfficialResult
                     );
@@ -363,42 +326,24 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
                   </label>
                 </div>
 
-                {/* Bulk Actions */}
-                <div className="inline-flex rounded-lg shadow-sm mb-3 overflow-hidden border border-gray-300">
-                  <button
-                    onClick={clearAllDrivers}
-                    className="px-3 py-1.5 text-xs font-medium bg-white hover:bg-gray-50 border-r border-gray-300 transition-colors"
+                {/* Filter Dropdown */}
+                <div className="mb-3">
+                  <select
+                    value={driverFilter}
+                    onChange={(e) => setDriverFilter(e.target.value as any)}
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-white"
                   >
-                    Clear
-                  </button>
-                  <button
-                    onClick={() => selectTopDrivers(3)}
-                    className="px-3 py-1.5 text-xs font-medium bg-white hover:bg-gray-50 border-r border-gray-300 transition-colors"
-                  >
-                    Top 3
-                  </button>
-                  <button
-                    onClick={() => selectTopDrivers(5)}
-                    className="px-3 py-1.5 text-xs font-medium bg-white hover:bg-gray-50 border-r border-gray-300 transition-colors"
-                  >
-                    Top 5
-                  </button>
-                  <button
-                    onClick={() => selectTopDrivers(10)}
-                    className="px-3 py-1.5 text-xs font-medium bg-white hover:bg-gray-50 border-r border-gray-300 transition-colors"
-                  >
-                    Top 10
-                  </button>
-                  <button
-                    onClick={selectAllDrivers}
-                    className="px-3 py-1.5 text-xs font-medium bg-white hover:bg-gray-50 transition-colors"
-                  >
-                    All
-                  </button>
+                    <option value="all">All Drivers</option>
+                    <option value="top3">Top 3</option>
+                    <option value="top5">Top 5</option>
+                    <option value="top10">Top 10</option>
+                    <option value="withPredictions">With Predictions</option>
+                    <option value="positionChanged">Position Changed</option>
+                  </select>
                 </div>
 
-                <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
-                  {results.driverStandings.map(standing => {
+                <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-red-400 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-red-500">
+                  {filteredDrivers.map(standing => {
                     const driver = seasonData.drivers.find(d => d.id === standing.driverId);
                     if (!driver) return null;
 
