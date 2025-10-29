@@ -6,7 +6,7 @@ interface ExportPreviewProps {
 }
 
 const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
-  const { races, grids, standings, drivers, teams } = data;
+  const { races, grids, driverStandings, drivers, teams } = data;
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
 
@@ -560,7 +560,7 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
               </div>
 
               {/* Standings Rows */}
-              {standings.slice(0, 3).map((standing, index) => {
+              {driverStandings?.slice(0, 3).map((standing, index) => {
                 const driver = drivers[standing.driverId];
                 const team = teams[driver?.teamId];
                 const teamColor = team?.color || '#9ca3af';

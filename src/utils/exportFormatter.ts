@@ -26,13 +26,22 @@ export interface ExportData {
     driverId: string;
     pointsGained: number;
   }>>;
-  standings: Array<{
+  driverStandings?: Array<{
     position: number;
     driverId: string;
     points: number;
     positionChange: number;
     pointsGained: number;
   }>;
+  teamStandings?: Array<{
+    position: number;
+    teamId: string;
+    points: number;
+    positionChange: number;
+    pointsGained: number;
+  }>;
+  showDriverStandings?: boolean;
+  showTeamStandings?: boolean;
   drivers: Record<string, {
     name: string;
     teamId: string;
@@ -48,7 +57,9 @@ export function formatExportData(
   title: string,
   subtitle?: string,
   raceSelection?: Record<string, boolean>,
-  driverSelection?: Record<string, boolean>
+  driverSelection?: Record<string, boolean>,
+  showDriverStandings: boolean = true,
+  showTeamStandings: boolean = false
 ): ExportData {
   const { seasonData, grid, results } = state;
 
@@ -93,16 +104,29 @@ export function formatExportData(
       }
     });
 
-  // Format standings (filter by driver selection if provided)
-  const standings = results.driverStandings
-    .filter(standing => !driverSelection || driverSelection[standing.driverId])
-    .map(standing => ({
-      position: standing.position,
-      driverId: standing.driverId,
-      points: standing.points,
-      positionChange: standing.positionChange,
-      pointsGained: standing.predictionPointsGained
-    }));
+  // Format driver standings if requested (filter by driver selection if provided)
+  const driverStandings = showDriverStandings
+    ? results.driverStandings
+        .filter(standing => !driverSelection || driverSelection[standing.driverId])
+        .map(standing => ({
+          position: standing.position,
+          driverId: standing.driverId,
+          points: standing.points,
+          positionChange: standing.positionChange,
+          pointsGained: standing.predictionPointsGained
+        }))
+    : undefined;
+
+  // Format team standings if requested
+  const teamStandings = showTeamStandings
+    ? results.teamStandings.map(standing => ({
+        position: standing.position,
+        teamId: standing.teamId,
+        points: standing.points,
+        positionChange: standing.positionChange,
+        pointsGained: standing.predictionPointsGained
+      }))
+    : undefined;
 
   // Format all drivers
   const drivers: Record<string, { name: string; teamId: string }> = {};
@@ -127,7 +151,10 @@ export function formatExportData(
     subtitle,
     races,
     grids,
-    standings,
+    driverStandings,
+    teamStandings,
+    showDriverStandings,
+    showTeamStandings,
     drivers,
     teams
   };

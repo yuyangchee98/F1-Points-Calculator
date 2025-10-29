@@ -128,12 +128,21 @@ const calculatePoints = (filterOfficialOnly: boolean) => {
 // First pass: Calculate points from official results only
 const officialResults = calculatePoints(true);
 const officialDriverPoints = officialResults.driverPoints;
+const officialTeamPoints = officialResults.teamPoints;
 
-// Create official standings to get positions (for position change calculation)
-const officialStandings = Object.entries(officialDriverPoints)
+// Create official driver standings to get positions (for position change calculation)
+const officialDriverStandings = Object.entries(officialDriverPoints)
   .sort(([, pointsA], [, pointsB]) => pointsB - pointsA)
   .reduce((acc, [driverId], index) => {
     acc[driverId] = index + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+// Create official team standings to get positions (for position change calculation)
+const officialTeamStandings = Object.entries(officialTeamPoints)
+  .sort(([, pointsA], [, pointsB]) => pointsB - pointsA)
+  .reduce((acc, [teamId], index) => {
+    acc[teamId] = index + 1;
     return acc;
   }, {} as Record<string, number>);
 
@@ -156,7 +165,7 @@ const driverStandings: DriverStanding[] = Object.entries(driverPoints)
   .sort((a, b) => b.points - a.points)
   .map((standing, index) => {
     const newPosition = index + 1;
-    const oldPosition = officialStandings[standing.driverId] || newPosition;
+    const oldPosition = officialDriverStandings[standing.driverId] || newPosition;
     return {
       ...standing,
       position: newPosition,
@@ -164,18 +173,25 @@ const driverStandings: DriverStanding[] = Object.entries(driverPoints)
     };
   });
 
-// Create team standings
+// Create team standings with predictionPointsGained and positionChange
 const teamStandings: TeamStanding[] = Object.entries(teamPoints)
   .map(([teamId, points]) => ({
     teamId,
     points,
-    position: 0 // Will be updated below
+    position: 0, // Will be updated below
+    predictionPointsGained: points - (officialTeamPoints[teamId] || 0),
+    positionChange: 0 // Will be calculated after sorting
   }))
   .sort((a, b) => b.points - a.points)
-  .map((standing, index) => ({
-    ...standing,
-    position: index + 1
-  }));
+  .map((standing, index) => {
+    const newPosition = index + 1;
+    const oldPosition = officialTeamStandings[standing.teamId] || newPosition;
+    return {
+      ...standing,
+      position: newPosition,
+      positionChange: oldPosition - newPosition // Positive means moved up
+    };
+  });
 
 // Dispatch the calculated results to the store
 dispatch(setResults({

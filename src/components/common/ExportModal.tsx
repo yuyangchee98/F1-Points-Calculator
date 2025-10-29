@@ -36,6 +36,8 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
   const [completedDropdownOpen, setCompletedDropdownOpen] = useState(false);
   const [upcomingDropdownOpen, setUpcomingDropdownOpen] = useState(false);
   const [driverDropdownOpen, setDriverDropdownOpen] = useState(false);
+  const [showDriverStandings, setShowDriverStandings] = useState(true);
+  const [showTeamStandings, setShowTeamStandings] = useState(false);
 
   const races = useSelector((state: RootState) => state.seasonData.races);
   const positions = useSelector((state: RootState) => state.grid.positions);
@@ -110,7 +112,9 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
         title,
         subtitle,
         raceSelection,
-        selectedDrivers
+        selectedDrivers,
+        showDriverStandings,
+        showTeamStandings
       );
 
       // Call export API
@@ -196,9 +200,11 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
       title,
       subtitle,
       raceSelection,
-      selectedDrivers
+      selectedDrivers,
+      showDriverStandings,
+      showTeamStandings
     );
-  }, [seasonData, grid, results, title, subtitle, raceSelection, selectedDrivers]);
+  }, [seasonData, grid, results, title, subtitle, raceSelection, selectedDrivers, showDriverStandings, showTeamStandings]);
 
   // Early return after all hooks have been called
   if (!isOpen) return null;
@@ -430,11 +436,39 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
                 )}
               </div>
 
+              {/* Standings Type Selection */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Standings Display
+                </label>
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={showDriverStandings}
+                      onChange={(e) => setShowDriverStandings(e.target.checked)}
+                      className="w-4 h-4 text-red-600 rounded focus:ring-2 focus:ring-red-500"
+                    />
+                    <span className="text-sm text-gray-700">Show Driver Standings</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={showTeamStandings}
+                      onChange={(e) => setShowTeamStandings(e.target.checked)}
+                      className="w-4 h-4 text-red-600 rounded focus:ring-2 focus:ring-red-500"
+                    />
+                    <span className="text-sm text-gray-700">Show Constructor Standings</span>
+                  </label>
+                </div>
+              </div>
+
               {/* Driver Selection */}
+              {showDriverStandings && (
               <div className="relative">
                 <div className="flex items-center justify-between gap-3 mb-2">
                   <label className="text-sm font-semibold text-gray-900">
-                    Championship Standings
+                    Select Drivers for Standings
                   </label>
 
                   {/* Filter Dropdown */}
@@ -558,6 +592,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
                   </div>
                 )}
               </div>
+              )}
             </div>
           </div>
 
