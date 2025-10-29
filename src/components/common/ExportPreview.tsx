@@ -9,9 +9,9 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
   const { races, grids, standings, drivers, teams } = data;
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', overflow: 'auto' }}>
+    <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start', width: '100%', height: '100%' }}>
       {/* Scale container to fit preview area */}
-      <div style={{ transform: 'scale(0.37)', transformOrigin: 'top center' }}>
+      <div style={{ transform: 'scale(1)', transformOrigin: 'top left' }}>
         {/* Exact copy of backend template */}
         <div
           style={{
