@@ -12,7 +12,8 @@ export default defineConfig({
       dynamicRoutes: ['/'],
       changefreq: 'weekly',
       priority: 1.0,
-      lastmod: new Date().toISOString().split('T')[0]
+      lastmod: new Date(),
+      generateRobotsTxt: false // Don't generate robots.txt - we have one in public folder
     })
   ],
   build: {
