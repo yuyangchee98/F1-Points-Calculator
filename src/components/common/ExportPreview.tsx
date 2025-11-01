@@ -74,6 +74,7 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
             background: 'linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%)',
             padding: '28px',
             fontFamily: 'Inter, sans-serif',
+            position: 'relative',
           }}
         >
           {/* Main Layout: Vertical Sections */}
@@ -84,48 +85,63 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
               flex: 1,
             }}
           >
-            {/* Title and Subtitle */}
+            {/* Title, Subtitle and Race Grid Section - Combined */}
             <div
               style={{
                 display: 'flex',
                 flexDirection: 'column',
-                marginBottom: '24px',
-                gap: '6px',
+                background: '#ffffff',
+                borderRadius: '12px',
+                padding: '20px',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)',
+                marginBottom: '20px',
               }}
             >
-              <h1
+              {/* Title and Subtitle */}
+              <div
                 style={{
-                  fontSize: '32px',
-                  fontWeight: '700',
-                  color: '#111827',
-                  margin: 0,
-                  lineHeight: 1.1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  marginBottom: '20px',
+                  gap: '6px',
+                  alignItems: 'center',
+                  textAlign: 'center',
                 }}
               >
-                {data.title || 'My F1 Predictions'}
-              </h1>
-              {data.subtitle && (
-                <p
+                <h1
                   style={{
-                    fontSize: '14px',
-                    fontWeight: '400',
-                    color: '#6b7280',
+                    fontSize: '32px',
+                    fontWeight: '700',
+                    color: '#111827',
                     margin: 0,
-                    lineHeight: 1.4,
+                    lineHeight: 1.1,
                   }}
                 >
-                  {data.subtitle}
-                </p>
-              )}
-            </div>
+                  {data.title || 'My F1 Predictions'}
+                </h1>
+                {data.subtitle && (
+                  <p
+                    style={{
+                      fontSize: '14px',
+                      fontWeight: '400',
+                      color: '#6b7280',
+                      margin: 0,
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    {data.subtitle}
+                  </p>
+                )}
+              </div>
 
-            {/* Race Grid Section */}
-            <div
-              style={{
-                display: 'flex',
-                gap: '8px',
-              }}
-            >
+              {/* Race Grid */}
+              <div
+                style={{
+                  display: 'flex',
+                  gap: '8px',
+                  justifyContent: 'center',
+                }}
+              >
               {/* Position/Points Index Column */}
               <div
                 style={{
@@ -425,6 +441,7 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                   </div>
                 );
               })}
+              </div>
             </div>
 
             {/* Flow Indicator */}
@@ -433,8 +450,8 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                marginTop: '20px',
-                marginBottom: '20px',
+                marginTop: '16px',
+                marginBottom: '16px',
               }}
             >
               <div
@@ -465,7 +482,15 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
 
             {/* Championship Standings Section - Conditional */}
             {(showDriverStandings || showTeamStandings) && (
-              <>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  background: '#f9fafb',
+                  borderRadius: '12px',
+                  padding: '20px',
+                }}
+              >
                 {/* Driver Standings Only */}
                 {showDriverStandings && !showTeamStandings && driverStandings && (
                   <div
@@ -681,21 +706,45 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                     </div>
                   </div>
                 )}
-              </>
+              </div>
             )}
           </div>
 
-          {/* Watermark */}
+          {/* Watermark - Top Left */}
           <div
             style={{
+              position: 'absolute',
+              top: '20px',
+              left: '20px',
               display: 'flex',
-              justifyContent: 'center',
-              marginTop: '14px',
-              fontSize: '11px',
-              color: 'rgba(107, 114, 128, 0.6)',
+              flexDirection: 'column',
+              padding: '8px 12px',
+              background: '#ffffff',
+              borderRadius: '8px',
+              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+              border: '1px solid #fee2e2',
             }}
           >
-            Created with F1 Points Calculator
+            <span
+              style={{
+                fontSize: '11px',
+                fontWeight: '700',
+                color: '#dc2626',
+                letterSpacing: '0.3px',
+              }}
+            >
+              F1 POINTS CALCULATOR
+            </span>
+            <span
+              style={{
+                fontSize: '9px',
+                fontWeight: '500',
+                color: '#6b7280',
+                marginTop: '2px',
+              }}
+            >
+              f1pointscalculator.yaaaang.com
+            </span>
           </div>
         </div>
       </div>

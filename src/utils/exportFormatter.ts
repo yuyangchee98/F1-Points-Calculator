@@ -59,7 +59,8 @@ export function formatExportData(
   raceSelection?: Record<string, boolean>,
   driverSelection?: Record<string, boolean>,
   showDriverStandings: boolean = true,
-  showTeamStandings: boolean = false
+  showTeamStandings: boolean = false,
+  teamSelection?: Record<string, boolean>
 ): ExportData {
   const { seasonData, grid, results } = state;
 
@@ -117,15 +118,17 @@ export function formatExportData(
         }))
     : undefined;
 
-  // Format team standings if requested
+  // Format team standings if requested (filter by team selection if provided)
   const teamStandings = showTeamStandings
-    ? results.teamStandings.map(standing => ({
-        position: standing.position,
-        teamId: standing.teamId,
-        points: standing.points,
-        positionChange: standing.positionChange,
-        pointsGained: standing.predictionPointsGained
-      }))
+    ? results.teamStandings
+        .filter(standing => !teamSelection || teamSelection[standing.teamId])
+        .map(standing => ({
+          position: standing.position,
+          teamId: standing.teamId,
+          points: standing.points,
+          positionChange: standing.positionChange,
+          pointsGained: standing.predictionPointsGained
+        }))
     : undefined;
 
   // Format all drivers

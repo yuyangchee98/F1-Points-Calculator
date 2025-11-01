@@ -63,7 +63,7 @@ const calculatePoints = (filterOfficialOnly: boolean) => {
     const raceTeamPoints: Record<string, number> = {};
 
     // Get past results for this race to determine which team each driver was racing for
-    const raceResults = state.seasonData.pastResults[race.name] || [];
+    const raceResults = state.seasonData.pastResults[race.id] || [];
 
     // Calculate points for each position
     racePositions.forEach(position => {
@@ -85,10 +85,18 @@ const calculatePoints = (filterOfficialOnly: boolean) => {
 
         // Find the team the driver was racing for in this specific race
         const raceResult = raceResults.find(r => r.driverId === position.driverId);
-        if (raceResult) {
-          // Use the team from the race result
-          const teamId = raceResult.teamId;
+        let teamId: string | undefined;
 
+        if (raceResult) {
+          // Official result: use historical team from pastResults
+          teamId = raceResult.teamId;
+        } else {
+          // User prediction: use current team from driver data
+          const driver = allDrivers.find(d => d.id === position.driverId);
+          teamId = driver?.team;
+        }
+
+        if (teamId) {
           if (!teamPoints[teamId]) {
             teamPoints[teamId] = 0;
           }
