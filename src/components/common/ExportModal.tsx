@@ -32,10 +32,13 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
   const [title, setTitle] = useState('F1 CHAMPIONSHIP PREDICTIONS');
   const [subtitle, setSubtitle] = useState('Current predictions and standings');
   const [selectedDrivers, setSelectedDrivers] = useState<Record<string, boolean>>({});
+  const [selectedTeams, setSelectedTeams] = useState<Record<string, boolean>>({});
   const [driverFilter, setDriverFilter] = useState<'all' | 'top3' | 'top5' | 'top10' | 'withPredictions' | 'positionChanged'>('all');
+  const [teamFilter, setTeamFilter] = useState<'all' | 'top3' | 'top5' | 'top10'>('all');
   const [completedDropdownOpen, setCompletedDropdownOpen] = useState(false);
   const [upcomingDropdownOpen, setUpcomingDropdownOpen] = useState(false);
   const [driverDropdownOpen, setDriverDropdownOpen] = useState(false);
+  const [teamDropdownOpen, setTeamDropdownOpen] = useState(false);
   const [showDriverStandings, setShowDriverStandings] = useState(true);
   const [showTeamStandings, setShowTeamStandings] = useState(false);
 
@@ -101,6 +104,19 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
     setSelectedDrivers(initial);
   }, [results.driverStandings]);
 
+  // Initialize team selection with top 3 teams
+  useEffect(() => {
+    if (results.teamStandings.length === 0) return;
+
+    const initial: Record<string, boolean> = {};
+    // Select top 3 teams by default
+    results.teamStandings.slice(0, 3).forEach(standing => {
+      initial[standing.teamId] = true;
+    });
+
+    setSelectedTeams(initial);
+  }, [results.teamStandings]);
+
   const handleExport = async () => {
     setIsLoading(true);
     setError(null);
@@ -114,7 +130,8 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
         raceSelection,
         selectedDrivers,
         showDriverStandings,
-        showTeamStandings
+        showTeamStandings,
+        selectedTeams
       );
 
       // Call export API
@@ -154,6 +171,13 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
     }));
   };
 
+  const toggleTeam = (teamId: string) => {
+    setSelectedTeams(prev => ({
+      ...prev,
+      [teamId]: !prev[teamId]
+    }));
+  };
+
   // Separate completed and upcoming races
   const completedRaces = useMemo(() => races.filter(r => r.completed), [races]);
   const upcomingRaces = useMemo(() => races.filter(r => !r.completed), [races]);
@@ -173,6 +197,15 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
     return results.driverStandings;
   }, [results.driverStandings, driverFilter]);
 
+  // Filter teams based on selected filter
+  const filteredTeams = useMemo(() => {
+    if (teamFilter === 'all') return results.teamStandings;
+    if (teamFilter === 'top3') return results.teamStandings.slice(0, 3);
+    if (teamFilter === 'top5') return results.teamStandings.slice(0, 5);
+    if (teamFilter === 'top10') return results.teamStandings.slice(0, 10);
+    return results.teamStandings;
+  }, [results.teamStandings, teamFilter]);
+
   // Calculate selected counts with limits (use all races, not filtered)
   const selectedCompletedRaces = races
     .filter(r => r.completed && raceSelection[r.id])
@@ -182,6 +215,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
     .length;
   const selectedRaceCount = selectedCompletedRaces + selectedUpcomingRaces;
   const selectedDriverCount = Object.values(selectedDrivers).filter(Boolean).length;
+  const selectedTeamCount = Object.values(selectedTeams).filter(Boolean).length;
 
   // Race limits
   const MAX_COMPLETED_RACES = 1;
@@ -193,6 +227,10 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
   const MAX_DRIVERS = 3;
   const isDriverLimitReached = selectedDriverCount >= MAX_DRIVERS;
 
+  // Team limit
+  const MAX_TEAMS = 3;
+  const isTeamLimitReached = selectedTeamCount >= MAX_TEAMS;
+
   // Generate preview data
   const previewData = useMemo(() => {
     return formatExportData(
@@ -202,9 +240,10 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
       raceSelection,
       selectedDrivers,
       showDriverStandings,
-      showTeamStandings
+      showTeamStandings,
+      selectedTeams
     );
-  }, [seasonData, grid, results, title, subtitle, raceSelection, selectedDrivers, showDriverStandings, showTeamStandings]);
+  }, [seasonData, grid, results, title, subtitle, raceSelection, selectedDrivers, showDriverStandings, showTeamStandings, selectedTeams]);
 
   // Early return after all hooks have been called
   if (!isOpen) return null;
@@ -584,6 +623,130 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
                     <div className="mt-4 pt-3 border-t">
                       <button
                         onClick={() => setDriverDropdownOpen(false)}
+                        className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium text-sm"
+                      >
+                        Done
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+              )}
+
+              {/* Team Selection */}
+              {showTeamStandings && (
+              <div className="relative">
+                <div className="flex items-center justify-between gap-3 mb-2">
+                  <label className="text-sm font-semibold text-gray-900">
+                    Select Constructors for Standings
+                  </label>
+
+                  {/* Filter Dropdown */}
+                  <select
+                    value={teamFilter}
+                    onChange={(e) => setTeamFilter(e.target.value as any)}
+                    className="px-3 py-1.5 text-xs text-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-white hover:text-gray-700 transition-colors"
+                  >
+                    <option value="all">Filter: All</option>
+                    <option value="top3">Filter: Top 3</option>
+                    <option value="top5">Filter: Top 5</option>
+                    <option value="top10">Filter: Top 10</option>
+                  </select>
+                </div>
+
+                {/* Dropdown Trigger */}
+                <button
+                  onClick={() => setTeamDropdownOpen(!teamDropdownOpen)}
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg bg-white hover:border-gray-400 transition-colors text-left flex items-center justify-between"
+                >
+                  <span className="text-sm text-gray-700">
+                    {selectedTeamCount === 0 ? 'No constructors selected' : `${selectedTeamCount}/${MAX_TEAMS} constructors selected`}
+                  </span>
+                  <svg
+                    className={`w-5 h-5 text-gray-500 transition-transform ${teamDropdownOpen ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {/* Dropdown Panel */}
+                {teamDropdownOpen && (
+                  <div className="absolute z-10 mt-2 w-full bg-white border-2 border-gray-300 rounded-lg shadow-xl p-4 max-h-96 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-red-400 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-red-500">
+                    <div className="space-y-1.5">
+                  {filteredTeams.map(standing => {
+                    const team = seasonData.teams.find(t => t.id === standing.teamId);
+                    if (!team) return null;
+
+                    const isSelected = selectedTeams[standing.teamId] || false;
+                    const isDisabled = !isSelected && isTeamLimitReached;
+
+                    return (
+                      <div
+                        key={standing.teamId}
+                        onClick={() => !isDisabled && toggleTeam(standing.teamId)}
+                        className={`
+                          relative flex items-center gap-3 p-3 rounded-lg transition-all duration-200
+                          ${isDisabled
+                            ? 'opacity-50 cursor-not-allowed border-2 border-gray-200 bg-gray-50'
+                            : isSelected
+                              ? 'border-2 border-red-500 bg-red-50/30 shadow-md cursor-pointer'
+                              : 'border-2 border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm cursor-pointer'
+                          }
+                        `}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          disabled={isDisabled}
+                          onChange={() => {}}
+                          className="w-5 h-5 text-red-600 rounded focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                        />
+                        <div
+                          className="w-1 h-12 rounded-full"
+                          style={{ backgroundColor: team.color }}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex-1 min-w-0">
+                              <div className="font-semibold text-gray-900 text-sm">
+                                {standing.position}. {team.name}
+                              </div>
+                            </div>
+                            <div className="text-right flex-shrink-0">
+                              <div className="font-bold text-gray-900 text-sm">
+                                {standing.points} pts
+                              </div>
+                              {standing.positionChange !== 0 && (
+                                <span
+                                  className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold mt-1 ${
+                                    standing.positionChange > 0
+                                      ? 'bg-green-100 text-green-700'
+                                      : 'bg-red-100 text-red-700'
+                                  }`}
+                                >
+                                  {standing.positionChange > 0 ? '↑' : '↓'} {Math.abs(standing.positionChange)}
+                                </span>
+                              )}
+                              {standing.predictionPointsGained > 0 && standing.positionChange === 0 && (
+                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 mt-1">
+                                  +{standing.predictionPointsGained}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                    </div>
+
+                    {/* Done Button */}
+                    <div className="mt-4 pt-3 border-t">
+                      <button
+                        onClick={() => setTeamDropdownOpen(false)}
                         className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium text-sm"
                       >
                         Done
