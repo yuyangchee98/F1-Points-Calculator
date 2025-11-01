@@ -5,7 +5,6 @@ import { ChartDataset, TooltipItem } from 'chart.js';
 import { RootState } from '../../store';
 import { selectTeamPointsForCharts, selectTopTeams } from '../../store/selectors/resultsSelectors';
 import { selectTeamsByIdMap } from '../../store/selectors/dataSelectors';
-import './responsive-chart.css';
 
 const TeamPointsChart: React.FC = () => {
   // Get teams from Redux
