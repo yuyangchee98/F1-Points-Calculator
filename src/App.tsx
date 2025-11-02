@@ -11,7 +11,6 @@ import { parseNaturalLanguage } from './api/naturalLanguage';
 import { createCheckoutSession } from './api/subscription';
 import useRaceResults from './hooks/useRaceResults';
 import { useAutoSave } from './hooks/useAutoSave';
-import { useLoadPredictions } from './hooks/useLoadPredictions';
 import { useDayAccess } from './hooks/useSubscription';
 import { useUserEmail } from './hooks/useUserEmail';
 import Layout from './components/layout/Layout';
@@ -39,8 +38,6 @@ const App: React.FC = () => {
   useRaceResults();
   // Enable auto-save
   useAutoSave();
-  // Load saved predictions only after fingerprint is initialized
-  const { isLoading: isLoadingPredictions } = useLoadPredictions();
   const mobileView = useSelector((state: RootState) => state.ui.mobileView);
   const selectedPointsSystem = useSelector((state: RootState) => state.ui.selectedPointsSystem);
   const { isMobile } = useWindowSize();
@@ -128,14 +125,7 @@ const App: React.FC = () => {
               </div>
               
               <ActionsBar />
-              
-              {/* Show loading state if predictions are being loaded */}
-              {isLoadingPredictions && (
-                <div className="text-center py-4 text-gray-600">
-                  <span className="animate-pulse">Loading your saved predictions...</span>
-                </div>
-              )}
-              
+
               {/* Show status message */}
               {statusMessage && (
                 <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
