@@ -101,6 +101,7 @@ export interface UiState {
   selectedDriver: string | null;
   selectedPointsSystem: string;
   positionColumnMode: 'position' | 'standings';
+  copiedDriver: string | null;
 }
 
 export interface ResultsState {
