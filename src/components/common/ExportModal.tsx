@@ -4,6 +4,7 @@ import { RootState } from '../../store';
 import { exportPrediction } from '../../api/export';
 import { formatExportData } from '../../utils/exportFormatter';
 import ExportPreview from './ExportPreview';
+import useWindowSize from '../../hooks/useWindowSize';
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -41,6 +42,9 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
   const [teamDropdownOpen, setTeamDropdownOpen] = useState(false);
   const [showDriverStandings, setShowDriverStandings] = useState(true);
   const [showTeamStandings, setShowTeamStandings] = useState(false);
+  const [activeTab, setActiveTab] = useState<'settings' | 'preview'>('settings');
+
+  const { isMobile } = useWindowSize();
 
   const races = useSelector((state: RootState) => state.seasonData.races);
   const positions = useSelector((state: RootState) => state.grid.positions);
@@ -265,10 +269,36 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
           </button>
         </div>
 
+        {/* Mobile Tab Bar */}
+        {isMobile && (
+          <div className="flex bg-gray-100 border-b">
+            <button
+              onClick={() => setActiveTab('settings')}
+              className={`flex-1 py-3 px-4 text-sm font-semibold transition ${
+                activeTab === 'settings'
+                  ? 'text-red-600 bg-white border-b-2 border-red-600'
+                  : 'text-gray-600 hover:text-gray-800'
+              }`}
+            >
+              Settings
+            </button>
+            <button
+              onClick={() => setActiveTab('preview')}
+              className={`flex-1 py-3 px-4 text-sm font-semibold transition ${
+                activeTab === 'preview'
+                  ? 'text-red-600 bg-white border-b-2 border-red-600'
+                  : 'text-gray-600 hover:text-gray-800'
+              }`}
+            >
+              Preview
+            </button>
+          </div>
+        )}
+
         {/* Main Content: Settings + Preview */}
         <div className="flex-1 flex overflow-hidden">
           {/* Settings Panel */}
-          <div className="w-96 border-r p-6 overflow-y-auto">
+          <div className={`w-96 border-r p-6 overflow-y-auto ${isMobile ? (activeTab === 'settings' ? 'block w-full border-r-0' : 'hidden') : 'block'}`}>
             <div className="space-y-6">
               {/* Title Input */}
               <div>
@@ -760,7 +790,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
           </div>
 
           {/* Preview Panel */}
-          <div className="flex-1 p-6 bg-gray-50 overflow-auto">
+          <div className={`flex-1 p-6 bg-gray-50 overflow-auto ${isMobile ? (activeTab === 'preview' ? 'block w-full' : 'hidden') : 'block'}`}>
             {selectedRaceCount > 0 ? (
               <ExportPreview data={previewData} />
             ) : (
