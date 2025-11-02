@@ -4,7 +4,7 @@ import { Race } from '../../types';
 import { RootState } from '../../store';
 import { selectDriverAtPosition, selectDriversByIdMap, getDriverLastName, getDriverDisplayName } from '../../store/selectors/dataSelectors';
 import DriverCard from '../drivers/DriverCard';
-import { selectDriver } from '../../store/slices/uiSlice';
+import { selectDriver, copyDriver } from '../../store/slices/uiSlice';
 import { placeDriver, clearPosition, fillRestOfSeason } from '../../store/slices/gridSlice';
 import { calculateResults } from '../../store/slices/resultsSlice';
 import { useAppDispatch } from '../../store';
@@ -26,6 +26,7 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
     selectDriverAtPosition(state, race.id, position)
   );
   const selectedDriverId = useSelector((state: RootState) => state.ui.selectedDriver);
+  const copiedDriverId = useSelector((state: RootState) => state.ui.copiedDriver);
   const positions = useSelector((state: RootState) => state.grid.positions);
   const driverById = useSelector(selectDriversByIdMap);
   const driverStandings = useSelector((state: RootState) => state.results.driverStandings);
@@ -67,46 +68,84 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
   const buildContextMenuItems = (): ContextMenuItem[] => {
     const items: ContextMenuItem[] = [];
 
-    if (driverId && driver && !isOfficialResult) {
-      // Menu when slot has a driver
+    if (driverId && driver) {
+      // Menu when slot has a driver (official or not)
+
+      // Copy is always available
       items.push({
-        id: 'remove',
-        label: 'Remove Driver',
-        icon: '✕',
+        id: 'copy',
+        label: 'Copy Driver',
+        icon: '📋',
         onClick: () => {
-          dispatch(clearPosition({ raceId: race.id, position }));
-          dispatch(calculateResults());
-          toastService.addToast(`Removed ${getDriverDisplayName(driver)} from P${position}`, 'info');
-          trackContextMenuAction('ACTION', 'remove_driver');
+          dispatch(copyDriver(driverId));
+          toastService.addToast(`Copied ${getDriverDisplayName(driver)}`, 'info');
+          trackContextMenuAction('ACTION', 'copy_driver');
         },
       });
 
-      items.push({
-        id: 'fill-rest',
-        label: 'Repeat for Remaining Races',
-        icon: '📅',
-        onClick: () => {
-          const raceIds = races.map(r => r.id);
-          dispatch(fillRestOfSeason({
-            driverId,
-            position,
-            startRaceId: race.id,
-            raceIds,
-          }));
-          dispatch(calculateResults());
+      // Remove and Fill are only for non-official results
+      if (!isOfficialResult) {
+        items.push({
+          id: 'remove',
+          label: 'Remove Driver',
+          icon: '✕',
+          onClick: () => {
+            dispatch(clearPosition({ raceId: race.id, position }));
+            dispatch(calculateResults());
+            toastService.addToast(`Removed ${getDriverDisplayName(driver)} from P${position}`, 'info');
+            trackContextMenuAction('ACTION', 'remove_driver');
+          },
+        });
 
-          const remainingCount = raceIds.slice(raceIds.indexOf(race.id)).length;
-          toastService.addToast(
-            `Filled ${getDriverDisplayName(driver)} at P${position} for ${remainingCount} remaining races`,
-            'success'
-          );
-          trackContextMenuAction('ACTION', 'fill_rest_of_season', remainingCount);
-        },
-      });
+        items.push({
+          id: 'fill-rest',
+          label: 'Repeat for Remaining Races',
+          icon: '📅',
+          onClick: () => {
+            const raceIds = races.map(r => r.id);
+            dispatch(fillRestOfSeason({
+              driverId,
+              position,
+              startRaceId: race.id,
+              raceIds,
+            }));
+            dispatch(calculateResults());
+
+            const remainingCount = raceIds.slice(raceIds.indexOf(race.id)).length;
+            toastService.addToast(
+              `Filled ${getDriverDisplayName(driver)} at P${position} for ${remainingCount} remaining races`,
+              'success'
+            );
+            trackContextMenuAction('ACTION', 'fill_rest_of_season', remainingCount);
+          },
+        });
+      }
     } else if (!driverId && !isOfficialResult) {
-      // Menu when slot is empty - submenus with lots of options
+      // Menu when slot is empty
 
-      // 1. Place Championship Leaders submenu (Top 5)
+      // Paste Driver if there's a copied driver
+      if (copiedDriverId) {
+        const copiedDriver = driverById[copiedDriverId];
+        if (copiedDriver) {
+          items.push({
+            id: 'paste',
+            label: 'Paste Driver',
+            icon: '📋',
+            onClick: () => {
+              dispatch(placeDriver({
+                raceId: race.id,
+                position,
+                driverId: copiedDriverId,
+              }));
+              dispatch(calculateResults());
+              toastService.addToast(`Pasted ${getDriverDisplayName(copiedDriver)} at P${position}`, 'success');
+              trackContextMenuAction('ACTION', 'paste_driver');
+            },
+          });
+        }
+      }
+
+      // Place Championship Leaders submenu (Top 5)
       const topDrivers = driverStandings.slice(0, 5);
       const leaderSubmenu: ContextMenuItem[] = topDrivers.map((standing, index) => {
         const standingDriver = driverById[standing.driverId];
@@ -147,9 +186,6 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
     event.preventDefault();
     event.stopPropagation();
 
-    // Don't show context menu on official results
-    if (isOfficialResult) return;
-
     const items = buildContextMenuItems();
     if (items.length > 0) {
       contextMenu.open(event, items);
@@ -159,9 +195,6 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
 
   // Handle long press for mobile
   const longPressHandlers = useLongPress((event: React.TouchEvent) => {
-    // Don't show context menu on official results
-    if (isOfficialResult) return;
-
     const items = buildContextMenuItems();
     if (items.length > 0) {
       contextMenu.open(event, items);

@@ -8,7 +8,8 @@ const initialState: UiState = {
   showOfficialResults: true, // Default to showing official results
   selectedDriver: null,
   selectedPointsSystem: DEFAULT_POINTS_SYSTEM,
-  positionColumnMode: 'position' // 'position' or 'standings'
+  positionColumnMode: 'position', // 'position' or 'standings'
+  copiedDriver: null
 };
 
 export const uiSlice = createSlice({
@@ -38,6 +39,10 @@ export const uiSlice = createSlice({
     
     selectDriver: (state, action: PayloadAction<string | null>) => {
       state.selectedDriver = action.payload;
+    },
+
+    copyDriver: (state, action: PayloadAction<string | null>) => {
+      state.copiedDriver = action.payload;
     },
 
     selectPointsSystem: (state, action: PayloadAction<string>) => {
@@ -86,6 +91,7 @@ export const {
   setMobileView,
   toggleOfficialResults,
   selectDriver,
+  copyDriver,
   selectPointsSystem,
   togglePositionColumnMode,
   initializeUiState
