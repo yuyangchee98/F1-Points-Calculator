@@ -165,6 +165,48 @@ export const gridSlice = createSlice({
           return position;
         });
       }
+    },
+
+    // Context menu action: Clear a specific position
+    clearPosition: (state, action: PayloadAction<{ raceId: string; position: number }>) => {
+      const { raceId, position } = action.payload;
+
+      const positionIndex = state.positions.findIndex(
+        p => p.raceId === raceId && p.position === position
+      );
+
+      if (positionIndex !== -1 && !state.positions[positionIndex].isOfficialResult) {
+        state.positions[positionIndex].driverId = null;
+      }
+    },
+
+    // Context menu action: Fill rest of season with the same driver at the same position
+    fillRestOfSeason: (state, action: PayloadAction<{
+      driverId: string;
+      position: number;
+      startRaceId: string;
+      raceIds: string[]; // All race IDs in order
+    }>) => {
+      const { driverId, position, startRaceId, raceIds } = action.payload;
+
+      // Find the start race index
+      const startIndex = raceIds.indexOf(startRaceId);
+      if (startIndex === -1) return;
+
+      // Get races after (and including) the start race
+      const racesToFill = raceIds.slice(startIndex);
+
+      // Place the driver in each race at the specified position
+      racesToFill.forEach(raceId => {
+        const positionIndex = state.positions.findIndex(
+          p => p.raceId === raceId && p.position === position
+        );
+
+        // Only fill if position exists and is not an official result
+        if (positionIndex !== -1 && !state.positions[positionIndex].isOfficialResult) {
+          state.positions[positionIndex].driverId = driverId;
+        }
+      });
     }
   },
   extraReducers: (builder) => {
@@ -184,7 +226,9 @@ export const {
   moveDriver,
   placeDriver,
   resetGrid,
-  toggleOfficialResults
+  toggleOfficialResults,
+  clearPosition,
+  fillRestOfSeason
 } = gridSlice.actions;
 
 export default gridSlice.reducer;

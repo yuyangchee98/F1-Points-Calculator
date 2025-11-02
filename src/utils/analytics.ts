@@ -84,6 +84,11 @@ export const GA_EVENTS = {
     COMMAND_FAIL: 'smart_input_command_fail',
     MANAGE_SUBSCRIPTION: 'smart_input_manage_subscription',
   },
+  CONTEXT_MENU: {
+    OPEN: 'context_menu_open',
+    CLOSE: 'context_menu_close',
+    ACTION: 'context_menu_action',
+  },
 } as const;
 
 export const trackDriverDrop = (
@@ -186,5 +191,14 @@ export const trackSmartInputCommand = (command: string, success: boolean, placem
     'Smart Input',
     command.substring(0, 50), // Truncate long commands
     placementCount
+  );
+};
+
+export const trackContextMenuAction = (action: keyof typeof GA_EVENTS.CONTEXT_MENU, details?: string, value?: number) => {
+  trackEvent(
+    GA_EVENTS.CONTEXT_MENU[action],
+    'Context Menu',
+    details,
+    value
   );
 };

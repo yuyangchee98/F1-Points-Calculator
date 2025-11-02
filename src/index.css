@@ -51,6 +51,17 @@
   100% { transform: translateX(0); opacity: 1; }
 }
 
+@keyframes fadeInScale {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 /* Drag and Drop Styles */
 /* Drop target styles */
 .race-slot.can-drop {
@@ -105,7 +116,11 @@ body {
     animation: gridRowEntry 0.5s ease-out;
     animation-fill-mode: both;
   }
-  
+
+  .animate-fadeInScale {
+    animation: fadeInScale 0.15s ease-out;
+  }
+
   /* Apply staggered animations to grid rows */
   .grid-row-1 { animation-delay: 0.05s; }
   .grid-row-2 { animation-delay: 0.1s; }
@@ -117,6 +132,32 @@ body {
   .grid-row-8 { animation-delay: 0.4s; }
   .grid-row-9 { animation-delay: 0.45s; }
   .grid-row-10 { animation-delay: 0.5s; }
+
+  /* Context Menu */
+  .context-menu {
+    user-select: none;
+  }
+
+  .context-submenu {
+    animation-delay: 0.05s;
+  }
+
+  .context-menu-item {
+    cursor: pointer;
+    font-size: 0.875rem;
+  }
+
+  .context-menu-item:focus {
+    outline: none;
+  }
+
+  .context-menu-item:disabled {
+    pointer-events: none;
+  }
+
+  .context-menu-divider {
+    height: 1px;
+  }
   
   /* Driver Card Styling */
   .driver-card {
