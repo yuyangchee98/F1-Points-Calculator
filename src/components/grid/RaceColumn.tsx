@@ -2,13 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Race } from '../../types';
 import { RootState } from '../../store';
-import { selectDriverAtPosition, selectDriversByIdMap, getDriverLastName } from '../../store/selectors/dataSelectors';
+import { selectDriverAtPosition, selectDriversByIdMap, getDriverLastName, getDriverDisplayName } from '../../store/selectors/dataSelectors';
 import DriverCard from '../drivers/DriverCard';
 import { selectDriver } from '../../store/slices/uiSlice';
-import { placeDriver } from '../../store/slices/gridSlice';
+import { placeDriver, clearPosition, fillRestOfSeason } from '../../store/slices/gridSlice';
 import { calculateResults } from '../../store/slices/resultsSlice';
 import { useAppDispatch } from '../../store';
 import { useDriverDrop } from '../../hooks/useDriverDragDrop';
+import { useContextMenu, useLongPress } from '../../hooks/useContextMenu';
+import ContextMenu from '../common/ContextMenu';
+import { ContextMenuItem } from '../../types/contextMenu';
+import { toastService } from '../common/ToastContainer';
+import { trackContextMenuAction } from '../../utils/analytics';
 
 interface RaceColumnProps {
   race: Race;
@@ -23,10 +28,15 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
   const selectedDriverId = useSelector((state: RootState) => state.ui.selectedDriver);
   const positions = useSelector((state: RootState) => state.grid.positions);
   const driverById = useSelector(selectDriversByIdMap);
+  const driverStandings = useSelector((state: RootState) => state.results.driverStandings);
+  const races = useSelector((state: RootState) => state.seasonData.races);
 
   // Animation states
   const [isHighlighted, setIsHighlighted] = useState(false);
   const [prevDriverId, setPrevDriverId] = useState<string | null>(null);
+
+  // Context menu hook
+  const contextMenu = useContextMenu();
 
   // Set up the drop target
   const { drop, isOver, canDrop } = useDriverDrop({
@@ -52,6 +62,112 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
 
   // Get the driver object if there's a driver in this position
   const driver = driverId ? driverById[driverId] : null;
+
+  // Build context menu items based on slot state
+  const buildContextMenuItems = (): ContextMenuItem[] => {
+    const items: ContextMenuItem[] = [];
+
+    if (driverId && driver && !isOfficialResult) {
+      // Menu when slot has a driver
+      items.push({
+        id: 'remove',
+        label: 'Remove Driver',
+        icon: '✕',
+        onClick: () => {
+          dispatch(clearPosition({ raceId: race.id, position }));
+          dispatch(calculateResults());
+          toastService.addToast(`Removed ${getDriverDisplayName(driver)} from P${position}`, 'info');
+          trackContextMenuAction('ACTION', 'remove_driver');
+        },
+      });
+
+      items.push({
+        id: 'fill-rest',
+        label: 'Repeat for Remaining Races',
+        icon: '📅',
+        onClick: () => {
+          const raceIds = races.map(r => r.id);
+          dispatch(fillRestOfSeason({
+            driverId,
+            position,
+            startRaceId: race.id,
+            raceIds,
+          }));
+          dispatch(calculateResults());
+
+          const remainingCount = raceIds.slice(raceIds.indexOf(race.id)).length;
+          toastService.addToast(
+            `Filled ${getDriverDisplayName(driver)} at P${position} for ${remainingCount} remaining races`,
+            'success'
+          );
+          trackContextMenuAction('ACTION', 'fill_rest_of_season', remainingCount);
+        },
+      });
+    } else if (!driverId && !isOfficialResult) {
+      // Menu when slot is empty - submenus with lots of options
+
+      // 1. Place Championship Leaders submenu (Top 5)
+      const topDrivers = driverStandings.slice(0, 5);
+      const leaderSubmenu: ContextMenuItem[] = topDrivers.map((standing, index) => {
+        const standingDriver = driverById[standing.driverId];
+        const icons = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
+        return {
+          id: `place-leader-${index + 1}`,
+          label: `P${standing.position}: ${getDriverDisplayName(standingDriver)} (${standing.points} pts)`,
+          icon: icons[index],
+          onClick: () => {
+            dispatch(placeDriver({
+              raceId: race.id,
+              position,
+              driverId: standing.driverId,
+            }));
+            dispatch(calculateResults());
+            toastService.addToast(
+              `Placed ${getDriverDisplayName(standingDriver)} at P${position}`,
+              'success'
+            );
+            trackContextMenuAction('ACTION', `place_leader_${index + 1}`);
+          },
+        };
+      });
+
+      items.push({
+        id: 'place-top5',
+        label: 'Place Top 5',
+        icon: '🏆',
+        submenu: leaderSubmenu,
+      });
+    }
+
+    return items;
+  };
+
+  // Handle right-click to open context menu
+  const handleContextMenu = (event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    // Don't show context menu on official results
+    if (isOfficialResult) return;
+
+    const items = buildContextMenuItems();
+    if (items.length > 0) {
+      contextMenu.open(event, items);
+      trackContextMenuAction('OPEN', `race:${race.id}_pos:${position}`);
+    }
+  };
+
+  // Handle long press for mobile
+  const longPressHandlers = useLongPress((event: React.TouchEvent) => {
+    // Don't show context menu on official results
+    if (isOfficialResult) return;
+
+    const items = buildContextMenuItems();
+    if (items.length > 0) {
+      contextMenu.open(event, items);
+      trackContextMenuAction('OPEN', `race:${race.id}_pos:${position}_longpress`);
+    }
+  });
 
   // Handle click on the race slot to place the selected driver
   const handleSlotClick = () => {
@@ -90,30 +206,42 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
   ].filter(Boolean).join(' ');
 
   return (
-    <div
-      className={slotClasses}
-      data-testid="race-slot"
-      data-race-id={race.id}
-      data-position={position}
-      onClick={handleSlotClick}
-      ref={drop}
-      role="button"
-      aria-label={driver ? `Position ${position}: ${getDriverLastName(driver.id)}` : `Empty position ${position}`}
-      tabIndex={0}
-    >
-      {driver && (
-        <div className="animate-placement grid-card-wrapper">
-          <DriverCard 
-            driver={driver}
-            isOfficialResult={isOfficialResult}
-            raceId={race.id}
-            position={position}
-            hideCode={true}
-            overrideTeamId={gridPosition?.teamId}
-          />
-        </div>
-      )}
-    </div>
+    <>
+      <div
+        className={slotClasses}
+        data-testid="race-slot"
+        data-race-id={race.id}
+        data-position={position}
+        onClick={handleSlotClick}
+        onContextMenu={handleContextMenu}
+        {...longPressHandlers}
+        ref={drop}
+        role="button"
+        aria-label={driver ? `Position ${position}: ${getDriverLastName(driver.id)}` : `Empty position ${position}`}
+        tabIndex={0}
+      >
+        {driver && (
+          <div className="animate-placement grid-card-wrapper">
+            <DriverCard
+              driver={driver}
+              isOfficialResult={isOfficialResult}
+              raceId={race.id}
+              position={position}
+              hideCode={true}
+              overrideTeamId={gridPosition?.teamId}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Context Menu */}
+      <ContextMenu
+        isOpen={contextMenu.isOpen}
+        position={contextMenu.position}
+        items={contextMenu.items}
+        onClose={contextMenu.close}
+      />
+    </>
   );
 };
 
