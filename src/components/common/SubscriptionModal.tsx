@@ -39,7 +39,6 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
       const session = await createCheckoutSession(localEmail);
       window.location.href = session.url;
     } catch (error) {
-      console.error('Error creating checkout session:', error);
       alert('Failed to start checkout process. Please try again.');
       setIsLoading(false);
     }

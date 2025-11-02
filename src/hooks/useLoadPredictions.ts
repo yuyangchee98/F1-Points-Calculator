@@ -52,10 +52,10 @@ export const useLoadPredictions = () => {
             dispatch(selectPointsSystem(saved.pointsSystem));
           }
         }
-        
+
         setHasLoaded(true);
       } catch (error) {
-        console.error('Failed to load predictions:', error);
+        // Failed to load predictions
       } finally {
         setIsLoading(false);
       }

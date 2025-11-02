@@ -46,7 +46,6 @@ export const useDayAccess = () => {
 
         setHasAccess(isActive);
       } catch (error) {
-        console.error('Error checking subscription status:', error);
         // Fall back to cached status if available
         const cacheKey = `${ACCESS_KEY}_${email}`;
         const cachedStatus = localStorage.getItem(cacheKey);
@@ -106,7 +105,7 @@ export const useDayAccess = () => {
 
         setHasAccess(isActive);
       } catch (error) {
-        console.error('Error refreshing access status:', error);
+        // Error refreshing access status
       } finally {
         setIsLoading(false);
       }
