@@ -60,17 +60,12 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
   useEffect(() => {
     if (races.length === 0) return; // Wait for races to load
 
-    console.log('[ExportModal] Updating race selection');
-    console.log('[ExportModal] Total races:', races.length);
-
     const initial: RaceSelection = {};
 
     // Find the last completed race (races array is already sorted chronologically)
     const completedRaces = races.filter(r => r.completed);
-    console.log('[ExportModal] Completed races:', completedRaces.map(r => ({ id: r.id, name: r.name, order: r.order })));
 
     const lastCompletedRace = completedRaces[completedRaces.length - 1];
-    console.log('[ExportModal] Last completed race:', lastCompletedRace ? { id: lastCompletedRace.id, name: lastCompletedRace.name } : 'none');
 
     races.forEach(race => {
       // Include if: (1) it's the last completed race OR (2) has user predictions
@@ -79,18 +74,8 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
       );
       const isLastCompletedRace = lastCompletedRace && race.id === lastCompletedRace.id;
 
-      if (hasUserPredictions) {
-        console.log(`[ExportModal] Race "${race.name}" has user predictions`);
-      }
-      if (isLastCompletedRace) {
-        console.log(`[ExportModal] Race "${race.name}" is last completed race`);
-      }
-
       initial[race.id] = isLastCompletedRace || hasUserPredictions;
     });
-
-    console.log('[ExportModal] Final initial selection:', initial);
-    console.log('[ExportModal] Selected race count:', Object.values(initial).filter(Boolean).length);
 
     setRaceSelection(initial);
   }, [races, positions]);
@@ -154,7 +139,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
       // Close modal
       onClose();
     } catch (err) {
-      console.error('Export failed:', err);
       setError('Failed to generate export image. Please try again.');
     } finally {
       setIsLoading(false);

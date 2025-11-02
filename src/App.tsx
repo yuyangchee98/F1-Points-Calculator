@@ -239,7 +239,6 @@ const App: React.FC = () => {
                                 trackSmartInputCommand(text, true, response.placements.length);
                               }
                             } catch (err) {
-                              console.error('Error parsing natural language:', err);
                               trackSmartInputCommand(text, false);
                               if (err instanceof Error && err.message === 'ACCESS_REQUIRED') {
                                 // User needs to get access
@@ -346,7 +345,6 @@ const App: React.FC = () => {
                                   const session = await createCheckoutSession(email);
                                   window.location.href = session.url;
                                 } catch (error) {
-                                  console.error('Error creating checkout session:', error);
                                   alert('Failed to start checkout process. Please try again.');
                                 }
                               }}
