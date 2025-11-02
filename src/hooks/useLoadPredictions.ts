@@ -7,11 +7,13 @@ import { useAppDispatch } from '../store';
 export const useLoadPredictions = () => {
   const dispatch = useAppDispatch();
   const { fingerprint } = useSelector((state: RootState) => state.predictions);
+  const { isLoaded: seasonDataLoaded } = useSelector((state: RootState) => state.seasonData);
   const [isLoading, setIsLoading] = useState(false);
   const [hasLoaded, setHasLoaded] = useState(false);
 
   useEffect(() => {
-    if (!fingerprint || hasLoaded) return;
+    // Wait for both fingerprint AND season data to be ready
+    if (!fingerprint || !seasonDataLoaded || hasLoaded) return;
 
     const loadSavedPredictions = async () => {
       setIsLoading(true);
@@ -60,7 +62,7 @@ export const useLoadPredictions = () => {
     };
 
     loadSavedPredictions();
-  }, [fingerprint, hasLoaded, dispatch]);
+  }, [fingerprint, seasonDataLoaded, hasLoaded, dispatch]);
 
   return { isLoading };
 };

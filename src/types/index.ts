@@ -83,6 +83,8 @@ export interface SeasonDataState {
   teams: Team[];
   races: Race[];
   pastResults: Record<string, RaceResult[]>;
+  isLoading: boolean;
+  isLoaded: boolean;
 }
 
 export interface GridState {
