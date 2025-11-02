@@ -8,13 +8,17 @@ export interface SeasonDataState {
   teams: Team[];
   races: Race[];
   pastResults: Record<string, RaceResult[]>;
+  isLoading: boolean;
+  isLoaded: boolean;
 }
 
 const initialState: SeasonDataState = {
   drivers: [],
   teams: [],
   races: [],
-  pastResults: {}
+  pastResults: {},
+  isLoading: false,
+  isLoaded: false
 };
 
 // Async thunk for fetching all season data (schedule + results + teams + drivers)
@@ -37,23 +41,35 @@ export const seasonDataSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(fetchSeasonData.fulfilled, (state, action) => {
-      const { schedule, results, teams, drivers } = action.payload;
+    builder
+      .addCase(fetchSeasonData.pending, (state) => {
+        state.isLoading = true;
+        state.isLoaded = false;
+      })
+      .addCase(fetchSeasonData.fulfilled, (state, action) => {
+        const { schedule, results, teams, drivers } = action.payload;
 
-      // Update all season data at once
-      state.drivers = drivers;
-      state.teams = teams;
-      state.races = schedule;
-      state.pastResults = { ...state.pastResults, ...results };
+        // Update all season data at once
+        state.drivers = drivers;
+        state.teams = teams;
+        state.races = schedule;
+        state.pastResults = { ...state.pastResults, ...results };
 
-      // Update the completed status for races
-      state.races = state.races.map(race => {
-        // Convert race name to API format (lowercase, hyphenated)
-        const apiRaceName = race.name.toLowerCase().replace(/\s+/g, '-');
-        const isCompleted = !!state.pastResults[apiRaceName];
-        return { ...race, completed: isCompleted };
+        // Update the completed status for races
+        state.races = state.races.map(race => {
+          // Convert race name to API format (lowercase, hyphenated)
+          const apiRaceName = race.name.toLowerCase().replace(/\s+/g, '-');
+          const isCompleted = !!state.pastResults[apiRaceName];
+          return { ...race, completed: isCompleted };
+        });
+
+        state.isLoading = false;
+        state.isLoaded = true;
+      })
+      .addCase(fetchSeasonData.rejected, (state) => {
+        state.isLoading = false;
+        state.isLoaded = true; // Still mark as loaded to unblock the app
       });
-    });
   }
 });
 
