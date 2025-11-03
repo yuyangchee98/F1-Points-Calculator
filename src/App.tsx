@@ -2,13 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { initializeUiState, setMobileView } from './store/slices/uiSlice';
+import { initializeUiState, setMobileView, toggleOfficialResults as toggleOfficialResultsUI } from './store/slices/uiSlice';
 import { RootState, store } from './store';
 import { calculateResults } from './store/slices/resultsSlice';
-import { moveDriver } from './store/slices/gridSlice';
+import { moveDriver, resetGrid, toggleOfficialResults } from './store/slices/gridSlice';
 import { selectDriverTeamsMap } from './store/selectors/dataSelectors';
 import { parseNaturalLanguage } from './api/naturalLanguage';
 import { createCheckoutSession } from './api/subscription';
+import { loadPrediction } from './api/predictions';
 import useRaceResults from './hooks/useRaceResults';
 import { useAutoSave } from './hooks/useAutoSave';
 import { useDayAccess } from './hooks/useSubscription';
@@ -16,7 +17,6 @@ import { useUserEmail } from './hooks/useUserEmail';
 import Layout from './components/layout/Layout';
 import StandingsSidebar from './components/standings/StandingsSidebar';
 import RaceGrid from './components/grid/RaceGrid';
-import ActionsBar from './components/common/ActionsBar';
 import InfoBanner from './components/common/InfoBanner';
 import IntroductionSection from './components/common/IntroductionSection';
 import ToastContainer from './components/common/ToastContainer';
@@ -24,12 +24,14 @@ import SaveStatus from './components/common/SaveStatus';
 import HorizontalScrollBar from './components/common/HorizontalScrollBar';
 import FAQ from './components/common/FAQ';
 import SubscriptionModal from './components/common/SubscriptionModal';
+import VersionHistory from './components/common/VersionHistory';
+import ExportModal from './components/common/ExportModal';
 import InputSections from './components/common/InputSections';
 import RacendoPromo from './components/common/RacendoPromo';
 const SmartInputDemo = React.lazy(() => import('./components/common/SmartInputDemo'));
 import { useAppDispatch } from './store';
 import useWindowSize from './hooks/useWindowSize';
-import { trackBuyCoffeeClick, trackFeedbackClick, trackSmartInputAction, trackSmartInputCommand } from './utils/analytics';
+import { trackBuyCoffeeClick, trackFeedbackClick, trackSmartInputAction, trackSmartInputCommand, GA_EVENTS, trackEvent, trackVersionHistoryAction } from './utils/analytics';
 import { CURRENT_SEASON } from './utils/constants';
 
 const App: React.FC = () => {
@@ -40,11 +42,16 @@ const App: React.FC = () => {
   useAutoSave();
   const mobileView = useSelector((state: RootState) => state.ui.mobileView);
   const selectedPointsSystem = useSelector((state: RootState) => state.ui.selectedPointsSystem);
+  const showOfficialResults = useSelector((state: RootState) => state.ui.showOfficialResults);
+  const pastResults = useSelector((state: RootState) => state.seasonData.pastResults);
+  const { fingerprint } = useSelector((state: RootState) => state.predictions);
   const { isMobile } = useWindowSize();
   const raceGridScrollRef = React.useRef<HTMLDivElement>(null);
   const { hasAccess, statusMessage } = useDayAccess();
   const { email, saveEmail } = useUserEmail();
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+  const [showExport, setShowExport] = useState(false);
   const [smartInputFirst, setSmartInputFirst] = useState(() => {
     return localStorage.getItem('f1_input_order') === 'smart-first';
   });
@@ -53,6 +60,60 @@ const App: React.FC = () => {
     const newValue = !smartInputFirst;
     setSmartInputFirst(newValue);
     localStorage.setItem('f1_input_order', newValue ? 'smart-first' : 'drivers-first');
+  };
+
+  // Handle grid reset
+  const handleReset = () => {
+    if (window.confirm('Are you sure you want to reset your predictions?')) {
+      dispatch(resetGrid());
+      dispatch(calculateResults());
+      trackEvent(GA_EVENTS.GRID_ACTIONS.RESET_PREDICTIONS, 'Grid Actions');
+    }
+  };
+
+  // Handle toggling official results
+  const handleToggleOfficialResults = () => {
+    const newValue = !showOfficialResults;
+    dispatch(toggleOfficialResultsUI(newValue));
+    dispatch(toggleOfficialResults({ show: newValue, pastResults }));
+    dispatch(calculateResults());
+    trackEvent(
+      GA_EVENTS.GRID_ACTIONS.TOGGLE_OFFICIAL,
+      'Grid Actions',
+      newValue ? 'show' : 'hide'
+    );
+  };
+
+  // Handle loading a specific version
+  const handleLoadVersion = async (version: string) => {
+    if (!fingerprint) return;
+
+    try {
+      const prediction = await loadPrediction(fingerprint, version);
+      if (prediction && prediction.grid) {
+        // Clear current grid
+        dispatch(resetGrid());
+
+        // Load the version
+        prediction.grid.forEach(pos => {
+          if (pos.driverId && !pos.isOfficialResult) {
+            dispatch(moveDriver({
+              driverId: pos.driverId,
+              toRaceId: pos.raceId,
+              toPosition: pos.position
+            }));
+          }
+        });
+
+        // Recalculate results
+        dispatch(calculateResults());
+
+        // Close history modal
+        setShowHistory(false);
+      }
+    } catch (error) {
+      // Error loading version
+    }
   };
 
 
@@ -123,8 +184,6 @@ const App: React.FC = () => {
                   <span className="mr-2">💬</span> Feature Requests / Report Bugs
                 </a>
               </div>
-              
-              <ActionsBar />
 
               {/* Show status message */}
               {statusMessage && (
@@ -362,9 +421,19 @@ const App: React.FC = () => {
                     </>
                   }
                 />
-                
+
                 <HorizontalScrollBar scrollContainerRef={raceGridScrollRef} />
-                <RaceGrid scrollRef={raceGridScrollRef} />
+                <RaceGrid
+                  scrollRef={raceGridScrollRef}
+                  onReset={handleReset}
+                  onToggleOfficialResults={handleToggleOfficialResults}
+                  onOpenHistory={() => {
+                    setShowHistory(true);
+                    trackVersionHistoryAction('OPEN_HISTORY');
+                  }}
+                  onOpenExport={() => setShowExport(true)}
+                  showOfficialResults={showOfficialResults}
+                />
               </div>
               
               <InfoBanner />
@@ -383,6 +452,20 @@ const App: React.FC = () => {
           onClose={() => setShowSubscriptionModal(false)}
           email={email}
           onEmailChange={saveEmail}
+        />
+
+        {/* Version History Modal */}
+        {showHistory && (
+          <VersionHistory
+            onClose={() => setShowHistory(false)}
+            onLoadVersion={handleLoadVersion}
+          />
+        )}
+
+        {/* Export Modal */}
+        <ExportModal
+          isOpen={showExport}
+          onClose={() => setShowExport(false)}
         />
       </div>
     </DndProvider>

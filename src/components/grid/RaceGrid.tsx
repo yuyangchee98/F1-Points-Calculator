@@ -3,15 +3,28 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import PositionColumn from './PositionColumn';
 import RaceColumn from './RaceColumn';
+import GridToolbar from './GridToolbar';
 import useWindowSize from '../../hooks/useWindowSize';
 import { togglePositionColumnMode } from '../../store/slices/uiSlice';
 import { useAppDispatch } from '../../store';
 
 interface RaceGridProps {
   scrollRef?: React.RefObject<HTMLDivElement>;
+  onReset: () => void;
+  onToggleOfficialResults: () => void;
+  onOpenHistory: () => void;
+  onOpenExport: () => void;
+  showOfficialResults: boolean;
 }
 
-const RaceGrid: React.FC<RaceGridProps> = ({ scrollRef }) => {
+const RaceGrid: React.FC<RaceGridProps> = ({
+  scrollRef,
+  onReset,
+  onToggleOfficialResults,
+  onOpenHistory,
+  onOpenExport,
+  showOfficialResults,
+}) => {
   const dispatch = useAppDispatch();
   const races = useSelector((state: RootState) => state.seasonData.races);
   const positionColumnMode = useSelector((state: RootState) => state.ui.positionColumnMode);
@@ -59,7 +72,16 @@ const RaceGrid: React.FC<RaceGridProps> = ({ scrollRef }) => {
   
   return (
     <div className="shadow-md rounded-lg border border-gray-200">
-      <div 
+      {/* Grid Toolbar */}
+      <GridToolbar
+        onReset={onReset}
+        onToggleOfficialResults={onToggleOfficialResults}
+        onOpenHistory={onOpenHistory}
+        onOpenExport={onOpenExport}
+        showOfficialResults={showOfficialResults}
+      />
+
+      <div
         ref={scrollRef}
         id="race-grid"
         className="race-grid overflow-x-auto pb-4" 
