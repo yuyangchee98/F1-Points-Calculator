@@ -207,6 +207,16 @@ export const gridSlice = createSlice({
           state.positions[positionIndex].driverId = driverId;
         }
       });
+    },
+
+    // Context menu action: Clear all positions including official results
+    clearEverything: (state) => {
+      state.positions = state.positions.map(position => ({
+        ...position,
+        driverId: null,
+        teamId: null,
+        isOfficialResult: false
+      }));
     }
   },
   extraReducers: (builder) => {
@@ -228,7 +238,8 @@ export const {
   resetGrid,
   toggleOfficialResults,
   clearPosition,
-  fillRestOfSeason
+  fillRestOfSeason,
+  clearEverything
 } = gridSlice.actions;
 
 export default gridSlice.reducer;

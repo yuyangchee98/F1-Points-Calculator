@@ -5,7 +5,7 @@ import { RootState } from '../../store';
 import { selectDriverAtPosition, selectDriversByIdMap, getDriverLastName, getDriverDisplayName } from '../../store/selectors/dataSelectors';
 import DriverCard from '../drivers/DriverCard';
 import { selectDriver, copyDriver } from '../../store/slices/uiSlice';
-import { placeDriver, clearPosition, fillRestOfSeason } from '../../store/slices/gridSlice';
+import { placeDriver, clearPosition, fillRestOfSeason, resetGrid, clearEverything } from '../../store/slices/gridSlice';
 import { calculateResults } from '../../store/slices/resultsSlice';
 import { useAppDispatch } from '../../store';
 import { useDriverDrop } from '../../hooks/useDriverDragDrop';
@@ -175,6 +175,44 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
         label: 'Place Top 5',
         icon: '🏆',
         submenu: leaderSubmenu,
+      });
+    }
+
+    // Add divider and "Clear All..." submenu at the bottom of every context menu
+    if (items.length > 0) {
+      items.push({
+        id: 'divider-clear',
+        label: '',
+        divider: true,
+        onClick: () => {},
+      });
+
+      items.push({
+        id: 'clear-all',
+        label: 'Clear All...',
+        icon: '🗑️',
+        submenu: [
+          {
+            id: 'clear-predictions',
+            label: 'Clear Predictions Only',
+            onClick: () => {
+              dispatch(resetGrid());
+              dispatch(calculateResults());
+              toastService.addToast('Cleared all predictions', 'info');
+              trackContextMenuAction('ACTION', 'clear_predictions');
+            },
+          },
+          {
+            id: 'clear-everything',
+            label: 'Clear Everything (Including Official Results)',
+            onClick: () => {
+              dispatch(clearEverything());
+              dispatch(calculateResults());
+              toastService.addToast('Cleared everything', 'warning');
+              trackContextMenuAction('ACTION', 'clear_everything');
+            },
+          },
+        ],
       });
     }
 
