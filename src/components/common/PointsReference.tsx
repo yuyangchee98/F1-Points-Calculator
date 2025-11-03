@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { POINTS_SYSTEMS } from '../../data/pointsSystems';
-import { trackInfoToggle } from '../../utils/analytics';
 
 const PointsReference: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -22,7 +21,6 @@ const PointsReference: React.FC = () => {
       <button
         onClick={() => {
           setIsExpanded(!isExpanded);
-          trackInfoToggle('TOGGLE_POINTS_REFERENCE', !isExpanded);
         }}
         className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-800 transition-colors"
       >

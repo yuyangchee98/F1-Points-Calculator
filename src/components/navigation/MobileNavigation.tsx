@@ -4,7 +4,6 @@ import { RootState } from '../../store';
 import { MobileView } from '../../types';
 import { setMobileView } from '../../store/slices/uiSlice';
 import { useAppDispatch } from '../../store';
-import { trackMobileViewChange } from '../../utils/analytics';
 
 const MobileNavigation: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -12,7 +11,6 @@ const MobileNavigation: React.FC = () => {
   
   const handleViewChange = (view: MobileView) => {
     dispatch(setMobileView(view));
-    trackMobileViewChange(view);
   };
   
   return (
