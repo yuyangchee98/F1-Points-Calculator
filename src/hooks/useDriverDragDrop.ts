@@ -8,7 +8,7 @@ import { calculateResults } from '../store/slices/resultsSlice';
 import { toastService } from '../components/common/ToastContainer';
 import { selectDriversByIdMap, selectTeamsByIdMap } from '../store/selectors/dataSelectors';
 import { useAppDispatch } from '../store';
-import { trackDriverDrop, GA_EVENTS, trackEvent } from '../utils/analytics';
+import { trackDriverDrop, GA_EVENTS, trackEvent, incrementPredictionCount, updateUserProperties } from '../utils/analytics';
 
 interface UseDriverDropParams {
   raceId: string;
@@ -25,7 +25,10 @@ export function useDriverDrop({ raceId, position }: UseDriverDropParams) {
 
   // Get races from the store
   const races = useSelector((state: RootState) => state.seasonData.races);
-  
+
+  // Get all positions for completion rate calculation
+  const allPositions = useSelector((state: RootState) => state.grid.positions);
+
   // Add a ref to track recent drops to prevent duplicate notifications
   const recentDropRef = useRef<{driverId: string, timestamp: number} | null>(null);
 
@@ -141,12 +144,21 @@ export function useDriverDrop({ raceId, position }: UseDriverDropParams) {
     
     // Track the drop event
     trackDriverDrop(driverId, raceId, position);
-    
+
+    // Update user properties
+    const totalPredictions = incrementPredictionCount();
+    const completionRate = Math.round((allPositions.length / 480) * 100); // 24 races × 20 positions
+
+    updateUserProperties({
+      total_predictions: totalPredictions,
+      completion_rate: completionRate
+    });
+
     // Recalculate results
     dispatch(calculateResults());
 
     return { driverId, raceId, position };
-  }, [raceId, position, currentDriverId, dispatch, races, driverById, teamById, recentDropRef]);
+  }, [raceId, position, currentDriverId, dispatch, races, driverById, teamById, recentDropRef, allPositions]);
   
   const [{ isOver, canDrop }, drop] = useDrop({
     accept: ItemTypes.DRIVER,
