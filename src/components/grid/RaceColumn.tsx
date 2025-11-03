@@ -227,7 +227,6 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
     const items = buildContextMenuItems();
     if (items.length > 0) {
       contextMenu.open(event, items);
-      trackContextMenuAction('OPEN', `race:${race.id}_pos:${position}`);
     }
   };
 
@@ -236,7 +235,6 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
     const items = buildContextMenuItems();
     if (items.length > 0) {
       contextMenu.open(event, items);
-      trackContextMenuAction('OPEN', `race:${race.id}_pos:${position}_longpress`);
     }
   });
 

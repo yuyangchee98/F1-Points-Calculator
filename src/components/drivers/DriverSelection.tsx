@@ -33,7 +33,6 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({ forceExpanded = false
       dispatch(selectDriver(null));
     } else {
       dispatch(selectDriver(driverId));
-      trackEvent(GA_EVENTS.DRIVER_ACTIONS.SELECT_DRIVER, 'Driver Selection', driverId);
     }
     
     // On mobile, collapse the selection panel after choosing

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { CURRENT_SEASON } from '../../utils/constants';
-import { trackInfoToggle } from '../../utils/analytics';
 
 const IntroductionSection: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -17,7 +16,6 @@ const IntroductionSection: React.FC = () => {
     const newState = !isExpanded;
     setIsExpanded(newState);
     localStorage.setItem('introExpanded', newState.toString());
-    trackInfoToggle('TOGGLE_INTRO_SECTION', newState);
   };
 
   return (

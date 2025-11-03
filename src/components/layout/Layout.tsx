@@ -5,7 +5,6 @@ import MobileNavigation from '../navigation/MobileNavigation';
 import useWindowSize from '../../hooks/useWindowSize';
 import { setMobileView } from '../../store/slices/uiSlice';
 import { useAppDispatch } from '../../store';
-import { trackSidebarToggle } from '../../utils/analytics';
 
 interface LayoutProps {
   sidebar: ReactNode;
@@ -37,7 +36,6 @@ const Layout: React.FC<LayoutProps> = ({ sidebar, content }) => {
     const newState = !isSidebarCollapsed;
     setIsSidebarCollapsed(newState);
     localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(newState));
-    trackSidebarToggle(!newState); // Track the new open/closed state
   };
 
   // Auto-update layout when window is resized to/from mobile

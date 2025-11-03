@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { CURRENT_SEASON } from '../../utils/constants';
-import { trackInfoToggle } from '../../utils/analytics';
 
 interface FAQItem {
   question: string;
@@ -38,9 +37,7 @@ const FAQ: React.FC = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const toggleQuestion = (index: number) => {
-    const isOpening = openIndex !== index;
     setOpenIndex(openIndex === index ? null : index);
-    trackInfoToggle('TOGGLE_FAQ', isOpening, faqData[index].question);
   };
 
   return (

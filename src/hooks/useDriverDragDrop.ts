@@ -8,7 +8,7 @@ import { calculateResults } from '../store/slices/resultsSlice';
 import { toastService } from '../components/common/ToastContainer';
 import { selectDriversByIdMap, selectTeamsByIdMap } from '../store/selectors/dataSelectors';
 import { useAppDispatch } from '../store';
-import { trackDriverDrop, GA_EVENTS, trackEvent, incrementPredictionCount, updateUserProperties } from '../utils/analytics';
+import { trackDriverDrop, incrementPredictionCount, updateUserProperties } from '../utils/analytics';
 
 interface UseDriverDropParams {
   raceId: string;
@@ -189,11 +189,8 @@ export function useDriverDrag(driverId: string, raceId?: string, position?: numb
     collect: monitor => ({
       isDragging: monitor.isDragging(),
     }),
-    end: (_item, monitor) => {
-      if (monitor.didDrop()) {
-        // Track drag start when drag ends successfully
-        trackEvent(GA_EVENTS.DRIVER_ACTIONS.DRAG_START, 'Driver Predictions', driverId);
-      }
+    end: () => {
+      // Drag completed
     },
   }), [driverId, raceId, position]);
   
