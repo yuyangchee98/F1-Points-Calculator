@@ -3,7 +3,7 @@ declare global {
     gtag: (
       command: string,
       target: string,
-      config?: Record<string, string | number | boolean | undefined>
+      config?: Record<string, any>
     ) => void;
   }
 }
@@ -201,4 +201,29 @@ export const trackContextMenuAction = (action: keyof typeof GA_EVENTS.CONTEXT_ME
     details,
     value
   );
+};
+
+// User Properties - track user characteristics for segmentation
+export const updateUserProperties = (properties: {
+  total_predictions?: number;
+  completion_rate?: number;
+  has_paid?: boolean;
+}) => {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('set', 'user_properties', properties);
+  }
+};
+
+// Track prediction count
+const PREDICTIONS_COUNT_KEY = 'f1_predictions_count';
+
+export const incrementPredictionCount = () => {
+  const count = parseInt(localStorage.getItem(PREDICTIONS_COUNT_KEY) || '0', 10);
+  const newCount = count + 1;
+  localStorage.setItem(PREDICTIONS_COUNT_KEY, newCount.toString());
+  return newCount;
+};
+
+export const getPredictionCount = (): number => {
+  return parseInt(localStorage.getItem(PREDICTIONS_COUNT_KEY) || '0', 10);
 };
