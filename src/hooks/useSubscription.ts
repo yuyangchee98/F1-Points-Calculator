@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { checkDayAccessStatus } from '../api/subscription';
 import { useUserEmail } from './useUserEmail';
-import { trackSmartInputAction } from '../utils/analytics';
+import { updateUserProperties } from '../utils/analytics';
 
 const ACCESS_KEY = 'f1_smart_input_access';
 const ACCESS_CHECK_INTERVAL = 1000 * 60 * 10; // Check every 10 minutes
@@ -60,7 +60,23 @@ export const useDayAccess = () => {
     const paymentParam = urlParams.get('payment');
 
     if (paymentParam === 'success') {
-      trackSmartInputAction('PAYMENT_SUCCESS', email || 'unknown');
+      // Track as GA4 purchase event
+      if (typeof window !== 'undefined' && window.gtag) {
+        window.gtag('event', 'purchase', {
+          transaction_id: `T_${Date.now()}_${email || 'unknown'}`,
+          value: 0.99,
+          currency: 'USD',
+          items: [{
+            item_id: 'smart_input_24hr',
+            item_name: 'Smart Input 24hr Access',
+            price: 0.99,
+            quantity: 1
+          }]
+        });
+      }
+
+      // Update user property: has_paid
+      updateUserProperties({ has_paid: true });
 
       // Clear ALL cached access data for ALL emails
       const keys = Object.keys(localStorage);
@@ -80,7 +96,6 @@ export const useDayAccess = () => {
         checkStatus();
       }
     } else if (paymentParam === 'cancelled') {
-      trackSmartInputAction('PAYMENT_CANCEL', email || 'unknown');
       // Clear the parameter from URL
       window.history.replaceState({}, document.title, window.location.pathname);
       checkStatus();
