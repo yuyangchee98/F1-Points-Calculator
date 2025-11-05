@@ -32,6 +32,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
   const [error, setError] = useState<string | null>(null);
   const [title, setTitle] = useState('F1 CHAMPIONSHIP PREDICTIONS');
   const [subtitle, setSubtitle] = useState('Current predictions and standings');
+  const [format, setFormat] = useState<'grid' | 'mobile'>('grid');
   const [selectedDrivers, setSelectedDrivers] = useState<Record<string, boolean>>({});
   const [selectedTeams, setSelectedTeams] = useState<Record<string, boolean>>({});
   const [driverFilter, setDriverFilter] = useState<'all' | 'top3' | 'top5' | 'top10' | 'withPredictions' | 'positionChanged'>('all');
@@ -120,7 +121,8 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
         selectedDrivers,
         showDriverStandings,
         showTeamStandings,
-        selectedTeams
+        selectedTeams,
+        format
       );
 
       // Call export API
@@ -229,9 +231,10 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
       selectedDrivers,
       showDriverStandings,
       showTeamStandings,
-      selectedTeams
+      selectedTeams,
+      format
     );
-  }, [seasonData, grid, results, title, subtitle, raceSelection, selectedDrivers, showDriverStandings, showTeamStandings, selectedTeams]);
+  }, [seasonData, grid, results, title, subtitle, raceSelection, selectedDrivers, showDriverStandings, showTeamStandings, selectedTeams, format]);
 
   // Early return after all hooks have been called
   if (!isOpen) return null;
@@ -310,6 +313,37 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                   placeholder="e.g., If Verstappen wins..."
                 />
+              </div>
+
+              {/* Format Selection */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Image Format
+                </label>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setFormat('grid')}
+                    className={`flex-1 px-4 py-3 border-2 rounded-lg transition-all ${
+                      format === 'grid'
+                        ? 'border-red-500 bg-red-50 text-red-700'
+                        : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                    }`}
+                  >
+                    <div className="text-sm font-semibold">Grid</div>
+                    <div className="text-xs text-gray-500 mt-1">1080 × 1080</div>
+                  </button>
+                  <button
+                    onClick={() => setFormat('mobile')}
+                    className={`flex-1 px-4 py-3 border-2 rounded-lg transition-all ${
+                      format === 'mobile'
+                        ? 'border-red-500 bg-red-50 text-red-700'
+                        : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                    }`}
+                  >
+                    <div className="text-sm font-semibold">Mobile Story</div>
+                    <div className="text-xs text-gray-500 mt-1">1080 × 1920</div>
+                  </button>
+                </div>
               </div>
 
               {/* Completed Race Selection */}

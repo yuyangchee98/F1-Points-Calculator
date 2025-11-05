@@ -15,6 +15,7 @@ function countryCodeToFlag(countryCode: string): string {
 export interface ExportData {
   title: string;
   subtitle?: string;
+  format?: 'grid' | 'mobile';
   races: Array<{
     raceId: string;
     name: string;
@@ -60,7 +61,8 @@ export function formatExportData(
   driverSelection?: Record<string, boolean>,
   showDriverStandings: boolean = true,
   showTeamStandings: boolean = false,
-  teamSelection?: Record<string, boolean>
+  teamSelection?: Record<string, boolean>,
+  format?: 'grid' | 'mobile'
 ): ExportData {
   const { seasonData, grid, results } = state;
 
@@ -152,6 +154,7 @@ export function formatExportData(
   return {
     title,
     subtitle,
+    format,
     races,
     grids,
     driverStandings,
