@@ -5,6 +5,7 @@ import { exportPrediction } from '../../api/export';
 import { formatExportData } from '../../utils/exportFormatter';
 import ExportPreview from './ExportPreview';
 import useWindowSize from '../../hooks/useWindowSize';
+import { trackExportAction } from '../../utils/analytics';
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -138,9 +139,21 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
+      // Track successful export
+      trackExportAction(
+        'GENERATE_SUCCESS',
+        format, // 'grid' or 'mobile'
+        selectedRaceCount // total races exported
+      );
+
       // Close modal
       onClose();
     } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'unknown_error';
+
+      // Track export failure
+      trackExportAction('GENERATE_FAIL', errorMessage);
+
       setError('Failed to generate export image. Please try again.');
     } finally {
       setIsLoading(false);
@@ -322,7 +335,10 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
                 </label>
                 <div className="flex gap-3">
                   <button
-                    onClick={() => setFormat('grid')}
+                    onClick={() => {
+                      setFormat('grid');
+                      trackExportAction('CHANGE_FORMAT', 'grid');
+                    }}
                     className={`flex-1 px-4 py-3 border-2 rounded-lg transition-all ${
                       format === 'grid'
                         ? 'border-red-500 bg-red-50 text-red-700'
@@ -333,7 +349,10 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
                     <div className="text-xs text-gray-500 mt-1">1080 × 1080</div>
                   </button>
                   <button
-                    onClick={() => setFormat('mobile')}
+                    onClick={() => {
+                      setFormat('mobile');
+                      trackExportAction('CHANGE_FORMAT', 'mobile');
+                    }}
                     className={`flex-1 px-4 py-3 border-2 rounded-lg transition-all ${
                       format === 'mobile'
                         ? 'border-red-500 bg-red-50 text-red-700'
