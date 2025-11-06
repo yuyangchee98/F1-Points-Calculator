@@ -6,6 +6,16 @@ export const CURRENT_SEASON = new Date().getFullYear();
 // Grid configuration
 export const MAX_GRID_POSITIONS = 20;
 
+// Skeleton loader configuration
+// These are fallback values used for initial page load
+// Actual values are cached in localStorage after first API load
+export const SKELETON_CONFIG = {
+  races: 24,      // Typical F1 season race count
+  drivers: 20,    // Standard F1 grid size
+  teams: 10,      // Current F1 team count (will be 11 in 2026)
+  year: CURRENT_SEASON
+};
+
 // Responsive breakpoints (matching Tailwind's breakpoints)
 export const BREAKPOINTS = {
   mobile: 640,  // < 640px

@@ -136,8 +136,6 @@ const HorizontalScrollBar: React.FC<HorizontalScrollBarProps> = ({ scrollContain
     };
   }, [isDragging, dragStartX, scrollStartX, scrollContainerRef]);
 
-  if (!isVisible) return null;
-
   // Calculate thumb width based on viewport to content ratio
   const scrollContainer = scrollContainerRef.current;
   let thumbWidthPercentage = 20; // default minimum
@@ -149,15 +147,16 @@ const HorizontalScrollBar: React.FC<HorizontalScrollBarProps> = ({ scrollContain
   // Calculate thumb position
   const maxThumbTravel = 100 - thumbWidthPercentage;
   let thumbPosition = (scrollPercentage / 100) * maxThumbTravel;
-  
+
   // Override with drag position if dragging
   if (isDragging && dragThumbPosition !== null && scrollBarRef.current) {
     const thumbCenterPercent = (dragThumbPosition / scrollBarRef.current.clientWidth) * 100;
     thumbPosition = thumbCenterPercent - (thumbWidthPercentage / 2);
   }
 
+  // Always render to reserve space, use opacity to hide
   return (
-    <div className="w-full py-2 px-4 hidden sm:block">
+    <div className={`w-full py-2 px-4 hidden sm:block transition-opacity duration-200 ${!isVisible ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
       <div className="bg-white rounded-md p-2 shadow-sm border border-gray-200">
         <div 
           ref={scrollBarRef}

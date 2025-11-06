@@ -13,6 +13,7 @@ const StandingsSidebar: React.FC = () => {
   const dispatch = useAppDispatch();
   const driverStandings = useSelector(selectDriverStandings);
   const teamStandings = useSelector(selectTeamStandings);
+  const isLoading = useSelector((state: RootState) => state.seasonData.isLoading);
   const uiActiveTab = useSelector((state: RootState) => state.ui.activeTab);
   
   // Local state to track the active tab
@@ -80,7 +81,7 @@ const StandingsSidebar: React.FC = () => {
                 Driver Standings
               </h2>
               <div className="overflow-x-auto">
-                {driverStandings.length === 0 ? (
+                {isLoading || driverStandings.length === 0 ? (
                   <TableSkeleton rows={20} type="driver" />
                 ) : (
                   <DriverStandingsTable standings={driverStandings} />
@@ -94,7 +95,7 @@ const StandingsSidebar: React.FC = () => {
                 Constructor Standings
               </h2>
               <div className="overflow-x-auto">
-                {teamStandings.length === 0 ? (
+                {isLoading || teamStandings.length === 0 ? (
                   <TableSkeleton rows={10} type="team" />
                 ) : (
                   <TeamStandingsTable standings={teamStandings} />
