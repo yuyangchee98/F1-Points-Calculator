@@ -28,6 +28,9 @@ import VersionHistory from './components/common/VersionHistory';
 import ExportModal from './components/common/ExportModal';
 import InputSections from './components/common/InputSections';
 import RacendoPromo from './components/common/RacendoPromo';
+import GridSkeleton from './components/common/GridSkeleton';
+import DriverSelectionSkeleton from './components/common/DriverSelectionSkeleton';
+import SmartInputSkeleton from './components/common/SmartInputSkeleton';
 const SmartInputDemo = React.lazy(() => import('./components/common/SmartInputDemo'));
 import { useAppDispatch } from './store';
 import useWindowSize from './hooks/useWindowSize';
@@ -44,6 +47,7 @@ const App: React.FC = () => {
   const selectedPointsSystem = useSelector((state: RootState) => state.ui.selectedPointsSystem);
   const showOfficialResults = useSelector((state: RootState) => state.ui.showOfficialResults);
   const pastResults = useSelector((state: RootState) => state.seasonData.pastResults);
+  const isLoading = useSelector((state: RootState) => state.seasonData.isLoading);
   const { fingerprint } = useSelector((state: RootState) => state.predictions);
   const { isMobile } = useWindowSize();
   const raceGridScrollRef = React.useRef<HTMLDivElement>(null);
@@ -185,17 +189,25 @@ const App: React.FC = () => {
                 </a>
               </div>
 
-              {/* Show status message */}
-              {statusMessage && (
-                <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              {/* Show status message - always reserve space to prevent layout shift */}
+              <div className={`mb-6 transition-all duration-300 ${statusMessage ? 'p-4 bg-blue-50 border border-blue-200 rounded-lg' : 'h-0 overflow-hidden'}`}>
+                {statusMessage && (
                   <p className="text-center text-blue-700 font-medium">
                     {statusMessage}
                   </p>
-                </div>
-              )}
+                )}
+              </div>
               
               {/* Always show driver selection and grid when in grid view */}
               <div className={`${(mobileView === 'grid' || !isMobile) ? 'block' : 'hidden'}`}>
+                {isLoading ? (
+                  <>
+                    <SmartInputSkeleton />
+                    <DriverSelectionSkeleton />
+                    <GridSkeleton />
+                  </>
+                ) : (
+                  <>
                 <InputSections 
                   smartInputFirst={smartInputFirst}
                   onSwap={handleSwapInputs}
@@ -422,21 +434,23 @@ const App: React.FC = () => {
                   }
                 />
 
-                <HorizontalScrollBar scrollContainerRef={raceGridScrollRef} />
-                <RaceGrid
-                  scrollRef={raceGridScrollRef}
-                  onReset={handleReset}
-                  onToggleOfficialResults={handleToggleOfficialResults}
-                  onOpenHistory={() => {
-                    setShowHistory(true);
-                    trackVersionHistoryAction('OPEN_HISTORY');
-                  }}
-                  onOpenExport={() => {
-                    trackExportAction('OPEN_MODAL');
-                    setShowExport(true);
-                  }}
-                  showOfficialResults={showOfficialResults}
-                />
+                  <HorizontalScrollBar scrollContainerRef={raceGridScrollRef} />
+                  <RaceGrid
+                    scrollRef={raceGridScrollRef}
+                    onReset={handleReset}
+                    onToggleOfficialResults={handleToggleOfficialResults}
+                    onOpenHistory={() => {
+                      setShowHistory(true);
+                      trackVersionHistoryAction('OPEN_HISTORY');
+                    }}
+                    onOpenExport={() => {
+                      trackExportAction('OPEN_MODAL');
+                      setShowExport(true);
+                    }}
+                    showOfficialResults={showOfficialResults}
+                  />
+                </>
+              )}
               </div>
               
               <InfoBanner />
