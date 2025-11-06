@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { Driver, Team, Race, RaceResult } from '../../types';
 import { fetchDrivers, fetchTeams, fetchPastRaceResults } from '../../api/dataFetchers';
 import { fetchRaceSchedule } from '../../api/raceSchedule';
+import { CURRENT_SEASON } from '../../utils/constants';
 
 export interface SeasonDataState {
   drivers: Driver[];
@@ -62,6 +63,21 @@ export const seasonDataSlice = createSlice({
           const isCompleted = !!state.pastResults[apiRaceName];
           return { ...race, completed: isCompleted };
         });
+
+        // Cache skeleton counts for next page load
+        // This prevents layout shifts on repeat visits
+        try {
+          const skeletonCounts = {
+            races: schedule.length,
+            drivers: drivers.length,
+            teams: teams.length,
+            year: CURRENT_SEASON
+          };
+          localStorage.setItem('f1-skeleton-counts', JSON.stringify(skeletonCounts));
+        } catch (error) {
+          // localStorage might be unavailable (private browsing, quota exceeded)
+          console.warn('Failed to cache skeleton counts:', error);
+        }
 
         state.isLoading = false;
         state.isLoaded = true;
