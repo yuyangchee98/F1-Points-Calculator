@@ -45,23 +45,23 @@ export const GA_EVENTS = {
     CLOSE_HISTORY: 'close_version_history',
   },
   SMART_INPUT: {
-    VIEW_FEATURE: 'smart_input_view',
     CLICK_TRY_NOW: 'smart_input_try_now',
-    CONFIRM_SUBSCRIPTION: 'smart_input_confirm_subscription',
-    CONFIRM_ACCESS: 'smart_input_confirm_access',
     OPEN_SUBSCRIPTION_MODAL: 'smart_input_open_modal',
     CLOSE_SUBSCRIPTION_MODAL: 'smart_input_close_modal',
     CLICK_SUBSCRIBE: 'smart_input_subscribe_click',
-    SUBSCRIPTION_SUCCESS: 'smart_input_subscription_success',
-    SUBSCRIPTION_CANCEL: 'smart_input_subscription_cancel',
     ENTER_EMAIL: 'smart_input_enter_email',
     USE_COMMAND: 'smart_input_use_command',
     COMMAND_SUCCESS: 'smart_input_command_success',
     COMMAND_FAIL: 'smart_input_command_fail',
-    MANAGE_SUBSCRIPTION: 'smart_input_manage_subscription',
   },
   CONTEXT_MENU: {
     ACTION: 'context_menu_action',
+  },
+  EXPORT: {
+    OPEN_MODAL: 'export_open_modal',
+    CHANGE_FORMAT: 'export_change_format',
+    GENERATE_SUCCESS: 'export_success',
+    GENERATE_FAIL: 'export_fail',
   },
 } as const;
 
@@ -132,6 +132,15 @@ export const trackContextMenuAction = (action: keyof typeof GA_EVENTS.CONTEXT_ME
   trackEvent(
     GA_EVENTS.CONTEXT_MENU[action],
     'Context Menu',
+    details,
+    value
+  );
+};
+
+export const trackExportAction = (action: keyof typeof GA_EVENTS.EXPORT, details?: string, value?: number) => {
+  trackEvent(
+    GA_EVENTS.EXPORT[action],
+    'Export',
     details,
     value
   );

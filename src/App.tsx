@@ -31,7 +31,7 @@ import RacendoPromo from './components/common/RacendoPromo';
 const SmartInputDemo = React.lazy(() => import('./components/common/SmartInputDemo'));
 import { useAppDispatch } from './store';
 import useWindowSize from './hooks/useWindowSize';
-import { trackBuyCoffeeClick, trackFeedbackClick, trackSmartInputAction, trackSmartInputCommand, GA_EVENTS, trackEvent, trackVersionHistoryAction } from './utils/analytics';
+import { trackBuyCoffeeClick, trackFeedbackClick, trackSmartInputAction, trackSmartInputCommand, GA_EVENTS, trackEvent, trackVersionHistoryAction, trackExportAction } from './utils/analytics';
 import { CURRENT_SEASON } from './utils/constants';
 
 const App: React.FC = () => {
@@ -431,7 +431,10 @@ const App: React.FC = () => {
                     setShowHistory(true);
                     trackVersionHistoryAction('OPEN_HISTORY');
                   }}
-                  onOpenExport={() => setShowExport(true)}
+                  onOpenExport={() => {
+                    trackExportAction('OPEN_MODAL');
+                    setShowExport(true);
+                  }}
                   showOfficialResults={showOfficialResults}
                 />
               </div>
