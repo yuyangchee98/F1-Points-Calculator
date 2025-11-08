@@ -10,11 +10,9 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
 
-  // Canvas dimensions based on format
   const canvasWidth = 1080;
   const canvasHeight = format === 'mobile' ? 1920 : 1080;
 
-  // Calculate optimal scale based on container size
   useEffect(() => {
     const calculateScale = () => {
       if (!containerRef.current) return;
@@ -23,23 +21,18 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
       const availableWidth = container.clientWidth;
       const availableHeight = container.clientHeight;
 
-      // Add padding buffer (40px total - 20px on each side)
       const paddingBuffer = 40;
 
-      // Calculate scale to fit both dimensions
       const scaleX = (availableWidth - paddingBuffer) / canvasWidth;
       const scaleY = (availableHeight - paddingBuffer) / canvasHeight;
 
-      // Use the smaller scale to ensure it fits, and never scale above 1
       const optimalScale = Math.min(scaleX, scaleY, 1);
 
       setScale(optimalScale);
     };
 
-    // Calculate on mount
     calculateScale();
 
-    // Observe container resize
     const resizeObserver = new ResizeObserver(() => {
       calculateScale();
     });
@@ -48,7 +41,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
       resizeObserver.observe(containerRef.current);
     }
 
-    // Also listen to window resize as fallback
     window.addEventListener('resize', calculateScale);
 
     return () => {
@@ -62,10 +54,8 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
       ref={containerRef}
       style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}
     >
-      {/* Scale container to fit preview area */}
       <div style={{ transform: `scale(${scale})`, transformOrigin: 'center center' }}>
         {format !== 'mobile' ? (
-          /* Grid Template (1080x1080) */
           <div
             style={{
               display: 'flex',
@@ -78,7 +68,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
               position: 'relative',
             }}
           >
-          {/* Main Layout: Vertical Sections */}
           <div
             style={{
               display: 'flex',
@@ -86,7 +75,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
               flex: 1,
             }}
           >
-            {/* Title, Subtitle and Race Grid Section - Combined */}
             <div
               style={{
                 display: 'flex',
@@ -98,7 +86,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                 marginBottom: '20px',
               }}
             >
-              {/* Title and Subtitle */}
               <div
                 style={{
                   display: 'flex',
@@ -135,7 +122,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                 )}
               </div>
 
-              {/* Race Grid */}
               <div
                 style={{
                   display: 'flex',
@@ -143,7 +129,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                   justifyContent: 'center',
                 }}
               >
-              {/* Position/Points Index Column */}
               <div
                 style={{
                   display: 'flex',
@@ -151,7 +136,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                   width: '50px',
                 }}
               >
-                {/* Empty header space */}
                 <div
                   style={{
                     height: '62px',
@@ -159,7 +143,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                   }}
                 />
 
-                {/* Position/Points rows */}
                 {[
                   { pos: 1, pts: 25 },
                   { pos: 2, pts: 18 },
@@ -200,7 +183,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                 ))}
               </div>
 
-              {/* Race Columns */}
               {(() => {
                 const completedRaces = races.filter(r => r.completed).slice(0, 1);
                 const predictionRaces = races.filter(r => !r.completed).slice(0, 5 - completedRaces.length);
@@ -219,7 +201,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                       maxWidth: '160px',
                     }}
                   >
-                    {/* Race Header */}
                     <div
                       style={{
                         fontWeight: '700',
@@ -264,7 +245,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                       )}
                     </div>
 
-                    {/* Grid Positions */}
                     <div
                       style={{
                         display: 'flex',
@@ -275,7 +255,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                       {[1, 2, 3, 4, 5].map((position) => {
                         const gridPos = raceGrid.find(gp => gp.position === position);
 
-                        // If no driver for this position, render empty invisible slot
                         if (!gridPos) {
                           return (
                             <div
@@ -310,7 +289,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                               filter: isCompleted ? 'blur(1px)' : 'none',
                             }}
                           >
-                            {/* Inner Driver Card */}
                             <div
                               style={{
                                 position: 'relative',
@@ -324,7 +302,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                                 zIndex: 1,
                               }}
                             >
-                              {/* Team Color Left Border */}
                               <div
                                 style={{
                                   position: 'absolute',
@@ -337,7 +314,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                                 }}
                               />
 
-                              {/* Team Color Gradient Overlay */}
                               <div
                                 style={{
                                   position: 'absolute',
@@ -351,7 +327,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                                 }}
                               />
 
-                              {/* Content */}
                               <div
                                 style={{
                                   display: 'flex',
@@ -362,7 +337,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                                   zIndex: 1,
                                 }}
                               >
-                                {/* Driver Name */}
                                 <span
                                   style={{
                                     fontSize: '13px',
@@ -375,7 +349,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                                 >
                                   {driver?.name || gridPos.driverId.toUpperCase()}
                                 </span>
-                                {/* Team Name */}
                                 <span
                                   style={{
                                     fontSize: '11px',
@@ -391,7 +364,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                               </div>
                             </div>
 
-                            {/* Diagonal Stripe Effect for Completed Races - renders on top */}
                             {isCompleted && (
                               <div
                                 style={{
@@ -406,7 +378,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                               />
                             )}
 
-                            {/* Points Gained Badge - only for predictions (not completed races) */}
                             {!isCompleted && gridPos.pointsGained !== undefined && gridPos.pointsGained > 0 && (
                               <div
                                 style={{
@@ -445,7 +416,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
               </div>
             </div>
 
-            {/* Flow Indicator */}
             <div
               style={{
                 display: 'flex',
@@ -481,7 +451,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
               </div>
             </div>
 
-            {/* Championship Standings Section - Conditional */}
             {(showDriverStandings || showTeamStandings) && (
               <div
                 style={{
@@ -492,7 +461,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                   padding: '20px',
                 }}
               >
-                {/* Driver Standings Only */}
                 {showDriverStandings && !showTeamStandings && driverStandings && (
                   <div
                     style={{
@@ -505,7 +473,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                       overflow: 'hidden',
                     }}
                   >
-                    {/* Column Headers */}
                     <div
                       style={{
                         display: 'flex',
@@ -519,7 +486,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                       <div style={{ width: '100px', fontSize: '11px', fontWeight: '600', color: '#6b7280', textAlign: 'right', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Points</div>
                     </div>
 
-                    {/* Driver Rows */}
                     {driverStandings.slice(0, 3).map((standing, index) => {
                       const driver = drivers[standing.driverId];
                       const team = teams[driver?.teamId];
@@ -556,7 +522,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                   </div>
                 )}
 
-                {/* Team Standings Only */}
                 {showTeamStandings && !showDriverStandings && teamStandings && (
                   <div
                     style={{
@@ -569,7 +534,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                       overflow: 'hidden',
                     }}
                   >
-                    {/* Column Headers */}
                     <div
                       style={{
                         display: 'flex',
@@ -583,7 +547,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                       <div style={{ width: '100px', fontSize: '11px', fontWeight: '600', color: '#6b7280', textAlign: 'right', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Points</div>
                     </div>
 
-                    {/* Team Rows */}
                     {teamStandings.slice(0, 3).map((standing, index) => {
                       const team = teams[standing.teamId];
                       const teamColor = team?.color || '#9ca3af';
@@ -616,10 +579,8 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                   </div>
                 )}
 
-                {/* Both Driver and Team Standings Side-by-Side */}
                 {showDriverStandings && showTeamStandings && driverStandings && teamStandings && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    {/* Table Headers Row */}
                     <div style={{ display: 'flex', gap: '16px' }}>
                       <div style={{ width: '490px', fontSize: '12px', fontWeight: '700', color: '#1f2937', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                         Drivers Championship
@@ -629,9 +590,7 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                       </div>
                     </div>
 
-                    {/* Tables Row */}
                     <div style={{ display: 'flex', gap: '16px' }}>
-                      {/* Driver Table */}
                       <div style={{ width: '490px', display: 'flex', flexDirection: 'column', background: '#ffffff', borderRadius: '8px', border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)', overflow: 'hidden' }}>
                         <div style={{ display: 'flex', padding: '12px 16px', borderBottom: '2px solid #e5e7eb', background: '#f9fafb' }}>
                           <div style={{ width: '50px', fontSize: '10px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Pos</div>
@@ -670,7 +629,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                         })}
                       </div>
 
-                      {/* Team Table */}
                       <div style={{ width: '490px', display: 'flex', flexDirection: 'column', background: '#ffffff', borderRadius: '8px', border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)', overflow: 'hidden' }}>
                         <div style={{ display: 'flex', padding: '12px 16px', borderBottom: '2px solid #e5e7eb', background: '#f9fafb' }}>
                           <div style={{ width: '50px', fontSize: '10px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Pos</div>
@@ -711,7 +669,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
             )}
           </div>
 
-          {/* Watermark - Top Left */}
           <div
             style={{
               position: 'absolute',
@@ -749,7 +706,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
           </div>
         </div>
         ) : (
-          /* Mobile Template (1080x1920) */
           <div
             style={{
               display: 'flex',
@@ -762,7 +718,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
               position: 'relative',
             }}
           >
-            {/* Main Layout: Vertical Sections */}
             <div
               style={{
                 display: 'flex',
@@ -770,7 +725,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                 flex: 1,
               }}
             >
-              {/* Title, Subtitle and Race Grid Section - Combined */}
               <div
                 style={{
                   display: 'flex',
@@ -782,7 +736,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                   marginBottom: '20px',
                 }}
               >
-                {/* Title and Subtitle */}
                 <div
                   style={{
                     display: 'flex',
@@ -819,7 +772,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                   )}
                 </div>
 
-                {/* Race Grid */}
                 <div
                   style={{
                     display: 'flex',
@@ -827,7 +779,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                     justifyContent: 'center',
                   }}
                 >
-                  {/* Position/Points Index Column */}
                   <div
                     style={{
                       display: 'flex',
@@ -835,7 +786,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                       width: '65px',
                     }}
                   >
-                    {/* Empty header space */}
                     <div
                       style={{
                         height: '72px',
@@ -843,7 +793,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                       }}
                     />
 
-                    {/* Position/Points rows */}
                     {[
                       { pos: 1, pts: 25 },
                       { pos: 2, pts: 18 },
@@ -884,7 +833,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                     ))}
                   </div>
 
-                  {/* Race Columns */}
                   {(() => {
                     const completedRaces = races.filter(r => r.completed).slice(0, 1);
                     const predictionRaces = races.filter(r => !r.completed).slice(0, 3 - completedRaces.length);
@@ -903,7 +851,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                           maxWidth: '160px',
                         }}
                       >
-                        {/* Race Header */}
                         <div
                           style={{
                             fontWeight: '700',
@@ -948,7 +895,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                           )}
                         </div>
 
-                        {/* Grid Positions */}
                         <div
                           style={{
                             display: 'flex',
@@ -993,7 +939,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                                   filter: isCompleted ? 'blur(1px)' : 'none',
                                 }}
                               >
-                                {/* Inner Driver Card */}
                                 <div
                                   style={{
                                     position: 'relative',
@@ -1007,7 +952,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                                     zIndex: 1,
                                   }}
                                 >
-                                  {/* Team Color Left Border */}
                                   <div
                                     style={{
                                       position: 'absolute',
@@ -1020,7 +964,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                                     }}
                                   />
 
-                                  {/* Team Color Gradient Overlay */}
                                   <div
                                     style={{
                                       position: 'absolute',
@@ -1034,7 +977,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                                     }}
                                   />
 
-                                  {/* Content */}
                                   <div
                                     style={{
                                       display: 'flex',
@@ -1046,7 +988,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                                       gap: '4px',
                                     }}
                                   >
-                                    {/* Driver Name */}
                                     <span
                                       style={{
                                         fontSize: '19px',
@@ -1059,7 +1000,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                                     >
                                       {driver?.name || gridPos.driverId.toUpperCase()}
                                     </span>
-                                    {/* Team Name */}
                                     <span
                                       style={{
                                         fontSize: '15px',
@@ -1075,7 +1015,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                                   </div>
                                 </div>
 
-                                {/* Diagonal Stripe Effect for Completed Races */}
                                 {isCompleted && (
                                   <div
                                     style={{
@@ -1090,7 +1029,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                                   />
                                 )}
 
-                                {/* Points Gained Badge */}
                                 {!isCompleted && gridPos.pointsGained !== undefined && gridPos.pointsGained > 0 && (
                                   <div
                                     style={{
@@ -1129,7 +1067,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                 </div>
               </div>
 
-              {/* Flow Indicator */}
               <div
                 style={{
                   display: 'flex',
@@ -1165,7 +1102,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                 </div>
               </div>
 
-              {/* Championship Standings Section */}
               {(showDriverStandings || showTeamStandings) && (
                 <div
                   style={{
@@ -1176,10 +1112,8 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                     padding: '20px',
                   }}
                 >
-                  {/* Both Driver and Team Standings Stacked Vertically */}
                   {showDriverStandings && showTeamStandings && driverStandings && teamStandings && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                        {/* Driver Championship Section */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                           <div style={{ fontSize: '17px', fontWeight: '700', color: '#1f2937', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                             Drivers Championship
@@ -1223,7 +1157,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                           </div>
                         </div>
 
-                        {/* Constructors Championship Section */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                           <div style={{ fontSize: '17px', fontWeight: '700', color: '#1f2937', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                             Constructors Championship
@@ -1265,7 +1198,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                     </div>
                   )}
 
-                  {/* Driver Standings Only */}
                   {showDriverStandings && !showTeamStandings && driverStandings && (
                     <div
                       style={{
@@ -1278,7 +1210,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                         overflow: 'hidden',
                       }}
                     >
-                      {/* Column Headers */}
                       <div
                         style={{
                           display: 'flex',
@@ -1292,7 +1223,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                         <div style={{ width: '100px', fontSize: '11px', fontWeight: '600', color: '#6b7280', textAlign: 'right', display: 'flex', justifyContent: 'flex-end', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Points</div>
                       </div>
 
-                      {/* Driver Rows */}
                       {driverStandings.slice(0, 3).map((standing, index) => {
                         const driver = drivers[standing.driverId];
                         const team = teams[driver?.teamId];
@@ -1329,7 +1259,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                     </div>
                   )}
 
-                  {/* Team Standings Only */}
                   {showTeamStandings && !showDriverStandings && teamStandings && (
                     <div
                       style={{
@@ -1342,7 +1271,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                         overflow: 'hidden',
                       }}
                     >
-                      {/* Column Headers */}
                       <div
                         style={{
                           display: 'flex',
@@ -1356,7 +1284,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                         <div style={{ width: '100px', fontSize: '11px', fontWeight: '600', color: '#6b7280', textAlign: 'right', display: 'flex', justifyContent: 'flex-end', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Points</div>
                       </div>
 
-                      {/* Team Rows */}
                       {teamStandings.slice(0, 3).map((standing, index) => {
                         const team = teams[standing.teamId];
                         const teamColor = team?.color || '#9ca3af';
@@ -1392,7 +1319,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
               )}
             </div>
 
-            {/* Watermark - Top Left */}
             <div
               style={{
                 position: 'absolute',

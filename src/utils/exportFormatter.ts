@@ -1,6 +1,5 @@
 import { RootState } from '../store';
 
-// Convert country code to flag emoji
 function countryCodeToFlag(countryCode: string): string {
   if (!countryCode || countryCode.length !== 2) return '🏁';
 
@@ -66,7 +65,6 @@ export function formatExportData(
 ): ExportData {
   const { seasonData, grid, results } = state;
 
-  // Format races (filter by selection if provided)
   const races = seasonData.races
     .filter(race => !raceSelection || raceSelection[race.id])
     .map(race => ({
@@ -76,7 +74,6 @@ export function formatExportData(
       flag: countryCodeToFlag(race.countryCode)
     }));
 
-  // Format grids - all positions grouped by race (filter by selection if provided)
   const grids: Record<string, Array<{
     position: number;
     driverId: string;
@@ -89,7 +86,6 @@ export function formatExportData(
       const racePositions = grid.positions
         .filter(p => p.raceId === race.id && p.driverId)
         .map(p => {
-          // Get points from pointsHistory
           const pointsEntry = results.pointsHistory.find(
             h => h.raceId === race.id && h.driverId === p.driverId
           );
@@ -107,7 +103,6 @@ export function formatExportData(
       }
     });
 
-  // Format driver standings if requested (filter by driver selection if provided)
   const driverStandings = showDriverStandings
     ? results.driverStandings
         .filter(standing => !driverSelection || driverSelection[standing.driverId])
@@ -120,7 +115,6 @@ export function formatExportData(
         }))
     : undefined;
 
-  // Format team standings if requested (filter by team selection if provided)
   const teamStandings = showTeamStandings
     ? results.teamStandings
         .filter(standing => !teamSelection || teamSelection[standing.teamId])
@@ -133,7 +127,6 @@ export function formatExportData(
         }))
     : undefined;
 
-  // Format all drivers
   const drivers: Record<string, { name: string; teamId: string }> = {};
   seasonData.drivers.forEach(driver => {
     drivers[driver.id] = {
@@ -142,7 +135,6 @@ export function formatExportData(
     };
   });
 
-  // Format all teams
   const teams: Record<string, { name: string; color: string }> = {};
   seasonData.teams.forEach(team => {
     teams[team.id] = {

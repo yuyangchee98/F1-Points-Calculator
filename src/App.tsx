@@ -39,9 +39,7 @@ import { CURRENT_SEASON } from './utils/constants';
 
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
-  // Call useRaceResults but don't use the loading state
   useRaceResults();
-  // Enable auto-save
   useAutoSave();
   const mobileView = useSelector((state: RootState) => state.ui.mobileView);
   const selectedPointsSystem = useSelector((state: RootState) => state.ui.selectedPointsSystem);
@@ -66,7 +64,6 @@ const App: React.FC = () => {
     localStorage.setItem('f1_input_order', newValue ? 'smart-first' : 'drivers-first');
   };
 
-  // Handle grid reset
   const handleReset = () => {
     if (window.confirm('Are you sure you want to reset your predictions?')) {
       dispatch(resetGrid());
@@ -75,7 +72,6 @@ const App: React.FC = () => {
     }
   };
 
-  // Handle toggling official results
   const handleToggleOfficialResults = () => {
     const newValue = !showOfficialResults;
     dispatch(toggleOfficialResultsUI(newValue));
@@ -88,17 +84,14 @@ const App: React.FC = () => {
     );
   };
 
-  // Handle loading a specific version
   const handleLoadVersion = async (version: string) => {
     if (!fingerprint) return;
 
     try {
       const prediction = await loadPrediction(fingerprint, version);
       if (prediction && prediction.grid) {
-        // Clear current grid
         dispatch(resetGrid());
 
-        // Load the version
         prediction.grid.forEach(pos => {
           if (pos.driverId && !pos.isOfficialResult) {
             dispatch(moveDriver({
@@ -109,36 +102,27 @@ const App: React.FC = () => {
           }
         });
 
-        // Recalculate results
         dispatch(calculateResults());
 
-        // Close history modal
         setShowHistory(false);
       }
     } catch (error) {
-      // Error loading version
     }
   };
 
 
   useEffect(() => {
-    // Initialize UI state from localStorage/URL
     dispatch(initializeUiState());
-    
-    // Calculate initial results
+
     dispatch(calculateResults());
   }, [dispatch]);
-  
-  // Recalculate results when points system changes
+
   useEffect(() => {
     dispatch(calculateResults());
   }, [dispatch, selectedPointsSystem]);
-  
-  // Auto-update layout when window is resized
+
   useEffect(() => {
-    // When in tablet or desktop mode, ensure we render the grid view
     if (!isMobile) {
-      // Only dispatch if needed to avoid unnecessary renders
       if (mobileView !== 'grid') {
         dispatch(setMobileView('grid'));
       }
@@ -165,8 +149,7 @@ const App: React.FC = () => {
                 </h1>
                 <RacendoPromo className="self-start sm:self-center" />
               </div>
-              
-              {/* Buy me a coffee link at top */}
+
               <div className="mb-8 flex flex-wrap gap-4">
                 <a 
                   href="https://buymeacoffee.com/yaang" 
@@ -189,7 +172,6 @@ const App: React.FC = () => {
                 </a>
               </div>
 
-              {/* Show status message - always reserve space to prevent layout shift */}
               <div className={`mb-6 transition-all duration-300 ${statusMessage ? 'p-4 bg-blue-50 border border-blue-200 rounded-lg' : 'h-0 overflow-hidden'}`}>
                 {statusMessage && (
                   <p className="text-center text-blue-700 font-medium">
@@ -197,8 +179,7 @@ const App: React.FC = () => {
                   </p>
                 )}
               </div>
-              
-              {/* Always show driver selection and grid when in grid view */}
+
               <div className={`${(mobileView === 'grid' || !isMobile) ? 'block' : 'hidden'}`}>
                 {isLoading ? (
                   <>
@@ -245,20 +226,17 @@ const App: React.FC = () => {
                             if (!text) return;
                             
                             trackSmartInputAction('USE_COMMAND', text.substring(0, 50));
-                            
+
                             try {
-                              // Gather context from Redux store
                               const state = store.getState();
-                              
-                              // Build race context
+
                               const races = state.seasonData.races.map(race => ({
                                 raceId: race.id,
                                 completed: race.completed,
                                 order: race.order,
                                 isSprint: race.isSprint
                               }));
-                              
-                              // Build predictions map (only user predictions, not official results)
+
                               const predictions: Record<string, Record<string, string>> = {};
                               state.grid.positions.forEach(pos => {
                                 if (pos.driverId && !pos.isOfficialResult) {
@@ -268,14 +246,12 @@ const App: React.FC = () => {
                                   predictions[pos.raceId][pos.position.toString()] = pos.driverId;
                                 }
                               });
-                              
-                              // Get standings
+
                               const standings = {
                                 drivers: state.results.driverStandings,
                                 teams: state.results.teamStandings
                               };
 
-                              // Get driver teams using selector
                               const driverTeams = selectDriverTeamsMap(state);
 
                               const context = {
@@ -302,7 +278,6 @@ const App: React.FC = () => {
                             } catch (err) {
                               trackSmartInputCommand(text, false);
                               if (err instanceof Error && err.message === 'ACCESS_REQUIRED') {
-                                // User needs to get access
                                 setShowSubscriptionModal(true);
                               } else {
                                 alert('Failed to understand the input. Try something like: "Max P1 at Vegas"');
@@ -323,11 +298,9 @@ const App: React.FC = () => {
                   ) : (
                     <div className="bg-white rounded-md p-6 border border-red-300 shadow-lg">
                       <div className="flex flex-col md:flex-row md:items-center md:gap-8">
-                        {/* Left side - Description */}
                         <div className="flex-1 mb-6 md:mb-0 text-center">
                           <h4 className="text-xl font-bold mb-3">Try Smart Input: <span className="font-normal text-sm text-gray-600">Type what you want to happen and watch the grid update instantly. <span className="text-xs text-gray-500">Watch demo ↓</span></span></h4>
-                          
-                          {/* Interactive Demo */}
+
                           <div className="mb-4">
                             <React.Suspense fallback={
                               <div style={{ width: '380px', maxWidth: '100%', margin: '0 auto' }}>
@@ -339,13 +312,10 @@ const App: React.FC = () => {
                             </React.Suspense>
                           </div>
                         </div>
-                        
-                        {/* Vertical divider - only on desktop */}
+
                         <div className="hidden md:block w-px bg-gray-200 self-stretch mx-4"></div>
-                        
-                        {/* Right side - CTA */}
+
                         <div className="text-center">
-                          {/* Desktop view */}
                           <div className="hidden md:block">
                             <button 
                               className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-md shadow-lg transition font-semibold text-lg"
@@ -360,8 +330,7 @@ const App: React.FC = () => {
                               $0.99 • One-time payment • Exactly 24 hours
                             </p>
                           </div>
-                          
-                          {/* Mobile view - keep the original inline flow */}
+
                           <div className="md:hidden">
                             <h4 className="text-xl font-bold mb-2">Get 24-Hour Access</h4>
                             <p className="text-4xl font-bold text-red-600 mb-1">$0.99</p>
@@ -454,16 +423,14 @@ const App: React.FC = () => {
               </div>
               
               <InfoBanner />
-              
+
               <IntroductionSection />
-              
-              {/* FAQ Section for SEO */}
+
               <FAQ />
             </div>
           }
         />
-        
-        {/* Subscription Modal */}
+
         <SubscriptionModal
           isOpen={showSubscriptionModal}
           onClose={() => setShowSubscriptionModal(false)}
@@ -471,7 +438,6 @@ const App: React.FC = () => {
           onEmailChange={saveEmail}
         />
 
-        {/* Version History Modal */}
         {showHistory && (
           <VersionHistory
             onClose={() => setShowHistory(false)}
@@ -479,7 +445,6 @@ const App: React.FC = () => {
           />
         )}
 
-        {/* Export Modal */}
         <ExportModal
           isOpen={showExport}
           onClose={() => setShowExport(false)}

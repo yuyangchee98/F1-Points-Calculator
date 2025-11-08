@@ -12,7 +12,6 @@ const RacendoPromo: React.FC<RacendoPromoProps> = ({ className = '' }) => {
       rel="noopener noreferrer"
       className={`group inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl hover:from-red-700 hover:to-red-800 transition-all duration-300 transform hover:scale-105 ${className}`}
       onClick={() => {
-        // Track the click if analytics is available
         if (window.gtag) {
           window.gtag('event', 'click', {
             event_category: 'Racendo Promo',

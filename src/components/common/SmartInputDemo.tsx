@@ -8,8 +8,7 @@ const SmartInputDemo: React.FC = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
   const [isAutoScrolling, setIsAutoScrolling] = useState(false);
-  
-  // Detect mobile viewport
+
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 640);
@@ -18,8 +17,7 @@ const SmartInputDemo: React.FC = () => {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
-  
-  // Randomly select a demo on mount
+
   const [currentDemo] = useState(() => {
     const randomIndex = Math.floor(Math.random() * demos.length);
     return demos[randomIndex];
@@ -28,11 +26,9 @@ const SmartInputDemo: React.FC = () => {
   const command = currentDemo.command;
   
   useEffect(() => {
-    // Start typing after a short delay
     const startDelay = setTimeout(() => {
       setShowCursor(true);
-      
-      // Type out the command
+
       let currentIndex = 0;
       const typingInterval = setInterval(() => {
         if (currentIndex <= command.length) {
@@ -41,26 +37,21 @@ const SmartInputDemo: React.FC = () => {
         } else {
           clearInterval(typingInterval);
           setShowCursor(false);
-          
-          // Show drivers after typing completes
+
           setTimeout(() => {
             setDriversVisible(true);
           }, 500);
         }
       }, 60);
-      
+
       return () => clearInterval(typingInterval);
     }, 500);
-    
-    // Reset animation every 5 seconds
+
     const resetInterval = setInterval(() => {
       setTypedText('');
       setShowCursor(false);
       setDriversVisible(false);
-      // Don't reset scroll if we're auto-scrolling on mobile
-      // Let it continue its ping-pong motion
-      
-      // Restart animation after brief pause
+
       setTimeout(() => {
         setShowCursor(true);
         let currentIndex = 0;
@@ -84,8 +75,7 @@ const SmartInputDemo: React.FC = () => {
       clearInterval(resetInterval);
     };
   }, [command]);
-  
-  // Cursor blink effect
+
   const [cursorVisible, setCursorVisible] = useState(true);
   useEffect(() => {
     const blinkInterval = setInterval(() => {
@@ -93,11 +83,9 @@ const SmartInputDemo: React.FC = () => {
     }, 500);
     return () => clearInterval(blinkInterval);
   }, []);
-  
-  // Render driver card based on position
+
   const renderDriverCard = (position: string, raceIndex: number) => {
     const race = currentDemo.races[raceIndex];
-    // Check for race-specific driver first
     const raceSpecificKey = `${race.code}-${position}`;
     const driver = currentDemo.drivers[raceSpecificKey] || currentDemo.drivers[position];
     if (!driver) return null;
@@ -124,7 +112,6 @@ const SmartInputDemo: React.FC = () => {
           transitionDelay: `${raceIndex * 100}ms`,
           boxSizing: 'border-box',
         }}>
-        {/* Team color gradient overlay - matching webapp exactly */}
         <div
           style={{
             position: 'absolute',
@@ -137,8 +124,7 @@ const SmartInputDemo: React.FC = () => {
             pointerEvents: 'none',
           }}
         />
-        
-        {/* Driver info */}
+
         <div style={{ 
           display: 'flex',
           flexDirection: 'column',
@@ -164,52 +150,45 @@ const SmartInputDemo: React.FC = () => {
       </div>
     );
   };
-  
-  // Calculate grid dimensions based on demo
+
   const gridColumns = currentDemo.races.length;
   const gridRows = currentDemo.positions.length;
   const shouldAutoScroll = isMobile && gridColumns > 1;
-  
-  // Show all races now, not just filtered
+
   const visibleRaces = currentDemo.races;
-  
-  // Auto-scroll effect for mobile
+
   useEffect(() => {
     if (!shouldAutoScroll) {
       setScrollPosition(0);
       setIsAutoScrolling(false);
       return;
     }
-    
-    // Only start scrolling once, not every time driversVisible changes
+
     if (isAutoScrolling) return;
-    
-    // Start auto-scrolling (only happens once on mobile)
+
     const scrollDelay = setTimeout(() => {
       setIsAutoScrolling(true);
-      
+
       let position = 0;
-      let direction = 1; // 1 for right, -1 for left
+      let direction = 1;
       const scrollInterval = setInterval(() => {
-        position += direction * 2; // Speed of scroll
-        
-        // Calculate max scroll (90px per column on mobile + gap)
+        position += direction * 2;
+
         const maxScroll = (gridColumns - 1) * 96;
-        
-        // Change direction at boundaries
+
         if (position >= maxScroll) {
           position = maxScroll;
-          direction = -1; // Start scrolling left
+          direction = -1;
         } else if (position <= 0) {
           position = 0;
-          direction = 1; // Start scrolling right
+          direction = 1;
         }
-        
+
         setScrollPosition(position);
-      }, 30); // Smooth 30fps scrolling
-      
+      }, 30);
+
       return () => clearInterval(scrollInterval);
-    }, 1500); // Wait a bit after component mounts
+    }, 1500);
     
     return () => clearTimeout(scrollDelay);
   }, [shouldAutoScroll, isAutoScrolling, gridColumns]);
@@ -221,7 +200,6 @@ const SmartInputDemo: React.FC = () => {
       margin: '0 auto',
       padding: isMobile ? '0 10px' : '0'
     }}>
-      {/* Input Box */}
       <div style={{ position: 'relative', marginBottom: '15px', height: '38px' }}>
         <div
           style={{
@@ -259,7 +237,6 @@ const SmartInputDemo: React.FC = () => {
         
       </div>
 
-      {/* Race Grid */}
       <div style={{
         overflowX: shouldAutoScroll ? 'hidden' : 'visible',
         width: '100%',
@@ -278,7 +255,6 @@ const SmartInputDemo: React.FC = () => {
             transition: isAutoScrolling ? 'none' : 'transform 0.3s ease-out',
           }}
         >
-        {/* Headers */}
         <div style={{
           backgroundColor: '#374151',
           color: 'white',
@@ -290,8 +266,7 @@ const SmartInputDemo: React.FC = () => {
         }}>
           Position
         </div>
-        
-        {/* Race headers */}
+
         {visibleRaces.map((race) => (
           <div 
             key={race.code}
@@ -312,14 +287,13 @@ const SmartInputDemo: React.FC = () => {
             {race.flag && `${race.flag} `}{race.name}
           </div>
         ))}
-        
-        {/* Position rows */}
+
         {currentDemo.positions.map((position) => {
           const posNumber = parseInt(position.replace('P', ''));
-          
+
+
           return (
             <React.Fragment key={position}>
-              {/* Position number */}
               <div style={{
                 backgroundColor: '#f3f4f6',
                 padding: isMobile ? '6px' : '8px',
@@ -333,8 +307,7 @@ const SmartInputDemo: React.FC = () => {
               }}>
                 {posNumber}
               </div>
-              
-              {/* Race cells */}
+
               {visibleRaces.map((race, raceIndex) => (
                 <div
                   key={`${race.code}-${position}`}

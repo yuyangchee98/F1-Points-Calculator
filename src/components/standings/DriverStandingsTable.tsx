@@ -9,11 +9,9 @@ interface DriverStandingsTableProps {
 }
 
 const DriverStandingsTable: React.FC<DriverStandingsTableProps> = ({ standings }) => {
-  // Get drivers and teams from Redux
   const driverById = useSelector(selectDriversByIdMap);
   const teamById = useSelector(selectTeamsByIdMap);
 
-  // Memoize animation options to prevent recreating functions on each render
   const animationOptions = useMemo(() => ({
     getItemId: (standing: DriverStanding) => standing.driverId,
     compareItems: (current: DriverStanding, prev: DriverStanding) => {
@@ -21,7 +19,6 @@ const DriverStandingsTable: React.FC<DriverStandingsTableProps> = ({ standings }
     }
   }), []);
 
-  // Use custom hook for animations
   const animatedDrivers = useStandingsAnimation(standings, animationOptions);
   
   return (
@@ -44,7 +41,6 @@ const DriverStandingsTable: React.FC<DriverStandingsTableProps> = ({ standings }
               const driver = driverById[standing.driverId];
               if (!driver) return null;
 
-              // Get the team color (team IDs now use hyphens matching API format)
               const teamColor = teamById[driver.team]?.color || '#ccc';
               
               return (

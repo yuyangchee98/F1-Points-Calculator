@@ -14,7 +14,6 @@ export const resultsSlice = createSlice({
   name: 'results',
   initialState,
   reducers: {
-    // Action to receive the calculated results
     setResults: (state, action) => {
       state.driverStandings = action.payload.driverStandings;
       state.teamStandings = action.payload.teamStandings;
@@ -24,10 +23,8 @@ export const resultsSlice = createSlice({
   }
 });
 
-// Export the action creator
 export const { setResults } = resultsSlice.actions;
 
-// Define the thunk to calculate results using createAsyncThunk
 export const calculateResults = createAsyncThunk(
 'results/calculateResults',
 async (_, { dispatch, getState }) => {
@@ -37,41 +34,32 @@ const allDrivers = state.seasonData.drivers;
 const allRaces = state.seasonData.races;
 const selectedPointsSystem = state.ui.selectedPointsSystem;
 
-// Helper function to calculate points with optional filtering
 const calculatePoints = (filterOfficialOnly: boolean) => {
   const driverPoints: Record<string, number> = {};
   const teamPoints: Record<string, number> = {};
   const driverHistories: PointsHistory[] = [];
   const teamHistories: TeamPointsHistory[] = [];
 
-  // Initialize teams (team IDs now use hyphens matching API format)
   allDrivers.forEach(driver => {
     if (!teamPoints[driver.team]) {
       teamPoints[driver.team] = 0;
     }
   });
 
-  // Process races in order
   allRaces.forEach(race => {
-    // Get positions for this race (filter by official results if needed)
     const racePositions = positions.filter(p =>
       p.raceId === race.id && (!filterOfficialOnly || p.isOfficialResult)
     );
 
-    // Track points earned in this race by driver and team
     const raceDriverPoints: Record<string, number> = {};
     const raceTeamPoints: Record<string, number> = {};
 
-    // Get past results for this race to determine which team each driver was racing for
     const raceResults = state.seasonData.pastResults[race.id] || [];
 
-    // Calculate points for each position
     racePositions.forEach(position => {
       if (position.driverId) {
-        // Award position points
         const pointsForPosition = getPointsForPositionWithSystem(position.position, race.isSprint, selectedPointsSystem);
 
-        // Initialize driver points if needed
         if (!driverPoints[position.driverId]) {
           driverPoints[position.driverId] = 0;
         }
@@ -79,19 +67,15 @@ const calculatePoints = (filterOfficialOnly: boolean) => {
           raceDriverPoints[position.driverId] = 0;
         }
 
-        // Add points
         driverPoints[position.driverId] += pointsForPosition;
         raceDriverPoints[position.driverId] += pointsForPosition;
 
-        // Find the team the driver was racing for in this specific race
         const raceResult = raceResults.find(r => r.driverId === position.driverId);
         let teamId: string | undefined;
 
         if (raceResult) {
-          // Official result: use historical team from pastResults
           teamId = raceResult.teamId;
         } else {
-          // User prediction: use current team from driver data
           const driver = allDrivers.find(d => d.id === position.driverId);
           teamId = driver?.team;
         }
@@ -110,7 +94,6 @@ const calculatePoints = (filterOfficialOnly: boolean) => {
       }
     });
 
-    // Record point history for this race
     Object.entries(raceDriverPoints).forEach(([driverId, points]) => {
       driverHistories.push({
         raceId: race.id,
@@ -133,12 +116,10 @@ const calculatePoints = (filterOfficialOnly: boolean) => {
   return { driverPoints, teamPoints, driverHistories, teamHistories };
 };
 
-// First pass: Calculate points from official results only
 const officialResults = calculatePoints(true);
 const officialDriverPoints = officialResults.driverPoints;
 const officialTeamPoints = officialResults.teamPoints;
 
-// Create official driver standings to get positions (for position change calculation)
 const officialDriverStandings = Object.entries(officialDriverPoints)
   .sort(([, pointsA], [, pointsB]) => pointsB - pointsA)
   .reduce((acc, [driverId], index) => {
@@ -146,7 +127,6 @@ const officialDriverStandings = Object.entries(officialDriverPoints)
     return acc;
   }, {} as Record<string, number>);
 
-// Create official team standings to get positions (for position change calculation)
 const officialTeamStandings = Object.entries(officialTeamPoints)
   .sort(([, pointsA], [, pointsB]) => pointsB - pointsA)
   .reduce((acc, [teamId], index) => {
@@ -154,21 +134,19 @@ const officialTeamStandings = Object.entries(officialTeamPoints)
     return acc;
   }, {} as Record<string, number>);
 
-// Second pass: Calculate points from all positions (official + predictions)
 const totalResults = calculatePoints(false);
 const driverPoints = totalResults.driverPoints;
 const teamPoints = totalResults.teamPoints;
 const driverHistories = totalResults.driverHistories;
 const teamHistories = totalResults.teamHistories;
 
-// Create driver standings with predictionPointsGained and positionChange
 const driverStandings: DriverStanding[] = Object.entries(driverPoints)
   .map(([driverId, points]) => ({
     driverId,
     points,
-    position: 0, // Will be updated below
+    position: 0,
     predictionPointsGained: points - (officialDriverPoints[driverId] || 0),
-    positionChange: 0 // Will be calculated after sorting
+    positionChange: 0
   }))
   .sort((a, b) => b.points - a.points)
   .map((standing, index) => {
@@ -177,18 +155,17 @@ const driverStandings: DriverStanding[] = Object.entries(driverPoints)
     return {
       ...standing,
       position: newPosition,
-      positionChange: oldPosition - newPosition // Positive means moved up
+      positionChange: oldPosition - newPosition
     };
   });
 
-// Create team standings with predictionPointsGained and positionChange
 const teamStandings: TeamStanding[] = Object.entries(teamPoints)
   .map(([teamId, points]) => ({
     teamId,
     points,
-    position: 0, // Will be updated below
+    position: 0,
     predictionPointsGained: points - (officialTeamPoints[teamId] || 0),
-    positionChange: 0 // Will be calculated after sorting
+    positionChange: 0
   }))
   .sort((a, b) => b.points - a.points)
   .map((standing, index) => {
@@ -197,11 +174,10 @@ const teamStandings: TeamStanding[] = Object.entries(teamPoints)
     return {
       ...standing,
       position: newPosition,
-      positionChange: oldPosition - newPosition // Positive means moved up
+      positionChange: oldPosition - newPosition
     };
   });
 
-// Dispatch the calculated results to the store
 dispatch(setResults({
   driverStandings,
   teamStandings,
@@ -209,7 +185,6 @@ dispatch(setResults({
   teamPointsHistory: teamHistories
 }));
 
-// Return the data (will be available in the fulfilled action)
 return {
   driverStandings,
   teamStandings,

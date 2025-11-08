@@ -21,7 +21,6 @@ export const useDayAccess = () => {
       }
 
       try {
-        // Check cached status first for this email
         const cacheKey = `${ACCESS_KEY}_${email}`;
         const cachedStatus = localStorage.getItem(cacheKey);
         const lastCheck = localStorage.getItem(`${cacheKey}_lastCheck`);
@@ -36,17 +35,14 @@ export const useDayAccess = () => {
           }
         }
 
-        // Check with API
         const status = await checkDayAccessStatus(email);
         const isActive = status.isActive;
 
-        // Cache the result for this email
         localStorage.setItem(cacheKey, isActive ? 'active' : 'inactive');
         localStorage.setItem(`${cacheKey}_lastCheck`, now.toString());
 
         setHasAccess(isActive);
       } catch (error) {
-        // Fall back to cached status if available
         const cacheKey = `${ACCESS_KEY}_${email}`;
         const cachedStatus = localStorage.getItem(cacheKey);
         setHasAccess(cachedStatus === 'active');
@@ -55,12 +51,10 @@ export const useDayAccess = () => {
       }
     };
 
-    // Check for payment parameter in URL BEFORE checking status
     const urlParams = new URLSearchParams(window.location.search);
     const paymentParam = urlParams.get('payment');
 
     if (paymentParam === 'success') {
-      // Track as GA4 purchase event
       if (typeof window !== 'undefined' && window.gtag) {
         window.gtag('event', 'purchase', {
           transaction_id: `T_${Date.now()}_${email || 'unknown'}`,
@@ -75,10 +69,8 @@ export const useDayAccess = () => {
         });
       }
 
-      // Update user property: has_paid
       updateUserProperties({ has_paid: true });
 
-      // Clear ALL cached access data for ALL emails
       const keys = Object.keys(localStorage);
       keys.forEach(key => {
         if (key.startsWith(ACCESS_KEY)) {
@@ -86,21 +78,17 @@ export const useDayAccess = () => {
         }
       });
 
-      // Clear the parameter from URL
       window.history.replaceState({}, document.title, window.location.pathname);
 
-      // Show success message and check status
       if (email) {
         setStatusMessage('🎉 Payment successful! Access granted for 24 hours.');
         setTimeout(() => setStatusMessage(''), 3000);
         checkStatus();
       }
     } else if (paymentParam === 'cancelled') {
-      // Clear the parameter from URL
       window.history.replaceState({}, document.title, window.location.pathname);
       checkStatus();
     } else {
-      // Normal status check
       checkStatus();
     }
   }, [email]);
@@ -120,7 +108,6 @@ export const useDayAccess = () => {
 
         setHasAccess(isActive);
       } catch (error) {
-        // Error refreshing access status
       } finally {
         setIsLoading(false);
       }

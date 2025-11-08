@@ -19,10 +19,7 @@ export const store = configureStore({
     getDefaultMiddleware().concat(predictionMiddleware),
 });
 
-// Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof store.getState>;
-// This exports the type of dispatch with thunk support
 export type AppDispatch = typeof store.dispatch;
 
-// Typed dispatch hook - use throughout the app instead of plain useDispatch
 export const useAppDispatch = () => useDispatch<AppDispatch>();

@@ -16,10 +16,6 @@ interface RaceScheduleItem {
   locality: string;
 }
 
-/**
- * Fetch race schedule for a given season
- * Converts API response to frontend Race type
- */
 export async function fetchRaceSchedule(year: number): Promise<Race[]> {
   const response = await fetch(`${API_BASE_URL}/api/schedule/${year}`);
 
@@ -29,7 +25,6 @@ export async function fetchRaceSchedule(year: number): Promise<Race[]> {
 
   const scheduleItems: RaceScheduleItem[] = await response.json();
 
-  // Convert to frontend Race type
   return scheduleItems.map(item => ({
     id: item.id,
     name: item.name,
@@ -37,7 +32,7 @@ export async function fetchRaceSchedule(year: number): Promise<Race[]> {
     country: item.country.toLowerCase(),
     countryCode: COUNTRY_CODE_MAP[item.country.toLowerCase()] || '',
     order: item.order,
-    completed: false, // Will be updated when race results are loaded
+    completed: false,
     date: item.date,
     round: item.round.toString(),
   }));

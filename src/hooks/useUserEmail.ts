@@ -6,7 +6,6 @@ export const useUserEmail = () => {
   const [email, setEmail] = useState<string>('');
 
   useEffect(() => {
-    // Load email from localStorage on mount
     const savedEmail = localStorage.getItem(EMAIL_STORAGE_KEY);
     if (savedEmail) {
       setEmail(savedEmail);
