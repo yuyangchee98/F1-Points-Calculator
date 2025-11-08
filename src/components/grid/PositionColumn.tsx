@@ -10,11 +10,9 @@ interface PositionColumnProps {
 }
 
 const PositionColumn: React.FC<PositionColumnProps> = ({ position, mode = 'position', standings = [] }) => {
-  // Get drivers and teams from Redux
   const driverById = useSelector(selectDriversByIdMap);
   const teamById = useSelector(selectTeamsByIdMap);
 
-  // In standings mode, find the driver at this championship position
   const standingDriver = mode === 'standings' && standings[position - 1];
   const driver = standingDriver ? driverById[standingDriver.driverId] : null;
   const team = driver ? teamById[driver.team] : null;

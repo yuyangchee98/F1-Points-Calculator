@@ -8,10 +8,8 @@ const PointsReference: React.FC = () => {
   const selectedSystemId = useSelector((state: RootState) => state.ui.selectedPointsSystem);
   const selectedSystem = POINTS_SYSTEMS[selectedSystemId];
 
-  // Always show regular points (sprint race selection was never implemented)
   const pointsToShow = selectedSystem.regular;
-  
-  // Get positions that actually have points
+
   const scoringPositions = pointsToShow ? Object.entries(pointsToShow)
     .filter(([, points]) => points > 0)
     .map(([position, points]) => ({ position: parseInt(position), points })) : [];

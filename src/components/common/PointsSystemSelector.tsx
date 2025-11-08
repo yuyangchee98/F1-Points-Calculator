@@ -16,7 +16,6 @@ const PointsSystemSelector: React.FC = () => {
 
   const currentSystem = POINTS_SYSTEMS[selectedSystem];
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -29,7 +28,6 @@ const PointsSystemSelector: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Focus search input when dropdown opens
   useEffect(() => {
     if (isOpen && searchInputRef.current) {
       searchInputRef.current.focus();
@@ -43,7 +41,6 @@ const PointsSystemSelector: React.FC = () => {
     trackPointsSystemChange(systemId);
   };
 
-  // Categorize systems
   const categorizedSystems = {
     'F1 Historical': ['current', '2003-2009', '1991-2002', '1960s-1980s', '1950s'],
     'Other Motorsports': ['motogp', 'indycar', 'formula-e'],
@@ -51,14 +48,12 @@ const PointsSystemSelector: React.FC = () => {
     'Creative': ['winner-takes-all', 'top-heavy', 'olympic', 'reliability', 'underdog', 'win-bonus']
   };
 
-  // Filter systems based on search
   const filteredSystems = Object.values(POINTS_SYSTEMS).filter(system => {
     const query = searchQuery.toLowerCase();
     return system.name.toLowerCase().includes(query) || 
            system.description.toLowerCase().includes(query);
   });
 
-  // Enhanced descriptions for each system
   const getDetailedDescription = (systemId: string) => {
     switch (systemId) {
       case 'current':
@@ -104,7 +99,6 @@ const PointsSystemSelector: React.FC = () => {
     }
   };
 
-  // Get filtered systems by category
   const getFilteredSystemsByCategory = () => {
     const result: Record<string, typeof filteredSystems> = {};
     
@@ -153,7 +147,6 @@ const PointsSystemSelector: React.FC = () => {
                right: window.innerWidth < BREAKPOINTS.mobile ? '50%' : 'auto',
                transform: window.innerWidth < BREAKPOINTS.mobile ? 'translateX(50%)' : 'none'
              }}>
-          {/* Search input */}
           <div className="p-3 border-b border-gray-200">
             <input
               ref={searchInputRef}

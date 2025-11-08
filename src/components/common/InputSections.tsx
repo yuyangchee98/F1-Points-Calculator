@@ -25,12 +25,10 @@ const InputSections: React.FC<InputSectionsProps> = ({
 
   return (
     <div className="relative">
-      {/* First Section with animation */}
       <div className={`transition-all duration-500 ease-in-out ${smartInputFirst ? 'translate-y-0' : ''}`}>
         {sections[0]}
       </div>
-      
-      {/* Swap Button */}
+
       <div className="flex items-center justify-center my-3">
         <div className="flex-1 h-px bg-gray-200 max-w-xs"></div>
         <button
@@ -38,17 +36,17 @@ const InputSections: React.FC<InputSectionsProps> = ({
           className="group flex items-center gap-1.5 px-3 py-1.5 mx-3 bg-white border border-gray-300 rounded-full shadow-sm hover:shadow hover:border-blue-400 transition-all duration-200"
           title="Swap input order"
         >
-          <svg 
-            className="w-4 h-4 text-gray-500 group-hover:text-blue-500 transition-colors" 
-            fill="none" 
-            stroke="currentColor" 
+          <svg
+            className="w-4 h-4 text-gray-500 group-hover:text-blue-500 transition-colors"
+            fill="none"
+            stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
-              d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" 
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
             />
           </svg>
           <span className="text-xs font-medium text-gray-500 group-hover:text-blue-500 transition-colors">
@@ -57,8 +55,7 @@ const InputSections: React.FC<InputSectionsProps> = ({
         </button>
         <div className="flex-1 h-px bg-gray-200 max-w-xs"></div>
       </div>
-      
-      {/* Second Section with animation */}
+
       <div className={`transition-all duration-500 ease-in-out ${smartInputFirst ? '' : 'translate-y-0'}`}>
         {sections[1]}
       </div>

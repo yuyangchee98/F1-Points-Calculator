@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 
 const InfoBanner: React.FC = () => {
-  // Start collapsed by default, but respect user preference
   const [isExpanded, setIsExpanded] = useState(false);
-  
+
   useEffect(() => {
-    // Check if user has a saved preference
     const savedState = localStorage.getItem('infoBannerExpanded');
     if (savedState === 'true') {
       setIsExpanded(true);

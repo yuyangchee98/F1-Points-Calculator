@@ -12,7 +12,7 @@ interface DriverCardProps {
   raceId?: string;
   position?: number;
   hideCode?: boolean;
-  overrideTeamId?: string | null; // Team ID from race results (historical)
+  overrideTeamId?: string | null;
 }
 
 const DriverCard: React.FC<DriverCardProps> = ({ 
@@ -25,14 +25,11 @@ const DriverCard: React.FC<DriverCardProps> = ({
   hideCode = false,
   overrideTeamId
 }) => {
-  // Get teams from Redux
   const teamById = useSelector(selectTeamsByIdMap);
 
-  // Use override team if provided (for historical accuracy), otherwise use driver's current team
   const teamId = overrideTeamId || driver.team;
   const team = teamById[teamId];
-  
-  // Set up drag source if we're in a grid position
+
   const { drag, isDragging } = useDriverDrag(driver.id, raceId, position);
   
   return (
@@ -53,15 +50,13 @@ const DriverCard: React.FC<DriverCardProps> = ({
         cursor: 'grab'
       }}
     >
-      {/* Team color gradient overlay */}
-      <div 
-        className="absolute left-0 top-0 bottom-0 w-1/3 opacity-10" 
-        style={{ 
+      <div
+        className="absolute left-0 top-0 bottom-0 w-1/3 opacity-10"
+        style={{
           background: `linear-gradient(to right, ${team?.color || '#ccc'} 0%, transparent 100%)`
         }}
       />
 
-      {/* Driver name and team */}
       <div className="flex flex-col ml-3 flex-grow">
         <span className="text-sm font-bold">
           {getDriverDisplayName(driver)}
@@ -71,7 +66,6 @@ const DriverCard: React.FC<DriverCardProps> = ({
         </span>
       </div>
 
-      {/* Driver code (3 letters) */}
       {!hideCode && (
         <div 
           className="flex-shrink-0 bg-gray-800 text-white text-xs font-bold py-1 px-2 rounded mr-2"

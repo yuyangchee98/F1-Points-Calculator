@@ -52,18 +52,15 @@ const VersionHistory: React.FC<VersionHistoryProps> = ({ onClose, onLoadVersion 
 
 
   const getVersionTitle = (version: VersionSummary, index: number): string => {
-    // First version
     if (index === versions.length - 1 && versions.length > 1) {
       return 'Initial predictions';
     }
-    
-    // Just show which races were edited - simple!
+
     if (version.races && version.races.length > 0) {
       const raceNames = version.races
         .map(raceId => {
           const race = races.find(r => r.id === raceId);
           const name = race?.name || raceId;
-          // Format the name: capitalize and replace hyphens with spaces
           return name
             .split('-')
             .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -71,11 +68,11 @@ const VersionHistory: React.FC<VersionHistoryProps> = ({ onClose, onLoadVersion 
         })
         .slice(0, 2)
         .join(', ');
-      
+
       const more = version.races.length > 2 ? ` +${version.races.length - 2} more` : '';
       return `Edited: ${raceNames}${more}`;
     }
-    
+
     return 'No changes';
   };
 
@@ -97,11 +94,8 @@ const VersionHistory: React.FC<VersionHistoryProps> = ({ onClose, onLoadVersion 
         setShowDeleteConfirm(false);
         trackVersionHistoryAction('DELETE_ALL_VERSIONS', 'success');
         onClose();
-      } else {
-        // Failed to delete history
       }
     } catch (error) {
-      // Error deleting history
     } finally {
       setIsDeleting(false);
     }
@@ -162,17 +156,14 @@ const VersionHistory: React.FC<VersionHistoryProps> = ({ onClose, onLoadVersion 
                       key={version.version}
                       className={`relative pl-8 ${index !== versions.length - 1 ? 'pb-4' : ''}`}
                     >
-                      {/* Timeline line */}
                       {index !== versions.length - 1 && (
                         <div className="absolute left-3 top-8 bottom-0 w-0.5 bg-gray-300"></div>
                       )}
-                      
-                      {/* Timeline dot */}
+
                       <div className={`absolute left-1.5 top-2 w-3 h-3 rounded-full ${
                         isLatest ? 'bg-green-500' : 'bg-gray-400'
                       }`}></div>
-                      
-                      {/* Version card */}
+
                       <div className={`border rounded-lg p-4 transition-all ${
                         isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
                       }`}>
@@ -217,7 +208,6 @@ const VersionHistory: React.FC<VersionHistoryProps> = ({ onClose, onLoadVersion 
         </div>
       </div>
 
-      {/* Delete Confirmation Dialog */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
           <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full">

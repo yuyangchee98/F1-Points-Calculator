@@ -13,36 +13,28 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ sidebar, content }) => {
   const dispatch = useAppDispatch();
-  // Get the current mobile view from Redux
   const mobileView = useSelector((state: RootState) => state.ui.mobileView);
   const { isMobile } = useWindowSize();
-  
-  // State to track if sidebar is collapsed on desktop/tablet
+
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  
-  // Local storage key
+
   const SIDEBAR_COLLAPSED_KEY = 'f1-calc-sidebar-collapsed';
-  
-  // Load sidebar collapsed state from localStorage on mount
+
   useEffect(() => {
     const storedValue = localStorage.getItem(SIDEBAR_COLLAPSED_KEY);
     if (storedValue !== null) {
       setIsSidebarCollapsed(storedValue === 'true');
     }
   }, []);
-  
-  // Save sidebar collapsed state to localStorage
+
   const toggleSidebar = () => {
     const newState = !isSidebarCollapsed;
     setIsSidebarCollapsed(newState);
     localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(newState));
   };
 
-  // Auto-update layout when window is resized to/from mobile
   useEffect(() => {
-    // When in tablet/desktop mode, ensure we render all components
     if (!isMobile) {
-      // Only dispatch if needed to avoid unnecessary renders
       if (mobileView !== 'grid') {
         dispatch(setMobileView('grid'));
       }
@@ -52,7 +44,6 @@ const Layout: React.FC<LayoutProps> = ({ sidebar, content }) => {
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="flex flex-col sm:flex-row">
-        {/* Sidebar - Only visible on tablet/desktop or when selected on mobile */}
         <aside 
           className={`
             ${mobileView === 'standings' ? 'block w-full h-[calc(100vh-64px)] z-30' : 'hidden'} 
@@ -62,7 +53,6 @@ const Layout: React.FC<LayoutProps> = ({ sidebar, content }) => {
             sm:sticky sm:top-0 sm:h-screen sm:z-20
           `}
         >
-          {/* Collapse toggle button - made more visible */}
           <button 
             onClick={toggleSidebar}
             className="hidden sm:flex absolute right-0 top-4 bg-red-100 hover:bg-red-200 text-red-600 rounded-l-md p-2 shadow-md z-10"
@@ -80,13 +70,11 @@ const Layout: React.FC<LayoutProps> = ({ sidebar, content }) => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          
-          {/* Sidebar content */}
+
           <div className={`h-full ${isSidebarCollapsed ? 'opacity-0 invisible' : 'opacity-100 visible'} transition-opacity duration-300 overflow-auto`}>
             {sidebar}
           </div>
-          
-          {/* Collapsed sidebar icons */}
+
           {isSidebarCollapsed && (
             <div className="flex flex-col items-center pt-4 space-y-6">
               <div className="text-xl font-bold text-red-600">F1</div>
@@ -103,8 +91,7 @@ const Layout: React.FC<LayoutProps> = ({ sidebar, content }) => {
             </div>
           )}
         </aside>
-      
-        {/* Main Content */}
+
         <main 
           className={`
             flex-1 relative ${mobileView !== 'standings' ? 'block' : 'hidden sm:block'}
@@ -113,7 +100,6 @@ const Layout: React.FC<LayoutProps> = ({ sidebar, content }) => {
           `}
         >
           <div className="py-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-            {/* Main page content */}
             {content}
           </div>
           <footer className="bg-gray-900 text-white py-8 mt-12 pb-24 sm:pb-8 sm:mt-auto">
@@ -145,7 +131,6 @@ const Layout: React.FC<LayoutProps> = ({ sidebar, content }) => {
           </footer>
         </main>
 
-        {/* Mobile Navigation - only visible on mobile */}
         <div className="sm:hidden">
           <MobileNavigation />
         </div>

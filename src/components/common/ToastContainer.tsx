@@ -7,18 +7,16 @@ export interface ToastMessage {
   type?: 'info' | 'success' | 'warning';
   duration?: number;
   teamColor?: string;
-  _addedAt?: number; // Internal timestamp for duplicate detection
+  _addedAt?: number;
 }
 
 interface ToastContainerProps {
   position?: 'top-right' | 'bottom-right' | 'top-left' | 'bottom-left';
 }
 
-// Create a singleton toast service to be used throughout the app
 export const toastService = {
   listeners: [] as ((toast: ToastMessage) => void)[],
-  
-  // Add a toast message
+
   addToast: (message: string, type: 'info' | 'success' | 'warning' = 'info', duration = 3000, teamColor?: string) => {
     const toast: ToastMessage = {
       id: Math.random().toString(36).substr(2, 9),
@@ -27,13 +25,11 @@ export const toastService = {
       duration,
       teamColor
     };
-    
-    // Notify all listeners about the new toast
+
     toastService.listeners.forEach(listener => listener(toast));
     return toast.id;
   },
-  
-  // Add a listener
+
   addListener: (listener: (toast: ToastMessage) => void) => {
     toastService.listeners.push(listener);
     return () => {
@@ -44,28 +40,23 @@ export const toastService = {
 
 const ToastContainer: React.FC<ToastContainerProps> = ({ position = 'bottom-right' }) => {
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
-  
-  // Subscribe to toast service
+
   React.useEffect(() => {
     const removeListener = toastService.addListener((toast) => {
-      // Check for duplicate message in the last 500ms
-      // This prevents multiple identical toasts from appearing when actions happen quickly
       const now = Date.now();
-      const recentToastWithSameMessage = toasts.find(t => 
-        t.message === toast.message && 
-        t._addedAt !== undefined && (now - t._addedAt < 500) // Only check recent toasts
+      const recentToastWithSameMessage = toasts.find(t =>
+        t.message === toast.message &&
+        t._addedAt !== undefined && (now - t._addedAt < 500)
       );
-      
+
       if (!recentToastWithSameMessage) {
-        // Add the new toast with timestamp
         setToasts(prev => [...prev, {...toast, _addedAt: now}]);
       }
     });
-    
+
     return () => removeListener();
   }, [toasts]);
-  
-  // Position classes
+
   const getPositionClasses = () => {
     switch (position) {
       case 'top-right': return 'top-4 right-4';
@@ -75,8 +66,7 @@ const ToastContainer: React.FC<ToastContainerProps> = ({ position = 'bottom-righ
       default: return 'bottom-4 right-4';
     }
   };
-  
-  // Remove toast by ID
+
   const removeToast = (id: string) => {
     setToasts(toasts.filter(t => t.id !== id));
   };

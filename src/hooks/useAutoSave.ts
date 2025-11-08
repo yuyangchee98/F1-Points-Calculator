@@ -15,27 +15,22 @@ export const useAutoSave = () => {
   const lastSavedDataRef = useRef<string>('');
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Initialize fingerprint
   useEffect(() => {
     const init = async () => {
       try {
-        // Get or create fingerprint
         const fp = await getBrowserFingerprint();
         dispatch(setFingerprint(fp));
         setIsInitialized(true);
       } catch (error) {
-        // Error initializing fingerprint
       }
     };
 
     init();
   }, [dispatch]);
 
-  // Save function
   const save = useCallback(async () => {
     if (!fingerprint || !isDirty) return;
 
-    // Create a hash of current data to avoid duplicate saves
     const currentData = JSON.stringify({ positions, selectedPointsSystem });
     if (currentData === lastSavedDataRef.current) {
       return;
@@ -57,19 +52,16 @@ export const useAutoSave = () => {
     }
   }, [fingerprint, positions, selectedPointsSystem, isDirty, dispatch]);
 
-  // Auto-save when data changes
   useEffect(() => {
     if (!fingerprint || !isDirty) return;
 
-    // Clear existing timeout
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
     }
 
-    // Set new timeout for debounced save
     saveTimeoutRef.current = setTimeout(() => {
       save();
-    }, 2000); // 2 second debounce
+    }, 2000);
 
     return () => {
       if (saveTimeoutRef.current) {

@@ -32,20 +32,16 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
   const driverStandings = useSelector((state: RootState) => state.results.driverStandings);
   const races = useSelector((state: RootState) => state.seasonData.races);
 
-  // Animation states
   const [isHighlighted, setIsHighlighted] = useState(false);
   const [prevDriverId, setPrevDriverId] = useState<string | null>(null);
 
-  // Context menu hook
   const contextMenu = useContextMenu();
 
-  // Set up the drop target
   const { drop, isOver, canDrop } = useDriverDrop({
     raceId: race.id,
     position,
   });
 
-  // Detect when a driver is placed and trigger animation
   useEffect(() => {
     if (driverId && driverId !== prevDriverId) {
       setIsHighlighted(true);
@@ -55,23 +51,17 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
     setPrevDriverId(driverId);
   }, [driverId, prevDriverId]);
 
-  // Find the grid position object to determine if it's an official result
   const gridPosition = positions.find(p =>
     p.raceId === race.id && p.position === position
   );
   const isOfficialResult = gridPosition?.isOfficialResult || false;
 
-  // Get the driver object if there's a driver in this position
   const driver = driverId ? driverById[driverId] : null;
 
-  // Build context menu items based on slot state
   const buildContextMenuItems = (): ContextMenuItem[] => {
     const items: ContextMenuItem[] = [];
 
     if (driverId && driver) {
-      // Menu when slot has a driver (official or not)
-
-      // Copy is always available
       items.push({
         id: 'copy',
         label: 'Copy Driver',
@@ -83,7 +73,6 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
         },
       });
 
-      // Remove and Fill are only for non-official results
       if (!isOfficialResult) {
         items.push({
           id: 'remove',
@@ -121,9 +110,6 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
         });
       }
     } else if (!driverId && !isOfficialResult) {
-      // Menu when slot is empty
-
-      // Paste Driver if there's a copied driver
       if (copiedDriverId) {
         const copiedDriver = driverById[copiedDriverId];
         if (copiedDriver) {
@@ -145,7 +131,6 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
         }
       }
 
-      // Place Championship Leaders submenu (Top 5)
       const topDrivers = driverStandings.slice(0, 5);
       const leaderSubmenu: ContextMenuItem[] = topDrivers.map((standing, index) => {
         const standingDriver = driverById[standing.driverId];
@@ -178,7 +163,6 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
       });
     }
 
-    // Add divider and "Clear All..." submenu at the bottom of every context menu
     if (items.length > 0) {
       items.push({
         id: 'divider-clear',
@@ -219,7 +203,6 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
     return items;
   };
 
-  // Handle right-click to open context menu
   const handleContextMenu = (event: React.MouseEvent) => {
     event.preventDefault();
     event.stopPropagation();
@@ -230,7 +213,6 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
     }
   };
 
-  // Handle long press for mobile
   const longPressHandlers = useLongPress((event: React.TouchEvent) => {
     const items = buildContextMenuItems();
     if (items.length > 0) {
@@ -238,37 +220,27 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
     }
   });
 
-  // Handle click on the race slot to place the selected driver
   const handleSlotClick = () => {
-    // If we have a driver selected and this is a valid slot
     if (selectedDriverId) {
       dispatch(placeDriver({
         raceId: race.id,
         position,
         driverId: selectedDriverId
       }));
-      
-      // Update point calculations
+
       dispatch(calculateResults());
-      
-      // Clear the selected driver
+
       dispatch(selectDriver(null));
     }
   };
 
-  // Prepare classes for the race slot
   const slotClasses = [
     'race-slot',
     race.isSprint ? 'sprint' : '',
-    // Highlight slots when a driver is selected
     selectedDriverId ? 'highlight-slot' : '',
-    // Keep the official-result class for styling only
     isOfficialResult ? 'official-result-styling' : '',
-    // Add a class for completed races
     race.completed ? 'completed-race' : '',
-    // Animation classes
     isHighlighted ? 'animate-slot-highlight' : '',
-    // React DnD classes
     isOver ? 'drag-over' : '',
     canDrop ? 'can-drop' : '',
     selectedDriverId ? 'cursor-pointer' : '',
@@ -303,7 +275,6 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
         )}
       </div>
 
-      {/* Context Menu */}
       <ContextMenu
         isOpen={contextMenu.isOpen}
         position={contextMenu.position}

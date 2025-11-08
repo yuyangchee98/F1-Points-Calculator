@@ -1,13 +1,11 @@
-// Context Menu Type Definitions
-
 export interface ContextMenuItem {
   id: string;
   label: string;
-  icon?: string; // Optional emoji or icon
-  onClick?: () => void; // Optional when submenu is present
+  icon?: string;
+  onClick?: () => void;
   disabled?: boolean;
-  divider?: boolean; // Render divider after this item
-  submenu?: ContextMenuItem[]; // Nested menu items
+  divider?: boolean;
+  submenu?: ContextMenuItem[];
 }
 
 export interface ContextMenuPosition {

@@ -1,4 +1,3 @@
-// Use production URL for Stripe subscription
 const API_BASE_URL = 'https://f1-points-calculator-api.yuyangchee98.workers.dev';
 
 interface DayAccessStatus {

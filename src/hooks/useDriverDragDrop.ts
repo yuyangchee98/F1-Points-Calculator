@@ -23,49 +23,37 @@ export function useDriverDrop({ raceId, position }: UseDriverDropParams) {
     state.grid.positions.find(p => p.raceId === raceId && p.position === position)?.driverId
   );
 
-  // Get races from the store
   const races = useSelector((state: RootState) => state.seasonData.races);
 
-  // Get all positions for completion rate calculation
   const allPositions = useSelector((state: RootState) => state.grid.positions);
 
-  // Add a ref to track recent drops to prevent duplicate notifications
   const recentDropRef = useRef<{driverId: string, timestamp: number} | null>(null);
 
   const handleDrop = useCallback((item: DriverDragItem) => {
     const { driverId, sourceRaceId, sourcePosition } = item;
-    
-    // Check if this is a duplicate drop event (e.g., from a swap)
+
     const now = Date.now();
-    if (recentDropRef.current && 
-        recentDropRef.current.driverId === driverId && 
+    if (recentDropRef.current &&
+        recentDropRef.current.driverId === driverId &&
         now - recentDropRef.current.timestamp < 300) {
-      // Ignore duplicate drop events happening within 300ms
       return;
     }
-    
-    // Mark this drop as processed
+
     recentDropRef.current = { driverId, timestamp: now };
-    
-    // If the driver is already in this position, do nothing
+
     if (currentDriverId === driverId) return;
-    
-    // Get driver objects for better messages
+
     const currentDriver = currentDriverId ? driverById[currentDriverId] : null;
     const newDriver = driverById[driverId];
 
-    // Get team color for toast styling (team IDs now use hyphens matching API format)
     const teamColor = newDriver ? teamById[newDriver.team]?.color || '#ccc' : '#ccc';
-    
-    // Get race names for better context in notifications
+
     const currentRace = races.find(r => r.id === raceId);
     const sourceRace = sourceRaceId ? races.find(r => r.id === sourceRaceId) : null;
     const currentRaceName = currentRace?.name || 'Unknown Race';
     const sourceRaceName = sourceRace?.name || 'Unknown Race';
-    
-    // We're moving from one position to another within the same race (potential swap)
+
     if (sourceRaceId && sourcePosition && sourceRaceId === raceId && currentDriverId) {
-      // This will be a swap
       if (currentDriver && newDriver) {
         toastService.addToast(
           `${newDriver.givenName} ${newDriver.familyName} swapped with ${currentDriver.givenName} ${currentDriver.familyName} at P${position} in ${currentRaceName}`,
@@ -74,12 +62,10 @@ export function useDriverDrop({ raceId, position }: UseDriverDropParams) {
           teamColor
         );
       }
-    } 
-    // Moving between different races (cross-race movement)
+    }
     else if (sourceRaceId && sourceRaceId !== raceId) {
       if (newDriver) {
         if (currentDriverId) {
-          // Replacing a driver in a different race
           toastService.addToast(
             `${newDriver.givenName} ${newDriver.familyName} moved from ${sourceRaceName} P${sourcePosition} to ${currentRaceName} P${position}` +
             (currentDriver ? `, replacing ${currentDriver.givenName} ${currentDriver.familyName}` : ''),
@@ -88,7 +74,6 @@ export function useDriverDrop({ raceId, position }: UseDriverDropParams) {
             teamColor
           );
         } else {
-          // Moving to an empty slot in a different race
           toastService.addToast(
             `${newDriver.givenName} ${newDriver.familyName} moved from ${sourceRaceName} P${sourcePosition} to ${currentRaceName} P${position}`,
             'info',
@@ -98,10 +83,8 @@ export function useDriverDrop({ raceId, position }: UseDriverDropParams) {
         }
       }
     }
-    // A driver is being placed on an occupied position (from outside the grid)
     else if (currentDriverId && (!sourceRaceId || !sourcePosition)) {
       if (currentDriver && newDriver) {
-        // Show toast notification about the replacement
         toastService.addToast(
           `${currentDriver.givenName} ${currentDriver.familyName} was replaced by ${newDriver.givenName} ${newDriver.familyName} in ${currentRaceName} P${position}`,
           'warning',
@@ -110,7 +93,6 @@ export function useDriverDrop({ raceId, position }: UseDriverDropParams) {
         );
       }
     }
-    // Driver is being placed from the selection pool to an empty slot
     else if (!sourceRaceId && !sourcePosition && !currentDriverId) {
       if (newDriver) {
         toastService.addToast(
@@ -121,7 +103,6 @@ export function useDriverDrop({ raceId, position }: UseDriverDropParams) {
         );
       }
     }
-    // Simple move within the same race (to an empty slot)
     else if (sourceRaceId && sourcePosition && sourceRaceId === raceId) {
       if (newDriver) {
         toastService.addToast(
@@ -132,8 +113,7 @@ export function useDriverDrop({ raceId, position }: UseDriverDropParams) {
         );
       }
     }
-    
-    // Use the unified moveDriver action
+
     dispatch(moveDriver({
       driverId,
       toRaceId: raceId,
@@ -141,20 +121,17 @@ export function useDriverDrop({ raceId, position }: UseDriverDropParams) {
       fromRaceId: sourceRaceId,
       fromPosition: sourcePosition
     }));
-    
-    // Track the drop event
+
     trackDriverDrop(driverId, raceId, position);
 
-    // Update user properties
     const totalPredictions = incrementPredictionCount();
-    const completionRate = Math.round((allPositions.length / 480) * 100); // 24 races × 20 positions
+    const completionRate = Math.round((allPositions.length / 480) * 100);
 
     updateUserProperties({
       total_predictions: totalPredictions,
       completion_rate: completionRate
     });
 
-    // Recalculate results
     dispatch(calculateResults());
 
     return { driverId, raceId, position };
@@ -190,7 +167,6 @@ export function useDriverDrag(driverId: string, raceId?: string, position?: numb
       isDragging: monitor.isDragging(),
     }),
     end: () => {
-      // Drag completed
     },
   }), [driverId, raceId, position]);
   

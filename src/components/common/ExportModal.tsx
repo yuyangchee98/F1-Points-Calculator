@@ -16,7 +16,6 @@ interface RaceSelection {
   [raceId: string]: boolean;
 }
 
-// Convert country code to flag emoji
 function countryCodeToFlag(countryCode: string): string {
   if (!countryCode || countryCode.length !== 2) return '🏁';
 
@@ -54,23 +53,18 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
   const grid = useSelector((state: RootState) => state.grid);
   const results = useSelector((state: RootState) => state.results);
 
-  // Initialize race selection with smart defaults
-  // Select: last completed race + races with user predictions
   const [raceSelection, setRaceSelection] = useState<RaceSelection>({});
 
-  // Update race selection when races or positions change
   useEffect(() => {
-    if (races.length === 0) return; // Wait for races to load
+    if (races.length === 0) return;
 
     const initial: RaceSelection = {};
 
-    // Find the last completed race (races array is already sorted chronologically)
     const completedRaces = races.filter(r => r.completed);
 
     const lastCompletedRace = completedRaces[completedRaces.length - 1];
 
     races.forEach(race => {
-      // Include if: (1) it's the last completed race OR (2) has user predictions
       const hasUserPredictions = positions.some(
         p => p.raceId === race.id && p.driverId && !p.isOfficialResult
       );
@@ -82,12 +76,10 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
     setRaceSelection(initial);
   }, [races, positions]);
 
-  // Initialize driver selection with top 3 drivers
   useEffect(() => {
     if (results.driverStandings.length === 0) return;
 
     const initial: Record<string, boolean> = {};
-    // Select top 3 drivers by default
     results.driverStandings.slice(0, 3).forEach(standing => {
       initial[standing.driverId] = true;
     });
@@ -95,12 +87,10 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
     setSelectedDrivers(initial);
   }, [results.driverStandings]);
 
-  // Initialize team selection with top 3 teams
   useEffect(() => {
     if (results.teamStandings.length === 0) return;
 
     const initial: Record<string, boolean> = {};
-    // Select top 3 teams by default
     results.teamStandings.slice(0, 3).forEach(standing => {
       initial[standing.teamId] = true;
     });
@@ -113,7 +103,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
     setError(null);
 
     try {
-      // Format the data with race and driver filtering
       const exportData = formatExportData(
         { seasonData, grid, results } as RootState,
         title,
@@ -126,10 +115,8 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
         format
       );
 
-      // Call export API
       const blob = await exportPrediction(exportData);
 
-      // Download the file
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -139,19 +126,16 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      // Track successful export
       trackExportAction(
         'GENERATE_SUCCESS',
-        format, // 'grid' or 'mobile'
-        selectedRaceCount // total races exported
+        format,
+        selectedRaceCount
       );
 
-      // Close modal
       onClose();
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'unknown_error';
 
-      // Track export failure
       trackExportAction('GENERATE_FAIL', errorMessage);
 
       setError('Failed to generate export image. Please try again.');
@@ -181,11 +165,9 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
     }));
   };
 
-  // Separate completed and upcoming races
   const completedRaces = useMemo(() => races.filter(r => r.completed), [races]);
   const upcomingRaces = useMemo(() => races.filter(r => !r.completed), [races]);
 
-  // Filter drivers based on selected filter
   const filteredDrivers = useMemo(() => {
     if (driverFilter === 'all') return results.driverStandings;
     if (driverFilter === 'top3') return results.driverStandings.slice(0, 3);
@@ -200,7 +182,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
     return results.driverStandings;
   }, [results.driverStandings, driverFilter]);
 
-  // Filter teams based on selected filter
   const filteredTeams = useMemo(() => {
     if (teamFilter === 'all') return results.teamStandings;
     if (teamFilter === 'top3') return results.teamStandings.slice(0, 3);
@@ -209,7 +190,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
     return results.teamStandings;
   }, [results.teamStandings, teamFilter]);
 
-  // Calculate selected counts with limits (use all races, not filtered)
   const selectedCompletedRaces = races
     .filter(r => r.completed && raceSelection[r.id])
     .length;
@@ -220,21 +200,17 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
   const selectedDriverCount = Object.values(selectedDrivers).filter(Boolean).length;
   const selectedTeamCount = Object.values(selectedTeams).filter(Boolean).length;
 
-  // Race limits
   const MAX_COMPLETED_RACES = 1;
   const MAX_UPCOMING_RACES = 4;
   const isCompletedLimitReached = selectedCompletedRaces >= MAX_COMPLETED_RACES;
   const isUpcomingLimitReached = selectedUpcomingRaces >= MAX_UPCOMING_RACES;
 
-  // Driver limit
   const MAX_DRIVERS = 3;
   const isDriverLimitReached = selectedDriverCount >= MAX_DRIVERS;
 
-  // Team limit
   const MAX_TEAMS = 3;
   const isTeamLimitReached = selectedTeamCount >= MAX_TEAMS;
 
-  // Generate preview data
   const previewData = useMemo(() => {
     return formatExportData(
       { seasonData, grid, results } as RootState,
@@ -249,13 +225,11 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
     );
   }, [seasonData, grid, results, title, subtitle, raceSelection, selectedDrivers, showDriverStandings, showTeamStandings, selectedTeams, format]);
 
-  // Early return after all hooks have been called
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full h-[90vh] flex flex-col">
-        {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
           <h2 className="text-2xl font-bold">Export to Image</h2>
           <button
@@ -269,7 +243,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        {/* Mobile Tab Bar */}
         {isMobile && (
           <div className="flex bg-gray-100 border-b">
             <button
@@ -295,12 +268,9 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
           </div>
         )}
 
-        {/* Main Content: Settings + Preview */}
         <div className="flex-1 flex overflow-hidden">
-          {/* Settings Panel */}
           <div className={`w-96 border-r p-6 overflow-y-auto ${isMobile ? (activeTab === 'settings' ? 'block w-full border-r-0' : 'hidden') : 'block'}`}>
             <div className="space-y-6">
-              {/* Title Input */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Title
@@ -314,7 +284,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
                 />
               </div>
 
-              {/* Subtitle Input */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Subtitle <span className="text-gray-400">(optional)</span>
@@ -328,7 +297,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
                 />
               </div>
 
-              {/* Format Selection */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Image Format
@@ -365,13 +333,11 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
                 </div>
               </div>
 
-              {/* Completed Race Selection */}
               <div className="relative">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Select Completed Race
                 </label>
 
-                {/* Dropdown Trigger */}
                 <button
                   onClick={() => setCompletedDropdownOpen(!completedDropdownOpen)}
                   className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg bg-white hover:border-gray-400 transition-colors text-left flex items-center justify-between"
@@ -389,7 +355,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
                   </svg>
                 </button>
 
-                {/* Dropdown Panel */}
                 {completedDropdownOpen && (
                   <div className="absolute z-10 mt-2 w-full bg-white border-2 border-gray-300 rounded-lg shadow-xl p-4 max-h-96 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-red-400 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-red-500">
                     <div className="space-y-1.5">
@@ -442,7 +407,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
                       })}
                     </div>
 
-                    {/* Done Button */}
                     <div className="mt-4 pt-3 border-t">
                       <button
                         onClick={() => setCompletedDropdownOpen(false)}
@@ -455,13 +419,11 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
                 )}
               </div>
 
-              {/* Upcoming Races Selection */}
               <div className="relative">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Select Upcoming Races
                 </label>
 
-                {/* Dropdown Trigger */}
                 <button
                   onClick={() => setUpcomingDropdownOpen(!upcomingDropdownOpen)}
                   className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg bg-white hover:border-gray-400 transition-colors text-left flex items-center justify-between"
@@ -479,7 +441,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
                   </svg>
                 </button>
 
-                {/* Dropdown Panel */}
                 {upcomingDropdownOpen && (
                   <div className="absolute z-10 mt-2 w-full bg-white border-2 border-gray-300 rounded-lg shadow-xl p-4 max-h-96 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-red-400 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-red-500">
                     <div className="space-y-1.5">
@@ -529,7 +490,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
                       })}
                     </div>
 
-                    {/* Done Button */}
                     <div className="mt-4 pt-3 border-t">
                       <button
                         onClick={() => setUpcomingDropdownOpen(false)}
@@ -542,7 +502,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
                 )}
               </div>
 
-              {/* Standings Type Selection */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Standings Display
@@ -569,7 +528,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
                 </div>
               </div>
 
-              {/* Driver Selection */}
               {showDriverStandings && (
               <div className="relative">
                 <div className="flex items-center justify-between gap-3 mb-2">
@@ -577,7 +535,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
                     Select Drivers for Standings
                   </label>
 
-                  {/* Filter Dropdown */}
                   <select
                     value={driverFilter}
                     onChange={(e) => setDriverFilter(e.target.value as any)}
@@ -592,7 +549,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
                   </select>
                 </div>
 
-                {/* Dropdown Trigger */}
                 <button
                   onClick={() => setDriverDropdownOpen(!driverDropdownOpen)}
                   className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg bg-white hover:border-gray-400 transition-colors text-left flex items-center justify-between"
@@ -610,7 +566,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
                   </svg>
                 </button>
 
-                {/* Dropdown Panel */}
                 {driverDropdownOpen && (
                   <div className="absolute z-10 mt-2 w-full bg-white border-2 border-gray-300 rounded-lg shadow-xl p-4 max-h-96 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-red-400 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-red-500">
                     <div className="space-y-1.5">
@@ -686,7 +641,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
                   })}
                     </div>
 
-                    {/* Done Button */}
                     <div className="mt-4 pt-3 border-t">
                       <button
                         onClick={() => setDriverDropdownOpen(false)}
@@ -700,7 +654,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
               </div>
               )}
 
-              {/* Team Selection */}
               {showTeamStandings && (
               <div className="relative">
                 <div className="flex items-center justify-between gap-3 mb-2">
@@ -708,7 +661,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
                     Select Constructors for Standings
                   </label>
 
-                  {/* Filter Dropdown */}
                   <select
                     value={teamFilter}
                     onChange={(e) => setTeamFilter(e.target.value as any)}
@@ -721,7 +673,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
                   </select>
                 </div>
 
-                {/* Dropdown Trigger */}
                 <button
                   onClick={() => setTeamDropdownOpen(!teamDropdownOpen)}
                   className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg bg-white hover:border-gray-400 transition-colors text-left flex items-center justify-between"
@@ -739,7 +690,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
                   </svg>
                 </button>
 
-                {/* Dropdown Panel */}
                 {teamDropdownOpen && (
                   <div className="absolute z-10 mt-2 w-full bg-white border-2 border-gray-300 rounded-lg shadow-xl p-4 max-h-96 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-red-400 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-red-500">
                     <div className="space-y-1.5">
@@ -810,7 +760,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
                   })}
                     </div>
 
-                    {/* Done Button */}
                     <div className="mt-4 pt-3 border-t">
                       <button
                         onClick={() => setTeamDropdownOpen(false)}
@@ -826,7 +775,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
             </div>
           </div>
 
-          {/* Preview Panel */}
           <div className={`flex-1 p-6 bg-gray-50 overflow-auto ${isMobile ? (activeTab === 'preview' ? 'block w-full' : 'hidden') : 'block'}`}>
             {selectedRaceCount > 0 ? (
               <ExportPreview data={previewData} />
@@ -838,7 +786,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
           </div>
         </div>
 
-        {/* Footer */}
         <div className="p-6 border-t">
           {error && (
             <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">

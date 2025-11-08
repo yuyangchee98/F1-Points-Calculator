@@ -3,9 +3,8 @@ import { CURRENT_SEASON } from '../../utils/constants';
 
 const IntroductionSection: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
-  
+
   useEffect(() => {
-    // Check if user has a saved preference
     const savedState = localStorage.getItem('introExpanded');
     if (savedState === 'true') {
       setIsExpanded(true);

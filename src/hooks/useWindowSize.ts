@@ -10,7 +10,6 @@ interface WindowSize {
 }
 
 const useWindowSize = (): WindowSize => {
-  // Initialize with server-side safe values
   const [windowSize, setWindowSize] = useState<WindowSize>({
     width: 0,
     height: 0,
@@ -20,16 +19,10 @@ const useWindowSize = (): WindowSize => {
   });
 
   useEffect(() => {
-    // Handler to call on window resize
     function handleResize() {
-      // Set window width/height to state
       const width = window.innerWidth;
       const height = window.innerHeight;
-      
-      // Using Tailwind breakpoints 
-      // Mobile: < 640px (sm)
-      // Tablet: 640px - 1023px (sm to lg)
-      // Desktop: >= 1024px (lg and up)
+
       const isMobile = width < BREAKPOINTS.mobile;
       const isTablet = width >= BREAKPOINTS.mobile && width < BREAKPOINTS.tablet;
       const isDesktop = width >= BREAKPOINTS.tablet;
@@ -42,16 +35,13 @@ const useWindowSize = (): WindowSize => {
         isDesktop
       });
     }
-    
-    // Add event listener
+
     window.addEventListener("resize", handleResize);
-    
-    // Call handler right away so state gets updated with initial window size
+
     handleResize();
-    
-    // Remove event listener on cleanup
+
     return () => window.removeEventListener("resize", handleResize);
-  }, []); // Empty array ensures that effect is only run on mount and unmount
+  }, []);
 
   return windowSize;
 };

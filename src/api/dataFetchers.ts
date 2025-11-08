@@ -2,10 +2,6 @@ import { Driver, Team, PastRaceResult } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://f1-points-calculator-api.yuyangchee98.workers.dev';
 
-/**
- * Fetch drivers for a given season
- * Returns drivers with team assignments from backend API
- */
 export async function fetchDrivers(year: number): Promise<Driver[]> {
   const response = await fetch(`${API_BASE_URL}/api/drivers/${year}`);
 
@@ -17,10 +13,6 @@ export async function fetchDrivers(year: number): Promise<Driver[]> {
   return drivers;
 }
 
-/**
- * Fetch teams for a given season
- * Returns teams with colors from backend API
- */
 export async function fetchTeams(year: number): Promise<Team[]> {
   const response = await fetch(`${API_BASE_URL}/api/teams/${year}`);
 
@@ -32,10 +24,6 @@ export async function fetchTeams(year: number): Promise<Team[]> {
   return teams;
 }
 
-/**
- * Fetch past race results
- * Returns all historical race results for the current season
- */
 export async function fetchPastRaceResults(): Promise<PastRaceResult> {
   const response = await fetch(`${API_BASE_URL}/api/race-results`);
 

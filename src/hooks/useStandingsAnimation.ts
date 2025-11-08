@@ -25,7 +25,6 @@ export function useStandingsAnimation<T extends StandingItem>(
   const optionsRef = useRef(options);
   const [animatedItems, setAnimatedItems] = useState<Record<string, AnimationState>>({});
 
-  // Update options ref when they change
   useEffect(() => {
     optionsRef.current = options;
   }, [options]);
@@ -34,8 +33,7 @@ export function useStandingsAnimation<T extends StandingItem>(
     const prevStandings = prevStandingsRef.current;
     const { getItemId: getId, compareItems: compare } = optionsRef.current;
     const compareItemsFn = compare || ((current, prev) => getId(current) === getId(prev));
-    
-    // Check if standings have actually changed by comparing content
+
     const standingsKey = JSON.stringify(standings.map(s => ({
       id: getId(s),
       position: s.position,
@@ -84,7 +82,6 @@ export function useStandingsAnimation<T extends StandingItem>(
       }
     }
 
-    // Only update ref if standings actually changed
     if (standingsChanged || prevStandings.length === 0) {
       prevStandingsRef.current = [...standings];
     }

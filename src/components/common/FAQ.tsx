@@ -81,8 +81,7 @@ const FAQ: React.FC = () => {
           </div>
         ))}
       </div>
-      
-      {/* Schema markup for FAQ */}
+
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
