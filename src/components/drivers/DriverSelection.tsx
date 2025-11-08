@@ -18,24 +18,20 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({ forceExpanded = false
   const selectedDriverId = useSelector((state: RootState) => state.ui.selectedDriver);
   const [isExpanded, setIsExpanded] = useState(forceExpanded);
   const { isMobile } = useWindowSize();
-  
-  // Use all drivers
+
   const drivers = allDrivers;
-  
-  // Update expanded state when forceExpanded prop changes
+
   useEffect(() => {
     setIsExpanded(forceExpanded);
   }, [forceExpanded]);
 
   const handleDriverClick = (driverId: string) => {
-    // If already selected, deselect
     if (selectedDriverId === driverId) {
       dispatch(selectDriver(null));
     } else {
       dispatch(selectDriver(driverId));
     }
-    
-    // On mobile, collapse the selection panel after choosing
+
     if (isMobile) {
       setIsExpanded(false);
     }
@@ -94,8 +90,7 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({ forceExpanded = false
           />
         ))}
       </div>
-      
-      {/* Mobile selection indicator */}
+
       {selectedDriverId && (
         <div 
           id="mobile-selection-indicator"

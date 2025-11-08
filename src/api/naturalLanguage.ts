@@ -13,7 +13,7 @@ interface NaturalLanguageContext {
     order: number;
     isSprint: boolean;
   }>;
-  predictions?: Record<string, Record<string, string>>; // raceId -> position -> driverId
+  predictions?: Record<string, Record<string, string>>;
   standings?: {
     drivers: Array<{ driverId: string; points: number; position: number }>;
     teams: Array<{ teamId: string; points: number; position: number }>;
@@ -21,7 +21,6 @@ interface NaturalLanguageContext {
   driverTeams?: Record<string, string>;
 }
 
-// Use production URL for Smart Input
 const API_BASE_URL = 'https://f1-points-calculator-api.yuyangchee98.workers.dev';
 
 export async function parseNaturalLanguage(

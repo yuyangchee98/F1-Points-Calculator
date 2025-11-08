@@ -2,28 +2,13 @@ import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../index';
 import { Driver, Team } from '../../types';
 
-// ============================================================================
-// DRIVER SELECTORS
-// ============================================================================
-
-/**
- * Select all drivers
- */
 export const selectDrivers = (state: RootState): Driver[] => state.seasonData.drivers;
 
-/**
- * Select a driver by ID
- * Returns undefined if driver not found
- */
 export const selectDriverById = createSelector(
   [selectDrivers, (_state: RootState, driverId: string) => driverId],
   (drivers, driverId) => drivers.find(driver => driver.id === driverId)
 );
 
-/**
- * Create a lookup object for drivers by ID
- * Useful for bulk lookups
- */
 export const selectDriversByIdMap = createSelector(
   [selectDrivers],
   (drivers) => {
@@ -35,10 +20,6 @@ export const selectDriversByIdMap = createSelector(
   }
 );
 
-/**
- * Create a map of driver ID to team ID
- * Used for natural language parsing and other features
- */
 export const selectDriverTeamsMap = createSelector(
   [selectDrivers],
   (drivers) => {
@@ -50,46 +31,22 @@ export const selectDriverTeamsMap = createSelector(
   }
 );
 
-/**
- * Helper function to get driver last name from driver ID
- * If ID contains underscore, takes the part after the last underscore
- * Otherwise uses the whole ID
- */
 export const getDriverLastName = (driverId: string): string => {
   const parts = driverId.split('_');
   const lastName = parts[parts.length - 1];
   return lastName.charAt(0).toUpperCase() + lastName.slice(1);
 };
 
-/**
- * Get the display name for a driver (last name in uppercase)
- * Takes a Driver object
- */
 export const getDriverDisplayName = (driver: Driver): string => {
   return driver.familyName.toUpperCase();
 };
 
-// ============================================================================
-// TEAM SELECTORS
-// ============================================================================
-
-/**
- * Remove "F1 Team" suffix from team names for cleaner display
- */
 const getDisplayName = (name: string): string => {
   return name.replace(/\s*F1\s+Team\s*$/i, '').trim();
 };
 
-/**
- * Select all teams
- */
 export const selectTeams = (state: RootState): Team[] => state.seasonData.teams;
 
-/**
- * Select a team by ID
- * Returns undefined if team not found
- * Team name has "F1 Team" suffix removed for cleaner display
- */
 export const selectTeamById = createSelector(
   [selectTeams, (_state: RootState, teamId: string) => teamId],
   (teams, teamId) => {
@@ -102,11 +59,6 @@ export const selectTeamById = createSelector(
   }
 );
 
-/**
- * Create a lookup object for teams by ID
- * Useful for bulk lookups
- * Team names have "F1 Team" suffix removed for cleaner display
- */
 export const selectTeamsByIdMap = createSelector(
   [selectTeams],
   (teams) => {
@@ -121,24 +73,10 @@ export const selectTeamsByIdMap = createSelector(
   }
 );
 
-// ============================================================================
-// GRID SELECTORS
-// ============================================================================
-
-/**
- * Select all grid positions
- */
 export const selectGridPositions = (state: RootState) => state.grid.positions;
 
-/**
- * Create a more specific key for the race-position combination
- * Using '::' as a separator to avoid conflicts with race IDs that contain dashes
- */
 export const selectRacePositionKey = (_: RootState, raceId: string, position: number) => `${raceId}::${position}`;
 
-/**
- * Select driver at a specific position - fixed to avoid creating new objects
- */
 export const selectDriverAtPosition = createSelector(
   [selectGridPositions, selectRacePositionKey],
   (positions, racePositionKey) => {
@@ -149,16 +87,6 @@ export const selectDriverAtPosition = createSelector(
   }
 );
 
-// ============================================================================
-// SEASON DATA SELECTORS
-// ============================================================================
-
-/**
- * Select all races
- */
 export const selectRaces = (state: RootState) => state.seasonData.races;
 
-/**
- * Select past race results
- */
 export const selectPastResults = (state: RootState) => state.seasonData.pastResults;

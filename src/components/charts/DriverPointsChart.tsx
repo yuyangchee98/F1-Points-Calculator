@@ -7,19 +7,15 @@ import { selectDriverPointsForCharts, selectTopDrivers } from '../../store/selec
 import { selectDriversByIdMap, getDriverLastName, selectTeamsByIdMap } from '../../store/selectors/dataSelectors';
 
 const DriverPointsChart: React.FC = () => {
-  // Get drivers and teams from Redux
   const driverById = useSelector(selectDriversByIdMap);
   const teamById = useSelector(selectTeamsByIdMap);
 
-  // Get top 5 drivers and their points history for the chart
   const topDrivers = useSelector((state: RootState) => selectTopDrivers(state, 5));
   const driverPoints = useSelector((state: RootState) => selectDriverPointsForCharts(state, 5));
   const races = useSelector((state: RootState) => state.seasonData.races);
 
-  // Get races with data and sort them by calendar order
   const racesWithData = races
     .filter(race => {
-      // Check if any driver has points for this race
       const raceHasData = Object.values(driverPoints).some(points => {
         const raceIndex = races.findIndex(r => r.id === race.id);
         return points[raceIndex] !== undefined;
@@ -28,23 +24,19 @@ const DriverPointsChart: React.FC = () => {
     })
     .sort((a, b) => a.order - b.order);
 
-  // Get race names for x-axis labels - using more meaningful abbreviations
   const raceLabels = racesWithData.map(race => {
-    // Create better abbreviations
     const baseName = race.name.replace(' Sprint', '');
     const suffix = race.isSprint ? ' (S)' : '';
     return baseName.slice(0, 3) + suffix;
   });
-  
-  // Prepare datasets for the chart
+
   const datasets = topDrivers.map(standing => {
     const driver = driverById[standing.driverId];
     if (!driver) return null;
-    
+
     const team = teamById[driver.team];
     const color = team?.color || '#ccc';
-    
-    // Get data points corresponding to the filtered races
+
     const filteredData = racesWithData.map(race => {
       const raceIndex = races.findIndex(r => r.id === race.id);
       const allDriverPoints = driverPoints[standing.driverId] || [];

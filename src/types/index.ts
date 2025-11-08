@@ -1,5 +1,3 @@
-// Type Definitions for F1 Points Calculator
-
 export interface Driver {
   id: string;
   code: string;
@@ -22,17 +20,17 @@ export interface Race {
   isSprint: boolean;
   country: string;
   countryCode: string;
-  order: number; // Race order in the calendar
+  order: number;
   completed: boolean;
-  date?: string; // ISO date string from API
-  round?: string; // Round number from API
+  date?: string;
+  round?: string;
 }
 
 export interface GridPosition {
   raceId: string;
   position: number;
   driverId: string | null;
-  teamId?: string | null; // Team at the time of this race (for historical accuracy)
+  teamId?: string | null;
   isOfficialResult: boolean;
 }
 
@@ -40,16 +38,16 @@ export interface DriverStanding {
   driverId: string;
   points: number;
   position: number;
-  predictionPointsGained: number; // Points gained from user predictions only
-  positionChange: number; // Change in championship position (positive = moved up, negative = moved down)
+  predictionPointsGained: number;
+  positionChange: number;
 }
 
 export interface TeamStanding {
   teamId: string;
   points: number;
   position: number;
-  predictionPointsGained: number; // Points gained from user predictions only
-  positionChange: number; // Change in championship position (positive = moved up, negative = moved down)
+  predictionPointsGained: number;
+  positionChange: number;
 }
 
 export interface PointsHistory {
@@ -66,10 +64,9 @@ export interface TeamPointsHistory {
   cumulativePoints: number;
 }
 
-// New structure for race results with driver-team pairs
 export interface RaceResult {
-  driverId: string;  // Clean driver ID without team suffix (e.g., "tsunoda", "lawson")
-  teamId: string;    // Team ID at the time of the race (e.g., "red-bull", "racing-bulls")
+  driverId: string;
+  teamId: string;
   position: number;
 }
 
@@ -77,7 +74,6 @@ export interface PastRaceResult {
   [race: string]: RaceResult[];
 }
 
-// State types
 export interface SeasonDataState {
   drivers: Driver[];
   teams: Team[];

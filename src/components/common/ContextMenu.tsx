@@ -15,7 +15,6 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ isOpen, position, items, onCl
   const [openSubmenuId, setOpenSubmenuId] = useState<string | null>(null);
   const [submenuPosition, setSubmenuPosition] = useState<ContextMenuPosition>({ x: 0, y: 0 });
 
-  // Handle keyboard navigation
   useEffect(() => {
     if (!isOpen) return;
 
@@ -23,33 +22,30 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ isOpen, position, items, onCl
       switch (event.key) {
         case 'ArrowDown':
           event.preventDefault();
-          // Find next selectable item
           let nextIndex = focusedIndex + 1;
           while (nextIndex < items.length && (items[nextIndex].divider || items[nextIndex].disabled)) {
             nextIndex++;
           }
           if (nextIndex < items.length) {
             setFocusedIndex(nextIndex);
-            setOpenSubmenuId(null); // Close submenu when navigating
+            setOpenSubmenuId(null);
           }
           break;
 
         case 'ArrowUp':
           event.preventDefault();
-          // Find previous selectable item
           let prevIndex = focusedIndex - 1;
           while (prevIndex >= 0 && (items[prevIndex].divider || items[prevIndex].disabled)) {
             prevIndex--;
           }
           if (prevIndex >= 0) {
             setFocusedIndex(prevIndex);
-            setOpenSubmenuId(null); // Close submenu when navigating
+            setOpenSubmenuId(null);
           }
           break;
 
         case 'ArrowRight':
           event.preventDefault();
-          // Open submenu if current item has one
           const currentItem = items[focusedIndex];
           if (currentItem?.submenu && currentItem.submenu.length > 0) {
             setOpenSubmenuId(currentItem.id);
@@ -60,10 +56,8 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ isOpen, position, items, onCl
         case 'Escape':
           event.preventDefault();
           if (openSubmenuId) {
-            // Close submenu first
             setOpenSubmenuId(null);
           } else {
-            // Close main menu
             onClose();
           }
           break;
@@ -74,7 +68,6 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ isOpen, position, items, onCl
           const focusedItem = items[focusedIndex];
           if (focusedItem && !focusedItem.disabled && !focusedItem.divider) {
             if (focusedItem.submenu) {
-              // Toggle submenu
               setOpenSubmenuId(openSubmenuId === focusedItem.id ? null : focusedItem.id);
             } else if (focusedItem.onClick) {
               focusedItem.onClick();
@@ -89,10 +82,8 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ isOpen, position, items, onCl
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, items, focusedIndex, onClose, openSubmenuId]);
 
-  // Reset focused index when menu opens
   useEffect(() => {
     if (isOpen) {
-      // Find first non-divider, non-disabled item
       const firstSelectableIndex = items.findIndex(item => !item.divider && !item.disabled);
       setFocusedIndex(Math.max(0, firstSelectableIndex));
       setOpenSubmenuId(null);
@@ -105,19 +96,17 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ isOpen, position, items, onCl
     if (item.disabled || item.divider) return;
 
     if (item.submenu) {
-      // Open submenu and position it
       if (event) {
         const target = event.currentTarget as HTMLElement;
         const rect = target.getBoundingClientRect();
         const newPos = {
-          x: rect.right + 5, // 5px gap
+          x: rect.right + 5,
           y: rect.top,
         };
 
-        // Check if submenu would overflow right edge
         const submenuWidth = 200;
         if (newPos.x + submenuWidth > window.innerWidth) {
-          newPos.x = rect.left - submenuWidth - 5; // Show on left side
+          newPos.x = rect.left - submenuWidth - 5;
         }
 
         setSubmenuPosition(newPos);
@@ -138,7 +127,6 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ isOpen, position, items, onCl
 
   return createPortal(
     <>
-      {/* Main Menu */}
       <div
         ref={menuRef}
         className="context-menu fixed z-50 animate-fadeInScale"
@@ -198,7 +186,6 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ isOpen, position, items, onCl
         </div>
       </div>
 
-      {/* Submenu */}
       {openSubmenuId && items.find(item => item.id === openSubmenuId)?.submenu && (
         <div
           className="context-menu context-submenu fixed z-[51] animate-fadeInScale"

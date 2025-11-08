@@ -146,7 +146,6 @@ export const trackExportAction = (action: keyof typeof GA_EVENTS.EXPORT, details
   );
 };
 
-// User Properties - track user characteristics for segmentation
 export const updateUserProperties = (properties: {
   total_predictions?: number;
   completion_rate?: number;
@@ -157,7 +156,6 @@ export const updateUserProperties = (properties: {
   }
 };
 
-// Track prediction count
 const PREDICTIONS_COUNT_KEY = 'f1_predictions_count';
 
 export const incrementPredictionCount = () => {

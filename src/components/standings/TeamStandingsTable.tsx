@@ -9,15 +9,12 @@ interface TeamStandingsTableProps {
 }
 
 const TeamStandingsTable: React.FC<TeamStandingsTableProps> = ({ standings }) => {
-  // Get teams from Redux
   const teamById = useSelector(selectTeamsByIdMap);
 
-  // Memoize animation options to prevent recreating functions on each render
   const animationOptions = useMemo(() => ({
     getItemId: (standing: TeamStanding) => standing.teamId
   }), []);
 
-  // Use custom hook for animations
   const animatedTeams = useStandingsAnimation(standings, animationOptions);
 
   return (
