@@ -62,8 +62,6 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
   const buildContextMenuItems = (): ContextMenuItem[] => {
     const items: ContextMenuItem[] = [];
 
-    console.log(`[Context Menu] race: ${race.id}, pos: ${position}, driver: ${driverId}, isOfficial: ${isOfficialResult}, season: ${getActiveSeason()}, hasFLSupport: ${hasFastestLapPoint(getActiveSeason())}`);
-
     if (driverId && driver) {
       items.push({
         id: 'copy',
@@ -80,7 +78,6 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
       if (hasFastestLapPoint(getActiveSeason())) {
         const hasFastestLap = gridPosition?.hasFastestLap || false;
         if (!hasFastestLap) {
-          console.log(`[Context Menu] Adding FL option for ${driver.id}`);
           items.push({
             id: 'fastest-lap',
             label: 'Set Fastest Lap',
