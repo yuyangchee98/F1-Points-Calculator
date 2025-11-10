@@ -27,7 +27,7 @@ export const fetchSeasonData = createAsyncThunk(
   async (year: number) => {
     const [schedule, results, teams, drivers] = await Promise.all([
       fetchRaceSchedule(year),
-      fetchPastRaceResults().catch(() => ({})),
+      fetchPastRaceResults(year).catch(() => ({})),
       fetchTeams(year).catch(() => []),
       fetchDrivers(year).catch(() => [])
     ]);

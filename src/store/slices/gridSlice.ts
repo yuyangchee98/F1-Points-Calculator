@@ -123,7 +123,8 @@ export const gridSlice = createSlice({
                 ...position,
                 driverId: raceResult.driverId,
                 teamId: raceResult.teamId,
-                isOfficialResult: true
+                isOfficialResult: true,
+                hasFastestLap: raceResult.fastestLap || false
               };
             }
           }
@@ -137,7 +138,8 @@ export const gridSlice = createSlice({
               ...position,
               driverId: null,
               teamId: null,
-              isOfficialResult: false
+              isOfficialResult: false,
+              hasFastestLap: false
             };
           }
           return position;
@@ -186,8 +188,30 @@ export const gridSlice = createSlice({
         ...position,
         driverId: null,
         teamId: null,
-        isOfficialResult: false
+        isOfficialResult: false,
+        hasFastestLap: false
       }));
+    },
+
+    setFastestLap: (state, action: PayloadAction<{ raceId: string; driverId: string | null }>) => {
+      const { raceId, driverId } = action.payload;
+
+      // Remove fastest lap from all drivers in this race
+      state.positions.forEach(pos => {
+        if (pos.raceId === raceId) {
+          pos.hasFastestLap = false;
+        }
+      });
+
+      // Set fastest lap for specified driver (if any)
+      if (driverId) {
+        const targetPosition = state.positions.find(
+          p => p.raceId === raceId && p.driverId === driverId && !p.isOfficialResult
+        );
+        if (targetPosition) {
+          targetPosition.hasFastestLap = true;
+        }
+      }
     }
   },
   extraReducers: (builder) => {
@@ -208,7 +232,8 @@ export const {
   toggleOfficialResults,
   clearPosition,
   fillRestOfSeason,
-  clearEverything
+  clearEverything,
+  setFastestLap
 } = gridSlice.actions;
 
 export default gridSlice.reducer;

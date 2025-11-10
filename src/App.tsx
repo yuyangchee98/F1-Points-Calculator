@@ -35,10 +35,11 @@ const SmartInputDemo = React.lazy(() => import('./components/common/SmartInputDe
 import { useAppDispatch } from './store';
 import useWindowSize from './hooks/useWindowSize';
 import { trackBuyCoffeeClick, trackFeedbackClick, trackSmartInputAction, trackSmartInputCommand, GA_EVENTS, trackEvent, trackVersionHistoryAction, trackExportAction } from './utils/analytics';
-import { CURRENT_SEASON } from './utils/constants';
+import { getActiveSeason } from './utils/constants';
 
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
+  const activeSeason = getActiveSeason();
   useRaceResults();
   useAutoSave();
   const mobileView = useSelector((state: RootState) => state.ui.mobileView);
@@ -145,7 +146,7 @@ const App: React.FC = () => {
                     <span className="bg-red-600 text-white px-3 py-1 mr-3 rounded-md">F1</span>
                     Championship Calculator
                   </span>
-                  <span className="text-base sm:text-lg text-gray-500 ml-0 sm:ml-3 font-normal">{CURRENT_SEASON} Season Predictor</span>
+                  <span className="text-base sm:text-lg text-gray-500 ml-0 sm:ml-3 font-normal">{activeSeason} Season Predictor</span>
                 </h1>
                 <RacendoPromo className="self-start sm:self-center" />
               </div>

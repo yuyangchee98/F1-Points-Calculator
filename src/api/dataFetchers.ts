@@ -24,8 +24,8 @@ export async function fetchTeams(year: number): Promise<Team[]> {
   return teams;
 }
 
-export async function fetchPastRaceResults(): Promise<PastRaceResult> {
-  const response = await fetch(`${API_BASE_URL}/api/race-results`);
+export async function fetchPastRaceResults(year: number): Promise<PastRaceResult> {
+  const response = await fetch(`${API_BASE_URL}/api/race-results?year=${year}`);
 
   if (!response.ok) {
     throw new Error(`Failed to fetch race results: ${response.status}`);
