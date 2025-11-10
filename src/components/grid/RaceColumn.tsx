@@ -62,8 +62,6 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
   const buildContextMenuItems = (): ContextMenuItem[] => {
     const items: ContextMenuItem[] = [];
 
-    console.log(`[RaceColumn] Building context menu for ${race.id} P${position}, isOfficialResult: ${isOfficialResult}, season: ${getActiveSeason()}, hasFastestLapPoint: ${hasFastestLapPoint(getActiveSeason())}`);
-
     if (driverId && driver) {
       items.push({
         id: 'copy',
@@ -92,7 +90,6 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
         // Add fastest lap option if season supports it
         if (hasFastestLapPoint(getActiveSeason())) {
           const hasFastestLap = gridPosition?.hasFastestLap || false;
-          console.log(`[RaceColumn] Adding fastest lap menu item for ${driver.id} at ${race.id} P${position}, hasFastestLap: ${hasFastestLap}`);
           items.push({
             id: 'fastest-lap',
             label: hasFastestLap ? 'Remove Fastest Lap' : 'Set Fastest Lap',
@@ -274,6 +271,8 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
     selectedDriverId ? 'cursor-pointer' : '',
   ].filter(Boolean).join(' ');
 
+  const hasFastestLap = gridPosition?.hasFastestLap || false;
+
   return (
     <>
       <div
@@ -288,6 +287,7 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
         role="button"
         aria-label={driver ? `Position ${position}: ${getDriverLastName(driver.id)}` : `Empty position ${position}`}
         tabIndex={0}
+        style={hasFastestLap ? { border: '3px solid #7D428E' } : undefined}
       >
         {driver && (
           <div className="animate-placement grid-card-wrapper">
