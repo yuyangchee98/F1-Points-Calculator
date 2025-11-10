@@ -206,7 +206,7 @@ export const gridSlice = createSlice({
       // Set fastest lap for specified driver (if any)
       if (driverId) {
         const targetPosition = state.positions.find(
-          p => p.raceId === raceId && p.driverId === driverId && !p.isOfficialResult
+          p => p.raceId === raceId && p.driverId === driverId
         );
         if (targetPosition) {
           targetPosition.hasFastestLap = true;
