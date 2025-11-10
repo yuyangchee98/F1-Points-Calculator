@@ -39,10 +39,6 @@ const DriverCard: React.FC<DriverCardProps> = ({
     ? positions.find(p => p.raceId === raceId && p.position === position)?.hasFastestLap || false
     : false;
 
-  if (hasFastestLap) {
-    console.log(`[DriverCard] ${driver.id} has fastest lap in ${raceId} P${position}, rendering ⚡`);
-  }
-
   return (
     <div
       ref={drag}
@@ -72,7 +68,6 @@ const DriverCard: React.FC<DriverCardProps> = ({
       <div className="flex flex-col ml-3 flex-grow relative" style={{ zIndex: 1 }}>
         <span className="text-sm font-bold flex items-center gap-1">
           {getDriverDisplayName(driver)}
-          {hasFastestLap && <span className="text-yellow-500 text-base font-bold" title="Fastest Lap" style={{ fontSize: '16px' }}>⚡</span>}
         </span>
         <span className="text-xs text-gray-600" style={{ color: team?.color || '#555' }}>
           {team?.name || driver.team}
