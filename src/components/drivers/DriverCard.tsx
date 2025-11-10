@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { Driver } from '../../types';
+import { RootState } from '../../store';
 import { selectTeamsByIdMap, getDriverLastName, getDriverDisplayName } from '../../store/selectors/dataSelectors';
 import { useDriverDrag } from '../../hooks/useDriverDragDrop';
 
@@ -15,8 +16,8 @@ interface DriverCardProps {
   overrideTeamId?: string | null;
 }
 
-const DriverCard: React.FC<DriverCardProps> = ({ 
-  driver, 
+const DriverCard: React.FC<DriverCardProps> = ({
+  driver,
   isOfficialResult = false,
   isSelected = false,
   onClick,
@@ -26,12 +27,22 @@ const DriverCard: React.FC<DriverCardProps> = ({
   overrideTeamId
 }) => {
   const teamById = useSelector(selectTeamsByIdMap);
+  const positions = useSelector((state: RootState) => state.grid.positions);
 
   const teamId = overrideTeamId || driver.team;
   const team = teamById[teamId];
 
   const { drag, isDragging } = useDriverDrag(driver.id, raceId, position);
-  
+
+  // Check if this driver has the fastest lap for this race
+  const hasFastestLap = raceId && position
+    ? positions.find(p => p.raceId === raceId && p.position === position)?.hasFastestLap || false
+    : false;
+
+  if (hasFastestLap) {
+    console.log(`[DriverCard] ${driver.id} has fastest lap in ${raceId} P${position}, rendering ⚡`);
+  }
+
   return (
     <div
       ref={drag}
@@ -53,13 +64,15 @@ const DriverCard: React.FC<DriverCardProps> = ({
       <div
         className="absolute left-0 top-0 bottom-0 w-1/3 opacity-10"
         style={{
-          background: `linear-gradient(to right, ${team?.color || '#ccc'} 0%, transparent 100%)`
+          background: `linear-gradient(to right, ${team?.color || '#ccc'} 0%, transparent 100%)`,
+          zIndex: 0
         }}
       />
 
-      <div className="flex flex-col ml-3 flex-grow">
-        <span className="text-sm font-bold">
+      <div className="flex flex-col ml-3 flex-grow relative" style={{ zIndex: 1 }}>
+        <span className="text-sm font-bold flex items-center gap-1">
           {getDriverDisplayName(driver)}
+          {hasFastestLap && <span className="text-yellow-500 text-base font-bold" title="Fastest Lap" style={{ fontSize: '16px' }}>⚡</span>}
         </span>
         <span className="text-xs text-gray-600" style={{ color: team?.color || '#555' }}>
           {team?.name || driver.team}
