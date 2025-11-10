@@ -32,6 +32,7 @@ export interface GridPosition {
   driverId: string | null;
   teamId?: string | null;
   isOfficialResult: boolean;
+  hasFastestLap?: boolean;
 }
 
 export interface DriverStanding {
@@ -68,6 +69,7 @@ export interface RaceResult {
   driverId: string;
   teamId: string;
   position: number;
+  fastestLap?: boolean;
 }
 
 export interface PastRaceResult {

@@ -4,7 +4,7 @@ import { toggleOfficialResults } from '../store/slices/gridSlice';
 import { calculateResults } from '../store/slices/resultsSlice';
 import { fetchSeasonData } from '../store/slices/seasonDataSlice';
 import { RootState } from '../store';
-import { CURRENT_SEASON } from '../utils/constants';
+import { getActiveSeason } from '../utils/constants';
 import { useAppDispatch } from '../store';
 
 export const useRaceResults = () => {
@@ -12,7 +12,7 @@ export const useRaceResults = () => {
   const pastResults = useSelector((state: RootState) => state.seasonData.pastResults);
 
   useEffect(() => {
-    dispatch(fetchSeasonData(CURRENT_SEASON));
+    dispatch(fetchSeasonData(getActiveSeason()));
   }, [dispatch]);
 
   useEffect(() => {

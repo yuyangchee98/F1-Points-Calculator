@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { ResultsState, DriverStanding, TeamStanding, PointsHistory, TeamPointsHistory } from '../../types';
 import { RootState } from '../index';
 import { getPointsForPositionWithSystem } from '../../data/pointsSystems';
+import { hasFastestLapPoint, getActiveSeason } from '../../utils/constants';
 
 const initialState: ResultsState = {
   driverStandings: [],
@@ -58,7 +59,12 @@ const calculatePoints = (filterOfficialOnly: boolean) => {
 
     racePositions.forEach(position => {
       if (position.driverId) {
-        const pointsForPosition = getPointsForPositionWithSystem(position.position, race.isSprint, selectedPointsSystem);
+        let pointsForPosition = getPointsForPositionWithSystem(position.position, race.isSprint, selectedPointsSystem);
+
+        // Add fastest lap bonus (only for 2019-2024, only if driver finishes in top 10)
+        if (hasFastestLapPoint(getActiveSeason()) && position.hasFastestLap && position.position >= 1 && position.position <= 10) {
+          pointsForPosition += 1;
+        }
 
         if (!driverPoints[position.driverId]) {
           driverPoints[position.driverId] = 0;

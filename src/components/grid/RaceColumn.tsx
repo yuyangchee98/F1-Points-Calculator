@@ -5,7 +5,7 @@ import { RootState } from '../../store';
 import { selectDriverAtPosition, selectDriversByIdMap, getDriverLastName, getDriverDisplayName } from '../../store/selectors/dataSelectors';
 import DriverCard from '../drivers/DriverCard';
 import { selectDriver, copyDriver } from '../../store/slices/uiSlice';
-import { placeDriver, clearPosition, fillRestOfSeason, resetGrid, clearEverything } from '../../store/slices/gridSlice';
+import { placeDriver, clearPosition, fillRestOfSeason, resetGrid, clearEverything, setFastestLap } from '../../store/slices/gridSlice';
 import { calculateResults } from '../../store/slices/resultsSlice';
 import { useAppDispatch } from '../../store';
 import { useDriverDrop } from '../../hooks/useDriverDragDrop';
@@ -14,6 +14,7 @@ import ContextMenu from '../common/ContextMenu';
 import { ContextMenuItem } from '../../types/contextMenu';
 import { toastService } from '../common/ToastContainer';
 import { trackContextMenuAction } from '../../utils/analytics';
+import { hasFastestLapPoint, getActiveSeason } from '../../utils/constants';
 
 interface RaceColumnProps {
   race: Race;
@@ -61,6 +62,8 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
   const buildContextMenuItems = (): ContextMenuItem[] => {
     const items: ContextMenuItem[] = [];
 
+    console.log(`[RaceColumn] Building context menu for ${race.id} P${position}, isOfficialResult: ${isOfficialResult}, season: ${getActiveSeason()}, hasFastestLapPoint: ${hasFastestLapPoint(getActiveSeason())}`);
+
     if (driverId && driver) {
       items.push({
         id: 'copy',
@@ -85,6 +88,31 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
             trackContextMenuAction('ACTION', 'remove_driver');
           },
         });
+
+        // Add fastest lap option if season supports it
+        if (hasFastestLapPoint(getActiveSeason())) {
+          const hasFastestLap = gridPosition?.hasFastestLap || false;
+          console.log(`[RaceColumn] Adding fastest lap menu item for ${driver.id} at ${race.id} P${position}, hasFastestLap: ${hasFastestLap}`);
+          items.push({
+            id: 'fastest-lap',
+            label: hasFastestLap ? 'Remove Fastest Lap' : 'Set Fastest Lap',
+            icon: '⚡',
+            onClick: () => {
+              dispatch(setFastestLap({
+                raceId: race.id,
+                driverId: hasFastestLap ? null : driverId
+              }));
+              dispatch(calculateResults());
+              toastService.addToast(
+                hasFastestLap
+                  ? `Removed fastest lap from ${getDriverDisplayName(driver)}`
+                  : `Set fastest lap for ${getDriverDisplayName(driver)}`,
+                'info'
+              );
+              trackContextMenuAction('ACTION', hasFastestLap ? 'remove_fastest_lap' : 'set_fastest_lap');
+            },
+          });
+        }
 
         items.push({
           id: 'fill-rest',

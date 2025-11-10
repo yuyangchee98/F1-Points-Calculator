@@ -9,7 +9,7 @@ export default defineConfig({
     react(),
     sitemap({
       hostname: 'https://f1pointscalculator.yaaaang.com',
-      dynamicRoutes: ['/'],
+      dynamicRoutes: ['/', '/2024.html'],
       changefreq: 'weekly',
       priority: 1.0,
       lastmod: new Date(),
@@ -30,6 +30,10 @@ export default defineConfig({
     // Chunk size warnings
     chunkSizeWarningLimit: 500,
     rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+        '2024': resolve(__dirname, '2024.html')
+      },
       output: {
         entryFileNames: 'assets/[name].[hash].js',
         chunkFileNames: 'assets/[name].[hash].js',
