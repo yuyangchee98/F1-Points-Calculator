@@ -20,7 +20,6 @@ import RaceGrid from './components/grid/RaceGrid';
 import InfoBanner from './components/common/InfoBanner';
 import IntroductionSection from './components/common/IntroductionSection';
 import ToastContainer from './components/common/ToastContainer';
-import SaveStatus from './components/common/SaveStatus';
 import HorizontalScrollBar from './components/common/HorizontalScrollBar';
 import FAQ from './components/common/FAQ';
 import SubscriptionModal from './components/common/SubscriptionModal';
@@ -134,8 +133,7 @@ const App: React.FC = () => {
     <DndProvider backend={HTML5Backend}>
       <div className="app min-h-screen">
         <ToastContainer />
-        <SaveStatus />
-        
+
         <Layout
           sidebar={<StandingsSidebar />}
           content={

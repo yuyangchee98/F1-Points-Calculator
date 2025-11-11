@@ -1,7 +1,5 @@
 import { Race } from '../types';
-import { COUNTRY_CODE_MAP } from '../utils/constants';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://f1-points-calculator-api.yuyangchee98.workers.dev';
+import { COUNTRY_CODE_MAP, API_BASE_URL } from '../utils/constants';
 
 interface RaceScheduleItem {
   id: string;
