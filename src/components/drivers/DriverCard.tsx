@@ -27,17 +27,11 @@ const DriverCard: React.FC<DriverCardProps> = ({
   overrideTeamId
 }) => {
   const teamById = useSelector(selectTeamsByIdMap);
-  const positions = useSelector((state: RootState) => state.grid.positions);
 
   const teamId = overrideTeamId || driver.team;
   const team = teamById[teamId];
 
   const { drag, isDragging } = useDriverDrag(driver.id, raceId, position);
-
-  // Check if this driver has the fastest lap for this race
-  const hasFastestLap = raceId && position
-    ? positions.find(p => p.raceId === raceId && p.position === position)?.hasFastestLap || false
-    : false;
 
   return (
     <div
