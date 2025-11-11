@@ -2,6 +2,8 @@ export const CURRENT_SEASON = new Date().getFullYear();
 
 export const getActiveSeason = () => window.INITIAL_YEAR || CURRENT_SEASON;
 
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 export const YEARS_WITH_FASTEST_LAP = [2019, 2020, 2021, 2022, 2023, 2024];
 
 export const hasFastestLapPoint = (year: number) =>

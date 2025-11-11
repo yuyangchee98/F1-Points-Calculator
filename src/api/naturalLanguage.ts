@@ -21,7 +21,7 @@ interface NaturalLanguageContext {
   driverTeams?: Record<string, string>;
 }
 
-const API_BASE_URL = 'https://f1-points-calculator-api.yuyangchee98.workers.dev';
+import { API_BASE_URL } from '../utils/constants';
 
 export async function parseNaturalLanguage(
   text: string, 

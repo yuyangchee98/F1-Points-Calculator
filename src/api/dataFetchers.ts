@@ -1,6 +1,5 @@
 import { Driver, Team, PastRaceResult } from '../types';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://f1-points-calculator-api.yuyangchee98.workers.dev';
+import { API_BASE_URL } from '../utils/constants';
 
 export async function fetchDrivers(year: number): Promise<Driver[]> {
   const response = await fetch(`${API_BASE_URL}/api/drivers/${year}`);
