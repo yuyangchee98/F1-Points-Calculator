@@ -3,8 +3,9 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { getBrowserFingerprint } from '../utils/fingerprint';
 import { savePrediction } from '../api/predictions';
-import { setFingerprint, setSaveStatus, setSaveInfo } from '../store/slices/predictionSlice';
+import { setFingerprint, setSaveInfo } from '../store/slices/predictionSlice';
 import { useAppDispatch } from '../store';
+import { toastService } from '../components/common/ToastContainer';
 
 export const useAutoSave = () => {
   const dispatch = useAppDispatch();
@@ -37,18 +38,19 @@ export const useAutoSave = () => {
     }
 
     try {
-      dispatch(setSaveStatus('saving'));
+      toastService.addToast('Saving predictions...', 'info', 2000, '#6b7280');
       const response = await savePrediction(fingerprint, positions, selectedPointsSystem);
-      
+
       if (response.success) {
         dispatch(setSaveInfo({
           timestamp: response.timestamp,
           version: response.version
         }));
         lastSavedDataRef.current = currentData;
+        toastService.addToast('Predictions saved ✓', 'success', 2000, '#10b981');
       }
     } catch (error) {
-      dispatch(setSaveStatus('error'));
+      toastService.addToast('Failed to save predictions', 'error', 3000, '#ef4444');
     }
   }, [fingerprint, positions, selectedPointsSystem, isDirty, dispatch]);
 
