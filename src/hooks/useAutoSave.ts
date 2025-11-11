@@ -50,7 +50,7 @@ export const useAutoSave = () => {
         toastService.addToast('Predictions saved ✓', 'success', 2000, '#10b981');
       }
     } catch (error) {
-      toastService.addToast('Failed to save predictions', 'error', 3000, '#ef4444');
+      toastService.addToast('Failed to save predictions', 'warning', 3000, '#ef4444');
     }
   }, [fingerprint, positions, selectedPointsSystem, isDirty, dispatch]);
 
