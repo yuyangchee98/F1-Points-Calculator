@@ -30,15 +30,18 @@ import RacendoPromo from './components/common/RacendoPromo';
 import GridSkeleton from './components/common/GridSkeleton';
 import DriverSelectionSkeleton from './components/common/DriverSelectionSkeleton';
 import SmartInputSkeleton from './components/common/SmartInputSkeleton';
+import DriverSelection from './components/drivers/DriverSelection';
+import SeasonSelector from './components/common/SeasonSelector';
 const SmartInputDemo = React.lazy(() => import('./components/common/SmartInputDemo'));
 import { useAppDispatch } from './store';
 import useWindowSize from './hooks/useWindowSize';
 import { trackBuyCoffeeClick, trackFeedbackClick, trackSmartInputAction, trackSmartInputCommand, GA_EVENTS, trackEvent, trackVersionHistoryAction, trackExportAction } from './utils/analytics';
-import { getActiveSeason } from './utils/constants';
+import { getActiveSeason, CURRENT_SEASON } from './utils/constants';
 
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
   const activeSeason = getActiveSeason();
+  const isHistoricalSeason = activeSeason < CURRENT_SEASON;
   useRaceResults();
   useAutoSave();
   const mobileView = useSelector((state: RootState) => state.ui.mobileView);
@@ -139,13 +142,15 @@ const App: React.FC = () => {
           content={
             <div className="px-4 py-6 max-w-5xl mx-auto">
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-                <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-gray-800 flex flex-wrap sm:flex-nowrap items-center">
-                  <span className="whitespace-nowrap">
-                    <span className="bg-red-600 text-white px-3 py-1 mr-3 rounded-md">F1</span>
-                    Championship Calculator
-                  </span>
-                  <span className="text-base sm:text-lg text-gray-500 ml-0 sm:ml-3 font-normal">{activeSeason} Season Predictor</span>
-                </h1>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                  <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-gray-800 flex flex-wrap sm:flex-nowrap items-center">
+                    <span className="whitespace-nowrap">
+                      <span className="bg-red-600 text-white px-3 py-1 mr-3 rounded-md">F1</span>
+                      Championship Calculator
+                    </span>
+                  </h1>
+                  <SeasonSelector />
+                </div>
                 <RacendoPromo className="self-start sm:self-center" />
               </div>
 
@@ -188,7 +193,10 @@ const App: React.FC = () => {
                   </>
                 ) : (
                   <>
-                <InputSections 
+                {isHistoricalSeason ? (
+                  <DriverSelection />
+                ) : (
+                <InputSections
                   smartInputFirst={smartInputFirst}
                   onSwap={handleSwapInputs}
                   smartInputContent={
@@ -401,6 +409,7 @@ const App: React.FC = () => {
                     </>
                   }
                 />
+                )}
 
                   <HorizontalScrollBar scrollContainerRef={raceGridScrollRef} />
                   <RaceGrid
