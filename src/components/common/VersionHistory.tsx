@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { getVersionHistory, deleteAllHistory, VersionSummary } from '../../api/predictions';
 import { trackVersionHistoryAction } from '../../utils/analytics';
+import { getActiveSeason } from '../../utils/constants';
 
 interface VersionHistoryProps {
   onClose: () => void;
@@ -12,6 +13,7 @@ interface VersionHistoryProps {
 const VersionHistory: React.FC<VersionHistoryProps> = ({ onClose, onLoadVersion }) => {
   const { fingerprint } = useSelector((state: RootState) => state.predictions);
   const races = useSelector((state: RootState) => state.seasonData.races);
+  const activeSeason = getActiveSeason();
   const [versions, setVersions] = useState<VersionSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedVersion, setSelectedVersion] = useState<string | null>(null);
@@ -23,13 +25,13 @@ const VersionHistory: React.FC<VersionHistoryProps> = ({ onClose, onLoadVersion 
 
     const loadHistory = async () => {
       setLoading(true);
-      const history = await getVersionHistory(fingerprint, 20);
+      const history = await getVersionHistory(fingerprint, 20, activeSeason);
       setVersions(history);
       setLoading(false);
     };
 
     loadHistory();
-  }, [fingerprint]);
+  }, [fingerprint, activeSeason]);
 
   const formatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp);
@@ -84,11 +86,11 @@ const VersionHistory: React.FC<VersionHistoryProps> = ({ onClose, onLoadVersion 
 
   const handleDeleteAll = async () => {
     if (!fingerprint) return;
-    
+
     setIsDeleting(true);
     try {
-      const success = await deleteAllHistory(fingerprint);
-      
+      const success = await deleteAllHistory(fingerprint, activeSeason);
+
       if (success) {
         setVersions([]);
         setShowDeleteConfirm(false);
