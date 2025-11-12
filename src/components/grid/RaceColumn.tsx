@@ -272,6 +272,7 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
   ].filter(Boolean).join(' ');
 
   const hasFastestLap = gridPosition?.hasFastestLap || false;
+  const shouldShowFastestLapBorder = hasFastestLap && hasFastestLapPoint(getActiveSeason());
 
   return (
     <>
@@ -287,7 +288,7 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
         role="button"
         aria-label={driver ? `Position ${position}: ${getDriverLastName(driver.id)}` : `Empty position ${position}`}
         tabIndex={0}
-        style={hasFastestLap ? { border: '3px solid #7D428E' } : undefined}
+        style={shouldShowFastestLapBorder ? { border: '3px solid #7D428E' } : undefined}
       >
         {driver && (
           <div className="animate-placement grid-card-wrapper">

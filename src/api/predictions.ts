@@ -6,6 +6,7 @@ export interface PredictionVersion {
   grid: GridPosition[];
   pointsSystem: string;
   schemaVersion?: number;
+  season: number;
 }
 
 export interface SaveResponse {
@@ -17,7 +18,8 @@ export interface SaveResponse {
 export async function savePrediction(
   fingerprint: string,
   grid: GridPosition[],
-  pointsSystem: string
+  pointsSystem: string,
+  season: number
 ): Promise<SaveResponse> {
   const response = await fetch(`${API_BASE_URL}/api/predictions/save`, {
     method: 'POST',
@@ -28,6 +30,7 @@ export async function savePrediction(
       fingerprint,
       grid,
       pointsSystem,
+      season,
     }),
   });
 
@@ -40,7 +43,8 @@ export async function savePrediction(
 
 export async function loadPrediction(
   fingerprint: string,
-  version?: string
+  version: string | undefined,
+  season: number
 ): Promise<PredictionVersion | null> {
   try {
     const response = await fetch(`${API_BASE_URL}/api/predictions/load`, {
@@ -51,6 +55,7 @@ export async function loadPrediction(
       body: JSON.stringify({
         fingerprint,
         version,
+        season,
       }),
     });
 
@@ -80,11 +85,13 @@ export interface VersionSummary {
   changeCount: number;
   races: string[];
   changes?: DriverChange[];
+  season: number;
 }
 
 export async function getVersionHistory(
   fingerprint: string,
-  limit?: number
+  limit: number | undefined,
+  season: number
 ): Promise<VersionSummary[]> {
   try {
     const response = await fetch(`${API_BASE_URL}/api/predictions/history`, {
@@ -95,6 +102,7 @@ export async function getVersionHistory(
       body: JSON.stringify({
         fingerprint,
         limit,
+        season,
       }),
     });
 
@@ -109,14 +117,14 @@ export async function getVersionHistory(
   }
 }
 
-export async function deleteAllHistory(fingerprint: string): Promise<boolean> {
+export async function deleteAllHistory(fingerprint: string, season: number): Promise<boolean> {
   try {
     const response = await fetch(`${API_BASE_URL}/api/predictions/delete-history`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ fingerprint }),
+      body: JSON.stringify({ fingerprint, season }),
     });
     return response.ok;
   } catch (error) {
