@@ -88,7 +88,7 @@ const App: React.FC = () => {
     if (!fingerprint) return;
 
     try {
-      const prediction = await loadPrediction(fingerprint, version);
+      const prediction = await loadPrediction(fingerprint, version, activeSeason);
       if (prediction && prediction.grid) {
         dispatch(resetGrid());
 

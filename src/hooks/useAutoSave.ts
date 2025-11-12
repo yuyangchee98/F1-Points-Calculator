@@ -6,6 +6,7 @@ import { savePrediction } from '../api/predictions';
 import { setFingerprint, setSaveInfo } from '../store/slices/predictionSlice';
 import { useAppDispatch } from '../store';
 import { toastService } from '../components/common/ToastContainer';
+import { getActiveSeason } from '../utils/constants';
 
 export const useAutoSave = () => {
   const dispatch = useAppDispatch();
@@ -32,14 +33,15 @@ export const useAutoSave = () => {
   const save = useCallback(async () => {
     if (!fingerprint || !isDirty) return;
 
-    const currentData = JSON.stringify({ positions, selectedPointsSystem });
+    const activeSeason = getActiveSeason();
+    const currentData = JSON.stringify({ positions, selectedPointsSystem, season: activeSeason });
     if (currentData === lastSavedDataRef.current) {
       return;
     }
 
     try {
       toastService.addToast('Saving predictions...', 'info', 2000, '#6b7280');
-      const response = await savePrediction(fingerprint, positions, selectedPointsSystem);
+      const response = await savePrediction(fingerprint, positions, selectedPointsSystem, activeSeason);
 
       if (response.success) {
         dispatch(setSaveInfo({
