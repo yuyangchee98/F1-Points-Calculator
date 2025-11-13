@@ -9,11 +9,15 @@ export default defineConfig({
     react(),
     sitemap({
       hostname: 'https://f1pointscalculator.yaaaang.com',
-      dynamicRoutes: ['/', '/2024.html'],
       changefreq: 'weekly',
       priority: 1.0,
       lastmod: new Date(),
-      generateRobotsTxt: false // Don't generate robots.txt - we have one in public folder
+      generateRobotsTxt: false,
+      // Manually specify routes with .html extensions
+      routes: [
+        '/',
+        '/2024.html'
+      ]
     })
   ],
   build: {
