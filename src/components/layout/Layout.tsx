@@ -5,6 +5,7 @@ import MobileNavigation from '../navigation/MobileNavigation';
 import useWindowSize from '../../hooks/useWindowSize';
 import { setMobileView } from '../../store/slices/uiSlice';
 import { useAppDispatch } from '../../store';
+import { getActiveSeason } from '../../utils/constants';
 
 interface LayoutProps {
   sidebar: ReactNode;
@@ -17,6 +18,7 @@ const Layout: React.FC<LayoutProps> = ({ sidebar, content }) => {
   const { isMobile } = useWindowSize();
 
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const activeSeason = getActiveSeason();
 
   const SIDEBAR_COLLAPSED_KEY = 'f1-calc-sidebar-collapsed';
 
@@ -108,6 +110,30 @@ const Layout: React.FC<LayoutProps> = ({ sidebar, content }) => {
                 <h3 className="text-lg font-medium mb-3">F1 Points Calculator</h3>
                 <p className="text-sm text-gray-400 mb-2">Created by <a href="https://yaaaang.com" className="text-gray-300 hover:text-white" target="_blank" rel="noopener noreferrer">Chyuang</a></p>
                 <p className="text-sm text-gray-400 mb-2"><a href="https://github.com/yuyangchee98/F1-Points-Calculator" className="text-gray-300 hover:text-white" target="_blank" rel="noopener noreferrer">Open source on GitHub</a></p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-medium mb-3">Seasons</h3>
+                <ul className="text-sm text-gray-400 space-y-1">
+                  <li>
+                    <a
+                      href="/"
+                      className={`${activeSeason === 2025 ? 'text-white font-medium' : 'text-gray-300 hover:text-white'}`}
+                      aria-current={activeSeason === 2025 ? 'page' : undefined}
+                    >
+                      2025 Season
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="/2024"
+                      className={`${activeSeason === 2024 ? 'text-white font-medium' : 'text-gray-300 hover:text-white'}`}
+                      aria-current={activeSeason === 2024 ? 'page' : undefined}
+                    >
+                      2024 Season
+                    </a>
+                  </li>
+                </ul>
               </div>
 
               <div>

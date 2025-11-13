@@ -30,8 +30,8 @@ const SeasonSelector: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleSelectSeason = (year: number) => {
-    window.location.href = year === CURRENT_SEASON ? '/' : `/${year}.html`;
+  const getSeasonUrl = (year: number): string => {
+    return year === CURRENT_SEASON ? '/' : `/${year}`;
   };
 
   return (
@@ -62,12 +62,13 @@ const SeasonSelector: React.FC = () => {
              }}>
           <div className="py-1">
             {SEASONS.map(season => (
-              <button
+              <a
                 key={season.year}
-                onClick={() => handleSelectSeason(season.year)}
-                className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors ${
+                href={getSeasonUrl(season.year)}
+                className={`block w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors ${
                   season.year === activeSeason ? 'bg-red-50' : ''
                 }`}
+                aria-current={season.year === activeSeason ? 'page' : undefined}
               >
                 <div className="font-medium text-gray-900 flex items-center justify-between">
                   <span>{season.label}</span>
@@ -87,7 +88,7 @@ const SeasonSelector: React.FC = () => {
                     ? 'View completed season results and explore what-if scenarios'
                     : 'Active season - predict upcoming race outcomes'}
                 </div>
-              </button>
+              </a>
             ))}
           </div>
         </div>
