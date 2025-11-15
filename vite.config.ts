@@ -16,7 +16,8 @@ export default defineConfig({
       // Manually specify routes with .html extensions
       routes: [
         '/',
-        '/2024.html'
+        '/2024.html',
+        '/2023.html'
       ]
     })
   ],
@@ -36,7 +37,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
-        '2024': resolve(__dirname, '2024.html')
+        '2024': resolve(__dirname, '2024.html'),
+        '2023': resolve(__dirname, '2023.html')
       },
       output: {
         entryFileNames: 'assets/[name].[hash].js',
