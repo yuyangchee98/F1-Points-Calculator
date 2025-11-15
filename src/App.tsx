@@ -141,39 +141,43 @@ const App: React.FC = () => {
           sidebar={<StandingsSidebar />}
           content={
             <div className="px-4 py-6 max-w-5xl mx-auto">
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                  <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-gray-800 flex flex-wrap sm:flex-nowrap items-center">
-                    <span className="whitespace-nowrap">
-                      <span className="bg-red-600 text-white px-3 py-1 mr-3 rounded-md">F1</span>
-                      Championship Calculator
-                    </span>
-                  </h1>
-                  <SeasonSelector />
-                </div>
-                <RacendoPromo className="self-start sm:self-center" />
-              </div>
+              <div className="mb-3">
+                {/* Row 1: Title */}
+                <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-gray-800 flex items-center mb-2 sm:mb-3">
+                  <span className="bg-red-600 text-white px-2 py-0.5 sm:px-3 sm:py-1 mr-2 sm:mr-3 rounded-md text-base sm:text-xl">F1</span>
+                  <span>Points Calculator</span>
+                </h1>
 
-              <div className="mb-8 flex flex-wrap gap-4">
-                <a 
-                  href="https://buymeacoffee.com/yaang" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="inline-block py-2 sm:py-3 px-4 sm:px-6 bg-red-600 text-white font-bold rounded-md shadow-lg hover:bg-red-700 transition-colors duration-200"
-                  onClick={trackBuyCoffeeClick}
-                >
-                  <span className="mr-2">🔴</span> Buy Chyuang a soft tyre
-                </a>
-                
-                <a 
-                  href="https://github.com/yuyangchee98/F1-Points-Calculator/issues" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="inline-block py-2 sm:py-3 px-4 sm:px-6 bg-gray-700 text-white font-bold rounded-md shadow-lg hover:bg-gray-800 transition-colors duration-200"
-                  onClick={trackFeedbackClick}
-                >
-                  <span className="mr-2">💬</span> Feature Requests / Report Bugs
-                </a>
+                {/* Row 2: Buttons + Season Selector + Racendo */}
+                <div className="flex flex-wrap items-center gap-2">
+                  <a
+                    href="https://buymeacoffee.com/yaang"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center py-1.5 px-2.5 sm:py-3 sm:px-6 bg-red-600 text-white font-bold rounded-md shadow-lg hover:bg-red-700 transition-colors duration-200 text-xs sm:text-base whitespace-nowrap"
+                    onClick={trackBuyCoffeeClick}
+                  >
+                    <span className="mr-1 sm:mr-2">🔴</span>
+                    <span className="sm:hidden">Support</span>
+                    <span className="hidden sm:inline">Buy Chyuang a soft tyre</span>
+                  </a>
+
+                  <a
+                    href="https://github.com/yuyangchee98/F1-Points-Calculator/issues"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center py-1.5 px-2.5 sm:py-3 sm:px-6 bg-gray-700 text-white font-bold rounded-md shadow-lg hover:bg-gray-800 transition-colors duration-200 text-xs sm:text-base whitespace-nowrap"
+                    onClick={trackFeedbackClick}
+                  >
+                    <span className="mr-1 sm:mr-2">💬</span>
+                    <span className="sm:hidden">Feedback</span>
+                    <span className="hidden sm:inline">Feature Requests / Report Bugs</span>
+                  </a>
+
+                  <SeasonSelector />
+
+                  <RacendoPromo className="hidden sm:block ml-auto" />
+                </div>
               </div>
 
               <div className={`mb-6 transition-all duration-300 ${statusMessage ? 'p-4 bg-blue-50 border border-blue-200 rounded-lg' : 'h-0 overflow-hidden'}`}>
