@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { getActiveSeason, CURRENT_SEASON } from '../../utils/constants';
 
 interface Season {
@@ -61,9 +62,9 @@ const SeasonSelector: React.FC = () => {
         <div className="absolute z-20 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl w-full sm:w-64 left-0 sm:left-auto sm:right-0 min-w-[200px]">
           <div className="py-1">
             {SEASONS.map(season => (
-              <a
+              <Link
                 key={season.year}
-                href={getSeasonUrl(season.year)}
+                to={getSeasonUrl(season.year)}
                 className={`block w-full px-3 py-2 sm:px-4 sm:py-3 text-left hover:bg-gray-50 transition-colors ${
                   season.year === activeSeason ? 'bg-red-50' : ''
                 }`}
@@ -87,7 +88,7 @@ const SeasonSelector: React.FC = () => {
                     ? 'View completed season results and explore what-if scenarios'
                     : 'Active season - predict upcoming race outcomes'}
                 </div>
-              </a>
+              </Link>
             ))}
           </div>
         </div>
