@@ -133,6 +133,24 @@ const Layout: React.FC<LayoutProps> = ({ sidebar, content }) => {
                       2024 Season
                     </a>
                   </li>
+                  <li>
+                    <a
+                      href="/2023"
+                      className={`${activeSeason === 2023 ? 'text-white font-medium' : 'text-gray-300 hover:text-white'}`}
+                      aria-current={activeSeason === 2023 ? 'page' : undefined}
+                    >
+                      2023 Season
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="/2022"
+                      className={`${activeSeason === 2022 ? 'text-white font-medium' : 'text-gray-300 hover:text-white'}`}
+                      aria-current={activeSeason === 2022 ? 'page' : undefined}
+                    >
+                      2022 Season
+                    </a>
+                  </li>
                 </ul>
               </div>
 
