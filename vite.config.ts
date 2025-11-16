@@ -17,7 +17,8 @@ export default defineConfig({
       routes: [
         '/',
         '/2024.html',
-        '/2023.html'
+        '/2023.html',
+        '/2022.html'
       ]
     })
   ],
@@ -38,7 +39,8 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'index.html'),
         '2024': resolve(__dirname, '2024.html'),
-        '2023': resolve(__dirname, '2023.html')
+        '2023': resolve(__dirname, '2023.html'),
+        '2022': resolve(__dirname, '2022.html')
       },
       output: {
         entryFileNames: 'assets/[name].[hash].js',
