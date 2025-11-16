@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { Link, useParams } from 'react-router-dom';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { initializeUiState, setMobileView, toggleOfficialResults as toggleOfficialResultsUI } from './store/slices/uiSlice';
@@ -18,10 +19,8 @@ import Layout from './components/layout/Layout';
 import StandingsSidebar from './components/standings/StandingsSidebar';
 import RaceGrid from './components/grid/RaceGrid';
 import InfoBanner from './components/common/InfoBanner';
-import IntroductionSection from './components/common/IntroductionSection';
 import ToastContainer from './components/common/ToastContainer';
 import HorizontalScrollBar from './components/common/HorizontalScrollBar';
-import FAQ from './components/common/FAQ';
 import SubscriptionModal from './components/common/SubscriptionModal';
 import VersionHistory from './components/common/VersionHistory';
 import ExportModal from './components/common/ExportModal';
@@ -40,6 +39,17 @@ import { getActiveSeason, CURRENT_SEASON } from './utils/constants';
 
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
+  const { year } = useParams<{ year?: string }>();
+
+  // Set window.INITIAL_YEAR from URL params
+  useEffect(() => {
+    if (year) {
+      (window as any).INITIAL_YEAR = parseInt(year, 10);
+    } else {
+      delete (window as any).INITIAL_YEAR;
+    }
+  }, [year]);
+
   const activeSeason = getActiveSeason();
   const isHistoricalSeason = activeSeason < CURRENT_SEASON;
   useRaceResults();
@@ -433,12 +443,8 @@ const App: React.FC = () => {
                 </>
               )}
               </div>
-              
+
               <InfoBanner />
-
-              <IntroductionSection />
-
-              <FAQ />
             </div>
           }
         />
@@ -461,6 +467,28 @@ const App: React.FC = () => {
           isOpen={showExport}
           onClose={() => setShowExport(false)}
         />
+
+        {/* Floating Help Button */}
+        <Link
+          to="/about"
+          className="fixed top-4 right-4 z-50 w-10 h-10 sm:w-12 sm:h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110"
+          aria-label="About and FAQ"
+          title="About & FAQ"
+        >
+          <svg
+            className="w-6 h-6 sm:w-7 sm:h-7"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        </Link>
       </div>
     </DndProvider>
   );
