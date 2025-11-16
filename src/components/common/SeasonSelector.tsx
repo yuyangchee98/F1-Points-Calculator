@@ -10,7 +10,8 @@ interface Season {
 const SEASONS: Season[] = [
   { year: 2025, label: '2025 Season', isHistorical: false },
   { year: 2024, label: '2024 Season', isHistorical: true },
-  { year: 2023, label: '2023 Season', isHistorical: true }
+  { year: 2023, label: '2023 Season', isHistorical: true },
+  { year: 2022, label: '2022 Season', isHistorical: true }
 ];
 
 const SeasonSelector: React.FC = () => {

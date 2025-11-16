@@ -7,17 +7,8 @@ export default {
   theme: {
     extend: {
       colors: {
-        // F1 team colors
-        'mercedes': '#00D2BE',
-        'redbull': '#0600EF',
-        'ferrari': '#DC0000',
-        'mclaren': '#FF8700',
-        'astonmartin': '#006F62',
-        'alpine': '#0090FF',
-        'sauber': '#C00000',
-        'racingbulls': '#2B4562',
-        'williams': '#005AFF',
-        'haas': '#E6002B',
+        // NOTE: Team colors are defined in the API (metadata.ts) as single source of truth
+        // These are only kept for potential future use with Tailwind utility classes
       },
     },
   },
