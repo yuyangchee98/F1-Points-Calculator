@@ -18,7 +18,6 @@ import { useUserEmail } from './hooks/useUserEmail';
 import Layout from './components/layout/Layout';
 import StandingsSidebar from './components/standings/StandingsSidebar';
 import RaceGrid from './components/grid/RaceGrid';
-import InfoBanner from './components/common/InfoBanner';
 import ToastContainer from './components/common/ToastContainer';
 import HorizontalScrollBar from './components/common/HorizontalScrollBar';
 import SubscriptionModal from './components/common/SubscriptionModal';
@@ -443,8 +442,6 @@ const App: React.FC = () => {
                 </>
               )}
               </div>
-
-              <InfoBanner />
             </div>
           }
         />
