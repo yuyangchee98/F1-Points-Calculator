@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { getActiveSeason, CURRENT_SEASON } from '../../utils/constants';
+import { CURRENT_SEASON } from '../../utils/constants';
 
 interface Season {
   year: number;

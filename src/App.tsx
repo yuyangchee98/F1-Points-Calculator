@@ -34,7 +34,7 @@ const SmartInputDemo = React.lazy(() => import('./components/common/SmartInputDe
 import { useAppDispatch } from './store';
 import useWindowSize from './hooks/useWindowSize';
 import { trackBuyCoffeeClick, trackFeedbackClick, trackSmartInputAction, trackSmartInputCommand, GA_EVENTS, trackEvent, trackVersionHistoryAction, trackExportAction } from './utils/analytics';
-import { getActiveSeason, CURRENT_SEASON } from './utils/constants';
+import { CURRENT_SEASON } from './utils/constants';
 
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
