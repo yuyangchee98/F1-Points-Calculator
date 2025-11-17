@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSkeletonCounts } from '../../hooks/useSkeletonCounts';
 
 const DriverSelectionSkeleton: React.FC = () => {
   const { drivers } = useSkeletonCounts();
+  const [isExpanded, setIsExpanded] = useState(false);
 
   return (
     <div className="mb-6">
@@ -12,8 +13,13 @@ const DriverSelectionSkeleton: React.FC = () => {
       </div>
 
       <div
-        className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4
-                   p-4 bg-gray-50 rounded-lg shadow-sm border border-gray-200"
+        className={`
+          grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4
+          ${isExpanded ? 'max-h-[800px]' : 'max-h-0 sm:max-h-[800px]'}
+          overflow-hidden transition-all duration-300 ease-in-out
+          sm:overflow-visible sm:max-h-full
+          p-4 bg-gray-50 rounded-lg shadow-sm border border-gray-200
+        `}
       >
         {Array.from({ length: drivers }).map((_, index) => (
           <div
