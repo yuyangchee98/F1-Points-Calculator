@@ -314,4 +314,4 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
   );
 };
 
-export default RaceColumn;
+export default React.memo(RaceColumn);
