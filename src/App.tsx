@@ -225,7 +225,7 @@ const App: React.FC = () => {
               <div className={`${(mobileView === 'grid' || !isMobile) ? 'block' : 'hidden'}`}>
                 {isLoading ? (
                   <>
-                    <SmartInputSkeleton />
+                    {!isHistoricalSeason && <SmartInputSkeleton />}
                     <DriverSelectionSkeleton />
                     <GridSkeleton />
                   </>
