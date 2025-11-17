@@ -31,7 +31,7 @@ const PositionColumn: React.FC<PositionColumnProps> = ({ position, mode = 'posit
           <span className="text-[10px] text-gray-500 font-semibold">{position}</span>
           {driver && (
             <>
-              <span 
+              <span
                 className="text-xs font-bold"
                 style={{ color: teamColor }}
               >
@@ -48,4 +48,4 @@ const PositionColumn: React.FC<PositionColumnProps> = ({ position, mode = 'posit
   );
 };
 
-export default PositionColumn;
+export default React.memo(PositionColumn);
