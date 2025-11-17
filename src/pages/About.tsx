@@ -29,9 +29,10 @@ const About: React.FC = () => {
           </Link>
         </div>
 
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-6">
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-6 flex items-center flex-wrap">
           <span className="bg-red-600 text-white px-3 py-1 mr-3 rounded-md">F1</span>
-          About & FAQ
+          <span className="mr-3">Points Calculator</span>
+          <span className="text-gray-600">- About & FAQ</span>
         </h1>
 
         <IntroductionSection />
