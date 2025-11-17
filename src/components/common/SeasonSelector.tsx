@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { getActiveSeason, CURRENT_SEASON } from '../../utils/constants';
 
 interface Season {
@@ -16,7 +16,8 @@ const SEASONS: Season[] = [
 ];
 
 const SeasonSelector: React.FC = () => {
-  const activeSeason = getActiveSeason();
+  const { year } = useParams<{ year?: string }>();
+  const activeSeason = year ? parseInt(year, 10) : CURRENT_SEASON;
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
