@@ -18,7 +18,8 @@ export default defineConfig({
         '/',
         '/2024.html',
         '/2023.html',
-        '/2022.html'
+        '/2022.html',
+        '/about.html'
       ]
     })
   ],
@@ -40,7 +41,8 @@ export default defineConfig({
         main: resolve(__dirname, 'index.html'),
         '2024': resolve(__dirname, '2024.html'),
         '2023': resolve(__dirname, '2023.html'),
-        '2022': resolve(__dirname, '2022.html')
+        '2022': resolve(__dirname, '2022.html'),
+        'about': resolve(__dirname, 'about.html')
       },
       output: {
         entryFileNames: 'assets/[name].[hash].js',
