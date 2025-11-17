@@ -4,7 +4,6 @@ import { toggleOfficialResults } from '../store/slices/gridSlice';
 import { calculateResults } from '../store/slices/resultsSlice';
 import { fetchSeasonData } from '../store/slices/seasonDataSlice';
 import { RootState } from '../store';
-import { getActiveSeason } from '../utils/constants';
 import { useAppDispatch } from '../store';
 
 export const useRaceResults = (season: number) => {

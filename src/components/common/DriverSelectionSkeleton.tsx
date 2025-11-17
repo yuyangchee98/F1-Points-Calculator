@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useSkeletonCounts } from '../../hooks/useSkeletonCounts';
 
 const DriverSelectionSkeleton: React.FC = () => {
   const { drivers } = useSkeletonCounts();
-  const [isExpanded, setIsExpanded] = useState(false);
+  // Skeleton starts collapsed on mobile to match actual component behavior
+  const isExpanded = false;
 
   return (
     <div className="mb-6">
