@@ -238,9 +238,10 @@ export const gridSlice = createSlice({
     builder.addCase(fetchSeasonData.fulfilled, (state, action) => {
       const { schedule } = action.payload;
 
-      if (state.positions.length === 0) {
-        state.positions = initializeGridPositions(schedule);
-      }
+      console.log('[gridSlice] fetchSeasonData.fulfilled - reinitializing grid with', schedule.length, 'races');
+      // Always reinitialize grid when season data loads to ensure proper season switching
+      state.positions = initializeGridPositions(schedule);
+      console.log('[gridSlice] Grid reinitialized, positions count:', state.positions.length);
     });
   }
 });
