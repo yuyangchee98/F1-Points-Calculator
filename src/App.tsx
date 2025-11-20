@@ -40,19 +40,13 @@ const App: React.FC = () => {
   const dispatch = useAppDispatch();
   const { year } = useParams<{ year?: string }>();
 
-  // Derive active season directly from URL params (reactive to route changes)
   const activeSeason = year ? parseInt(year, 10) : CURRENT_SEASON;
-  console.log('[App] Active season from URL params:', activeSeason);
 
-  // Set window.INITIAL_YEAR from URL params for backward compatibility
   useEffect(() => {
-    console.log('[App] URL year param changed:', year);
     if (year) {
       (window as any).INITIAL_YEAR = parseInt(year, 10);
-      console.log('[App] Set window.INITIAL_YEAR to:', parseInt(year, 10));
     } else {
       delete (window as any).INITIAL_YEAR;
-      console.log('[App] Deleted window.INITIAL_YEAR (current season)');
     }
   }, [year]);
   const isHistoricalSeason = activeSeason < CURRENT_SEASON;

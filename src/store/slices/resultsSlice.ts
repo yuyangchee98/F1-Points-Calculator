@@ -61,7 +61,6 @@ const calculatePoints = (filterOfficialOnly: boolean) => {
       if (position.driverId) {
         let pointsForPosition = getPointsForPositionWithSystem(position.position, race.isSprint, selectedPointsSystem);
 
-        // Add fastest lap bonus (only for 2019-2024, only in main races (not sprints), only if driver finishes in top 10)
         if (!race.isSprint && hasFastestLapPoint(getActiveSeason()) && position.hasFastestLap && position.position >= 1 && position.position <= 10) {
           pointsForPosition += 1;
         }

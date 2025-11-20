@@ -74,7 +74,6 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
         },
       });
 
-      // Add fastest lap option if season supports it and driver doesn't already have it
       if (hasFastestLapPoint(getActiveSeason())) {
         const hasFastestLap = gridPosition?.hasFastestLap || false;
         if (!hasFastestLap) {
