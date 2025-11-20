@@ -19,7 +19,6 @@ export const useSkeletonCounts = (): SkeletonCounts => {
       }
     }
   } catch (error) {
-    console.warn('Failed to load skeleton counts from cache:', error);
   }
 
   return SKELETON_CONFIG;

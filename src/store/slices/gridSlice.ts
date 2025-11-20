@@ -52,20 +52,17 @@ export const gridSlice = createSlice({
 
         if (sourcePositionIndex !== -1) {
           if (state.positions[sourcePositionIndex].driverId === driverId) {
-            // Set target position as a new prediction (clear metadata)
             state.positions[targetPositionIndex].driverId = driverId;
             state.positions[targetPositionIndex].isOfficialResult = false;
             state.positions[targetPositionIndex].teamId = undefined;
             state.positions[targetPositionIndex].hasFastestLap = false;
 
             if (displacedDriverId && displacedDriverId !== driverId && fromRaceId === toRaceId) {
-              // Set source position with displaced driver as a new prediction (clear metadata)
               state.positions[sourcePositionIndex].driverId = displacedDriverId;
               state.positions[sourcePositionIndex].isOfficialResult = false;
               state.positions[sourcePositionIndex].teamId = undefined;
               state.positions[sourcePositionIndex].hasFastestLap = false;
             } else {
-              // Clear source position completely
               state.positions[sourcePositionIndex].driverId = null;
               state.positions[sourcePositionIndex].isOfficialResult = false;
               state.positions[sourcePositionIndex].teamId = undefined;
@@ -74,7 +71,6 @@ export const gridSlice = createSlice({
           }
         }
       } else {
-        // Placing from driver list - clear target metadata
         state.positions[targetPositionIndex].driverId = driverId;
         state.positions[targetPositionIndex].isOfficialResult = false;
         state.positions[targetPositionIndex].teamId = undefined;
@@ -98,7 +94,6 @@ export const gridSlice = createSlice({
       );
 
       if (positionIndex !== -1) {
-        // Clear metadata when placing a driver (treat as new prediction)
         state.positions[positionIndex].driverId = driverId;
         state.positions[positionIndex].isOfficialResult = false;
         state.positions[positionIndex].teamId = undefined;
@@ -216,14 +211,12 @@ export const gridSlice = createSlice({
     setFastestLap: (state, action: PayloadAction<{ raceId: string; driverId: string | null }>) => {
       const { raceId, driverId } = action.payload;
 
-      // Remove fastest lap from all drivers in this race
       state.positions.forEach(pos => {
         if (pos.raceId === raceId) {
           pos.hasFastestLap = false;
         }
       });
 
-      // Set fastest lap for specified driver (if any)
       if (driverId) {
         const targetPosition = state.positions.find(
           p => p.raceId === raceId && p.driverId === driverId
@@ -238,10 +231,7 @@ export const gridSlice = createSlice({
     builder.addCase(fetchSeasonData.fulfilled, (state, action) => {
       const { schedule } = action.payload;
 
-      console.log('[gridSlice] fetchSeasonData.fulfilled - reinitializing grid with', schedule.length, 'races');
-      // Always reinitialize grid when season data loads to ensure proper season switching
       state.positions = initializeGridPositions(schedule);
-      console.log('[gridSlice] Grid reinitialized, positions count:', state.positions.length);
     });
   }
 });
