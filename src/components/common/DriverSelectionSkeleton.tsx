@@ -3,7 +3,6 @@ import { useSkeletonCounts } from '../../hooks/useSkeletonCounts';
 
 const DriverSelectionSkeleton: React.FC = () => {
   const { drivers } = useSkeletonCounts();
-  // Skeleton starts collapsed on mobile to match actual component behavior
   const isExpanded = false;
 
   return (
