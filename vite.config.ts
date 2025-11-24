@@ -3,8 +3,43 @@ import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
 import sitemap from 'vite-plugin-sitemap'
 
+// Generate race URLs from API
+async function generateRaceUrls(): Promise<string[]> {
+  const baseUrls = [
+    '/',
+    '/2024.html',
+    '/2023.html',
+    '/2022.html',
+    '/about.html'
+  ];
+
+  const years = [2022, 2023, 2024];
+  const API_BASE = 'https://f1-points-calculator-api.yuyangchee98.workers.dev';
+
+  try {
+    for (const year of years) {
+      console.log(`Fetching schedule for ${year}...`);
+      const response = await fetch(`${API_BASE}/api/schedule/${year}`);
+      if (response.ok) {
+        const races = await response.json();
+        console.log(`Found ${races.length} races for ${year}`);
+        races.forEach((race: { id: string }) => {
+          baseUrls.push(`/race/${year}/${race.id}`);
+        });
+      } else {
+        console.error(`Failed to fetch ${year}: ${response.status}`);
+      }
+    }
+  } catch (error) {
+    console.error('Failed to fetch race schedules for sitemap:', error);
+  }
+
+  console.log(`Total URLs generated: ${baseUrls.length}`);
+  return baseUrls;
+}
+
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(async () => ({
   plugins: [
     react(),
     sitemap({
@@ -13,14 +48,7 @@ export default defineConfig({
       priority: 1.0,
       lastmod: new Date(),
       generateRobotsTxt: false,
-      // Manually specify routes with .html extensions
-      routes: [
-        '/',
-        '/2024.html',
-        '/2023.html',
-        '/2022.html',
-        '/about.html'
-      ]
+      dynamicRoutes: await generateRaceUrls()
     })
   ],
   build: {
@@ -70,4 +98,4 @@ export default defineConfig({
       '@': resolve(__dirname, 'src')
     }
   }
-})
+}))

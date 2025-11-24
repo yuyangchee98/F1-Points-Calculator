@@ -6,3 +6,4 @@ automatic-updates/*
 .vite
 dist/*
 .claude
+.wrangler
