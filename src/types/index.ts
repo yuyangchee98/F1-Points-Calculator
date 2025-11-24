@@ -41,6 +41,7 @@ export interface DriverStanding {
   position: number;
   predictionPointsGained: number;
   positionChange: number;
+  finishCounts: number[]; // Index 0 = 1st place wins, 1 = 2nd places, etc.
 }
 
 export interface TeamStanding {
@@ -49,6 +50,7 @@ export interface TeamStanding {
   position: number;
   predictionPointsGained: number;
   positionChange: number;
+  finishCounts: number[]; // Index 0 = 1st place wins, 1 = 2nd places, etc.
 }
 
 export interface PointsHistory {
