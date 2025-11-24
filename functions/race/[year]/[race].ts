@@ -377,6 +377,34 @@ function generateRacePage(
   }
   </script>
 
+  <!-- Breadcrumb Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://f1pointscalculator.yaaaang.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "${year} Season",
+        "item": "https://f1pointscalculator.yaaaang.com/${year}.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "${raceInfo.displayName} Grand Prix",
+        "item": "https://f1pointscalculator.yaaaang.com/race/${year}/${race}"
+      }
+    ]
+  }
+  </script>
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
@@ -474,7 +502,7 @@ function generateRacePage(
       <div class="py-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <!-- Header section -->
         <div class="mb-3">
-          <h1 class="text-xl sm:text-3xl md:text-4xl font-bold text-gray-800 flex items-center mb-2 sm:mb-3">
+          <div class="text-xl sm:text-3xl md:text-4xl font-bold text-gray-800 flex items-center mb-2 sm:mb-3">
             <span class="bg-red-600 text-white px-2 py-0.5 sm:px-3 sm:py-1 mr-2 sm:mr-3 rounded-md text-base sm:text-xl">F1</span>
             <span>Points Calculator</span>
             <a href="/about.html" class="ml-2 sm:ml-3 w-8 h-8 sm:w-10 sm:h-10 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110 flex-shrink-0" aria-label="About and FAQ" title="About & FAQ">
@@ -482,7 +510,7 @@ function generateRacePage(
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </a>
-          </h1>
+          </div>
 
           <div class="flex flex-wrap items-center gap-2">
             <a href="https://buymeacoffee.com/yaang" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center py-1.5 px-2.5 sm:py-3 sm:px-6 bg-red-600 text-white font-bold rounded-md shadow-lg hover:bg-red-700 transition-colors duration-200 text-xs sm:text-base whitespace-nowrap">
@@ -499,9 +527,39 @@ function generateRacePage(
           </div>
         </div>
 
+        <!-- Breadcrumbs -->
+        <nav aria-label="Breadcrumb" class="mb-4">
+          <ol class="flex items-center space-x-2 text-sm text-gray-600">
+            <li>
+              <a href="/" class="hover:text-red-600 transition-colors">Home</a>
+            </li>
+            <li>
+              <span class="text-gray-400">›</span>
+            </li>
+            <li>
+              <a href="/${year}.html" class="hover:text-red-600 transition-colors">${year} Season</a>
+            </li>
+            <li>
+              <span class="text-gray-400">›</span>
+            </li>
+            <li class="text-gray-900 font-medium">
+              ${raceInfo.displayName} Grand Prix
+            </li>
+          </ol>
+        </nav>
+
+        <!-- Main H1 Title -->
+        <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-6">${winnerName} Wins ${year} ${raceInfo.displayName} GP</h1>
+
         <!-- Race Info Header -->
         <div class="bg-white rounded-xl shadow-lg p-6 md:p-8 mb-6 border-b-4 border-red-600">
-          <h2 class="text-3xl md:text-4xl font-bold text-red-600 mb-3">${year} ${raceInfo.displayName} Grand Prix</h2>
+          <a href="https://en.wikipedia.org/wiki/${year}_${raceInfo.displayName.replace(/\s+/g, '_')}_Grand_Prix" target="_blank" rel="noopener noreferrer" class="text-3xl md:text-4xl font-bold text-red-600 hover:text-red-700 transition-colors inline-flex items-center gap-2 mb-3">
+            ${year} ${raceInfo.displayName} Grand Prix
+            <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
+              <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
+            </svg>
+          </a>
           <div class="flex flex-wrap gap-4 text-gray-600 text-sm md:text-base">
             <span class="flex items-center gap-1">📍 Round ${raceInfo.round}</span>
             <span class="flex items-center gap-1">📅 ${raceDate}</span>
@@ -517,7 +575,7 @@ function generateRacePage(
 
         <!-- Results Table -->
         <div class="bg-white rounded-xl shadow-lg p-6 md:p-8 mb-6">
-          <h3 class="text-2xl font-bold text-gray-900 mb-6">Race Classification</h3>
+          <h2 class="text-2xl font-bold text-gray-900 mb-6">Race Classification</h2>
           <div class="overflow-x-auto">
             <table class="w-full">
               <thead class="bg-gray-900 text-white">
