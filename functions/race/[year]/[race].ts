@@ -285,7 +285,7 @@ function generateRacePage(
     ? `${winnerDriver.givenName} ${winnerDriver.familyName}`
     : 'Race';
 
-  const title = `${winnerName} Wins ${year} ${raceInfo.displayName} GP - Full Results | F1 Points Calculator`;
+  const title = `${winnerName} Wins ${year} ${raceInfo.displayName} ${raceInfo.isSprint ? 'Sprint' : 'GP'} - Full Results | F1 Points Calculator`;
 
   // Get podium finishers for description
   const p2 = sortedResults[1];
@@ -302,15 +302,18 @@ function generateRacePage(
     ? ` ${winnerName} also set the fastest lap.`
     : '';
 
-  // Build dynamic description
-  let description = `${winnerName} wins the ${year} ${raceInfo.displayName} Grand Prix`;
+  // Build dynamic description (keep under 160 chars)
+  let description = `${winnerName} wins ${year} ${raceInfo.displayName} ${raceInfo.isSprint ? 'Sprint' : 'GP'}`;
   if (p2Driver && p3Driver) {
-    description += ` ahead of ${p2Driver.givenName} ${p2Driver.familyName} and ${p3Driver.givenName} ${p3Driver.familyName}.`;
+    description += ` ahead of ${p2Driver.familyName} and ${p3Driver.familyName}.`;
   } else {
     description += '.';
   }
-  description += fastestLapText;
-  description += ` View complete race classification${fastestLapText ? '' : ', fastest lap,'} and championship points.`;
+  // Only add fastest lap if description is still short enough
+  if (fastestLapHolder && description.length < 130) {
+    description += ` ${fastestLapHolder.familyName} fastest lap.`;
+  }
+  description += ` Full results and standings.`;
 
   const raceDate = new Date(raceInfo.date).toLocaleDateString('en-US', {
     year: 'numeric',
@@ -553,7 +556,7 @@ function generateRacePage(
               <span class="text-gray-400">›</span>
             </li>
             <li class="text-gray-900 font-medium">
-              ${raceInfo.displayName} Grand Prix
+              ${raceInfo.displayName} ${raceInfo.isSprint ? 'Sprint' : 'Grand Prix'}
             </li>
           </ol>
         </nav>
@@ -606,7 +609,7 @@ function generateRacePage(
                       <td class="px-4 py-4 text-lg font-bold text-red-600">${result.position}</td>
                       <td class="px-4 py-4">
                         <span class="font-semibold text-gray-900">${formatDriverName(result.driverId)}</span>
-                        ${result.fastestLap ? '<span class="ml-2 inline-block bg-purple-600 text-white text-xs px-2 py-1 rounded font-semibold">⚡ Fastest Lap</span>' : ''}
+                        ${result.fastestLap && !raceInfo.isSprint ? '<span class="ml-2 inline-block bg-purple-600 text-white text-xs px-2 py-1 rounded font-semibold">⚡ Fastest Lap</span>' : ''}
                       </td>
                       <td class="px-4 py-4 text-gray-600">${formatTeamName(result.teamId)}</td>
                       <td class="px-4 py-4 text-right font-semibold text-gray-900">${getPoints(result.position, result.fastestLap, raceInfo.isSprint)}</td>
@@ -891,6 +894,7 @@ function generate404Page(year: string, race: string): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
   <title>Race Not Found | F1 Points Calculator</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -900,7 +904,7 @@ function generate404Page(year: string, race: string): string {
     <p class="text-lg text-gray-600 mb-3">We couldn't find results for the <span class="font-semibold text-gray-900">${year} ${race}</span> Grand Prix.</p>
     <p class="text-gray-600 mb-8">This race may not have happened yet, or the race name might be incorrect.</p>
     <div class="flex flex-col sm:flex-row gap-4 justify-center">
-      <a href="/" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors">Go to Calculator</a>
+      <a href="/" class="inline-block bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors">Go to Calculator</a>
       <a href="/${year}.html" class="inline-block bg-gray-200 hover:bg-gray-300 text-gray-800 px-8 py-3 rounded-lg font-semibold transition-colors">View ${year} Season</a>
     </div>
   </div>
@@ -914,6 +918,7 @@ function generateErrorPage(year: string, race: string): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
   <title>Error | F1 Points Calculator</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
