@@ -558,18 +558,17 @@ function generateRacePage(
           </ol>
         </nav>
 
-        <!-- Main H1 Title -->
-        <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-6">${winnerName} Wins ${year} ${raceInfo.displayName} ${raceInfo.isSprint ? 'Sprint' : 'GP'}</h1>
-
         <!-- Race Info Header -->
         <div class="bg-white rounded-xl shadow-lg p-6 md:p-8 mb-6 border-b-4 border-red-600">
-          <a href="https://en.wikipedia.org/wiki/${year}_${raceInfo.displayName.replace(/\s+/g, '_')}_Grand_Prix" target="_blank" rel="noopener noreferrer" class="text-3xl md:text-4xl font-bold text-red-600 hover:text-red-700 transition-colors inline-flex items-center gap-2 mb-3">
-            ${year} ${raceInfo.displayName} ${raceInfo.isSprint ? 'Sprint' : 'Grand Prix'}
-            <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
-              <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
-            </svg>
-          </a>
+          <h1>
+            <a href="https://en.wikipedia.org/wiki/${year}_${raceInfo.displayName.replace(/\s+/g, '_')}_Grand_Prix" target="_blank" rel="noopener noreferrer" class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 hover:text-gray-700 transition-colors inline-flex items-center gap-2 mb-3">
+              <span class="text-red-600">${winnerName}</span> Wins ${year} ${raceInfo.displayName} ${raceInfo.isSprint ? 'Sprint' : 'Grand Prix'}
+              <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
+                <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
+              </svg>
+            </a>
+          </h1>
           <div class="flex flex-wrap gap-4 text-gray-600 text-sm md:text-base">
             <span class="flex items-center gap-1">📍 Round ${raceInfo.round}</span>
             <span class="flex items-center gap-1">📅 ${raceDate}</span>
