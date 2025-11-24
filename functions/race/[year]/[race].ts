@@ -92,7 +92,17 @@ function formatTeamName(teamId: string): string {
 }
 
 // Current F1 points system
-function getPoints(position: number, fastestLap?: boolean): number {
+function getPoints(position: number, fastestLap?: boolean, isSprint?: boolean): number {
+  // Sprint race points (no fastest lap bonus)
+  if (isSprint) {
+    const sprintPointsMap: Record<number, number> = {
+      1: 8, 2: 7, 3: 6, 4: 5, 5: 4,
+      6: 3, 7: 2, 8: 1
+    };
+    return sprintPointsMap[position] || 0;
+  }
+
+  // Regular Grand Prix points
   const pointsMap: Record<number, number> = {
     1: 25, 2: 18, 3: 15, 4: 12, 5: 10,
     6: 8, 7: 6, 8: 4, 9: 2, 10: 1
@@ -135,7 +145,7 @@ function calculateStandingsUpToRace(
     if (!results) continue;
 
     for (const result of results) {
-      const points = getPoints(result.position, result.fastestLap);
+      const points = getPoints(result.position, result.fastestLap, race.isSprint);
 
       // Driver points
       driverPoints[result.driverId] = (driverPoints[result.driverId] || 0) + points;
@@ -549,12 +559,12 @@ function generateRacePage(
         </nav>
 
         <!-- Main H1 Title -->
-        <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-6">${winnerName} Wins ${year} ${raceInfo.displayName} GP</h1>
+        <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-6">${winnerName} Wins ${year} ${raceInfo.displayName} ${raceInfo.isSprint ? 'Sprint' : 'GP'}</h1>
 
         <!-- Race Info Header -->
         <div class="bg-white rounded-xl shadow-lg p-6 md:p-8 mb-6 border-b-4 border-red-600">
           <a href="https://en.wikipedia.org/wiki/${year}_${raceInfo.displayName.replace(/\s+/g, '_')}_Grand_Prix" target="_blank" rel="noopener noreferrer" class="text-3xl md:text-4xl font-bold text-red-600 hover:text-red-700 transition-colors inline-flex items-center gap-2 mb-3">
-            ${year} ${raceInfo.displayName} Grand Prix
+            ${year} ${raceInfo.displayName} ${raceInfo.isSprint ? 'Sprint' : 'Grand Prix'}
             <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
               <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
               <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
@@ -600,7 +610,7 @@ function generateRacePage(
                         ${result.fastestLap ? '<span class="ml-2 inline-block bg-purple-600 text-white text-xs px-2 py-1 rounded font-semibold">⚡ Fastest Lap</span>' : ''}
                       </td>
                       <td class="px-4 py-4 text-gray-600">${formatTeamName(result.teamId)}</td>
-                      <td class="px-4 py-4 text-right font-semibold text-gray-900">${getPoints(result.position, result.fastestLap)}</td>
+                      <td class="px-4 py-4 text-right font-semibold text-gray-900">${getPoints(result.position, result.fastestLap, raceInfo.isSprint)}</td>
                     </tr>
                   `;
                 }).join('')}
