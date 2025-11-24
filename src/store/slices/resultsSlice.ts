@@ -159,17 +159,39 @@ const calculatePoints = (filterOfficialOnly: boolean) => {
 const officialResults = calculatePoints(true);
 const officialDriverPoints = officialResults.driverPoints;
 const officialTeamPoints = officialResults.teamPoints;
+const officialDriverFinishes = officialResults.driverFinishes;
+const officialTeamFinishes = officialResults.teamFinishes;
 
 const officialDriverStandings = Object.entries(officialDriverPoints)
-  .sort(([, pointsA], [, pointsB]) => pointsB - pointsA)
-  .reduce((acc, [driverId], index) => {
+  .map(([driverId, points]) => ({
+    driverId,
+    points,
+    finishCounts: officialDriverFinishes[driverId] || []
+  }))
+  .sort((a, b) => {
+    if (b.points !== a.points) {
+      return b.points - a.points;
+    }
+    return compareByCountback(a.finishCounts, b.finishCounts);
+  })
+  .reduce((acc, { driverId }, index) => {
     acc[driverId] = index + 1;
     return acc;
   }, {} as Record<string, number>);
 
 const officialTeamStandings = Object.entries(officialTeamPoints)
-  .sort(([, pointsA], [, pointsB]) => pointsB - pointsA)
-  .reduce((acc, [teamId], index) => {
+  .map(([teamId, points]) => ({
+    teamId,
+    points,
+    finishCounts: officialTeamFinishes[teamId] || []
+  }))
+  .sort((a, b) => {
+    if (b.points !== a.points) {
+      return b.points - a.points;
+    }
+    return compareByCountback(a.finishCounts, b.finishCounts);
+  })
+  .reduce((acc, { teamId }, index) => {
     acc[teamId] = index + 1;
     return acc;
   }, {} as Record<string, number>);
