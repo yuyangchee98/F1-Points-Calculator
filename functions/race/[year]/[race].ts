@@ -165,7 +165,9 @@ export async function onRequest(context: {
   env: Env;
   request: Request;
 }): Promise<Response> {
-  const { year, race } = context.params;
+  const { year } = context.params;
+  // Decode the race parameter to handle special characters like ã in são-paulo
+  const race = decodeURIComponent(context.params.race);
 
   try {
     // Fetch all data in parallel
@@ -225,7 +227,7 @@ export async function onRequest(context: {
     );
 
     // Generate the HTML page
-    const html = generateRacePage(year, race, raceInfo, results, drivers, teams, driverStandings, teamStandings);
+    const html = generateRacePage(year, race, raceInfo, results, drivers, teams, driverStandings, teamStandings, schedule);
 
     return new Response(html, {
       headers: {
@@ -253,16 +255,9 @@ function generateRacePage(
   drivers: Driver[],
   teams: Team[],
   driverStandings: DriverStanding[],
-  teamStandings: TeamStanding[]
+  teamStandings: TeamStanding[],
+  schedule: RaceScheduleItem[]
 ): string {
-  const title = `${year} ${raceInfo.displayName} Grand Prix Results | F1 Points Calculator`;
-  const description = `Complete results from the ${year} ${raceInfo.displayName} Grand Prix. See final classification, points awarded, and championship standings.`;
-  const raceDate = new Date(raceInfo.date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
-
   // Create lookup maps
   const driverMap: Record<string, Driver> = {};
   drivers.forEach(d => driverMap[d.id] = d);
@@ -272,6 +267,46 @@ function generateRacePage(
 
   // Sort results by position
   const sortedResults = [...results].sort((a, b) => a.position - b.position);
+
+  // Get winner for title
+  const winner = sortedResults[0];
+  const winnerDriver = winner ? driverMap[winner.driverId] : null;
+  const winnerName = winnerDriver
+    ? `${winnerDriver.givenName} ${winnerDriver.familyName}`
+    : 'Race';
+
+  const title = `${winnerName} Wins ${year} ${raceInfo.displayName} GP - Full Results | F1 Points Calculator`;
+
+  // Get podium finishers for description
+  const p2 = sortedResults[1];
+  const p3 = sortedResults[2];
+  const p2Driver = p2 ? driverMap[p2.driverId] : null;
+  const p3Driver = p3 ? driverMap[p3.driverId] : null;
+
+  // Check for fastest lap
+  const fastestLapDriver = sortedResults.find(r => r.fastestLap);
+  const fastestLapHolder = fastestLapDriver ? driverMap[fastestLapDriver.driverId] : null;
+  const fastestLapText = fastestLapHolder && fastestLapHolder !== winnerDriver
+    ? ` ${fastestLapHolder.familyName} set the fastest lap.`
+    : fastestLapHolder
+    ? ` ${winnerName} also set the fastest lap.`
+    : '';
+
+  // Build dynamic description
+  let description = `${winnerName} wins the ${year} ${raceInfo.displayName} Grand Prix`;
+  if (p2Driver && p3Driver) {
+    description += ` ahead of ${p2Driver.givenName} ${p2Driver.familyName} and ${p3Driver.givenName} ${p3Driver.familyName}.`;
+  } else {
+    description += '.';
+  }
+  description += fastestLapText;
+  description += ` View complete race classification${fastestLapText ? '' : ', fastest lap,'} and championship points.`;
+
+  const raceDate = new Date(raceInfo.date).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -308,68 +343,6 @@ function generateRacePage(
     }
     .podium-third {
       background: linear-gradient(135deg, #cd7f32 0%, #e6a85c 100%);
-    }
-
-    /* Podium container for reordering */
-    .podium-container {
-      display: flex;
-      justify-content: center;
-      align-items: flex-end;
-      gap: 1rem;
-      max-width: 900px;
-      margin: 0 auto;
-      min-height: 220px;
-    }
-
-    @media (max-width: 768px) {
-      .podium-container {
-        flex-direction: column;
-        align-items: stretch;
-        min-height: auto;
-      }
-    }
-
-    .podium-position-1 {
-      order: 2;
-      flex: 1;
-      max-width: 280px;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding-bottom: 2rem;
-    }
-
-    .podium-position-2 {
-      order: 1;
-      flex: 1;
-      max-width: 280px;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding-bottom: 1rem;
-      margin-top: 4rem;
-    }
-
-    .podium-position-3 {
-      order: 3;
-      flex: 1;
-      max-width: 280px;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding-bottom: 1rem;
-      margin-top: 5rem;
-    }
-
-    @media (max-width: 768px) {
-      .podium-position-1,
-      .podium-position-2,
-      .podium-position-3 {
-        order: initial !important;
-        max-width: 100% !important;
-        margin-top: 0 !important;
-        padding-bottom: 0 !important;
-      }
     }
 
     .blur-overlay {
@@ -486,6 +459,9 @@ function generateRacePage(
           </div>
         </div>
 
+        <!-- Race Navigation -->
+        ${generateRaceNavigation(year, raceInfo, schedule)}
+
         <!-- Podium -->
         ${generatePodium(sortedResults, driverMap, teamMap)}
 
@@ -534,12 +510,8 @@ function generateRacePage(
           </a>
         </div>
 
-        <!-- Navigation Links -->
-        <div class="text-center space-x-6 text-sm md:text-base mb-12">
-          <a href="/" class="text-blue-600 hover:underline font-semibold">← Home</a>
-          <a href="/${year}.html" class="text-blue-600 hover:underline font-semibold">View ${year} Season</a>
-          <a href="/about.html" class="text-blue-600 hover:underline font-semibold">About</a>
-        </div>
+        <!-- Race Navigation -->
+        ${generateRaceNavigation(year, raceInfo, schedule)}
       </div>
 
       <!-- Footer -->
@@ -737,6 +709,34 @@ function generateTeamStandingsTableTeaser(
   `;
 }
 
+function generateRaceNavigation(
+  year: string,
+  currentRace: RaceScheduleItem,
+  allRaces: RaceScheduleItem[]
+): string {
+  const currentIndex = allRaces.findIndex(r => r.id === currentRace.id);
+  const prevRace = currentIndex > 0 ? allRaces[currentIndex - 1] : null;
+  const nextRace = currentIndex < allRaces.length - 1 ? allRaces[currentIndex + 1] : null;
+
+  return `
+    <div class="flex items-center justify-between text-sm md:text-base mb-6 px-2">
+      <div class="flex-1 text-left">
+        ${prevRace
+          ? `<a href="/race/${year}/${prevRace.id}" class="text-blue-600 hover:underline font-semibold">← ${prevRace.displayName} GP</a>`
+          : '<span class="text-gray-400"></span>'}
+      </div>
+      <div class="flex-1 text-center">
+        <a href="/${year}.html" class="text-blue-600 hover:underline font-semibold">View All ${year} Races</a>
+      </div>
+      <div class="flex-1 text-right">
+        ${nextRace
+          ? `<a href="/race/${year}/${nextRace.id}" class="text-blue-600 hover:underline font-semibold">${nextRace.displayName} GP →</a>`
+          : '<span class="text-gray-400"></span>'}
+      </div>
+    </div>
+  `;
+}
+
 function generatePodium(
   results: RaceResult[],
   driverMap: Record<string, Driver>,
@@ -747,18 +747,17 @@ function generatePodium(
   if (top3.length < 3) return '';
 
   return `
-    <div class="podium-container mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
       ${top3.map((result, index) => {
         const driver = driverMap[result.driverId];
         const team = teamMap[result.teamId];
         if (!driver || !team) return '';
 
         const podiumClass = index === 0 ? 'podium-first' : index === 1 ? 'podium-second' : 'podium-third';
-        const positionClass = `podium-position-${result.position}`;
         const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉';
 
         return `
-          <div class="${podiumClass} ${positionClass} rounded-xl p-6 text-center shadow-lg">
+          <div class="${podiumClass} rounded-xl p-6 text-center shadow-lg">
             <div class="text-2xl font-bold mb-2">${medal} P${result.position}</div>
             <div class="text-xl font-semibold mb-1 text-gray-900">${formatDriverName(result.driverId)}</div>
             <div class="text-sm text-gray-700">${formatTeamName(result.teamId)}</div>
