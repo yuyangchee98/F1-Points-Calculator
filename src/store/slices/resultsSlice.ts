@@ -4,6 +4,19 @@ import { RootState } from '../index';
 import { getPointsForPositionWithSystem } from '../../data/pointsSystems';
 import { hasFastestLapPoint, getActiveSeason } from '../../utils/constants';
 
+// F1 tie-breaking: compare finish positions (most wins, then 2nds, then 3rds, etc.)
+const compareByCountback = (finishesA: number[], finishesB: number[]): number => {
+  const maxLength = Math.max(finishesA.length, finishesB.length);
+  for (let i = 0; i < maxLength; i++) {
+    const countA = finishesA[i] || 0;
+    const countB = finishesB[i] || 0;
+    if (countA !== countB) {
+      return countB - countA; // More finishes at this position wins
+    }
+  }
+  return 0; // Still tied after all positions
+};
+
 const initialState: ResultsState = {
   driverStandings: [],
   teamStandings: [],
@@ -40,6 +53,8 @@ const calculatePoints = (filterOfficialOnly: boolean) => {
   const teamPoints: Record<string, number> = {};
   const driverHistories: PointsHistory[] = [];
   const teamHistories: TeamPointsHistory[] = [];
+  const driverFinishes: Record<string, number[]> = {};
+  const teamFinishes: Record<string, number[]> = {};
 
   allDrivers.forEach(driver => {
     if (!teamPoints[driver.team]) {
@@ -75,6 +90,16 @@ const calculatePoints = (filterOfficialOnly: boolean) => {
         driverPoints[position.driverId] += pointsForPosition;
         raceDriverPoints[position.driverId] += pointsForPosition;
 
+        // Track finish positions for tie-breaking (only count main races, not sprints)
+        if (!race.isSprint && position.position >= 1) {
+          if (!driverFinishes[position.driverId]) {
+            driverFinishes[position.driverId] = [];
+          }
+          const finishIndex = position.position - 1; // 0-indexed: 0 = 1st place
+          driverFinishes[position.driverId][finishIndex] =
+            (driverFinishes[position.driverId][finishIndex] || 0) + 1;
+        }
+
         const raceResult = raceResults.find(r => r.driverId === position.driverId);
         let teamId: string | undefined;
 
@@ -95,6 +120,16 @@ const calculatePoints = (filterOfficialOnly: boolean) => {
 
           teamPoints[teamId] += pointsForPosition;
           raceTeamPoints[teamId] += pointsForPosition;
+
+          // Track team finish positions for tie-breaking (only count main races, not sprints)
+          if (!race.isSprint && position.position >= 1) {
+            if (!teamFinishes[teamId]) {
+              teamFinishes[teamId] = [];
+            }
+            const finishIndex = position.position - 1; // 0-indexed: 0 = 1st place
+            teamFinishes[teamId][finishIndex] =
+              (teamFinishes[teamId][finishIndex] || 0) + 1;
+          }
         }
       }
     });
@@ -118,7 +153,7 @@ const calculatePoints = (filterOfficialOnly: boolean) => {
     });
   });
 
-  return { driverPoints, teamPoints, driverHistories, teamHistories };
+  return { driverPoints, teamPoints, driverHistories, teamHistories, driverFinishes, teamFinishes };
 };
 
 const officialResults = calculatePoints(true);
@@ -144,6 +179,8 @@ const driverPoints = totalResults.driverPoints;
 const teamPoints = totalResults.teamPoints;
 const driverHistories = totalResults.driverHistories;
 const teamHistories = totalResults.teamHistories;
+const driverFinishes = totalResults.driverFinishes;
+const teamFinishes = totalResults.teamFinishes;
 
 const driverStandings: DriverStanding[] = Object.entries(driverPoints)
   .map(([driverId, points]) => ({
@@ -151,9 +188,17 @@ const driverStandings: DriverStanding[] = Object.entries(driverPoints)
     points,
     position: 0,
     predictionPointsGained: points - (officialDriverPoints[driverId] || 0),
-    positionChange: 0
+    positionChange: 0,
+    finishCounts: driverFinishes[driverId] || []
   }))
-  .sort((a, b) => b.points - a.points)
+  .sort((a, b) => {
+    // First compare by points
+    if (b.points !== a.points) {
+      return b.points - a.points;
+    }
+    // If tied on points, use F1 countback rule
+    return compareByCountback(a.finishCounts, b.finishCounts);
+  })
   .map((standing, index) => {
     const newPosition = index + 1;
     const oldPosition = officialDriverStandings[standing.driverId] || newPosition;
@@ -170,9 +215,17 @@ const teamStandings: TeamStanding[] = Object.entries(teamPoints)
     points,
     position: 0,
     predictionPointsGained: points - (officialTeamPoints[teamId] || 0),
-    positionChange: 0
+    positionChange: 0,
+    finishCounts: teamFinishes[teamId] || []
   }))
-  .sort((a, b) => b.points - a.points)
+  .sort((a, b) => {
+    // First compare by points
+    if (b.points !== a.points) {
+      return b.points - a.points;
+    }
+    // If tied on points, use F1 countback rule
+    return compareByCountback(a.finishCounts, b.finishCounts);
+  })
   .map((standing, index) => {
     const newPosition = index + 1;
     const oldPosition = officialTeamStandings[standing.teamId] || newPosition;
