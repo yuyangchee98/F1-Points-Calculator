@@ -315,17 +315,67 @@ function generateRacePage(
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${title}</title>
   <meta name="description" content="${description}">
+  <link rel="canonical" href="https://f1pointscalculator.yaaaang.com/race/${year}/${race}">
 
   <!-- Open Graph / Social Media -->
   <meta property="og:type" content="article">
   <meta property="og:title" content="${title}">
   <meta property="og:description" content="${description}">
   <meta property="og:url" content="https://f1pointscalculator.yaaaang.com/race/${year}/${race}">
+  <meta property="og:image" content="https://f1pointscalculator.yaaaang.com/og-image.jpg">
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${title}">
   <meta name="twitter:description" content="${description}">
+  <meta name="twitter:image" content="https://f1pointscalculator.yaaaang.com/og-image.jpg">
+
+  <!-- Structured Data (Schema.org) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SportsEvent",
+    "name": "${year} ${raceInfo.displayName} Grand Prix",
+    "description": "${description.replace(/"/g, '\\"')}",
+    "startDate": "${raceInfo.date}",
+    "endDate": "${raceInfo.date}",
+    "eventStatus": "https://schema.org/EventScheduled",
+    "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+    "location": {
+      "@type": "Place",
+      "name": "${raceInfo.locality}",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "${raceInfo.country}",
+        "addressLocality": "${raceInfo.locality}"
+      }
+    },
+    "organizer": {
+      "@type": "Organization",
+      "name": "Formula 1",
+      "url": "https://www.formula1.com"
+    },
+    "sport": "Formula 1 Racing",
+    "competitor": [
+      ${winnerDriver ? `{
+        "@type": "Person",
+        "name": "${winnerDriver.givenName} ${winnerDriver.familyName}",
+        "nationality": "${winnerDriver.nationality}"
+      }` : ''}${p2Driver ? `,
+      {
+        "@type": "Person",
+        "name": "${p2Driver.givenName} ${p2Driver.familyName}",
+        "nationality": "${p2Driver.nationality}"
+      }` : ''}${p3Driver ? `,
+      {
+        "@type": "Person",
+        "name": "${p3Driver.givenName} ${p3Driver.familyName}",
+        "nationality": "${p3Driver.nationality}"
+      }` : ''}
+    ],
+    "url": "https://f1pointscalculator.yaaaang.com/race/${year}/${race}"
+  }
+  </script>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
