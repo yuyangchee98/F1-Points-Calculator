@@ -350,6 +350,7 @@ function generateRacePage(
     "@type": "SportsEvent",
     "name": "${year} ${raceInfo.displayName} Grand Prix",
     "description": "${description.replace(/"/g, '\\"')}",
+    "image": "https://f1pointscalculator.yaaaang.com/og-image.jpg",
     "startDate": "${raceInfo.date}",
     "endDate": "${raceInfo.date}",
     "eventStatus": "https://schema.org/EventScheduled",
@@ -386,6 +387,30 @@ function generateRacePage(
         "nationality": "${p3Driver.nationality}"
       }` : ''}
     ],
+    "performer": [
+      ${winnerDriver ? `{
+        "@type": "Person",
+        "name": "${winnerDriver.givenName} ${winnerDriver.familyName}",
+        "nationality": "${winnerDriver.nationality}"
+      }` : ''}${p2Driver ? `,
+      {
+        "@type": "Person",
+        "name": "${p2Driver.givenName} ${p2Driver.familyName}",
+        "nationality": "${p2Driver.nationality}"
+      }` : ''}${p3Driver ? `,
+      {
+        "@type": "Person",
+        "name": "${p3Driver.givenName} ${p3Driver.familyName}",
+        "nationality": "${p3Driver.nationality}"
+      }` : ''}
+    ],
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD",
+      "availability": "https://schema.org/InStock",
+      "url": "https://f1pointscalculator.yaaaang.com/race/${year}/${race}"
+    },
     "url": "https://f1pointscalculator.yaaaang.com/race/${year}/${race}"
   }
   </script>
