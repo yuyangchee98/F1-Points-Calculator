@@ -3,10 +3,25 @@ import { RootState } from '../index';
 import { DriverStanding, TeamStanding } from '../../types';
 import { selectRaces } from './dataSelectors';
 
-export const selectDriverStandings = (state: RootState) => state.results.driverStandings;
-export const selectTeamStandings = (state: RootState) => state.results.teamStandings;
-export const selectPointsHistory = (state: RootState) => state.results.pointsHistory;
-export const selectTeamPointsHistory = (state: RootState) => state.results.teamPointsHistory;
+// Re-export from standingsSelectors (these are the memoized computed versions)
+export {
+  selectDriverStandings,
+  selectTeamStandings,
+  selectPointsHistory,
+  selectTeamPointsHistory
+} from './standingsSelectors';
+
+// Import for use in chart selectors
+import {
+  selectDriverStandings,
+  selectTeamStandings,
+  selectPointsHistory,
+  selectTeamPointsHistory
+} from './standingsSelectors';
+
+// ============================================================================
+// CHART SELECTORS
+// ============================================================================
 
 export const selectTopDrivers = createSelector(
   [selectDriverStandings, (_: RootState, count: number) => count],
@@ -26,12 +41,10 @@ export const selectDriverPointsForCharts = createSelector(
   [selectPointsHistory, selectDriverStandings, selectRaces, (_: RootState, count: number) => count],
   (history, standings, races, count): Record<string, number[]> => {
     const topDrivers = standings.slice(0, count).map(d => d.driverId);
-
     const pointsByDriver: Record<string, number[]> = {};
 
     topDrivers.forEach(driverId => {
       pointsByDriver[driverId] = [];
-
       const driverHistory = history.filter(h => h.driverId === driverId);
 
       driverHistory.sort((a, b) => {
@@ -51,12 +64,10 @@ export const selectTeamPointsForCharts = createSelector(
   [selectTeamPointsHistory, selectTeamStandings, selectRaces, (_: RootState, count: number) => count],
   (history, standings, races, count): Record<string, number[]> => {
     const topTeams = standings.slice(0, count).map(t => t.teamId);
-
     const pointsByTeam: Record<string, number[]> = {};
 
     topTeams.forEach(teamId => {
       pointsByTeam[teamId] = [];
-
       const teamHistory = history.filter(h => h.teamId === teamId);
 
       teamHistory.sort((a, b) => {

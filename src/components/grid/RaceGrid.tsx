@@ -6,6 +6,7 @@ import RaceColumn from './RaceColumn';
 import GridToolbar from './GridToolbar';
 import useWindowSize from '../../hooks/useWindowSize';
 import { togglePositionColumnMode } from '../../store/slices/uiSlice';
+import { selectDriverStandings } from '../../store/selectors/resultsSelectors';
 import { useAppDispatch } from '../../store';
 
 interface RaceGridProps {
@@ -28,7 +29,7 @@ const RaceGrid: React.FC<RaceGridProps> = ({
   const dispatch = useAppDispatch();
   const races = useSelector((state: RootState) => state.seasonData.races);
   const positionColumnMode = useSelector((state: RootState) => state.ui.positionColumnMode);
-  const driverStandings = useSelector((state: RootState) => state.results.driverStandings);
+  const driverStandings = useSelector(selectDriverStandings);
   const { isMobile, isTablet } = useWindowSize();
 
   const getMinColumnWidth = () => {

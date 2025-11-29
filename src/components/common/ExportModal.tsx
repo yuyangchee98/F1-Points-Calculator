@@ -6,6 +6,7 @@ import { formatExportData } from '../../utils/exportFormatter';
 import ExportPreview from './ExportPreview';
 import useWindowSize from '../../hooks/useWindowSize';
 import { trackExportAction } from '../../utils/analytics';
+import { selectDriverStandings, selectTeamStandings, selectPointsHistory } from '../../store/selectors/resultsSelectors';
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -51,7 +52,9 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
   const positions = useSelector((state: RootState) => state.grid.positions);
   const seasonData = useSelector((state: RootState) => state.seasonData);
   const grid = useSelector((state: RootState) => state.grid);
-  const results = useSelector((state: RootState) => state.results);
+  const driverStandings = useSelector(selectDriverStandings);
+  const teamStandings = useSelector(selectTeamStandings);
+  const pointsHistory = useSelector(selectPointsHistory);
 
   const [raceSelection, setRaceSelection] = useState<RaceSelection>({});
 
@@ -77,34 +80,36 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
   }, [races, positions]);
 
   useEffect(() => {
-    if (results.driverStandings.length === 0) return;
+    if (driverStandings.length === 0) return;
 
     const initial: Record<string, boolean> = {};
-    results.driverStandings.slice(0, 3).forEach(standing => {
+    driverStandings.slice(0, 3).forEach(standing => {
       initial[standing.driverId] = true;
     });
 
     setSelectedDrivers(initial);
-  }, [results.driverStandings]);
+  }, [driverStandings]);
 
   useEffect(() => {
-    if (results.teamStandings.length === 0) return;
+    if (teamStandings.length === 0) return;
 
     const initial: Record<string, boolean> = {};
-    results.teamStandings.slice(0, 3).forEach(standing => {
+    teamStandings.slice(0, 3).forEach(standing => {
       initial[standing.teamId] = true;
     });
 
     setSelectedTeams(initial);
-  }, [results.teamStandings]);
+  }, [teamStandings]);
 
   const handleExport = async () => {
     setIsLoading(true);
     setError(null);
 
     try {
+      // Construct results object for formatExportData compatibility
+      const results = { driverStandings, teamStandings, pointsHistory };
       const exportData = formatExportData(
-        { seasonData, grid, results } as RootState,
+        { seasonData, grid, results },
         title,
         subtitle,
         raceSelection,
@@ -169,26 +174,26 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
   const upcomingRaces = useMemo(() => races.filter(r => !r.completed), [races]);
 
   const filteredDrivers = useMemo(() => {
-    if (driverFilter === 'all') return results.driverStandings;
-    if (driverFilter === 'top3') return results.driverStandings.slice(0, 3);
-    if (driverFilter === 'top5') return results.driverStandings.slice(0, 5);
-    if (driverFilter === 'top10') return results.driverStandings.slice(0, 10);
+    if (driverFilter === 'all') return driverStandings;
+    if (driverFilter === 'top3') return driverStandings.slice(0, 3);
+    if (driverFilter === 'top5') return driverStandings.slice(0, 5);
+    if (driverFilter === 'top10') return driverStandings.slice(0, 10);
     if (driverFilter === 'withPredictions') {
-      return results.driverStandings.filter(s => s.predictionPointsGained > 0);
+      return driverStandings.filter(s => s.predictionPointsGained > 0);
     }
     if (driverFilter === 'positionChanged') {
-      return results.driverStandings.filter(s => s.positionChange !== 0);
+      return driverStandings.filter(s => s.positionChange !== 0);
     }
-    return results.driverStandings;
-  }, [results.driverStandings, driverFilter]);
+    return driverStandings;
+  }, [driverStandings, driverFilter]);
 
   const filteredTeams = useMemo(() => {
-    if (teamFilter === 'all') return results.teamStandings;
-    if (teamFilter === 'top3') return results.teamStandings.slice(0, 3);
-    if (teamFilter === 'top5') return results.teamStandings.slice(0, 5);
-    if (teamFilter === 'top10') return results.teamStandings.slice(0, 10);
-    return results.teamStandings;
-  }, [results.teamStandings, teamFilter]);
+    if (teamFilter === 'all') return teamStandings;
+    if (teamFilter === 'top3') return teamStandings.slice(0, 3);
+    if (teamFilter === 'top5') return teamStandings.slice(0, 5);
+    if (teamFilter === 'top10') return teamStandings.slice(0, 10);
+    return teamStandings;
+  }, [teamStandings, teamFilter]);
 
   const selectedCompletedRaces = races
     .filter(r => r.completed && raceSelection[r.id])
@@ -212,8 +217,10 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
   const isTeamLimitReached = selectedTeamCount >= MAX_TEAMS;
 
   const previewData = useMemo(() => {
+    // Construct results object for formatExportData compatibility
+    const results = { driverStandings, teamStandings, pointsHistory };
     return formatExportData(
-      { seasonData, grid, results } as RootState,
+      { seasonData, grid, results },
       title,
       subtitle,
       raceSelection,
@@ -223,7 +230,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
       selectedTeams,
       format
     );
-  }, [seasonData, grid, results, title, subtitle, raceSelection, selectedDrivers, showDriverStandings, showTeamStandings, selectedTeams, format]);
+  }, [seasonData, grid, driverStandings, teamStandings, pointsHistory, title, subtitle, raceSelection, selectedDrivers, showDriverStandings, showTeamStandings, selectedTeams, format]);
 
   if (!isOpen) return null;
 
