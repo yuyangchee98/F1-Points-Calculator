@@ -104,9 +104,3 @@ export interface UiState {
   copiedDriver: string | null;
 }
 
-export interface ResultsState {
-  driverStandings: DriverStanding[];
-  teamStandings: TeamStanding[];
-  pointsHistory: PointsHistory[];
-  teamPointsHistory: TeamPointsHistory[];
-}

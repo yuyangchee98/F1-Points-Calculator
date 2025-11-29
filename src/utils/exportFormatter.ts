@@ -1,4 +1,16 @@
-import { RootState } from '../store';
+import { SeasonDataState } from '../store/slices/seasonDataSlice';
+import { GridState, DriverStanding, TeamStanding, PointsHistory, GridPosition } from '../types';
+
+// Custom type for export data input - accepts computed results
+export interface ExportStateInput {
+  seasonData: SeasonDataState;
+  grid: GridState;
+  results: {
+    driverStandings: DriverStanding[];
+    teamStandings: TeamStanding[];
+    pointsHistory: PointsHistory[];
+  };
+}
 
 function countryCodeToFlag(countryCode: string): string {
   if (!countryCode || countryCode.length !== 2) return '🏁';
@@ -53,7 +65,7 @@ export interface ExportData {
 }
 
 export function formatExportData(
-  state: RootState,
+  state: ExportStateInput,
   title: string,
   subtitle?: string,
   raceSelection?: Record<string, boolean>,
@@ -84,10 +96,10 @@ export function formatExportData(
     .filter(race => !raceSelection || raceSelection[race.id])
     .forEach(race => {
       const racePositions = grid.positions
-        .filter(p => p.raceId === race.id && p.driverId)
-        .map(p => {
+        .filter((p: GridPosition) => p.raceId === race.id && p.driverId)
+        .map((p: GridPosition) => {
           const pointsEntry = results.pointsHistory.find(
-            h => h.raceId === race.id && h.driverId === p.driverId
+            (h: PointsHistory) => h.raceId === race.id && h.driverId === p.driverId
           );
           const pointsGained = pointsEntry?.points || 0;
 
@@ -105,8 +117,8 @@ export function formatExportData(
 
   const driverStandings = showDriverStandings
     ? results.driverStandings
-        .filter(standing => !driverSelection || driverSelection[standing.driverId])
-        .map(standing => ({
+        .filter((standing: DriverStanding) => !driverSelection || driverSelection[standing.driverId])
+        .map((standing: DriverStanding) => ({
           position: standing.position,
           driverId: standing.driverId,
           points: standing.points,
@@ -117,8 +129,8 @@ export function formatExportData(
 
   const teamStandings = showTeamStandings
     ? results.teamStandings
-        .filter(standing => !teamSelection || teamSelection[standing.teamId])
-        .map(standing => ({
+        .filter((standing: TeamStanding) => !teamSelection || teamSelection[standing.teamId])
+        .map((standing: TeamStanding) => ({
           position: standing.position,
           teamId: standing.teamId,
           points: standing.points,

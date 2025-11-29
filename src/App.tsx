@@ -5,8 +5,8 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { initializeUiState, setMobileView, toggleOfficialResults as toggleOfficialResultsUI } from './store/slices/uiSlice';
 import { RootState, store } from './store';
-import { calculateResults } from './store/slices/resultsSlice';
 import { moveDriver, resetGrid, toggleOfficialResults } from './store/slices/gridSlice';
+import { selectDriverStandings, selectTeamStandings } from './store/selectors/resultsSelectors';
 import { selectDriverTeamsMap } from './store/selectors/dataSelectors';
 import { parseNaturalLanguage } from './api/naturalLanguage';
 import { createCheckoutSession } from './api/subscription';
@@ -53,7 +53,6 @@ const App: React.FC = () => {
   useRaceResults(activeSeason);
   useAutoSave();
   const mobileView = useSelector((state: RootState) => state.ui.mobileView);
-  const selectedPointsSystem = useSelector((state: RootState) => state.ui.selectedPointsSystem);
   const showOfficialResults = useSelector((state: RootState) => state.ui.showOfficialResults);
   const pastResults = useSelector((state: RootState) => state.seasonData.pastResults);
   const isLoading = useSelector((state: RootState) => state.seasonData.isLoading);
@@ -78,7 +77,6 @@ const App: React.FC = () => {
   const handleReset = () => {
     if (window.confirm('Are you sure you want to reset your predictions?')) {
       dispatch(resetGrid());
-      dispatch(calculateResults());
       trackEvent(GA_EVENTS.GRID_ACTIONS.RESET_PREDICTIONS, 'Grid Actions');
     }
   };
@@ -87,7 +85,6 @@ const App: React.FC = () => {
     const newValue = !showOfficialResults;
     dispatch(toggleOfficialResultsUI(newValue));
     dispatch(toggleOfficialResults({ show: newValue, pastResults }));
-    dispatch(calculateResults());
     trackEvent(
       GA_EVENTS.GRID_ACTIONS.TOGGLE_OFFICIAL,
       'Grid Actions',
@@ -113,8 +110,6 @@ const App: React.FC = () => {
           }
         });
 
-        dispatch(calculateResults());
-
         setShowHistory(false);
       }
     } catch (error) {
@@ -124,13 +119,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     dispatch(initializeUiState());
-
-    dispatch(calculateResults());
   }, [dispatch]);
-
-  useEffect(() => {
-    dispatch(calculateResults());
-  }, [dispatch, selectedPointsSystem]);
 
   useEffect(() => {
     if (!isMobile) {
@@ -287,8 +276,8 @@ const App: React.FC = () => {
                               });
 
                               const standings = {
-                                drivers: state.results.driverStandings,
-                                teams: state.results.teamStandings
+                                drivers: selectDriverStandings(state),
+                                teams: selectTeamStandings(state)
                               };
 
                               const driverTeams = selectDriverTeamsMap(state);
@@ -310,7 +299,6 @@ const App: React.FC = () => {
                                     toPosition: p.toPosition
                                   }));
                                 });
-                                dispatch(calculateResults());
                                 textarea.value = '';
                                 trackSmartInputCommand(text, true, response.placements.length);
                               }
