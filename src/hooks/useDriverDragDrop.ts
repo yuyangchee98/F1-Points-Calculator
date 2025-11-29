@@ -4,7 +4,6 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { DriverDragItem, ItemTypes } from '../types/dragTypes';
 import { moveDriver } from '../store/slices/gridSlice';
-import { calculateResults } from '../store/slices/resultsSlice';
 import { toastService } from '../components/common/ToastContainer';
 import { selectDriversByIdMap, selectTeamsByIdMap } from '../store/selectors/dataSelectors';
 import { useAppDispatch } from '../store';
@@ -131,8 +130,6 @@ export function useDriverDrop({ raceId, position }: UseDriverDropParams) {
       total_predictions: totalPredictions,
       completion_rate: completionRate
     });
-
-    dispatch(calculateResults());
 
     return { driverId, raceId, position };
   }, [raceId, position, currentDriverId, dispatch, races, driverById, teamById, recentDropRef, allPositions]);

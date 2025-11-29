@@ -6,7 +6,7 @@ import { selectDriverAtPosition, selectDriversByIdMap, getDriverLastName, getDri
 import DriverCard from '../drivers/DriverCard';
 import { selectDriver, copyDriver } from '../../store/slices/uiSlice';
 import { placeDriver, clearPosition, fillRestOfSeason, resetGrid, clearEverything, setFastestLap } from '../../store/slices/gridSlice';
-import { calculateResults } from '../../store/slices/resultsSlice';
+import { selectDriverStandings } from '../../store/selectors/resultsSelectors';
 import { useAppDispatch } from '../../store';
 import { useDriverDrop } from '../../hooks/useDriverDragDrop';
 import { useContextMenu, useLongPress } from '../../hooks/useContextMenu';
@@ -30,7 +30,7 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
   const copiedDriverId = useSelector((state: RootState) => state.ui.copiedDriver);
   const positions = useSelector((state: RootState) => state.grid.positions);
   const driverById = useSelector(selectDriversByIdMap);
-  const driverStandings = useSelector((state: RootState) => state.results.driverStandings);
+  const driverStandings = useSelector(selectDriverStandings);
   const races = useSelector((state: RootState) => state.seasonData.races);
 
   const [isHighlighted, setIsHighlighted] = useState(false);
@@ -86,7 +86,6 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
                 raceId: race.id,
                 driverId: driverId
               }));
-              dispatch(calculateResults());
               toastService.addToast(
                 `Set fastest lap for ${getDriverDisplayName(driver)}`,
                 'info'
@@ -104,7 +103,6 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
           icon: '✕',
           onClick: () => {
             dispatch(clearPosition({ raceId: race.id, position }));
-            dispatch(calculateResults());
             toastService.addToast(`Removed ${getDriverDisplayName(driver)} from P${position}`, 'info');
             trackContextMenuAction('ACTION', 'remove_driver');
           },
@@ -122,7 +120,6 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
               startRaceId: race.id,
               raceIds,
             }));
-            dispatch(calculateResults());
 
             const remainingCount = raceIds.slice(raceIds.indexOf(race.id)).length;
             toastService.addToast(
@@ -147,7 +144,6 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
                 position,
                 driverId: copiedDriverId,
               }));
-              dispatch(calculateResults());
               toastService.addToast(`Pasted ${getDriverDisplayName(copiedDriver)} at P${position}`, 'success');
               trackContextMenuAction('ACTION', 'paste_driver');
             },
@@ -169,7 +165,6 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
               position,
               driverId: standing.driverId,
             }));
-            dispatch(calculateResults());
             toastService.addToast(
               `Placed ${getDriverDisplayName(standingDriver)} at P${position}`,
               'success'
@@ -205,7 +200,6 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
             label: 'Clear Predictions Only',
             onClick: () => {
               dispatch(resetGrid());
-              dispatch(calculateResults());
               toastService.addToast('Cleared all predictions', 'info');
               trackContextMenuAction('ACTION', 'clear_predictions');
             },
@@ -215,7 +209,6 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
             label: 'Clear Everything (Including Official Results)',
             onClick: () => {
               dispatch(clearEverything());
-              dispatch(calculateResults());
               toastService.addToast('Cleared everything', 'warning');
               trackContextMenuAction('ACTION', 'clear_everything');
             },
@@ -251,8 +244,6 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
         position,
         driverId: selectedDriverId
       }));
-
-      dispatch(calculateResults());
 
       dispatch(selectDriver(null));
     }
