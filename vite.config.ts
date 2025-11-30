@@ -82,7 +82,10 @@ export default defineConfig(async () => ({
           if (id.includes('chart.js') || id.includes('react-chartjs-2')) {
             return undefined;
           }
-          // Include react-dnd with React to ensure proper load order
+          // Lazy load react-dnd separately to reduce initial bundle
+          if (id.includes('react-dnd') || id.includes('dnd-core')) {
+            return 'dnd';
+          }
           if (id.includes('react')) {
             return 'react-vendor';
           }
