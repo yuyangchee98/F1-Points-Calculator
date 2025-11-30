@@ -223,6 +223,14 @@ const App: React.FC = () => {
                       </>
                     )}
                     <DriverSelectionSkeleton />
+                    {/* Horizontal scrollbar skeleton - hidden on mobile like the real one */}
+                    <div className="w-full py-2 px-4 hidden sm:block">
+                      <div className="bg-white rounded-md p-2 shadow-sm border border-gray-200">
+                        <div className="relative w-full h-2.5 bg-gray-200 rounded-full">
+                          <div className="absolute top-0 h-full w-1/4 bg-gray-300 rounded-full" style={{ left: '0%' }} />
+                        </div>
+                      </div>
+                    </div>
                     <GridSkeleton />
                   </>
                 ) : (
