@@ -1,10 +1,25 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { Line } from 'react-chartjs-2';
-import { ChartDataset, TooltipItem } from 'chart.js';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  ChartDataset,
+  TooltipItem
+} from 'chart.js';
 import { RootState } from '../../store';
+
 import { selectTeamPointsForCharts, selectTopTeams } from '../../store/selectors/resultsSelectors';
 import { selectTeamsByIdMap } from '../../store/selectors/dataSelectors';
+
+// Register ChartJS components (safe to call multiple times)
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 const TeamPointsChart: React.FC = () => {
   const teamById = useSelector(selectTeamsByIdMap);
