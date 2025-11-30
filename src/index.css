@@ -14,15 +14,16 @@
   100% { transform: scale(1); opacity: 1; }
 }
 
-@keyframes slotHighlight {
-  0% { box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5); }
-  50% { box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3); }
-  100% { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); }
+/* Compositor-friendly highlight animation using transform/opacity */
+@keyframes slotHighlightFade {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.02); }
 }
 
-@keyframes pointsUpdate {
-  0% { background-color: rgba(37, 99, 235, 0.1); }
-  100% { background-color: transparent; }
+/* Compositor-friendly points update using opacity */
+@keyframes pointsUpdateFade {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 @keyframes moveUp {
@@ -40,10 +41,11 @@
   100% { background-position: 1000px 0; }
 }
 
-@keyframes pulseGlow {
-  0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
-  70% { box-shadow: 0 0 0 8px rgba(59, 130, 246, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+/* Compositor-friendly pulse using transform/opacity */
+@keyframes pulseGlowFade {
+  0% { opacity: 0.4; transform: scale(1); }
+  70% { opacity: 0; transform: scale(1.15); }
+  100% { opacity: 0; transform: scale(1); }
 }
 
 @keyframes gridRowEntry {
@@ -88,28 +90,60 @@ body {
     animation: cardPlacement 0.4s ease-out;
   }
   
+  /* Slot highlight using pseudo-element for GPU acceleration */
   .animate-slot-highlight {
-    animation: slotHighlight 0.8s ease-out;
+    position: relative;
+    overflow: visible;
+  }
+  .animate-slot-highlight::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border: 2px solid rgba(59, 130, 246, 0.5);
+    border-radius: inherit;
+    pointer-events: none;
+    animation: slotHighlightFade 0.8s ease-out forwards;
   }
 
   .animate-toast-in {
     animation: toastIn 0.3s ease-out forwards;
   }
-  
+
+  /* Points update using pseudo-element for GPU acceleration */
   .animate-points-update {
-    animation: pointsUpdate 1.5s ease-out;
+    position: relative;
   }
-  
+  .animate-points-update::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: rgba(37, 99, 235, 0.15);
+    border-radius: inherit;
+    pointer-events: none;
+    animation: pointsUpdateFade 1.5s ease-out forwards;
+  }
+
   .animate-position-up {
     animation: moveUp 0.5s ease-out;
   }
-  
+
   .animate-position-down {
     animation: moveDown 0.5s ease-out;
   }
-  
+
+  /* Pulse glow using pseudo-element for GPU acceleration */
   .animate-pulse {
-    animation: pulseGlow 2s infinite;
+    position: relative;
+    overflow: visible;
+  }
+  .animate-pulse::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 2px solid rgba(59, 130, 246, 0.4);
+    border-radius: inherit;
+    pointer-events: none;
+    animation: pulseGlowFade 2s infinite;
   }
   
   .animate-grid-entry {
@@ -179,6 +213,27 @@ body {
     background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
     background-size: 1000px 100%;
     animation: shimmer 2s infinite;
+  }
+
+  /* Single overlay shimmer - replaces 500+ individual animations with 1 */
+  .skeleton-shimmer-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.4) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmerOverlay 1.5s infinite;
+  }
+
+  @keyframes shimmerOverlay {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
   }
 
   /* Race Grid Components */
