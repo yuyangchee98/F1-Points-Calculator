@@ -7,8 +7,7 @@ import App from './App'
 import About from './pages/About'
 import './index.css'
 
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js'
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
+// ChartJS registration moved to chart components for lazy loading
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
