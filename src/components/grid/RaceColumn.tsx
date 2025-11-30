@@ -19,9 +19,11 @@ import { hasFastestLapPoint, getActiveSeason } from '../../utils/constants';
 interface RaceColumnProps {
   race: Race;
   position: number;
+  style?: React.CSSProperties;
+  className?: string;
 }
 
-const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
+const RaceColumn: React.FC<RaceColumnProps> = ({ race, position, style, className }) => {
   const dispatch = useAppDispatch();
   const driverId = useSelector((state: RootState) =>
     selectDriverAtPosition(state, race.id, position)
@@ -259,6 +261,7 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
     isOver ? 'drag-over' : '',
     canDrop ? 'can-drop' : '',
     selectedDriverId ? 'cursor-pointer' : '',
+    className || '',
   ].filter(Boolean).join(' ');
 
   const hasFastestLap = gridPosition?.hasFastestLap || false;
@@ -278,7 +281,10 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position }) => {
         role="button"
         aria-label={driver ? `Position ${position}: ${getDriverLastName(driver.id)}` : `Empty position ${position}`}
         tabIndex={0}
-        style={shouldShowFastestLapBorder ? { border: '3px solid #7D428E' } : undefined}
+        style={{
+          ...style,
+          ...(shouldShowFastestLapBorder ? { border: '3px solid #7D428E' } : {})
+        }}
       >
         {driver && (
           <div className="animate-placement grid-card-wrapper">
