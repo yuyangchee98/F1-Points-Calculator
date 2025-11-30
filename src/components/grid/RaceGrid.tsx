@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { RootState } from '../../store';
 import PositionColumn from './PositionColumn';
 import RaceColumn from './RaceColumn';
@@ -18,6 +19,14 @@ interface RaceGridProps {
   showOfficialResults: boolean;
 }
 
+// Constants for grid dimensions
+const POSITION_COLUMN_WIDTH = 80;
+const HEADER_HEIGHT = 64;
+const ROW_HEIGHT = 72;
+const GAP = 8;
+const ROW_COUNT = 20;
+const OVERSCAN = 2;
+
 const RaceGrid: React.FC<RaceGridProps> = ({
   scrollRef,
   onReset,
@@ -32,35 +41,51 @@ const RaceGrid: React.FC<RaceGridProps> = ({
   const driverStandings = useSelector(selectDriverStandings);
   const { isMobile, isTablet } = useWindowSize();
 
-  const getMinColumnWidth = () => {
-    if (isMobile) return '100px';
-    if (isTablet) return '110px';
-    return '120px';
-  };
+  // Track if initial render is complete (for entry animations)
+  const [hasInitiallyRendered, setHasInitiallyRendered] = useState(false);
 
+  // Internal scroll ref if none provided
+  const internalScrollRef = useRef<HTMLDivElement>(null);
+  const actualScrollRef = scrollRef || internalScrollRef;
+
+  // Calculate column width based on viewport
+  const columnWidth = isMobile ? 100 + GAP : isTablet ? 110 + GAP : 120 + GAP;
+
+  // Column virtualizer (horizontal only - rows always fit in viewport)
+  const columnVirtualizer = useVirtualizer({
+    horizontal: true,
+    count: races.length,
+    getScrollElement: () => actualScrollRef.current,
+    estimateSize: () => columnWidth,
+    overscan: OVERSCAN,
+  });
+
+  // Auto-scroll to first upcoming race on initial load
   useEffect(() => {
-    if (!scrollRef?.current || races.length === 0) return;
+    if (!actualScrollRef?.current || races.length === 0) return;
 
     const firstUpcomingRaceIndex = races.findIndex(race => !race.completed);
-
     if (firstUpcomingRaceIndex === -1) return;
 
-    setTimeout(() => {
-      if (!scrollRef.current) return;
-
-      const columnWidth = isMobile ? 100 : isTablet ? 110 : 120;
-
-      const positionColumnWidth = 80;
-
-      const scrollPosition = positionColumnWidth + (Math.max(0, firstUpcomingRaceIndex - 1) * columnWidth);
-
-      scrollRef.current.scrollTo({
-        left: scrollPosition,
-        behavior: 'smooth'
-      });
+    const scrollTimeout = setTimeout(() => {
+      columnVirtualizer.scrollToIndex(
+        Math.max(0, firstUpcomingRaceIndex - 1),
+        { behavior: 'smooth', align: 'start' }
+      );
     }, 100);
-  }, [races, scrollRef, isMobile, isTablet]);
-  
+
+    return () => clearTimeout(scrollTimeout);
+  }, [races, columnVirtualizer]);
+
+  // Mark initial render complete after first paint
+  useEffect(() => {
+    const timer = setTimeout(() => setHasInitiallyRendered(true), 600);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const virtualColumns = columnVirtualizer.getVirtualItems();
+  const totalVirtualWidth = columnVirtualizer.getTotalSize();
+
   return (
     <div className="shadow-md rounded-lg border border-gray-200">
       <GridToolbar
@@ -71,81 +96,156 @@ const RaceGrid: React.FC<RaceGridProps> = ({
         showOfficialResults={showOfficialResults}
       />
 
+      {/* Single scroll container for the entire grid */}
       <div
-        ref={scrollRef}
+        ref={actualScrollRef}
         id="race-grid"
-        className="race-grid overflow-x-auto pb-4"
-        style={{
-          gridTemplateColumns: `80px repeat(${races.length}, minmax(${getMinColumnWidth()}, 1fr))`,
-          gridAutoRows: 'minmax(40px, auto)'
-        }}
+        className="overflow-x-auto p-4"
+        style={{ maxHeight: `calc(100vh - 180px)` }}
       >
-        <div 
-          className="position-header sticky left-0 z-10 cursor-pointer hover:bg-gray-800 transition-all duration-200 flex flex-col items-center justify-center gap-0.5 group"
-          onClick={() => dispatch(togglePositionColumnMode())}
-          title={`Click to switch to ${positionColumnMode === 'position' ? 'championship standings' : 'grid positions'} view`}
+        {/* Inner container sized to total virtual width + position column */}
+        <div
+          style={{
+            width: POSITION_COLUMN_WIDTH + GAP + totalVirtualWidth,
+            position: 'relative',
+          }}
         >
-          <span className="text-[11px] font-bold">
-            {positionColumnMode === 'position' ? 'Grid' : 'Driver'}
-          </span>
-          <span className="text-[9px] opacity-80">
-            {positionColumnMode === 'position' ? 'Position' : 'Standings'}
-          </span>
-          <svg 
-            className="w-3 h-3 opacity-60 group-hover:opacity-100 transition-opacity" 
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
-          </svg>
-        </div>
-
-        {races.map(race => (
-          <div 
-            key={race.id} 
-            className={`race-header ${race.isSprint ? 'sprint' : ''} ${race.completed ? 'completed-race-header' : ''}`}
-          >
-            {race.countryCode && (
-              <img 
-                src={`/flags/${race.countryCode}.png`} 
-                alt={race.country} 
-                className="flag"
-              />
-            )}
-            <span className={`${isMobile ? 'text-xs' : 'text-sm'}`}>
-              {race.name
-                .split('-')
-                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                .join(' ')}
-            </span>
-            {race.completed && (
-              <span className="completed-indicator" title="Completed Race">✓</span>
-            )}
-          </div>
-        ))}
-
-        {Array.from({ length: 20 }, (_, i) => i + 1).map(position => (
-          <React.Fragment key={position}>
+          {/* Header Row */}
+          <div style={{ display: 'flex', marginBottom: GAP, height: HEADER_HEIGHT }}>
+            {/* Position Header - sticky */}
             <div
-              className={`contents animate-grid-entry grid-row-${Math.min(position, 10)} ${position % 2 === 0 ? 'even-row' : ''}`}
+              className="position-header cursor-pointer hover:bg-gray-800 transition-all duration-200 flex flex-col items-center justify-center gap-0.5 group sticky left-0 z-20"
+              onClick={() => dispatch(togglePositionColumnMode())}
+              title={`Click to switch to ${positionColumnMode === 'position' ? 'championship standings' : 'grid positions'} view`}
+              style={{
+                width: POSITION_COLUMN_WIDTH,
+                height: HEADER_HEIGHT,
+                flexShrink: 0,
+              }}
             >
-              <PositionColumn
-                position={position}
-                mode={positionColumnMode}
-                standings={driverStandings}
-              />
-
-              {races.map(race => (
-                <RaceColumn 
-                  key={`${race.id}-${position}`}
-                  race={race}
-                  position={position}
-                />
-              ))}
+              <span className="text-[11px] font-bold">
+                {positionColumnMode === 'position' ? 'Grid' : 'Driver'}
+              </span>
+              <span className="text-[9px] opacity-80">
+                {positionColumnMode === 'position' ? 'Position' : 'Standings'}
+              </span>
+              <svg
+                className="w-3 h-3 opacity-60 group-hover:opacity-100 transition-opacity"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+              </svg>
             </div>
-          </React.Fragment>
-        ))}
+
+            {/* Spacer for position column */}
+            <div style={{ width: GAP, flexShrink: 0 }} />
+
+            {/* Race Headers - virtualized */}
+            <div style={{ position: 'relative', width: totalVirtualWidth, height: HEADER_HEIGHT }}>
+              {virtualColumns.map(virtualColumn => {
+                const race = races[virtualColumn.index];
+                return (
+                  <div
+                    key={race.id}
+                    className={`race-header ${race.isSprint ? 'sprint' : ''} ${race.completed ? 'completed-race-header' : ''}`}
+                    style={{
+                      position: 'absolute',
+                      left: virtualColumn.start,
+                      top: 0,
+                      width: columnWidth - GAP,
+                      height: HEADER_HEIGHT,
+                    }}
+                  >
+                    {race.countryCode && (
+                      <img
+                        src={`/flags/${race.countryCode}.png`}
+                        alt={race.country}
+                        className="flag"
+                      />
+                    )}
+                    <span className={`${isMobile ? 'text-xs' : 'text-sm'}`}>
+                      {race.name
+                        .split('-')
+                        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                        .join(' ')}
+                    </span>
+                    {race.completed && (
+                      <span className="completed-indicator" title="Completed Race">✓</span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Grid Rows */}
+          {Array.from({ length: ROW_COUNT }, (_, i) => i + 1).map(position => {
+            const isEvenRow = position % 2 === 0;
+            const animationClass = !hasInitiallyRendered
+              ? `animate-grid-entry grid-row-${Math.min(position, 10)}`
+              : '';
+
+            return (
+              <div
+                key={position}
+                className={animationClass}
+                style={{
+                  display: 'flex',
+                  marginBottom: GAP,
+                  height: ROW_HEIGHT,
+                }}
+              >
+                {/* Position Column - sticky left */}
+                <div
+                  className="sticky left-0 z-10"
+                  style={{
+                    width: POSITION_COLUMN_WIDTH,
+                    height: ROW_HEIGHT,
+                    flexShrink: 0,
+                  }}
+                >
+                  <PositionColumn
+                    position={position}
+                    mode={positionColumnMode}
+                    standings={driverStandings}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                    }}
+                  />
+                </div>
+
+                {/* Spacer */}
+                <div style={{ width: GAP, flexShrink: 0 }} />
+
+                {/* Race Columns - virtualized */}
+                <div style={{ position: 'relative', width: totalVirtualWidth, height: ROW_HEIGHT }}>
+                  {virtualColumns.map(virtualColumn => {
+                    const race = races[virtualColumn.index];
+
+                    return (
+                      <RaceColumn
+                        key={`${race.id}-${position}`}
+                        race={race}
+                        position={position}
+                        style={{
+                          position: 'absolute',
+                          left: virtualColumn.start,
+                          top: 0,
+                          width: columnWidth - GAP,
+                          height: ROW_HEIGHT,
+                          ...(isEvenRow ? { backgroundColor: 'rgb(249 250 251)' } : {}),
+                        }}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
