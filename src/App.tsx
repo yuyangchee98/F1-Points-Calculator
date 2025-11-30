@@ -208,7 +208,20 @@ const App: React.FC = () => {
               <div className={`${(mobileView === 'grid' || !isMobile) ? 'block' : 'hidden'}`}>
                 {isLoading ? (
                   <>
-                    {!isHistoricalSeason && <SmartInputSkeleton />}
+                    {!isHistoricalSeason && (
+                      <>
+                        <SmartInputSkeleton />
+                        {/* Swap button skeleton */}
+                        <div className="flex items-center justify-center my-3">
+                          <div className="flex-1 h-px bg-gray-200 max-w-xs"></div>
+                          <div className="flex items-center gap-1.5 px-3 py-1.5 mx-3 bg-white border border-gray-300 rounded-full shadow-sm">
+                            <div className="w-4 h-4 bg-gray-200 rounded"></div>
+                            <div className="w-8 h-3 bg-gray-200 rounded"></div>
+                          </div>
+                          <div className="flex-1 h-px bg-gray-200 max-w-xs"></div>
+                        </div>
+                      </>
+                    )}
                     <DriverSelectionSkeleton />
                     <GridSkeleton />
                   </>
