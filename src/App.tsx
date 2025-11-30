@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
+import LazyDndProvider from './components/common/LazyDndProvider';
 import { initializeUiState, setMobileView, toggleOfficialResults as toggleOfficialResultsUI } from './store/slices/uiSlice';
 import { RootState, store } from './store';
 import { moveDriver, resetGrid, toggleOfficialResults } from './store/slices/gridSlice';
@@ -130,7 +129,7 @@ const App: React.FC = () => {
   }, [isMobile, mobileView, dispatch]);
 
   return (
-    <DndProvider backend={HTML5Backend}>
+    <LazyDndProvider>
       <div className="app min-h-screen">
         <ToastContainer />
 
@@ -494,7 +493,7 @@ const App: React.FC = () => {
         />
 
       </div>
-    </DndProvider>
+    </LazyDndProvider>
   );
 };
 
