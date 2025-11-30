@@ -160,7 +160,7 @@ const RaceGrid: React.FC<RaceGridProps> = ({
                   >
                     {race.countryCode && (
                       <img
-                        src={`/flags/${race.countryCode}.png`}
+                        src={`/flags/${race.countryCode}.webp`}
                         alt={race.country}
                         className="flag"
                       />
