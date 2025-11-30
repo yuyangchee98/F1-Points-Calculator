@@ -183,16 +183,18 @@ body {
 
   /* Race Grid Components */
   .race-grid {
-    @apply grid p-6 rounded-lg min-w-full gap-2 shadow-xl;
+    @apply p-6 rounded-lg min-w-full gap-2 shadow-xl;
   }
-  
+
   .race-slot {
-    @apply bg-white p-3 rounded-md border border-gray-200 min-h-[3.5rem] flex items-center justify-center transition-all duration-200 shadow-md;
+    @apply bg-white p-2 rounded-md border border-gray-200 flex items-center justify-center transition-all duration-200 shadow-md;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
   }
   
   .race-slot:hover {
     @apply border-blue-300 shadow-lg;
-    transform: translateY(-2px);
   }
   
   .race-slot.highlight-slot {
@@ -289,17 +291,24 @@ body {
   }
   
   .race-header {
-    @apply bg-gray-700 text-white font-bold text-center p-3 rounded-md shadow-md transition-all duration-200;
+    @apply bg-gray-700 text-white font-bold text-center p-2 rounded-md shadow-md transition-all duration-200 flex flex-col items-center justify-center;
+    box-sizing: border-box;
   }
-  
+
   .position {
-    @apply sticky left-0 z-10 flex items-center justify-center font-bold rounded-md transition-all duration-200 border border-slate-300;
+    @apply flex items-center justify-center font-bold rounded-md transition-all duration-200 border border-slate-300;
     background: #f0f4f8;
     box-shadow: 2px 0 6px -2px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
   }
 
   .even-row > * {
     @apply bg-gray-50;
+  }
+
+  /* Virtualized grid specific styles */
+  .virtualized-cell {
+    box-sizing: border-box;
   }
 
   /* Grid Card Wrapper */

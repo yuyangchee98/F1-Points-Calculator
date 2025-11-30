@@ -7,9 +7,10 @@ interface PositionColumnProps {
   position: number;
   mode?: 'position' | 'standings';
   standings?: DriverStanding[];
+  style?: React.CSSProperties;
 }
 
-const PositionColumn: React.FC<PositionColumnProps> = ({ position, mode = 'position', standings = [] }) => {
+const PositionColumn: React.FC<PositionColumnProps> = ({ position, mode = 'position', standings = [], style }) => {
   const driverById = useSelector(selectDriversByIdMap);
   const teamById = useSelector(selectTeamsByIdMap);
 
@@ -23,6 +24,7 @@ const PositionColumn: React.FC<PositionColumnProps> = ({ position, mode = 'posit
       className="position sticky left-0 z-10 flex items-center justify-center"
       data-position={position}
       title={mode === 'standings' && driver && standingDriver ? `${driver.givenName} ${driver.familyName} - ${standingDriver.points} pts` : `Position ${position}`}
+      style={style}
     >
       {mode === 'position' ? (
         <span className="font-bold text-gray-700">{position}</span>
