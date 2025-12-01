@@ -43,7 +43,7 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({ forceExpanded = false
         <h2 className="text-2xl font-bold">DRIVERS</h2>
         <button
           id="driver-toggle-button"
-          className="sm:hidden bg-red-600 hover:bg-red-700 text-white px-5 py-3 rounded-md shadow-lg transition-all duration-200 flex items-center"
+          className="sm:hidden bg-red-600 hover:bg-red-700 text-white px-5 py-3 rounded-md shadow-lg transition-colors duration-200 flex items-center"
           onClick={() => {
             setIsExpanded(!isExpanded);
             trackEvent(
@@ -75,8 +75,8 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({ forceExpanded = false
         id="driver-selection"
         className={`
           grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 
-          ${isExpanded ? 'max-h-[800px]' : 'max-h-0 sm:max-h-[800px]'} 
-          overflow-hidden transition-all duration-300 ease-in-out
+          ${isExpanded ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0 sm:max-h-[800px] sm:opacity-100'}
+          overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out
           ${forceExpanded ? 'overflow-y-auto pb-20' : 'sm:overflow-visible sm:max-h-full'} 
           p-4 bg-gray-50 rounded-lg shadow-sm border border-gray-200
         `}

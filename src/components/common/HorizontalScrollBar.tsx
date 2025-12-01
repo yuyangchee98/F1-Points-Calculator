@@ -10,12 +10,12 @@ const HorizontalScrollBar: React.FC<HorizontalScrollBarProps> = ({ scrollContain
   const scrollBarRef = useRef<HTMLDivElement>(null);
   const thumbRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [dragStartX, setDragStartX] = useState(0);
-  const [scrollStartX, setScrollStartX] = useState(0);
   const [dragThumbPosition, setDragThumbPosition] = useState<number | null>(null);
+  const [scrollBarWidth, setScrollBarWidth] = useState(0);
 
   useEffect(() => {
     const scrollContainer = scrollContainerRef.current;
+    const scrollBar = scrollBarRef.current;
     if (!scrollContainer) return;
 
     const updateScrollBar = () => {
@@ -23,10 +23,15 @@ const HorizontalScrollBar: React.FC<HorizontalScrollBarProps> = ({ scrollContain
       const maxScroll = scrollWidth - clientWidth;
 
       setIsVisible(scrollWidth > clientWidth);
-      
+
       if (maxScroll > 0) {
         const percentage = (scrollLeft / maxScroll) * 100;
         setScrollPercentage(percentage);
+      }
+
+      // Track scrollbar width for GPU-accelerated transforms
+      if (scrollBar) {
+        setScrollBarWidth(scrollBar.clientWidth);
       }
     };
 
@@ -36,6 +41,9 @@ const HorizontalScrollBar: React.FC<HorizontalScrollBarProps> = ({ scrollContain
 
     const resizeObserver = new ResizeObserver(updateScrollBar);
     resizeObserver.observe(scrollContainer);
+    if (scrollBar) {
+      resizeObserver.observe(scrollBar);
+    }
 
     return () => {
       scrollContainer.removeEventListener('scroll', updateScrollBar);
@@ -66,15 +74,13 @@ const HorizontalScrollBar: React.FC<HorizontalScrollBarProps> = ({ scrollContain
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     setIsDragging(true);
-    setDragStartX(e.clientX);
-    setScrollStartX(scrollContainerRef.current?.scrollLeft || 0);
 
-    if (scrollBarRef.current && scrollContainerRef.current) {
+    if (scrollBarRef.current) {
       const rect = scrollBarRef.current.getBoundingClientRect();
       const initialPosition = e.clientX - rect.left;
       setDragThumbPosition(initialPosition);
     }
-    
+
     e.preventDefault();
   };
 
@@ -121,7 +127,7 @@ const HorizontalScrollBar: React.FC<HorizontalScrollBarProps> = ({ scrollContain
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
     };
-  }, [isDragging, dragStartX, scrollStartX, scrollContainerRef]);
+  }, [isDragging, scrollContainerRef]);
 
   const scrollContainer = scrollContainerRef.current;
   let thumbWidthPercentage = 20;
@@ -133,25 +139,29 @@ const HorizontalScrollBar: React.FC<HorizontalScrollBarProps> = ({ scrollContain
   const maxThumbTravel = 100 - thumbWidthPercentage;
   let thumbPosition = (scrollPercentage / 100) * maxThumbTravel;
 
-  if (isDragging && dragThumbPosition !== null && scrollBarRef.current) {
-    const thumbCenterPercent = (dragThumbPosition / scrollBarRef.current.clientWidth) * 100;
+  if (isDragging && dragThumbPosition !== null && scrollBarWidth > 0) {
+    const thumbCenterPercent = (dragThumbPosition / scrollBarWidth) * 100;
     thumbPosition = thumbCenterPercent - (thumbWidthPercentage / 2);
   }
+
+  // Calculate pixel offset for GPU-accelerated transform
+  const thumbWidthPx = (thumbWidthPercentage / 100) * scrollBarWidth;
+  const thumbOffsetPx = (thumbPosition / 100) * scrollBarWidth;
 
   return (
     <div className={`w-full py-2 px-4 hidden sm:block transition-opacity duration-200 ${!isVisible ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
       <div className="bg-white rounded-md p-2 shadow-sm border border-gray-200">
-        <div 
+        <div
           ref={scrollBarRef}
           className="relative w-full h-2.5 bg-gray-200 rounded-full cursor-pointer"
           onClick={handleScrollBarClick}
         >
-          <div 
+          <div
             ref={thumbRef}
-            className={`absolute top-0 h-full bg-gradient-to-r from-red-500 to-red-600 rounded-full shadow transition-all ${isDragging ? '' : 'duration-200'} cursor-grab active:cursor-grabbing hover:shadow-md`}
-            style={{ 
+            className={`absolute top-0 left-0 h-full bg-gradient-to-r from-red-500 to-red-600 rounded-full shadow transition-transform ${isDragging ? '' : 'duration-200'} cursor-grab active:cursor-grabbing hover:shadow-md will-change-transform`}
+            style={{
               width: `${thumbWidthPercentage}%`,
-              left: `${thumbPosition}%`
+              transform: `translateX(${thumbOffsetPx}px)`
             }}
             onMouseDown={handleMouseDown}
           />

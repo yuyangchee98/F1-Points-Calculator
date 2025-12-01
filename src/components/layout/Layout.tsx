@@ -46,11 +46,11 @@ const Layout: React.FC<LayoutProps> = ({ sidebar, content }) => {
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="flex flex-col sm:flex-row">
-        <aside 
+        <aside
           className={`
-            ${mobileView === 'standings' ? 'block w-full h-[calc(100vh-64px)] z-30' : 'hidden'} 
+            ${mobileView === 'standings' ? 'block w-full h-[calc(100vh-64px)] z-30' : 'hidden'}
             sm:block bg-white border-r border-gray-200 overflow-hidden shadow-md
-            transition-all duration-300 ease-in-out
+            transition-[width,min-width,max-width] duration-300 ease-in-out
             ${isSidebarCollapsed ? 'sm:w-16' : 'sm:w-72 lg:w-1/4 min-w-[280px] max-w-[450px]'}
             sm:sticky sm:top-0 sm:h-screen sm:z-20
           `}
@@ -94,10 +94,9 @@ const Layout: React.FC<LayoutProps> = ({ sidebar, content }) => {
           )}
         </aside>
 
-        <main 
+        <main
           className={`
             flex-1 relative ${mobileView !== 'standings' ? 'block' : 'hidden sm:block'}
-            transition-all duration-300 ease-in-out
             pt-0 min-h-screen
           `}
         >
