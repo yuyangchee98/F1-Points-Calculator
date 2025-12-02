@@ -28,10 +28,10 @@ const LazyDndProvider: React.FC<LazyDndProviderProps> = ({ children }) => {
     loadDnd();
   }, []);
 
-  // Render children immediately, DnD will wrap once loaded
+  // Wait for DnD module to load before rendering children
+  // This prevents "Expected drag drop context" errors from useDrag/useDrop hooks
   if (!DndModule) {
-    // Return children without DnD - drag/drop won't work yet but UI is visible
-    return <>{children}</>;
+    return null;
   }
 
   const { DndProvider, HTML5Backend } = DndModule;
