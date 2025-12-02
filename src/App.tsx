@@ -66,6 +66,12 @@ const App: React.FC = () => {
   const [smartInputFirst, setSmartInputFirst] = useState(() => {
     return localStorage.getItem('f1_input_order') === 'smart-first';
   });
+  const [showSmartInputDemo, setShowSmartInputDemo] = useState(false);
+
+  useEffect(() => {
+    const id = requestIdleCallback(() => setShowSmartInputDemo(true));
+    return () => cancelIdleCallback(id);
+  }, []);
 
   const handleSwapInputs = () => {
     const newValue = !smartInputFirst;
@@ -349,14 +355,21 @@ const App: React.FC = () => {
                           <h4 className="text-xl font-bold mb-3">Try Smart Input: <span className="font-normal text-sm text-gray-600">Type what you want to happen and watch the grid update instantly. <span className="text-xs text-gray-500">Watch demo ↓</span></span></h4>
 
                           <div className="mb-4">
-                            <React.Suspense fallback={
+                            {showSmartInputDemo ? (
+                              <React.Suspense fallback={
+                                <div style={{ width: '380px', maxWidth: '100%', margin: '0 auto' }}>
+                                  <div style={{ height: '38px', marginBottom: '15px' }}></div>
+                                  <div style={{ height: '150px' }}></div>
+                                </div>
+                              }>
+                                <SmartInputDemo />
+                              </React.Suspense>
+                            ) : (
                               <div style={{ width: '380px', maxWidth: '100%', margin: '0 auto' }}>
                                 <div style={{ height: '38px', marginBottom: '15px' }}></div>
                                 <div style={{ height: '150px' }}></div>
                               </div>
-                            }>
-                              <SmartInputDemo />
-                            </React.Suspense>
+                            )}
                           </div>
                         </div>
 
