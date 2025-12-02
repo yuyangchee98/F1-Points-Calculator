@@ -19,9 +19,10 @@ async function generateRaceUrls(): Promise<string[]> {
   try {
     for (const year of years) {
       console.log(`Fetching schedule for ${year}...`);
-      const response = await fetch(`${API_BASE}/api/schedule/${year}`);
+      const response = await fetch(`${API_BASE}/api/init?year=${year}`);
       if (response.ok) {
-        const races = await response.json();
+        const data = await response.json();
+        const races = data.schedule || [];
         console.log(`Found ${races.length} races for ${year}`);
         races.forEach((race: { id: string }) => {
           baseUrls.push(`/race/${year}/${race.id}`);
