@@ -182,7 +182,6 @@ const RaceGrid: React.FC<RaceGridProps> = ({
 
           {/* Grid Rows */}
           {Array.from({ length: ROW_COUNT }, (_, i) => i + 1).map(position => {
-            const isEvenRow = position % 2 === 0;
             const animationClass = !hasInitiallyRendered
               ? `animate-grid-entry grid-row-${Math.min(position, 10)}`
               : '';
@@ -236,7 +235,6 @@ const RaceGrid: React.FC<RaceGridProps> = ({
                           top: 0,
                           width: columnWidth - GAP,
                           height: ROW_HEIGHT,
-                          ...(isEvenRow ? { backgroundColor: 'rgb(249 250 251)' } : {}),
                         }}
                       />
                     );

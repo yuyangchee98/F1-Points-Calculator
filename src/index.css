@@ -241,7 +241,7 @@ body {
   }
 
   .race-slot {
-    @apply bg-white p-2 rounded-md border border-gray-200 flex items-center justify-center transition-transform duration-200 shadow-md;
+    @apply p-2 rounded-md border border-gray-200 flex items-center justify-center transition-transform duration-200 shadow-md;
     box-sizing: border-box;
     width: 100%;
     height: 100%;
@@ -353,10 +353,6 @@ body {
     background: #f0f4f8;
     box-shadow: 2px 0 6px -2px rgba(0, 0, 0, 0.1);
     box-sizing: border-box;
-  }
-
-  .even-row > * {
-    @apply bg-gray-50;
   }
 
   /* Virtualized grid specific styles */
