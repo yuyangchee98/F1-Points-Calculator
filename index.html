@@ -29,10 +29,6 @@
     
     <!-- Preconnect to critical origins -->
     <link rel="preconnect" href="https://f1-points-calculator-api.yuyangchee98.workers.dev">
-    <link rel="preconnect" href="https://www.googletagmanager.com">
-    <link rel="preconnect" href="https://www.google-analytics.com">
-    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-    <link rel="dns-prefetch" href="https://www.google-analytics.com">
 
     <!-- Schema.org data -->
     <script type="application/ld+json">
@@ -76,16 +72,6 @@
       }
     </script>
     
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GJ61RX1FZJ"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag("js", new Date());
-      gtag("config", "G-GJ61RX1FZJ");
-    </script>
   </head>
   <body class="bg-gray-100">
     <div id="root"></div>
@@ -104,5 +90,23 @@
         </ul>
       </div>
     </noscript>
+
+    <!-- Google Analytics - Deferred to not block rendering -->
+    <script>
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          var script = document.createElement('script');
+          script.src = 'https://www.googletagmanager.com/gtag/js?id=G-GJ61RX1FZJ';
+          script.async = true;
+          document.head.appendChild(script);
+
+          window.dataLayer = window.dataLayer || [];
+          function gtag() { dataLayer.push(arguments); }
+          window.gtag = gtag;
+          gtag('js', new Date());
+          gtag('config', 'G-GJ61RX1FZJ');
+        }, 100);
+      });
+    </script>
   </body>
 </html>
