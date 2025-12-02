@@ -1,8 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { Driver, Team, Race, RaceResult } from '../../types';
-import { fetchDrivers, fetchTeams, fetchPastRaceResults } from '../../api/dataFetchers';
-import { fetchRaceSchedule } from '../../api/raceSchedule';
-import { CURRENT_SEASON } from '../../utils/constants';
+import { API_BASE_URL, CURRENT_SEASON, COUNTRY_CODE_MAP } from '../../utils/constants';
 
 export interface SeasonDataState {
   drivers: Driver[];
@@ -25,14 +23,13 @@ const initialState: SeasonDataState = {
 export const fetchSeasonData = createAsyncThunk(
   'seasonData/fetchSeasonData',
   async (year: number) => {
-    const [results, schedule, teams, drivers] = await Promise.all([
-      fetchPastRaceResults(year).catch(() => ({})),
-      fetchRaceSchedule(year),
-      fetchTeams(year).catch(() => []),
-      fetchDrivers(year).catch(() => [])
-    ]);
+    const response = await fetch(`${API_BASE_URL}/api/init?year=${year}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch season data');
+    }
 
-    return { schedule, results, teams, drivers };
+    const { schedule, teams, drivers, raceResults } = await response.json();
+    return { schedule, results: raceResults, teams, drivers };
   }
 );
 
@@ -51,13 +48,23 @@ export const seasonDataSlice = createSlice({
 
         state.drivers = drivers;
         state.teams = teams;
-        state.races = schedule;
         state.pastResults = results;
 
-        state.races = state.races.map(race => {
-          const apiRaceName = race.name.toLowerCase().replace(/\s+/g, '-');
-          const isCompleted = !!state.pastResults[apiRaceName];
-          return { ...race, completed: isCompleted };
+        // Transform schedule to add countryCode and completed status
+        state.races = schedule.map((item: { id: string; name: string; isSprint: boolean; country: string; order: number; date: string; round: number }) => {
+          const apiRaceName = item.name.toLowerCase().replace(/\s+/g, '-');
+          const isCompleted = !!results[apiRaceName];
+          return {
+            id: item.id,
+            name: item.name,
+            isSprint: item.isSprint,
+            country: item.country.toLowerCase(),
+            countryCode: COUNTRY_CODE_MAP[item.country.toLowerCase()] || '',
+            order: item.order,
+            completed: isCompleted,
+            date: item.date,
+            round: item.round.toString(),
+          };
         });
 
         try {

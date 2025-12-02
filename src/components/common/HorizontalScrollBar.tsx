@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, memo } from 'react';
 
 interface HorizontalScrollBarProps {
   scrollContainerRef: React.RefObject<HTMLDivElement>;
@@ -12,6 +12,7 @@ const HorizontalScrollBar: React.FC<HorizontalScrollBarProps> = ({ scrollContain
   const [isDragging, setIsDragging] = useState(false);
   const [dragThumbPosition, setDragThumbPosition] = useState<number | null>(null);
   const [scrollBarWidth, setScrollBarWidth] = useState(0);
+  const [viewportRatio, setViewportRatio] = useState(0.2);
 
   useEffect(() => {
     const scrollContainer = scrollContainerRef.current;
@@ -23,6 +24,7 @@ const HorizontalScrollBar: React.FC<HorizontalScrollBarProps> = ({ scrollContain
       const maxScroll = scrollWidth - clientWidth;
 
       setIsVisible(scrollWidth > clientWidth);
+      setViewportRatio(clientWidth / scrollWidth);
 
       if (maxScroll > 0) {
         const percentage = (scrollLeft / maxScroll) * 100;
@@ -129,12 +131,8 @@ const HorizontalScrollBar: React.FC<HorizontalScrollBarProps> = ({ scrollContain
     };
   }, [isDragging, scrollContainerRef]);
 
-  const scrollContainer = scrollContainerRef.current;
-  let thumbWidthPercentage = 20;
-  if (scrollContainer) {
-    const viewportRatio = scrollContainer.clientWidth / scrollContainer.scrollWidth;
-    thumbWidthPercentage = Math.max(20, Math.min(90, viewportRatio * 100));
-  }
+  // Use state-based viewportRatio to avoid forced reflow during render
+  const thumbWidthPercentage = Math.max(20, Math.min(90, viewportRatio * 100));
 
   const maxThumbTravel = 100 - thumbWidthPercentage;
   let thumbPosition = (scrollPercentage / 100) * maxThumbTravel;
@@ -169,4 +167,4 @@ const HorizontalScrollBar: React.FC<HorizontalScrollBarProps> = ({ scrollContain
   );
 };
 
-export default HorizontalScrollBar;
+export default memo(HorizontalScrollBar);
