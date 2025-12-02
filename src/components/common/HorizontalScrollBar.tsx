@@ -144,8 +144,6 @@ const HorizontalScrollBar: React.FC<HorizontalScrollBarProps> = ({ scrollContain
     thumbPosition = thumbCenterPercent - (thumbWidthPercentage / 2);
   }
 
-  // Calculate pixel offset for GPU-accelerated transform
-  const thumbWidthPx = (thumbWidthPercentage / 100) * scrollBarWidth;
   const thumbOffsetPx = (thumbPosition / 100) * scrollBarWidth;
 
   return (

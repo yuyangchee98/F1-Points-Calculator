@@ -14,7 +14,7 @@ const InputSections: React.FC<InputSectionsProps> = ({
 }) => {
   const driverSection = <DriverSelection key="drivers" />;
   const smartSection = (
-    <div key="smart" className="mb-6 p-4 bg-gray-50 rounded-lg shadow-sm border border-gray-200 relative">
+    <div key="smart" className="mb-6 p-4 rounded-lg shadow-sm border border-gray-200 relative">
       {smartInputContent}
     </div>
   );
