@@ -23,7 +23,6 @@ import SubscriptionModal from './components/common/SubscriptionModal';
 import VersionHistory from './components/common/VersionHistory';
 import ExportModal from './components/common/ExportModal';
 import InputSections from './components/common/InputSections';
-import RacendoPromo from './components/common/RacendoPromo';
 import GridSkeleton from './components/common/GridSkeleton';
 import DriverSelectionSkeleton from './components/common/DriverSelectionSkeleton';
 import SmartInputSkeleton from './components/common/SmartInputSkeleton';
@@ -197,8 +196,6 @@ const App: React.FC = () => {
                   </a>
 
                   <SeasonSelector />
-
-                  <RacendoPromo className="hidden sm:block ml-auto" />
                 </div>
               </div>
 
