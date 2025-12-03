@@ -23,6 +23,7 @@ import SubscriptionModal from './components/common/SubscriptionModal';
 import VersionHistory from './components/common/VersionHistory';
 import ExportModal from './components/common/ExportModal';
 import InputSections from './components/common/InputSections';
+import DrawLineRacingPromo from './components/common/DrawLineRacingPromo';
 import GridSkeleton from './components/common/GridSkeleton';
 import DriverSelectionSkeleton from './components/common/DriverSelectionSkeleton';
 import SmartInputSkeleton from './components/common/SmartInputSkeleton';
@@ -196,6 +197,8 @@ const App: React.FC = () => {
                   </a>
 
                   <SeasonSelector />
+
+                  <DrawLineRacingPromo className="w-full sm:w-auto sm:ml-auto" />
                 </div>
               </div>
 
