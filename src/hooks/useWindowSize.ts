@@ -9,14 +9,23 @@ interface WindowSize {
   isDesktop: boolean;
 }
 
+const getWindowSize = (): WindowSize => {
+  if (typeof window === 'undefined') {
+    return { width: 0, height: 0, isMobile: false, isTablet: false, isDesktop: true };
+  }
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+  return {
+    width,
+    height,
+    isMobile: width < BREAKPOINTS.mobile,
+    isTablet: width >= BREAKPOINTS.mobile && width < BREAKPOINTS.tablet,
+    isDesktop: width >= BREAKPOINTS.tablet,
+  };
+};
+
 const useWindowSize = (): WindowSize => {
-  const [windowSize, setWindowSize] = useState<WindowSize>({
-    width: 0,
-    height: 0,
-    isMobile: false,
-    isTablet: false,
-    isDesktop: false
-  });
+  const [windowSize, setWindowSize] = useState<WindowSize>(getWindowSize);
 
   useEffect(() => {
     function handleResize() {
