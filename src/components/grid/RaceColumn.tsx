@@ -14,7 +14,8 @@ import ContextMenu from '../common/ContextMenu';
 import { ContextMenuItem } from '../../types/contextMenu';
 import { toastService } from '../common/ToastContainer';
 import { trackContextMenuAction } from '../../utils/analytics';
-import { hasFastestLapPoint, getActiveSeason } from '../../utils/constants';
+import { getActiveSeason } from '../../utils/constants';
+import { hasFastestLapPoint } from '../../data/seasonRules';
 
 interface RaceColumnProps {
   race: Race;

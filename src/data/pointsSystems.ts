@@ -1,9 +1,12 @@
+/**
+ * Point system interface for regular race point distribution.
+ * Sprint points are handled by seasonRules.ts based on the year.
+ */
 export interface PointsSystem {
   id: string;
   name: string;
   description: string;
   regular: Record<number, number>;
-  sprint?: Record<number, number>;
 }
 
 export const POINTS_SYSTEMS: Record<string, PointsSystem> = {
@@ -33,28 +36,6 @@ export const POINTS_SYSTEMS: Record<string, PointsSystem> = {
       19: 0,
       20: 0,
     },
-    sprint: {
-      1: 8,
-      2: 7,
-      3: 6,
-      4: 5,
-      5: 4,
-      6: 3,
-      7: 2,
-      8: 1,
-      9: 0,
-      10: 0,
-      11: 0,
-      12: 0,
-      13: 0,
-      14: 0,
-      15: 0,
-      16: 0,
-      17: 0,
-      18: 0,
-      19: 0,
-      20: 0,
-    }
   },
   '2003-2009': {
     id: '2003-2009',
@@ -136,28 +117,6 @@ export const POINTS_SYSTEMS: Record<string, PointsSystem> = {
       19: 2,
       20: 1,
     },
-    sprint: {
-      1: 10,
-      2: 9,
-      3: 8,
-      4: 7,
-      5: 6,
-      6: 5,
-      7: 4,
-      8: 3,
-      9: 2,
-      10: 1,
-      11: 0,
-      12: 0,
-      13: 0,
-      14: 0,
-      15: 0,
-      16: 0,
-      17: 0,
-      18: 0,
-      19: 0,
-      20: 0,
-    }
   },
   'winner-takes-all': {
     id: 'winner-takes-all',
@@ -185,28 +144,6 @@ export const POINTS_SYSTEMS: Record<string, PointsSystem> = {
       19: 0,
       20: 0,
     },
-    sprint: {
-      1: 25,
-      2: 0,
-      3: 0,
-      4: 0,
-      5: 0,
-      6: 0,
-      7: 0,
-      8: 0,
-      9: 0,
-      10: 0,
-      11: 0,
-      12: 0,
-      13: 0,
-      14: 0,
-      15: 0,
-      16: 0,
-      17: 0,
-      18: 0,
-      19: 0,
-      20: 0,
-    }
   },
   'top-heavy': {
     id: 'top-heavy',
@@ -234,28 +171,6 @@ export const POINTS_SYSTEMS: Record<string, PointsSystem> = {
       19: 0,
       20: 0,
     },
-    sprint: {
-      1: 20,
-      2: 12,
-      3: 8,
-      4: 5,
-      5: 3,
-      6: 2,
-      7: 1,
-      8: 0,
-      9: 0,
-      10: 0,
-      11: 0,
-      12: 0,
-      13: 0,
-      14: 0,
-      15: 0,
-      16: 0,
-      17: 0,
-      18: 0,
-      19: 0,
-      20: 0,
-    }
   },
   '1960s-1980s': {
     id: '1960s-1980s',
@@ -610,17 +525,15 @@ export const POINTS_SYSTEMS: Record<string, PointsSystem> = {
   }
 };
 
+/**
+ * Get points for a position in a regular race using the specified point system.
+ * Sprint points are now handled by seasonRules.ts based on the year.
+ */
 export const getPointsForPositionWithSystem = (
-  position: number, 
-  isSprint: boolean, 
+  position: number,
   systemId: string
 ): number => {
   const system = POINTS_SYSTEMS[systemId] || POINTS_SYSTEMS['current'];
-  
-  if (isSprint && system.sprint) {
-    return system.sprint[position] || 0;
-  }
-  
   return system.regular[position] || 0;
 };
 
