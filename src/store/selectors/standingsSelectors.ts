@@ -2,7 +2,8 @@ import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../index';
 import { DriverStanding, TeamStanding, PointsHistory, TeamPointsHistory } from '../../types';
 import { getPointsForPositionWithSystem } from '../../data/pointsSystems';
-import { hasFastestLapPoint, getActiveSeason } from '../../utils/constants';
+import { getSprintPoints, getFastestLapPoints } from '../../data/seasonRules';
+import { getActiveSeason } from '../../utils/constants';
 
 // ============================================================================
 // BASE INPUT SELECTORS
@@ -73,19 +74,19 @@ const selectCalculatedPoints = createSelector(
 
         racePositions.forEach(position => {
           if (position.driverId) {
-            let pointsForPosition = getPointsForPositionWithSystem(
-              position.position,
-              race.isSprint,
-              pointsSystem
-            );
+            const activeSeason = getActiveSeason();
 
-            // Add fastest lap point if applicable
-            if (!race.isSprint &&
-                hasFastestLapPoint(getActiveSeason()) &&
-                position.hasFastestLap &&
-                position.position >= 1 &&
-                position.position <= 10) {
-              pointsForPosition += 1;
+            // Calculate base points: sprint uses season rules, regular uses selected point system
+            let pointsForPosition: number;
+            if (race.isSprint) {
+              pointsForPosition = getSprintPoints(position.position, activeSeason);
+            } else {
+              pointsForPosition = getPointsForPositionWithSystem(position.position, pointsSystem);
+            }
+
+            // Add fastest lap point if applicable (uses season rules)
+            if (!race.isSprint && position.hasFastestLap) {
+              pointsForPosition += getFastestLapPoints(position.position, activeSeason);
             }
 
             // Update driver points
