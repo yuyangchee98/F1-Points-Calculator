@@ -1,7 +1,3 @@
-/**
- * Point system interface for regular race point distribution.
- * Sprint points are handled by seasonRules.ts based on the year.
- */
 export interface PointsSystem {
   id: string;
   name: string;
@@ -525,10 +521,6 @@ export const POINTS_SYSTEMS: Record<string, PointsSystem> = {
   }
 };
 
-/**
- * Get points for a position in a regular race using the specified point system.
- * Sprint points are now handled by seasonRules.ts based on the year.
- */
 export const getPointsForPositionWithSystem = (
   position: number,
   systemId: string

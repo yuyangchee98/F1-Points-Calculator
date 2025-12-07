@@ -4,8 +4,6 @@ export const getActiveSeason = () => window.INITIAL_YEAR || CURRENT_SEASON;
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-// Note: Fastest lap rules are now in src/data/seasonRules.ts
-
 export const MAX_GRID_POSITIONS = 20;
 
 export const SKELETON_CONFIG = {

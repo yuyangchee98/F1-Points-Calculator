@@ -1,5 +1,4 @@
 interface Env {
-  // Add environment variables here if needed in the future
 }
 
 interface RaceResult {
