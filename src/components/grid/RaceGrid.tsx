@@ -19,7 +19,6 @@ interface RaceGridProps {
   showOfficialResults: boolean;
 }
 
-// Constants for grid dimensions
 const POSITION_COLUMN_WIDTH = 80;
 const HEADER_HEIGHT = 64;
 const ROW_HEIGHT = 72;
@@ -41,17 +40,13 @@ const RaceGrid: React.FC<RaceGridProps> = ({
   const driverStandings = useSelector(selectDriverStandings);
   const { isMobile, isTablet } = useWindowSize();
 
-  // Track if initial render is complete (for entry animations)
   const [hasInitiallyRendered, setHasInitiallyRendered] = useState(false);
 
-  // Internal scroll ref if none provided
   const internalScrollRef = useRef<HTMLDivElement>(null);
   const actualScrollRef = scrollRef || internalScrollRef;
 
-  // Calculate column width based on viewport
   const columnWidth = isMobile ? 100 + GAP : isTablet ? 110 + GAP : 120 + GAP;
 
-  // Column virtualizer (horizontal only - rows always fit in viewport)
   const columnVirtualizer = useVirtualizer({
     horizontal: true,
     count: races.length,
@@ -60,7 +55,6 @@ const RaceGrid: React.FC<RaceGridProps> = ({
     overscan: OVERSCAN,
   });
 
-  // Auto-scroll to first upcoming race on initial load
   useEffect(() => {
     if (!actualScrollRef?.current || races.length === 0) return;
 
@@ -77,7 +71,6 @@ const RaceGrid: React.FC<RaceGridProps> = ({
     return () => clearTimeout(scrollTimeout);
   }, [races, columnVirtualizer]);
 
-  // Mark initial render complete after first paint
   useEffect(() => {
     const timer = setTimeout(() => setHasInitiallyRendered(true), 600);
     return () => clearTimeout(timer);
@@ -96,23 +89,19 @@ const RaceGrid: React.FC<RaceGridProps> = ({
         showOfficialResults={showOfficialResults}
       />
 
-      {/* Single scroll container for the entire grid */}
       <div
         ref={actualScrollRef}
         id="race-grid"
         className="overflow-x-auto p-4"
         style={{ maxHeight: `calc(100vh - 180px)` }}
       >
-        {/* Inner container sized to total virtual width + position column */}
         <div
           style={{
             width: POSITION_COLUMN_WIDTH + GAP + totalVirtualWidth,
             position: 'relative',
           }}
         >
-          {/* Header Row */}
           <div style={{ display: 'flex', marginBottom: GAP, height: HEADER_HEIGHT }}>
-            {/* Position Header - sticky */}
             <div
               className="position-header cursor-pointer hover:bg-gray-800 transition-all duration-200 flex flex-col items-center justify-center gap-0.5 group sticky left-0 z-20"
               onClick={() => dispatch(togglePositionColumnMode())}
@@ -139,10 +128,8 @@ const RaceGrid: React.FC<RaceGridProps> = ({
               </svg>
             </div>
 
-            {/* Spacer for position column */}
             <div style={{ width: GAP, flexShrink: 0 }} />
 
-            {/* Race Headers - virtualized */}
             <div style={{ position: 'relative', width: totalVirtualWidth, height: HEADER_HEIGHT }}>
               {virtualColumns.map(virtualColumn => {
                 const race = races[virtualColumn.index];
@@ -180,7 +167,6 @@ const RaceGrid: React.FC<RaceGridProps> = ({
             </div>
           </div>
 
-          {/* Grid Rows */}
           {Array.from({ length: ROW_COUNT }, (_, i) => i + 1).map(position => {
             const animationClass = !hasInitiallyRendered
               ? `animate-grid-entry grid-row-${Math.min(position, 10)}`
@@ -196,7 +182,6 @@ const RaceGrid: React.FC<RaceGridProps> = ({
                   height: ROW_HEIGHT,
                 }}
               >
-                {/* Position Column - sticky left */}
                 <div
                   className="sticky left-0 z-10"
                   style={{
@@ -216,10 +201,8 @@ const RaceGrid: React.FC<RaceGridProps> = ({
                   />
                 </div>
 
-                {/* Spacer */}
                 <div style={{ width: GAP, flexShrink: 0 }} />
 
-                {/* Race Columns - virtualized */}
                 <div style={{ position: 'relative', width: totalVirtualWidth, height: ROW_HEIGHT }}>
                   {virtualColumns.map(virtualColumn => {
                     const race = races[virtualColumn.index];

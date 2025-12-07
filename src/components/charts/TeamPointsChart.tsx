@@ -18,7 +18,6 @@ import { RootState } from '../../store';
 import { selectTeamPointsForCharts, selectTopTeams } from '../../store/selectors/resultsSelectors';
 import { selectTeamsByIdMap } from '../../store/selectors/dataSelectors';
 
-// Register ChartJS components (safe to call multiple times)
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 const TeamPointsChart: React.FC = () => {

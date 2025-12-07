@@ -144,7 +144,6 @@ const App: React.FC = () => {
           content={
             <div className="px-4 py-6 max-w-5xl mx-auto">
               <div className="mb-3">
-                {/* Row 1: Title */}
                 <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-gray-800 flex items-center mb-2 sm:mb-3">
                   <span className="bg-red-600 text-white px-2 py-0.5 sm:px-3 sm:py-1 mr-2 sm:mr-3 rounded-md text-base sm:text-xl">F1</span>
                   <span>Points Calculator</span>
@@ -170,7 +169,6 @@ const App: React.FC = () => {
                   </Link>
                 </h1>
 
-                {/* Row 2: Buttons + Season Selector + Racendo */}
                 <div className="flex flex-wrap items-center gap-2">
                   <a
                     href="https://buymeacoffee.com/yaang"
@@ -216,7 +214,6 @@ const App: React.FC = () => {
                     {!isHistoricalSeason && (
                       <>
                         <SmartInputSkeleton />
-                        {/* Swap button skeleton */}
                         <div className="flex items-center justify-center my-3">
                           <div className="flex-1 h-px bg-gray-200 max-w-xs"></div>
                           <div className="flex items-center gap-1.5 px-3 py-1.5 mx-3 bg-white border border-gray-300 rounded-full shadow-sm">
@@ -228,7 +225,6 @@ const App: React.FC = () => {
                       </>
                     )}
                     <DriverSelectionSkeleton />
-                    {/* Horizontal scrollbar skeleton - hidden on mobile like the real one */}
                     <div className="w-full py-2 px-4 hidden sm:block">
                       <div className="bg-white rounded-md p-2 shadow-sm border border-gray-200">
                         <div className="relative w-full h-2.5 bg-gray-200 rounded-full">

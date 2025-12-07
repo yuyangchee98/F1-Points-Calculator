@@ -3,7 +3,6 @@ import { RootState } from '../index';
 import { DriverStanding, TeamStanding } from '../../types';
 import { selectRaces } from './dataSelectors';
 
-// Re-export from standingsSelectors (these are the memoized computed versions)
 export {
   selectDriverStandings,
   selectTeamStandings,
@@ -11,17 +10,12 @@ export {
   selectTeamPointsHistory
 } from './standingsSelectors';
 
-// Import for use in chart selectors
 import {
   selectDriverStandings,
   selectTeamStandings,
   selectPointsHistory,
   selectTeamPointsHistory
 } from './standingsSelectors';
-
-// ============================================================================
-// CHART SELECTORS
-// ============================================================================
 
 export const selectTopDrivers = createSelector(
   [selectDriverStandings, (_: RootState, count: number) => count],

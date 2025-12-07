@@ -5,19 +5,11 @@ import { getPointsForPositionWithSystem } from '../../data/pointsSystems';
 import { getSprintPoints, getFastestLapPoints } from '../../data/seasonRules';
 import { getActiveSeason } from '../../utils/constants';
 
-// ============================================================================
-// BASE INPUT SELECTORS
-// ============================================================================
-
 const selectGridPositions = (state: RootState) => state.grid.positions;
 const selectRaces = (state: RootState) => state.seasonData.races;
 const selectDrivers = (state: RootState) => state.seasonData.drivers;
 const selectPastResults = (state: RootState) => state.seasonData.pastResults;
 const selectPointsSystem = (state: RootState) => state.ui.selectedPointsSystem;
-
-// ============================================================================
-// HELPER: Tie-breaking comparison (F1 countback rule)
-// ============================================================================
 
 const compareByCountback = (finishesA: number[], finishesB: number[]): number => {
   const maxLength = Math.max(finishesA.length, finishesB.length);
@@ -30,10 +22,6 @@ const compareByCountback = (finishesA: number[], finishesB: number[]): number =>
   }
   return 0;
 };
-
-// ============================================================================
-// CORE CALCULATION SELECTOR
-// ============================================================================
 
 interface CalculatedResults {
   driverPoints: Record<string, number>;
@@ -56,7 +44,6 @@ const selectCalculatedPoints = createSelector(
       const driverFinishes: Record<string, number[]> = {};
       const teamFinishes: Record<string, number[]> = {};
 
-      // Initialize team points
       drivers.forEach(driver => {
         if (!teamPoints[driver.team]) {
           teamPoints[driver.team] = 0;
@@ -76,7 +63,6 @@ const selectCalculatedPoints = createSelector(
           if (position.driverId) {
             const activeSeason = getActiveSeason();
 
-            // Calculate base points: sprint uses season rules, regular uses selected point system
             let pointsForPosition: number;
             if (race.isSprint) {
               pointsForPosition = getSprintPoints(position.position, activeSeason);
@@ -84,12 +70,10 @@ const selectCalculatedPoints = createSelector(
               pointsForPosition = getPointsForPositionWithSystem(position.position, pointsSystem);
             }
 
-            // Add fastest lap point if applicable (uses season rules)
             if (!race.isSprint && position.hasFastestLap) {
               pointsForPosition += getFastestLapPoints(position.position, activeSeason);
             }
 
-            // Update driver points
             if (!driverPoints[position.driverId]) {
               driverPoints[position.driverId] = 0;
             }
@@ -99,7 +83,6 @@ const selectCalculatedPoints = createSelector(
             driverPoints[position.driverId] += pointsForPosition;
             raceDriverPoints[position.driverId] += pointsForPosition;
 
-            // Track finish positions for tie-breaking (main races only)
             if (!race.isSprint && position.position >= 1) {
               if (!driverFinishes[position.driverId]) {
                 driverFinishes[position.driverId] = [];
@@ -109,7 +92,6 @@ const selectCalculatedPoints = createSelector(
                 (driverFinishes[position.driverId][finishIndex] || 0) + 1;
             }
 
-            // Find team for this driver
             const raceResult = raceResults.find(r => r.driverId === position.driverId);
             let teamId: string | undefined;
             if (raceResult) {
@@ -129,7 +111,6 @@ const selectCalculatedPoints = createSelector(
               teamPoints[teamId] += pointsForPosition;
               raceTeamPoints[teamId] += pointsForPosition;
 
-              // Track team finishes for tie-breaking
               if (!race.isSprint && position.position >= 1) {
                 if (!teamFinishes[teamId]) {
                   teamFinishes[teamId] = [];
@@ -142,7 +123,6 @@ const selectCalculatedPoints = createSelector(
           }
         });
 
-        // Build race histories
         Object.entries(raceDriverPoints).forEach(([driverId, points]) => {
           driverHistories.push({
             raceId: race.id,
@@ -172,14 +152,9 @@ const selectCalculatedPoints = createSelector(
   }
 );
 
-// ============================================================================
-// DRIVER STANDINGS SELECTOR
-// ============================================================================
-
 export const selectDriverStandings = createSelector(
   [selectCalculatedPoints],
   ({ official, total }): DriverStanding[] => {
-    // Build official rankings first
     const officialRankings = Object.entries(official.driverPoints)
       .map(([driverId, points]) => ({
         driverId,
@@ -195,7 +170,6 @@ export const selectDriverStandings = createSelector(
         return acc;
       }, {} as Record<string, number>);
 
-    // Build final standings with position changes
     return Object.entries(total.driverPoints)
       .map(([driverId, points]) => ({
         driverId,
@@ -221,14 +195,9 @@ export const selectDriverStandings = createSelector(
   }
 );
 
-// ============================================================================
-// TEAM STANDINGS SELECTOR
-// ============================================================================
-
 export const selectTeamStandings = createSelector(
   [selectCalculatedPoints],
   ({ official, total }): TeamStanding[] => {
-    // Build official rankings first
     const officialRankings = Object.entries(official.teamPoints)
       .map(([teamId, points]) => ({
         teamId,
@@ -244,7 +213,6 @@ export const selectTeamStandings = createSelector(
         return acc;
       }, {} as Record<string, number>);
 
-    // Build final standings with position changes
     return Object.entries(total.teamPoints)
       .map(([teamId, points]) => ({
         teamId,
@@ -269,10 +237,6 @@ export const selectTeamStandings = createSelector(
       });
   }
 );
-
-// ============================================================================
-// POINTS HISTORY SELECTORS
-// ============================================================================
 
 export const selectPointsHistory = createSelector(
   [selectCalculatedPoints],
