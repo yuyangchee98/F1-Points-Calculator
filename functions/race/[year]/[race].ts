@@ -180,15 +180,10 @@ export async function onRequest(context: {
   const race = decodeURIComponent(context.params.race);
 
   try {
-    // Fetch all data in parallel
-    const [resultsResponse, scheduleResponse, driversResponse, teamsResponse] = await Promise.all([
-      fetch(`${API_BASE}/api/race-results?year=${year}`),
-      fetch(`${API_BASE}/api/schedule/${year}`),
-      fetch(`${API_BASE}/api/drivers/${year}`),
-      fetch(`${API_BASE}/api/teams/${year}`)
-    ]);
+    // Fetch all data from the unified /api/init endpoint
+    const initResponse = await fetch(`${API_BASE}/api/init?year=${year}`);
 
-    if (!resultsResponse.ok || !scheduleResponse.ok || !driversResponse.ok || !teamsResponse.ok) {
+    if (!initResponse.ok) {
       return new Response(generate404Page(year, race), {
         status: 404,
         headers: {
@@ -197,10 +192,17 @@ export async function onRequest(context: {
       });
     }
 
-    const raceResults: PastRaceResults = await resultsResponse.json();
-    const schedule: RaceScheduleItem[] = await scheduleResponse.json();
-    const drivers: Driver[] = await driversResponse.json();
-    const teams: Team[] = await teamsResponse.json();
+    const initData = await initResponse.json() as {
+      schedule: RaceScheduleItem[];
+      teams: Team[];
+      drivers: Driver[];
+      raceResults: PastRaceResults;
+    };
+
+    const schedule = initData.schedule;
+    const teams = initData.teams;
+    const drivers = initData.drivers;
+    const raceResults = initData.raceResults;
 
     // Find the specific race
     const raceId = race.toLowerCase();
