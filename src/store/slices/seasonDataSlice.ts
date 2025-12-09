@@ -23,7 +23,7 @@ const initialState: SeasonDataState = {
 export const fetchSeasonData = createAsyncThunk(
   'seasonData/fetchSeasonData',
   async (year: number) => {
-    const response = await fetch(`${API_BASE_URL}/api/init?year=${year}&v=1`);
+    const response = await fetch(`${API_BASE_URL}/api/init?year=${year}`);
     if (!response.ok) {
       throw new Error('Failed to fetch season data');
     }
