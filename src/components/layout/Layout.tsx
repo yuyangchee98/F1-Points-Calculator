@@ -107,7 +107,7 @@ const Layout: React.FC<LayoutProps> = ({ sidebar, content }) => {
             <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between space-y-6 sm:space-y-0">
               <div>
                 <h3 className="text-lg font-medium mb-3">F1 Points Calculator</h3>
-                <p className="text-sm text-gray-400 mb-2">Created by <a href="https://yaaaang.com" className="text-gray-300 hover:text-white" target="_blank" rel="noopener noreferrer">Chyuang</a></p>
+                <p className="text-sm text-gray-400 mb-2">Created by <a href="https://chyuang.com" className="text-gray-300 hover:text-white" target="_blank" rel="noopener noreferrer">Chyuang</a></p>
                 <p className="text-sm text-gray-400 mb-2"><a href="https://github.com/yuyangchee98/F1-Points-Calculator" className="text-gray-300 hover:text-white" target="_blank" rel="noopener noreferrer">Open source on GitHub</a></p>
               </div>
 
@@ -164,10 +164,7 @@ const Layout: React.FC<LayoutProps> = ({ sidebar, content }) => {
               <div>
                 <h3 className="text-lg font-medium mb-3">Other Projects</h3>
                 <ul className="text-sm text-gray-400 space-y-1">
-                  <li><a href="https://chyuang.com/" className="text-gray-300 hover:text-white" target="_blank" rel="noopener noreferrer">Chyuang</a></li>
-                  <li><a href="https://solvethisoaforme.chyuang.com/" className="text-gray-300 hover:text-white" target="_blank" rel="noopener noreferrer">Solve This OA For Me</a></li>
-                  <li><a href="https://japanese-patent-attorney-rankings.chyuang.com/" className="text-gray-300 hover:text-white" target="_blank" rel="noopener noreferrer">Japanese Patent Attorney Rankings</a></li>
-                  <li><a href="https://try-pro-tools-for-google-patents-by-readpatents.chyuang.com/" className="text-gray-300 hover:text-white" target="_blank" rel="noopener noreferrer">Pro Tools for Google Patents</a></li>
+                  <li><a href="https://drawlineracing.chyuang.com/" className="text-gray-300 hover:text-white" target="_blank" rel="noopener noreferrer">Draw Line Racing</a></li>
                 </ul>
               </div>
             </div>
