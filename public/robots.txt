@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 
 # Point to sitemap if you add one in the future
-Sitemap: https://f1pointscalculator.yaaaang.com/sitemap.xml
+Sitemap: https://f1pointscalculator.chyuang.com/sitemap.xml

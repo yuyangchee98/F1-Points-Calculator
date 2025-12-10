@@ -701,7 +701,7 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                 marginTop: '2px',
               }}
             >
-              f1pointscalculator.yaaaang.com
+              f1pointscalculator.chyuang.com
             </span>
           </div>
         </div>
@@ -1351,7 +1351,7 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                   marginTop: '2px',
                 }}
               >
-                f1pointscalculator.yaaaang.com
+                f1pointscalculator.chyuang.com
               </span>
             </div>
           </div>

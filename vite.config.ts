@@ -44,7 +44,7 @@ export default defineConfig(async () => ({
   plugins: [
     react(),
     sitemap({
-      hostname: 'https://f1pointscalculator.yaaaang.com',
+      hostname: 'https://f1pointscalculator.chyuang.com',
       changefreq: 'weekly',
       priority: 1.0,
       lastmod: new Date(),

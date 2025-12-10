@@ -329,20 +329,20 @@ function generateRacePage(
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${title}</title>
   <meta name="description" content="${description}">
-  <link rel="canonical" href="https://f1pointscalculator.yaaaang.com/race/${year}/${race}">
+  <link rel="canonical" href="https://f1pointscalculator.chyuang.com/race/${year}/${race}">
 
   <!-- Open Graph / Social Media -->
   <meta property="og:type" content="article">
   <meta property="og:title" content="${title}">
   <meta property="og:description" content="${description}">
-  <meta property="og:url" content="https://f1pointscalculator.yaaaang.com/race/${year}/${race}">
-  <meta property="og:image" content="https://f1pointscalculator.yaaaang.com/og-image.jpg">
+  <meta property="og:url" content="https://f1pointscalculator.chyuang.com/race/${year}/${race}">
+  <meta property="og:image" content="https://f1pointscalculator.chyuang.com/og-image.jpg">
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${title}">
   <meta name="twitter:description" content="${description}">
-  <meta name="twitter:image" content="https://f1pointscalculator.yaaaang.com/og-image.jpg">
+  <meta name="twitter:image" content="https://f1pointscalculator.chyuang.com/og-image.jpg">
 
   <!-- Structured Data (Schema.org) -->
   <script type="application/ld+json">
@@ -351,7 +351,7 @@ function generateRacePage(
     "@type": "SportsEvent",
     "name": "${year} ${raceInfo.displayName} Grand Prix",
     "description": "${description.replace(/"/g, '\\"')}",
-    "image": "https://f1pointscalculator.yaaaang.com/og-image.jpg",
+    "image": "https://f1pointscalculator.chyuang.com/og-image.jpg",
     "startDate": "${raceInfo.date}",
     "endDate": "${raceInfo.date}",
     "eventStatus": "https://schema.org/EventScheduled",
@@ -410,9 +410,9 @@ function generateRacePage(
       "price": "0",
       "priceCurrency": "USD",
       "availability": "https://schema.org/InStock",
-      "url": "https://f1pointscalculator.yaaaang.com/race/${year}/${race}"
+      "url": "https://f1pointscalculator.chyuang.com/race/${year}/${race}"
     },
-    "url": "https://f1pointscalculator.yaaaang.com/race/${year}/${race}"
+    "url": "https://f1pointscalculator.chyuang.com/race/${year}/${race}"
   }
   </script>
 
@@ -426,19 +426,19 @@ function generateRacePage(
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": "https://f1pointscalculator.yaaaang.com/"
+        "item": "https://f1pointscalculator.chyuang.com/"
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": "${year} Season",
-        "item": "https://f1pointscalculator.yaaaang.com/${year}.html"
+        "item": "https://f1pointscalculator.chyuang.com/${year}.html"
       },
       {
         "@type": "ListItem",
         "position": 3,
         "name": "${raceInfo.displayName} Grand Prix",
-        "item": "https://f1pointscalculator.yaaaang.com/race/${year}/${race}"
+        "item": "https://f1pointscalculator.chyuang.com/race/${year}/${race}"
       }
     ]
   }
