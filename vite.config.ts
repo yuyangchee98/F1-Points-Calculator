@@ -5,13 +5,8 @@ import sitemap from 'vite-plugin-sitemap'
 
 // Generate race URLs from API
 async function generateRaceUrls(): Promise<string[]> {
-  const baseUrls = [
-    '/',
-    '/2024.html',
-    '/2023.html',
-    '/2022.html',
-    '/about.html'
-  ];
+  // Base URLs are auto-discovered from rollup input, so only add race pages here
+  const raceUrls: string[] = [];
 
   const years = [2022, 2023, 2024];
   const API_BASE = 'https://f1-points-calculator-api.yuyangchee98.workers.dev';
@@ -25,7 +20,7 @@ async function generateRaceUrls(): Promise<string[]> {
         const races = data.schedule || [];
         console.log(`Found ${races.length} races for ${year}`);
         races.forEach((race: { id: string }) => {
-          baseUrls.push(`/race/${year}/${race.id}`);
+          raceUrls.push(`/race/${year}/${race.id}`);
         });
       } else {
         console.error(`Failed to fetch ${year}: ${response.status}`);
@@ -35,8 +30,8 @@ async function generateRaceUrls(): Promise<string[]> {
     console.error('Failed to fetch race schedules for sitemap:', error);
   }
 
-  console.log(`Total URLs generated: ${baseUrls.length}`);
-  return baseUrls;
+  console.log(`Total race URLs generated: ${raceUrls.length}`);
+  return raceUrls;
 }
 
 // https://vitejs.dev/config/
