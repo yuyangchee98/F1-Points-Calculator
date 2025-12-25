@@ -45,6 +45,7 @@ const selectCalculatedPoints = createSelector(
       const teamFinishes: Record<string, number[]> = {};
 
       drivers.forEach(driver => {
+        driverPoints[driver.id] = 0;
         if (!teamPoints[driver.team]) {
           teamPoints[driver.team] = 0;
         }
