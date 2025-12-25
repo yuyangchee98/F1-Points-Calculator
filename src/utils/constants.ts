@@ -4,12 +4,22 @@ export const getActiveSeason = () => window.INITIAL_YEAR || CURRENT_SEASON;
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-export const MAX_GRID_POSITIONS = 22;
+const SEASON_DRIVER_COUNT: { [key: number]: number } = {
+  2026: 22,
+  2025: 20,
+  2024: 20,
+  2023: 20,
+  2022: 20,
+};
+
+export const getGridPositions = (season: number): number => {
+  return SEASON_DRIVER_COUNT[season];
+};
 
 export const SKELETON_CONFIG = {
   races: 24,
-  drivers: 22,
-  teams: 11,
+  drivers: getGridPositions(CURRENT_SEASON),
+  teams: CURRENT_SEASON >= 2026 ? 11 : 10,
   year: CURRENT_SEASON
 };
 

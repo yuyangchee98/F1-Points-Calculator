@@ -1,6 +1,7 @@
 import React from 'react';
 import useWindowSize from '../../hooks/useWindowSize';
 import { useSkeletonCounts } from '../../hooks/useSkeletonCounts';
+import { getActiveSeason, getGridPositions } from '../../utils/constants';
 
 const GridSkeleton: React.FC = () => {
   const { races } = useSkeletonCounts();
@@ -12,7 +13,7 @@ const GridSkeleton: React.FC = () => {
     return '120px';
   };
 
-  const positionCount = 20;
+  const positionCount = getGridPositions(getActiveSeason());
 
   return (
     <div className="shadow-md rounded-lg border border-gray-200 relative overflow-hidden">
