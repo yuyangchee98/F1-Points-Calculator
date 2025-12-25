@@ -23,7 +23,7 @@ const POSITION_COLUMN_WIDTH = 80;
 const HEADER_HEIGHT = 64;
 const ROW_HEIGHT = 72;
 const GAP = 8;
-const ROW_COUNT = 20;
+const ROW_COUNT = 22;
 const OVERSCAN = 2;
 
 const RaceGrid: React.FC<RaceGridProps> = ({

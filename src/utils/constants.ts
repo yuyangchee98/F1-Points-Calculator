@@ -4,12 +4,12 @@ export const getActiveSeason = () => window.INITIAL_YEAR || CURRENT_SEASON;
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-export const MAX_GRID_POSITIONS = 20;
+export const MAX_GRID_POSITIONS = 22;
 
 export const SKELETON_CONFIG = {
   races: 24,
-  drivers: 20,
-  teams: 10,
+  drivers: 22,
+  teams: 11,
   year: CURRENT_SEASON
 };
 
