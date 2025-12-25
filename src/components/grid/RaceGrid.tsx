@@ -23,7 +23,6 @@ const POSITION_COLUMN_WIDTH = 80;
 const HEADER_HEIGHT = 64;
 const ROW_HEIGHT = 72;
 const GAP = 8;
-const ROW_COUNT = 22;
 const OVERSCAN = 2;
 
 const RaceGrid: React.FC<RaceGridProps> = ({
@@ -36,6 +35,7 @@ const RaceGrid: React.FC<RaceGridProps> = ({
 }) => {
   const dispatch = useAppDispatch();
   const races = useSelector((state: RootState) => state.seasonData.races);
+  const drivers = useSelector((state: RootState) => state.seasonData.drivers);
   const positionColumnMode = useSelector((state: RootState) => state.ui.positionColumnMode);
   const driverStandings = useSelector(selectDriverStandings);
   const { isMobile, isTablet } = useWindowSize();
@@ -167,7 +167,7 @@ const RaceGrid: React.FC<RaceGridProps> = ({
             </div>
           </div>
 
-          {Array.from({ length: ROW_COUNT }, (_, i) => i + 1).map(position => {
+          {Array.from({ length: drivers.length }, (_, i) => i + 1).map(position => {
             const animationClass = !hasInitiallyRendered
               ? `animate-grid-entry grid-row-${Math.min(position, 10)}`
               : '';
