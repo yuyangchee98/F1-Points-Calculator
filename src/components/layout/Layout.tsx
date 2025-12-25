@@ -5,7 +5,7 @@ import MobileNavigation from '../navigation/MobileNavigation';
 import useWindowSize from '../../hooks/useWindowSize';
 import { setMobileView } from '../../store/slices/uiSlice';
 import { useAppDispatch } from '../../store';
-import { getActiveSeason } from '../../utils/constants';
+import { getActiveSeason, CURRENT_SEASON } from '../../utils/constants';
 
 interface LayoutProps {
   sidebar: ReactNode;
@@ -117,6 +117,15 @@ const Layout: React.FC<LayoutProps> = ({ sidebar, content }) => {
                   <li>
                     <a
                       href="/"
+                      className={`${activeSeason === CURRENT_SEASON ? 'text-white font-medium' : 'text-gray-300 hover:text-white'}`}
+                      aria-current={activeSeason === CURRENT_SEASON ? 'page' : undefined}
+                    >
+                      {CURRENT_SEASON} Season
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="/2025"
                       className={`${activeSeason === 2025 ? 'text-white font-medium' : 'text-gray-300 hover:text-white'}`}
                       aria-current={activeSeason === 2025 ? 'page' : undefined}
                     >

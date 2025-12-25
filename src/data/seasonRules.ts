@@ -23,6 +23,7 @@ export const SEASON_RULES: Record<number, SeasonRules> = {
   2024: { fastestLap: { points: 1, maxEligiblePosition: 10 }, sprintFormat: '2022+' },
 
   2025: { sprintFormat: '2022+' },
+  2026: { sprintFormat: '2022+' },
 };
 
 export const SPRINT_POINTS: Record<SprintFormat, Record<number, number>> = {

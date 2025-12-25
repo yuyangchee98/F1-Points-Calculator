@@ -1,4 +1,4 @@
-export const CURRENT_SEASON = new Date().getFullYear();
+export const CURRENT_SEASON = 2026;
 
 export const getActiveSeason = () => window.INITIAL_YEAR || CURRENT_SEASON;
 
