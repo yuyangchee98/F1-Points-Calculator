@@ -5,7 +5,6 @@ export interface PredictionVersion {
   timestamp: string;
   grid: GridPosition[];
   pointsSystem: string;
-  schemaVersion?: number;
   season: number;
 }
 
