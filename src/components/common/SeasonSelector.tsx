@@ -85,11 +85,6 @@ const SeasonSelector: React.FC = () => {
                     )}
                   </div>
                 </div>
-                <div className="mt-1 text-xs sm:text-sm text-gray-600 hidden sm:block">
-                  {season.isHistorical
-                    ? 'View completed season results and explore what-if scenarios'
-                    : 'Active season - predict upcoming race outcomes'}
-                </div>
               </Link>
             ))}
           </div>
