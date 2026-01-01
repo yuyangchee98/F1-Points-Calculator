@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { GridState, GridPosition, PastRaceResult, Race } from '../../types';
 import { fetchSeasonData } from './seasonDataSlice';
+import { getActiveSeason, getGridPositions } from '../../utils/constants';
 
 const initializeGridPositions = (races: Race[], driverCount: number): GridPosition[] => {
   const positions: GridPosition[] = [];
@@ -228,9 +229,10 @@ export const gridSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(fetchSeasonData.fulfilled, (state, action) => {
-      const { schedule, drivers } = action.payload;
+      const { schedule } = action.payload;
+      const gridSize = getGridPositions(getActiveSeason());
 
-      state.positions = initializeGridPositions(schedule, drivers.length);
+      state.positions = initializeGridPositions(schedule, gridSize);
     });
   }
 });

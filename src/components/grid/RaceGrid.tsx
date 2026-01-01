@@ -9,6 +9,7 @@ import useWindowSize from '../../hooks/useWindowSize';
 import { togglePositionColumnMode } from '../../store/slices/uiSlice';
 import { selectDriverStandings } from '../../store/selectors/resultsSelectors';
 import { useAppDispatch } from '../../store';
+import { getActiveSeason, getGridPositions } from '../../utils/constants';
 
 interface RaceGridProps {
   scrollRef?: React.RefObject<HTMLDivElement>;
@@ -35,7 +36,6 @@ const RaceGrid: React.FC<RaceGridProps> = ({
 }) => {
   const dispatch = useAppDispatch();
   const races = useSelector((state: RootState) => state.seasonData.races);
-  const drivers = useSelector((state: RootState) => state.seasonData.drivers);
   const positionColumnMode = useSelector((state: RootState) => state.ui.positionColumnMode);
   const driverStandings = useSelector(selectDriverStandings);
   const { isMobile, isTablet } = useWindowSize();
@@ -167,7 +167,7 @@ const RaceGrid: React.FC<RaceGridProps> = ({
             </div>
           </div>
 
-          {Array.from({ length: drivers.length }, (_, i) => i + 1).map(position => {
+          {Array.from({ length: getGridPositions(getActiveSeason()) }, (_, i) => i + 1).map(position => {
             const animationClass = !hasInitiallyRendered
               ? `animate-grid-entry grid-row-${Math.min(position, 10)}`
               : '';
