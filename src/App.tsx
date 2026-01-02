@@ -3,12 +3,8 @@ import { useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
 import LazyDndProvider from './components/common/LazyDndProvider';
 import { initializeUiState, setMobileView, toggleOfficialResults as toggleOfficialResultsUI } from './store/slices/uiSlice';
-import { RootState, store } from './store';
+import { RootState } from './store';
 import { moveDriver, resetGrid, toggleOfficialResults } from './store/slices/gridSlice';
-import { selectDriverStandings, selectTeamStandings } from './store/selectors/resultsSelectors';
-import { selectDriverTeamsMap } from './store/selectors/dataSelectors';
-import { parseNaturalLanguage } from './api/naturalLanguage';
-import { createCheckoutSession } from './api/subscription';
 import { loadPrediction } from './api/predictions';
 import useRaceResults from './hooks/useRaceResults';
 import { useAutoSave } from './hooks/useAutoSave';
@@ -22,17 +18,14 @@ import HorizontalScrollBar from './components/common/HorizontalScrollBar';
 import SubscriptionModal from './components/common/SubscriptionModal';
 import VersionHistory from './components/common/VersionHistory';
 import ExportModal from './components/common/ExportModal';
-import InputSections from './components/common/InputSections';
 import DrawLineRacingPromo from './components/common/DrawLineRacingPromo';
 import GridSkeleton from './components/common/GridSkeleton';
 import DriverSelectionSkeleton from './components/common/DriverSelectionSkeleton';
-import SmartInputSkeleton from './components/common/SmartInputSkeleton';
 import DriverSelection from './components/drivers/DriverSelection';
 import SeasonSelector from './components/common/SeasonSelector';
-const SmartInputDemo = React.lazy(() => import('./components/common/SmartInputDemo'));
 import { useAppDispatch } from './store';
 import useWindowSize from './hooks/useWindowSize';
-import { trackBuyCoffeeClick, trackFeedbackClick, trackSmartInputAction, trackSmartInputCommand, GA_EVENTS, trackEvent, trackVersionHistoryAction, trackExportAction } from './utils/analytics';
+import { trackBuyCoffeeClick, trackFeedbackClick, GA_EVENTS, trackEvent, trackVersionHistoryAction, trackExportAction } from './utils/analytics';
 import { CURRENT_SEASON } from './utils/constants';
 
 const App: React.FC = () => {
@@ -48,7 +41,6 @@ const App: React.FC = () => {
       delete (window as any).INITIAL_YEAR;
     }
   }, [year]);
-  const isHistoricalSeason = activeSeason < CURRENT_SEASON;
   useRaceResults(activeSeason);
   useAutoSave();
   const mobileView = useSelector((state: RootState) => state.ui.mobileView);
@@ -58,26 +50,11 @@ const App: React.FC = () => {
   const { fingerprint } = useSelector((state: RootState) => state.predictions);
   const { isMobile } = useWindowSize();
   const raceGridScrollRef = React.useRef<HTMLDivElement>(null);
-  const { hasAccess, statusMessage } = useDayAccess();
+  const { statusMessage } = useDayAccess();
   const { email, saveEmail } = useUserEmail();
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [showExport, setShowExport] = useState(false);
-  const [smartInputFirst, setSmartInputFirst] = useState(() => {
-    return localStorage.getItem('f1_input_order') === 'smart-first';
-  });
-  const [showSmartInputDemo, setShowSmartInputDemo] = useState(false);
-
-  useEffect(() => {
-    const id = requestIdleCallback(() => setShowSmartInputDemo(true));
-    return () => cancelIdleCallback(id);
-  }, []);
-
-  const handleSwapInputs = () => {
-    const newValue = !smartInputFirst;
-    setSmartInputFirst(newValue);
-    localStorage.setItem('f1_input_order', newValue ? 'smart-first' : 'drivers-first');
-  };
 
   const handleReset = () => {
     if (window.confirm('Are you sure you want to reset your predictions?')) {
