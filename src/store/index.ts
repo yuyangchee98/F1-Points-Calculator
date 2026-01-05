@@ -4,6 +4,7 @@ import seasonDataReducer from './slices/seasonDataSlice';
 import gridReducer from './slices/gridSlice';
 import uiReducer from './slices/uiSlice';
 import predictionReducer from './slices/predictionSlice';
+import lockedPredictionsReducer from './slices/lockedPredictionsSlice';
 import { predictionMiddleware } from './middleware/predictionMiddleware';
 
 export const store = configureStore({
@@ -12,6 +13,7 @@ export const store = configureStore({
     grid: gridReducer,
     ui: uiReducer,
     predictions: predictionReducer,
+    lockedPredictions: lockedPredictionsReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(predictionMiddleware),

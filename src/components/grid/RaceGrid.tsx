@@ -8,6 +8,7 @@ import GridToolbar from './GridToolbar';
 import useWindowSize from '../../hooks/useWindowSize';
 import { togglePositionColumnMode } from '../../store/slices/uiSlice';
 import { selectDriverStandings } from '../../store/selectors/resultsSelectors';
+import { selectLockedPredictions } from '../../store/selectors/lockedPredictionsSelectors';
 import { useAppDispatch } from '../../store';
 import { getActiveSeason, getGridPositions } from '../../utils/constants';
 
@@ -17,6 +18,7 @@ interface RaceGridProps {
   onToggleOfficialResults: () => void;
   onOpenHistory: () => void;
   onOpenExport: () => void;
+  onOpenPredictions: () => void;
   showOfficialResults: boolean;
 }
 
@@ -32,12 +34,14 @@ const RaceGrid: React.FC<RaceGridProps> = ({
   onToggleOfficialResults,
   onOpenHistory,
   onOpenExport,
+  onOpenPredictions,
   showOfficialResults,
 }) => {
   const dispatch = useAppDispatch();
   const races = useSelector((state: RootState) => state.seasonData.races);
   const positionColumnMode = useSelector((state: RootState) => state.ui.positionColumnMode);
   const driverStandings = useSelector(selectDriverStandings);
+  const lockedPredictions = useSelector(selectLockedPredictions);
   const { isMobile, isTablet } = useWindowSize();
 
   const [hasInitiallyRendered, setHasInitiallyRendered] = useState(false);
@@ -86,6 +90,7 @@ const RaceGrid: React.FC<RaceGridProps> = ({
         onToggleOfficialResults={onToggleOfficialResults}
         onOpenHistory={onOpenHistory}
         onOpenExport={onOpenExport}
+        onOpenPredictions={onOpenPredictions}
         showOfficialResults={showOfficialResults}
       />
 
@@ -133,6 +138,10 @@ const RaceGrid: React.FC<RaceGridProps> = ({
             <div style={{ position: 'relative', width: totalVirtualWidth, height: HEADER_HEIGHT }}>
               {virtualColumns.map(virtualColumn => {
                 const race = races[virtualColumn.index];
+                const lockedPrediction = lockedPredictions[race.id];
+                const isLocked = !!lockedPrediction;
+                const hasScore = lockedPrediction?.score !== undefined;
+
                 return (
                   <div
                     key={race.id}
@@ -158,9 +167,24 @@ const RaceGrid: React.FC<RaceGridProps> = ({
                         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
                         .join(' ')}
                     </span>
-                    {race.completed && (
+                    {/* Lock/Score badges */}
+                    {hasScore ? (
+                      <span
+                        className="text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-medium"
+                        title={`You scored ${lockedPrediction.score}/30 pts`}
+                      >
+                        {lockedPrediction.score}pt
+                      </span>
+                    ) : isLocked ? (
+                      <span
+                        className="text-sm"
+                        title="Prediction locked"
+                      >
+                        🔒
+                      </span>
+                    ) : race.completed ? (
                       <span className="completed-indicator" title="Completed Race">✓</span>
-                    )}
+                    ) : null}
                   </div>
                 );
               })}

@@ -7,6 +7,7 @@ interface GridToolbarProps {
   onToggleOfficialResults: () => void;
   onOpenHistory: () => void;
   onOpenExport: () => void;
+  onOpenPredictions: () => void;
   showOfficialResults: boolean;
 }
 
@@ -15,6 +16,7 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
   onToggleOfficialResults,
   onOpenHistory,
   onOpenExport,
+  onOpenPredictions,
   showOfficialResults,
 }) => {
   const { isMobile, isTablet } = useWindowSize();
@@ -97,6 +99,15 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
             {!isCompact && <span>Reset</span>}
+          </button>
+
+          <button
+            onClick={onOpenPredictions}
+            className="bg-amber-500 hover:bg-amber-600 text-white px-3 py-2 rounded-md shadow transition flex items-center gap-2"
+            title="My Predictions"
+          >
+            <span className="text-lg">🎯</span>
+            {!isCompact && <span>My Predictions</span>}
           </button>
 
           <button

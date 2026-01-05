@@ -5,6 +5,7 @@ import LazyDndProvider from './components/common/LazyDndProvider';
 import { initializeUiState, setMobileView, toggleOfficialResults as toggleOfficialResultsUI } from './store/slices/uiSlice';
 import { RootState } from './store';
 import { moveDriver, resetGrid, toggleOfficialResults } from './store/slices/gridSlice';
+import { fetchLockedPredictions, unlockPrediction } from './store/slices/lockedPredictionsSlice';
 import { loadPrediction } from './api/predictions';
 import useRaceResults from './hooks/useRaceResults';
 import { useAutoSave } from './hooks/useAutoSave';
@@ -23,10 +24,14 @@ import GridSkeleton from './components/common/GridSkeleton';
 import DriverSelectionSkeleton from './components/common/DriverSelectionSkeleton';
 import DriverSelection from './components/drivers/DriverSelection';
 import SeasonSelector from './components/common/SeasonSelector';
+import SmartBanner from './components/predictions/SmartBanner';
+import LockConfirmationModal from './components/predictions/LockConfirmationModal';
+import MyPredictionsPanel from './components/predictions/MyPredictionsPanel';
 import { useAppDispatch } from './store';
 import useWindowSize from './hooks/useWindowSize';
 import { trackBuyCoffeeClick, trackFeedbackClick, GA_EVENTS, trackEvent, trackVersionHistoryAction, trackExportAction } from './utils/analytics';
 import { CURRENT_SEASON } from './utils/constants';
+import { Race } from './types';
 
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -55,6 +60,38 @@ const App: React.FC = () => {
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [showExport, setShowExport] = useState(false);
+  const [showPredictions, setShowPredictions] = useState(false);
+  const [raceToLock, setRaceToLock] = useState<Race | null>(null);
+  const races = useSelector((state: RootState) => state.seasonData.races);
+
+  // Fetch locked predictions when fingerprint is available
+  useEffect(() => {
+    if (fingerprint) {
+      dispatch(fetchLockedPredictions({ fingerprint, season: activeSeason }));
+    }
+  }, [fingerprint, activeSeason, dispatch]);
+
+  const handleLockRace = (raceId: string) => {
+    const race = races.find(r => r.id === raceId);
+    if (race) {
+      setRaceToLock(race);
+    }
+  };
+
+  const handleUnlockRace = (raceId: string) => {
+    if (!fingerprint) return;
+    if (window.confirm('Are you sure you want to unlock this prediction?')) {
+      dispatch(unlockPrediction({ fingerprint, season: activeSeason, raceId }));
+    }
+  };
+
+  const handleViewLockedRace = (_raceId: string) => {
+    setShowPredictions(true);
+  };
+
+  const handleSeeBreakdown = (_raceId: string) => {
+    setShowPredictions(true);
+  };
 
   const handleReset = () => {
     if (window.confirm('Are you sure you want to reset your predictions?')) {
@@ -203,6 +240,13 @@ const App: React.FC = () => {
                 {/* TODO: Smart Input feature disabled for now - just show DriverSelection */}
                 <DriverSelection />
 
+                  <SmartBanner
+                    onLockClick={handleLockRace}
+                    onViewClick={handleViewLockedRace}
+                    onUnlockClick={handleUnlockRace}
+                    onSeeBreakdownClick={handleSeeBreakdown}
+                  />
+
                   <HorizontalScrollBar scrollContainerRef={raceGridScrollRef} />
                   <RaceGrid
                     scrollRef={raceGridScrollRef}
@@ -216,6 +260,7 @@ const App: React.FC = () => {
                       trackExportAction('OPEN_MODAL');
                       setShowExport(true);
                     }}
+                    onOpenPredictions={() => setShowPredictions(true)}
                     showOfficialResults={showOfficialResults}
                   />
                 </>
@@ -243,6 +288,24 @@ const App: React.FC = () => {
           isOpen={showExport}
           onClose={() => setShowExport(false)}
         />
+
+        {raceToLock && (
+          <LockConfirmationModal
+            race={raceToLock}
+            onClose={() => setRaceToLock(null)}
+            onSuccess={() => setRaceToLock(null)}
+          />
+        )}
+
+        {showPredictions && (
+          <MyPredictionsPanel
+            onClose={() => setShowPredictions(false)}
+            onLockRace={(raceId) => {
+              setShowPredictions(false);
+              handleLockRace(raceId);
+            }}
+          />
+        )}
 
       </div>
     </LazyDndProvider>
