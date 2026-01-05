@@ -130,3 +130,109 @@ export async function deleteAllHistory(fingerprint: string, season: number): Pro
     return false;
   }
 }
+
+// Locked Predictions Types and API
+
+export interface LockedPosition {
+  position: number;
+  driverId: string;
+}
+
+export interface PositionScore {
+  position: number;
+  predictedDriverId: string;
+  actualDriverId: string | null;
+  actualPosition: number | null;
+  points: number;
+}
+
+export interface LockedPrediction {
+  raceId: string;
+  positions: LockedPosition[];
+  lockedAt: string;
+  score?: number;
+  breakdown?: PositionScore[];
+}
+
+export interface LockResponse {
+  success: boolean;
+  raceId: string;
+  lockedAt: string;
+}
+
+export async function lockPrediction(
+  fingerprint: string,
+  season: number,
+  raceId: string,
+  positions: LockedPosition[]
+): Promise<LockResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/predictions/lock`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      fingerprint,
+      season,
+      raceId,
+      positions,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to lock prediction');
+  }
+
+  return response.json();
+}
+
+export async function unlockPrediction(
+  fingerprint: string,
+  season: number,
+  raceId: string
+): Promise<{ success: boolean }> {
+  const response = await fetch(`${API_BASE_URL}/api/predictions/unlock`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      fingerprint,
+      season,
+      raceId,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to unlock prediction');
+  }
+
+  return response.json();
+}
+
+export async function getLockedPredictions(
+  fingerprint: string,
+  season: number
+): Promise<LockedPrediction[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/predictions/locked`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        fingerprint,
+        season,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to get locked predictions');
+    }
+
+    const data = await response.json();
+    return data.lockedPredictions || [];
+  } catch (error) {
+    return [];
+  }
+}
