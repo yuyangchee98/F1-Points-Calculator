@@ -6,7 +6,7 @@ import {
   selectTotalLockedScore,
   selectLockedRaceCount,
   selectScoredRaceCount,
-  selectUpcomingUnlockedRaces,
+  selectNextRaceToLock,
   selectLockedRacesWithScores,
 } from '../../store/selectors/lockedPredictionsSelectors';
 import { useCountdown } from '../../hooks/useCountdown';
@@ -41,7 +41,7 @@ const MyPredictionsPanel: React.FC<MyPredictionsPanelProps> = ({
   const totalScore = useSelector(selectTotalLockedScore);
   const lockedCount = useSelector(selectLockedRaceCount);
   const scoredCount = useSelector(selectScoredRaceCount);
-  const upcomingRaces = useSelector(selectUpcomingUnlockedRaces);
+  const nextRaceToLock = useSelector(selectNextRaceToLock);
   const lockedRacesWithScores = useSelector(selectLockedRacesWithScores);
   const driverById = useSelector(selectDriversByIdMap);
   const races = useSelector((state: RootState) => state.seasonData.races);
@@ -117,7 +117,7 @@ const MyPredictionsPanel: React.FC<MyPredictionsPanelProps> = ({
                 : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
             }`}
           >
-            Upcoming ({upcomingRaces.length})
+            Upcoming{nextRaceToLock ? ' (1)' : ''}
           </button>
           <button
             onClick={() => setActiveTab('results')}
@@ -135,31 +135,28 @@ const MyPredictionsPanel: React.FC<MyPredictionsPanelProps> = ({
         <div className="flex-1 overflow-y-auto p-6">
           {activeTab === 'upcoming' && (
             <div className="space-y-3">
-              {upcomingRaces.length === 0 ? (
+              {!nextRaceToLock ? (
                 <div className="text-center text-gray-500 py-8">
                   <p>No upcoming races to lock.</p>
                   <p className="text-sm mt-2">All available races have been locked!</p>
                 </div>
               ) : (
-                upcomingRaces.map(race => (
-                  <div
-                    key={race.id}
-                    className="border border-gray-200 rounded-lg p-4 flex items-center justify-between hover:border-gray-300 transition-colors"
-                  >
-                    <div>
-                      <div className="font-semibold text-gray-800">
-                        {formatRaceName(race.name)}
-                      </div>
-                      {race.date && <RaceCountdownBadge date={race.date} />}
+                <div
+                  className="border border-gray-200 rounded-lg p-4 flex items-center justify-between hover:border-gray-300 transition-colors"
+                >
+                  <div>
+                    <div className="font-semibold text-gray-800">
+                      {formatRaceName(nextRaceToLock.name)}
                     </div>
-                    <button
-                      onClick={() => onLockRace(race.id)}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
-                    >
-                      Lock Now
-                    </button>
+                    {nextRaceToLock.date && <RaceCountdownBadge date={nextRaceToLock.date} />}
                   </div>
-                ))
+                  <button
+                    onClick={() => onLockRace(nextRaceToLock.id)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                  >
+                    Lock Now
+                  </button>
+                </div>
               )}
             </div>
           )}
