@@ -24,7 +24,6 @@ import GridSkeleton from './components/common/GridSkeleton';
 import DriverSelectionSkeleton from './components/common/DriverSelectionSkeleton';
 import DriverSelection from './components/drivers/DriverSelection';
 import SeasonSelector from './components/common/SeasonSelector';
-import SmartBanner from './components/predictions/SmartBanner';
 import LockConfirmationModal from './components/predictions/LockConfirmationModal';
 import MyPredictionsPanel from './components/predictions/MyPredictionsPanel';
 import { useAppDispatch } from './store';
@@ -83,14 +82,6 @@ const App: React.FC = () => {
     if (window.confirm('Are you sure you want to unlock this prediction?')) {
       dispatch(unlockPrediction({ fingerprint, season: activeSeason, raceId }));
     }
-  };
-
-  const handleViewLockedRace = (_raceId: string) => {
-    setShowPredictions(true);
-  };
-
-  const handleSeeBreakdown = (_raceId: string) => {
-    setShowPredictions(true);
   };
 
   const handleReset = () => {
@@ -240,13 +231,6 @@ const App: React.FC = () => {
                 {/* TODO: Smart Input feature disabled for now - just show DriverSelection */}
                 <DriverSelection />
 
-                  <SmartBanner
-                    onLockClick={handleLockRace}
-                    onViewClick={handleViewLockedRace}
-                    onUnlockClick={handleUnlockRace}
-                    onSeeBreakdownClick={handleSeeBreakdown}
-                  />
-
                   <HorizontalScrollBar scrollContainerRef={raceGridScrollRef} />
                   <RaceGrid
                     scrollRef={raceGridScrollRef}
@@ -304,6 +288,7 @@ const App: React.FC = () => {
               setShowPredictions(false);
               handleLockRace(raceId);
             }}
+            onUnlockRace={handleUnlockRace}
           />
         )}
 

@@ -79,3 +79,31 @@ export const selectLockedRacesWithScores = createSelector(
       .sort((a, b) => a.race.order - b.race.order);
   }
 );
+
+// Races that are locked but not yet completed (awaiting results)
+export const selectAwaitingResultsRaces = createSelector(
+  [(state: RootState) => state.seasonData.races, selectLockedPredictions],
+  (races, lockedPredictions) => {
+    return races
+      .filter(race => lockedPredictions[race.id] && !race.completed)
+      .map(race => ({
+        race,
+        lockedPrediction: lockedPredictions[race.id],
+      }))
+      .sort((a, b) => a.race.order - b.race.order);
+  }
+);
+
+// Races that are locked and completed (scored)
+export const selectScoredRaces = createSelector(
+  [(state: RootState) => state.seasonData.races, selectLockedPredictions],
+  (races, lockedPredictions) => {
+    return races
+      .filter(race => lockedPredictions[race.id] && race.completed && lockedPredictions[race.id].score !== undefined)
+      .map(race => ({
+        race,
+        lockedPrediction: lockedPredictions[race.id],
+      }))
+      .sort((a, b) => b.race.order - a.race.order); // Most recent first
+  }
+);
