@@ -12,24 +12,21 @@ import {
 } from '../../store/selectors/lockedPredictionsSelectors';
 import { useCountdown } from '../../hooks/useCountdown';
 
+const getDriverCode = (driver: { code?: string; familyName: string } | undefined): string => {
+  if (!driver) return '---';
+  return driver.code || driver.familyName.substring(0, 3).toUpperCase();
+};
+
 interface MyPredictionsPanelProps {
   onClose: () => void;
   onLockRace: (raceId: string) => void;
   onUnlockRace: (raceId: string) => void;
 }
 
-const RaceCountdownBadge: React.FC<{ date: string }> = ({ date }) => {
+const Countdown: React.FC<{ date: string }> = ({ date }) => {
   const countdown = useCountdown(date);
-
-  if (!countdown || countdown.isPast) {
-    return <span className="text-gray-400 text-sm">Started</span>;
-  }
-
-  return (
-    <span className="text-gray-500 text-sm">
-      Locks in {countdown.formatted}
-    </span>
-  );
+  if (!countdown || countdown.isPast) return <span className="text-gray-400">Started</span>;
+  return <span className="text-gray-400">{countdown.formatted}</span>;
 };
 
 const MyPredictionsPanel: React.FC<MyPredictionsPanelProps> = ({
@@ -47,233 +44,175 @@ const MyPredictionsPanel: React.FC<MyPredictionsPanelProps> = ({
   const scoredRaces = useSelector(selectScoredRaces);
   const driverById = useSelector(selectDriversByIdMap);
   const races = useSelector((state: RootState) => state.seasonData.races);
+  const gridPositions = useSelector((state: RootState) => state.grid.positions);
 
-  const formatRaceName = (name: string) => {
-    return name
-      .split('-')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-  };
+  const nextRacePositions = nextRaceToLock
+    ? gridPositions
+        .filter(p => p.raceId === nextRaceToLock.id && p.position <= 10)
+        .sort((a, b) => a.position - b.position)
+    : [];
 
-  const getScoreColor = (points: number) => {
-    if (points === 3) return 'text-green-600 bg-green-100';
-    if (points === 1) return 'text-yellow-600 bg-yellow-100';
-    return 'text-red-600 bg-red-100';
-  };
+  const filledCount = nextRacePositions.filter(p => p.driverId).length;
 
-  const getScoreIcon = (points: number) => {
-    if (points === 3) return '✓';
-    if (points === 1) return '↕';
-    return '✗';
-  };
+  const formatName = (name: string) =>
+    name.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
-  const maxPossibleScore = scoredCount * 30;
-  const accuracy = maxPossibleScore > 0 ? Math.round((totalScore / maxPossibleScore) * 100) : 0;
-
-  const toggleExpanded = (raceId: string) => {
-    setExpandedRaceId(expandedRaceId === raceId ? null : raceId);
-  };
+  const maxScore = scoredCount * 30;
+  const accuracy = maxScore > 0 ? Math.round((totalScore / maxScore) * 100) : 0;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col">
-        {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-              <span>🎯</span> My Predictions
-            </h2>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
-              aria-label="Close"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl w-full max-w-md max-h-[80vh] overflow-hidden flex flex-col">
+
+        {/* Header - minimal */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+          <div>
+            <div className="text-lg font-semibold text-gray-900">Predictions</div>
+            <div className="text-sm text-gray-400">
+              {totalScore} pts{scoredCount > 0 && ` · ${accuracy}%`} · {lockedCount}/{races.length}
+            </div>
           </div>
-          {/* Summary stats */}
-          <div className="mt-2 text-sm text-gray-600">
-            <span className="font-semibold text-gray-800">{totalScore} pts</span>
-            {scoredCount > 0 && (
-              <>
-                <span className="mx-2">·</span>
-                <span>{accuracy}% accuracy</span>
-              </>
-            )}
-            <span className="mx-2">·</span>
-            <span>{lockedCount}/{races.length} races</span>
-          </div>
+          <button
+            onClick={onClose}
+            className="text-gray-300 hover:text-gray-500 text-2xl leading-none"
+          >
+            ×
+          </button>
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto">
 
-          {/* Section: Lock Your Prediction */}
+          {/* Next Race to Lock */}
           {nextRaceToLock && (
-            <div>
-              <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 flex items-center gap-2">
-                <span>⚡</span> Lock Your Prediction
-              </h3>
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="font-semibold text-gray-800 text-lg">
-                      {formatRaceName(nextRaceToLock.name)}
-                    </div>
-                    {nextRaceToLock.date && <RaceCountdownBadge date={nextRaceToLock.date} />}
+            <div className="px-5 py-4 border-b border-gray-100">
+              <div className="text-xs text-gray-400 uppercase tracking-wide mb-2">
+                Next Race
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <div>
+                  <div className="font-medium text-gray-900">{formatName(nextRaceToLock.name)}</div>
+                  {nextRaceToLock.date && <Countdown date={nextRaceToLock.date} />}
+                </div>
+                <button
+                  onClick={() => filledCount > 0 ? onLockRace(nextRaceToLock.id) : onClose()}
+                  className={filledCount > 0
+                    ? "bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-md text-sm font-medium transition-colors"
+                    : "text-blue-600 hover:text-blue-700 font-medium text-sm"
+                  }
+                >
+                  {filledCount > 0 ? '🔒 Lock' : 'Set up →'}
+                </button>
+              </div>
+
+              {filledCount > 0 ? (
+                <div className="bg-gray-50 rounded-lg p-3">
+                  <div className="grid grid-cols-5 gap-2">
+                    {nextRacePositions.map((pos) => {
+                      const driver = pos.driverId ? driverById[pos.driverId] : null;
+                      return (
+                        <div key={pos.position} className="text-center">
+                          <div className="text-[10px] text-gray-400 mb-0.5">P{pos.position}</div>
+                          <div className={`text-sm font-medium ${driver ? 'text-gray-800' : 'text-gray-300'}`}>
+                            {driver ? getDriverCode(driver) : '---'}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
+                  {filledCount < 10 && (
+                    <div className="text-xs text-amber-600 mt-2 text-center">
+                      {filledCount}/10 positions filled
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-sm text-gray-400">
+                  Drag drivers into the grid to make predictions
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Awaiting Results */}
+          {awaitingResults.length > 0 && (
+            <div className="px-5 py-4 border-b border-gray-100">
+              <div className="text-xs text-gray-400 uppercase tracking-wide mb-2">
+                Awaiting Results
+              </div>
+              {awaitingResults.map(({ race }) => (
+                <div key={race.id} className="flex items-center justify-between py-1.5">
+                  <span className="text-gray-700">{formatName(race.name)}</span>
                   <button
-                    onClick={() => onLockRace(nextRaceToLock.id)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-md text-sm font-medium transition-colors"
+                    onClick={() => onUnlockRace(race.id)}
+                    className="text-gray-400 hover:text-red-500 text-xs"
                   >
-                    Lock Prediction
+                    Unlock
                   </button>
                 </div>
-              </div>
+              ))}
             </div>
           )}
 
-          {/* Section: Awaiting Results */}
-          {awaitingResults.length > 0 && (
-            <div>
-              <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 flex items-center gap-2">
-                <span>⏳</span> Awaiting Results ({awaitingResults.length})
-              </h3>
-              <div className="space-y-2">
-                {awaitingResults.map(({ race }) => (
-                  <div
-                    key={race.id}
-                    className="bg-green-50 border border-green-200 rounded-lg p-3 flex items-center justify-between"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="text-green-600">🔒</span>
-                      <span className="font-medium text-gray-800">{formatRaceName(race.name)}</span>
-                      {race.date && (
-                        <span className="text-gray-500 text-sm">
-                          · Race {new Date(race.date).toLocaleDateString()}
-                        </span>
-                      )}
-                    </div>
-                    <button
-                      onClick={() => onUnlockRace(race.id)}
-                      className="text-red-600 hover:text-red-700 text-sm font-medium"
-                    >
-                      Unlock
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Section: Scored Results */}
+          {/* Scored Results */}
           {scoredRaces.length > 0 && (
-            <div>
-              <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 flex items-center gap-2">
-                <span>📊</span> Scored Results ({scoredRaces.length})
-              </h3>
-              <div className="space-y-2">
-                {scoredRaces.map(({ race, lockedPrediction }) => {
-                  const isExpanded = expandedRaceId === race.id;
-
-                  return (
-                    <div
-                      key={race.id}
-                      className="border border-gray-200 rounded-lg overflow-hidden"
-                    >
-                      {/* Collapsed row */}
-                      <button
-                        onClick={() => toggleExpanded(race.id)}
-                        className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors"
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className={`transform transition-transform ${isExpanded ? 'rotate-90' : ''}`}>
-                            ▶
-                          </span>
-                          <span className="font-medium text-gray-800">
-                            {formatRaceName(race.name)}
-                          </span>
-                        </div>
-                        <span className="font-bold text-blue-600">
-                          {lockedPrediction.score}/30 pts
-                        </span>
-                      </button>
-
-                      {/* Expanded breakdown */}
-                      {isExpanded && lockedPrediction.breakdown && (
-                        <div className="px-4 pb-4 pt-2 bg-gray-50 border-t border-gray-200">
-                          <div className="grid grid-cols-2 gap-2">
-                            {lockedPrediction.breakdown.map((score) => {
-                              const predictedDriver = driverById[score.predictedDriverId];
-
-                              return (
-                                <div
-                                  key={score.position}
-                                  className="flex items-center justify-between py-1.5 px-2 bg-white rounded border border-gray-100"
-                                >
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-xs font-medium text-gray-500 w-6">
-                                      P{score.position}
-                                    </span>
-                                    <span className="text-sm">
-                                      {predictedDriver?.familyName || '-'}
-                                    </span>
-                                  </div>
-                                  <span
-                                    className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium ${getScoreColor(
-                                      score.points
-                                    )}`}
-                                  >
-                                    {getScoreIcon(score.points)}
-                                  </span>
-                                </div>
-                              );
-                            })}
-                          </div>
-                          {/* Legend */}
-                          <div className="mt-3 flex items-center justify-center gap-4 text-xs text-gray-500">
-                            <span className="flex items-center gap-1">
-                              <span className="inline-block w-4 h-4 rounded bg-green-100 text-green-600 text-center text-xs leading-4">✓</span>
-                              Exact
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <span className="inline-block w-4 h-4 rounded bg-yellow-100 text-yellow-600 text-center text-xs leading-4">↕</span>
-                              Off by 1
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <span className="inline-block w-4 h-4 rounded bg-red-100 text-red-600 text-center text-xs leading-4">✗</span>
-                              Wrong
-                            </span>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+            <div className="px-5 py-4">
+              <div className="text-xs text-gray-400 uppercase tracking-wide mb-2">
+                Results
               </div>
+              {scoredRaces.map(({ race, lockedPrediction }) => {
+                const isExpanded = expandedRaceId === race.id;
+                return (
+                  <div key={race.id}>
+                    <button
+                      onClick={() => setExpandedRaceId(isExpanded ? null : race.id)}
+                      className="w-full flex items-center justify-between py-2 text-left"
+                    >
+                      <span className="text-gray-700">{formatName(race.name)}</span>
+                      <span className="text-gray-900 font-medium">
+                        {lockedPrediction.score}<span className="text-gray-400 font-normal">/30</span>
+                      </span>
+                    </button>
+
+                    {isExpanded && lockedPrediction.breakdown && (
+                      <div className="pb-3 pt-1">
+                        <div className="grid grid-cols-5 gap-x-3 gap-y-1 text-sm">
+                          {lockedPrediction.breakdown.map((score) => {
+                            const driver = driverById[score.predictedDriverId];
+                            return (
+                              <div key={score.position} className="flex items-center gap-1">
+                                <span className={
+                                  score.points === 3 ? 'text-green-600' :
+                                  score.points === 1 ? 'text-yellow-600' : 'text-gray-300'
+                                }>
+                                  {score.points === 3 ? '●' : score.points === 1 ? '◐' : '○'}
+                                </span>
+                                <span className="text-gray-500 text-xs">
+                                  {getDriverCode(driver)}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
 
           {/* Empty state */}
           {!nextRaceToLock && awaitingResults.length === 0 && scoredRaces.length === 0 && (
-            <div className="text-center text-gray-500 py-12">
-              <p className="text-lg mb-2">No predictions yet</p>
-              <p className="text-sm">Make your predictions on the grid and lock them before races start!</p>
+            <div className="px-5 py-12 text-center text-gray-400">
+              No predictions yet
             </div>
           )}
+        </div>
 
-          {/* Season complete state */}
-          {!nextRaceToLock && awaitingResults.length === 0 && scoredRaces.length === races.length && races.length > 0 && (
-            <div className="text-center py-6 bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-200 rounded-lg">
-              <span className="text-4xl">🏆</span>
-              <p className="text-lg font-semibold text-gray-800 mt-2">Season Complete!</p>
-              <p className="text-gray-600">
-                Final Score: {totalScore}/{races.length * 30} pts ({accuracy}%)
-              </p>
-            </div>
-          )}
+        {/* Footer hint */}
+        <div className="px-5 py-3 border-t border-gray-100 text-xs text-gray-400 text-center">
+          Lock your predictions before the race to get scored
         </div>
       </div>
     </div>
