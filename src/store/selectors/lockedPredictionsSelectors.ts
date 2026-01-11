@@ -19,12 +19,18 @@ export const selectLockedPredictionForRace = (raceId: string) => (state: RootSta
 export const selectIsRaceLocked = (raceId: string) => (state: RootState) =>
   !!state.lockedPredictions.lockedPredictions[raceId];
 
-export const selectTotalLockedScore = createSelector(
+// Overall accuracy across all scored races
+export const selectOverallAccuracy = createSelector(
   [selectLockedPredictions],
   (lockedPredictions) => {
-    return Object.values(lockedPredictions)
-      .filter(lp => lp.score !== undefined)
-      .reduce((sum, lp) => sum + (lp.score || 0), 0);
+    const scored = Object.values(lockedPredictions).filter(lp => lp.score);
+    if (scored.length === 0) return { exact: 0, total: 0, percentage: 0 };
+
+    const totalExact = scored.reduce((sum, lp) => sum + (lp.score?.exact || 0), 0);
+    const totalPredictions = scored.reduce((sum, lp) => sum + (lp.score?.total || 0), 0);
+    const percentage = totalPredictions > 0 ? Math.round((totalExact / totalPredictions) * 100) : 0;
+
+    return { exact: totalExact, total: totalPredictions, percentage };
   }
 );
 
@@ -37,7 +43,7 @@ export const selectScoredRaceCount = createSelector(
   [selectLockedPredictions],
   (lockedPredictions) => {
     return Object.values(lockedPredictions)
-      .filter(lp => lp.score !== undefined).length;
+      .filter(lp => lp.score).length;
   }
 );
 

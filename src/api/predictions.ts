@@ -142,15 +142,20 @@ export interface PositionScore {
   position: number;
   predictedDriverId: string;
   actualDriverId: string | null;
-  actualPosition: number | null;
-  points: number;
+  isExact: boolean;
+}
+
+export interface PredictionScore {
+  exact: number;
+  total: number;
+  percentage: number;
 }
 
 export interface LockedPrediction {
   raceId: string;
   positions: LockedPosition[];
   lockedAt: string;
-  score?: number;
+  score?: PredictionScore;
   breakdown?: PositionScore[];
 }
 

@@ -5,7 +5,7 @@ import LazyDndProvider from './components/common/LazyDndProvider';
 import { initializeUiState, setMobileView, toggleOfficialResults as toggleOfficialResultsUI } from './store/slices/uiSlice';
 import { RootState } from './store';
 import { moveDriver, resetGrid, toggleOfficialResults } from './store/slices/gridSlice';
-import { fetchLockedPredictions, unlockPrediction } from './store/slices/lockedPredictionsSlice';
+import { fetchLockedPredictions } from './store/slices/lockedPredictionsSlice';
 import { loadPrediction } from './api/predictions';
 import useRaceResults from './hooks/useRaceResults';
 import { useAutoSave } from './hooks/useAutoSave';
@@ -74,13 +74,6 @@ const App: React.FC = () => {
     const race = races.find(r => r.id === raceId);
     if (race) {
       setRaceToLock(race);
-    }
-  };
-
-  const handleUnlockRace = (raceId: string) => {
-    if (!fingerprint) return;
-    if (window.confirm('Are you sure you want to unlock this prediction?')) {
-      dispatch(unlockPrediction({ fingerprint, season: activeSeason, raceId }));
     }
   };
 
@@ -288,7 +281,6 @@ const App: React.FC = () => {
               setShowPredictions(false);
               handleLockRace(raceId);
             }}
-            onUnlockRace={handleUnlockRace}
           />
         )}
 

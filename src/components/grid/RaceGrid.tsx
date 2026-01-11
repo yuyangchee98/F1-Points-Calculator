@@ -171,9 +171,9 @@ const RaceGrid: React.FC<RaceGridProps> = ({
                     {hasScore ? (
                       <span
                         className="text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-medium"
-                        title={`You scored ${lockedPrediction.score}/30 pts`}
+                        title={`You scored ${lockedPrediction.score?.percentage}%`}
                       >
-                        {lockedPrediction.score}pt
+                        {lockedPrediction.score?.percentage}%
                       </span>
                     ) : isLocked ? (
                       <span

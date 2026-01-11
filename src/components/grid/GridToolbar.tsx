@@ -104,10 +104,10 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
           <button
             onClick={onOpenPredictions}
             className="bg-amber-500 hover:bg-amber-600 text-white px-3 py-2 rounded-md shadow transition flex items-center gap-2"
-            title="My Predictions"
+            title="Lock & Score"
           >
-            <span className="text-lg">🎯</span>
-            {!isCompact && <span>My Predictions</span>}
+            <span className="text-lg">🔒</span>
+            {!isCompact && <span>Lock & Score</span>}
           </button>
 
           <button
