@@ -76,11 +76,17 @@ export function useCountdown(targetDate: string | undefined): CountdownResult | 
 
 export function formatRaceDate(dateString: string): string {
   const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', {
+  const formatted = date.toLocaleDateString('en-US', {
     weekday: 'short',
     month: 'short',
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
   });
+
+  // Get timezone city name (e.g., "Asia/Tokyo" -> "Tokyo")
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const cityName = timezone.split('/').pop()?.replace(/_/g, ' ') || timezone;
+
+  return `${formatted} (${cityName})`;
 }

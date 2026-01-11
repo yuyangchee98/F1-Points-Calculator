@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../store';
 import { Race } from '../../types';
-import { selectDriversByIdMap } from '../../store/selectors/dataSelectors';
-import { lockPrediction } from '../../store/slices/lockedPredictionsSlice';
+import { selectDriversByIdMap, selectTeamsByIdMap } from '../../store/selectors/dataSelectors';
+import { lockPrediction, clearLockError } from '../../store/slices/lockedPredictionsSlice';
 import { useCountdown, formatRaceDate } from '../../hooks/useCountdown';
 import { LockedPosition } from '../../api/predictions';
 import { getActiveSeason } from '../../utils/constants';
@@ -23,13 +23,20 @@ const LockConfirmationModal: React.FC<LockConfirmationModalProps> = ({
   const fingerprint = useSelector((state: RootState) => state.predictions.fingerprint);
   const positions = useSelector((state: RootState) => state.grid.positions);
   const driverById = useSelector(selectDriversByIdMap);
+  const teamById = useSelector(selectTeamsByIdMap);
   const isLocking = useSelector((state: RootState) => state.lockedPredictions.isLocking);
+  const lockError = useSelector((state: RootState) => state.lockedPredictions.error);
+
+  // Clear any previous error when modal opens
+  useEffect(() => {
+    dispatch(clearLockError());
+  }, [dispatch]);
 
   const countdown = useCountdown(race.date);
 
-  // Get P1-P10 for this race
+  // Get ALL filled positions for this race
   const racePositions = positions
-    .filter(p => p.raceId === race.id && p.position <= 10 && p.driverId)
+    .filter(p => p.raceId === race.id && p.driverId)
     .sort((a, b) => a.position - b.position);
 
   const formatRaceName = (name: string) => {
@@ -62,8 +69,7 @@ const LockConfirmationModal: React.FC<LockConfirmationModalProps> = ({
     }
   };
 
-  const filledPositions = racePositions.filter(p => p.driverId).length;
-  const hasMinPredictions = filledPositions >= 3;
+  const filledPositions = racePositions.length;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -77,39 +83,34 @@ const LockConfirmationModal: React.FC<LockConfirmationModalProps> = ({
           </div>
 
           <p className="text-gray-600 mb-4">
-            Your current P1-P10 predictions:
+            {filledPositions} position{filledPositions !== 1 ? 's' : ''} to lock:
           </p>
 
           <div className="bg-gray-50 rounded-lg p-4 mb-4 max-h-64 overflow-y-auto">
-            {Array.from({ length: 10 }, (_, i) => i + 1).map(position => {
-              const gridPos = racePositions.find(p => p.position === position);
-              const driver = gridPos?.driverId ? driverById[gridPos.driverId] : null;
+            {racePositions.map((gridPos, index) => {
+              const driver = gridPos.driverId ? driverById[gridPos.driverId] : null;
 
               return (
                 <div
-                  key={position}
+                  key={gridPos.position}
                   className={`flex items-center gap-3 py-2 ${
-                    position < 10 ? 'border-b border-gray-200' : ''
+                    index < racePositions.length - 1 ? 'border-b border-gray-200' : ''
                   }`}
                 >
-                  <span className="w-8 text-sm font-bold text-gray-500">P{position}</span>
-                  {driver ? (
-                    <span className="font-medium text-gray-800">
-                      {driver.givenName} {driver.familyName}
-                    </span>
-                  ) : (
-                    <span className="text-gray-400 italic">Empty</span>
+                  <span className="w-8 text-sm font-bold text-gray-500">P{gridPos.position}</span>
+                  <span className="font-medium text-gray-800">
+                    {driver?.givenName} {driver?.familyName}
+                  </span>
+                  {driver?.team && teamById[driver.team] && (
+                    <span className="text-xs text-gray-400">{teamById[driver.team].name}</span>
                   )}
                 </div>
               );
             })}
           </div>
 
-          <div className="bg-blue-50 rounded-lg p-3 mb-4">
-            <p className="text-sm text-blue-800">
-              <strong>This is what will be scored after the race.</strong>
-              {' '}You can unlock and re-lock until race start.
-            </p>
+          <div className="text-sm text-gray-500 mb-4">
+            Score = % of these positions you get exactly right
           </div>
 
           {race.date && countdown && !countdown.isPast && (
@@ -118,12 +119,13 @@ const LockConfirmationModal: React.FC<LockConfirmationModalProps> = ({
             </div>
           )}
 
-          {!hasMinPredictions && (
-            <div className="bg-yellow-50 rounded-lg p-3 mb-4">
-              <p className="text-sm text-yellow-800">
-                You only have {filledPositions} position{filledPositions !== 1 ? 's' : ''} filled.
-                Add more predictions for a better score!
-              </p>
+          <div className="text-xs text-amber-600 bg-amber-50 px-3 py-2 rounded mb-4">
+            Final step — no edits after locking.
+          </div>
+
+          {lockError && (
+            <div className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded mb-4">
+              Failed to lock. Please try again later.
             </div>
           )}
 
