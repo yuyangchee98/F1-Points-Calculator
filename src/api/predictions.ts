@@ -1,6 +1,20 @@
 import { GridPosition } from '../types';
 import { API_BASE_URL } from '../utils/constants';
 
+// User identifier - either fingerprint (anonymous) or userId (logged in)
+export interface UserIdentifier {
+  fingerprint?: string;
+  userId?: string;
+}
+
+// Helper to get the identifier payload
+function getIdentifierPayload(identifier: UserIdentifier): { fingerprint?: string; userId?: string } {
+  if (identifier.userId) {
+    return { userId: identifier.userId };
+  }
+  return { fingerprint: identifier.fingerprint };
+}
+
 export interface PredictionVersion {
   timestamp: string;
   grid: GridPosition[];
@@ -15,7 +29,7 @@ export interface SaveResponse {
 }
 
 export async function savePrediction(
-  fingerprint: string,
+  identifier: UserIdentifier,
   grid: GridPosition[],
   pointsSystem: string,
   season: number
@@ -25,8 +39,9 @@ export async function savePrediction(
     headers: {
       'Content-Type': 'application/json',
     },
+    credentials: 'include',
     body: JSON.stringify({
-      fingerprint,
+      ...getIdentifierPayload(identifier),
       grid,
       pointsSystem,
       season,
@@ -41,7 +56,7 @@ export async function savePrediction(
 }
 
 export async function loadPrediction(
-  fingerprint: string,
+  identifier: UserIdentifier,
   version: string | undefined,
   season: number
 ): Promise<PredictionVersion | null> {
@@ -51,8 +66,9 @@ export async function loadPrediction(
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
       body: JSON.stringify({
-        fingerprint,
+        ...getIdentifierPayload(identifier),
         version,
         season,
       }),
@@ -88,7 +104,7 @@ export interface VersionSummary {
 }
 
 export async function getVersionHistory(
-  fingerprint: string,
+  identifier: UserIdentifier,
   limit: number | undefined,
   season: number
 ): Promise<VersionSummary[]> {
@@ -98,8 +114,9 @@ export async function getVersionHistory(
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
       body: JSON.stringify({
-        fingerprint,
+        ...getIdentifierPayload(identifier),
         limit,
         season,
       }),
@@ -116,14 +133,15 @@ export async function getVersionHistory(
   }
 }
 
-export async function deleteAllHistory(fingerprint: string, season: number): Promise<boolean> {
+export async function deleteAllHistory(identifier: UserIdentifier, season: number): Promise<boolean> {
   try {
     const response = await fetch(`${API_BASE_URL}/api/predictions/delete-history`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ fingerprint, season }),
+      credentials: 'include',
+      body: JSON.stringify({ ...getIdentifierPayload(identifier), season }),
     });
     return response.ok;
   } catch (error) {
@@ -166,7 +184,7 @@ export interface LockResponse {
 }
 
 export async function lockPrediction(
-  fingerprint: string,
+  identifier: UserIdentifier,
   season: number,
   raceId: string,
   positions: LockedPosition[]
@@ -176,8 +194,9 @@ export async function lockPrediction(
     headers: {
       'Content-Type': 'application/json',
     },
+    credentials: 'include',
     body: JSON.stringify({
-      fingerprint,
+      ...getIdentifierPayload(identifier),
       season,
       raceId,
       positions,
@@ -192,7 +211,7 @@ export async function lockPrediction(
 }
 
 export async function unlockPrediction(
-  fingerprint: string,
+  identifier: UserIdentifier,
   season: number,
   raceId: string
 ): Promise<{ success: boolean }> {
@@ -201,8 +220,9 @@ export async function unlockPrediction(
     headers: {
       'Content-Type': 'application/json',
     },
+    credentials: 'include',
     body: JSON.stringify({
-      fingerprint,
+      ...getIdentifierPayload(identifier),
       season,
       raceId,
     }),
@@ -216,7 +236,7 @@ export async function unlockPrediction(
 }
 
 export async function getLockedPredictions(
-  fingerprint: string,
+  identifier: UserIdentifier,
   season: number
 ): Promise<LockedPrediction[]> {
   try {
@@ -225,8 +245,9 @@ export async function getLockedPredictions(
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
       body: JSON.stringify({
-        fingerprint,
+        ...getIdentifierPayload(identifier),
         season,
       }),
     });
@@ -240,4 +261,25 @@ export async function getLockedPredictions(
   } catch (error) {
     return [];
   }
+}
+
+// Claim fingerprint data to user account
+export async function claimFingerprint(
+  fingerprint: string,
+  userId: string
+): Promise<{ success: boolean; claimedPredictions: number; claimedLocks: number }> {
+  const response = await fetch(`${API_BASE_URL}/api/auth/claim-fingerprint`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify({ fingerprint, userId }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to claim fingerprint data');
+  }
+
+  return response.json();
 }

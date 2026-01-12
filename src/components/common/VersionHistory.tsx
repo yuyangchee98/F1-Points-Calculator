@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
-import { getVersionHistory, deleteAllHistory, VersionSummary } from '../../api/predictions';
+import { getVersionHistory, deleteAllHistory, VersionSummary, UserIdentifier } from '../../api/predictions';
 import { trackVersionHistoryAction } from '../../utils/analytics';
 import { getActiveSeason } from '../../utils/constants';
 
@@ -12,6 +12,7 @@ interface VersionHistoryProps {
 
 const VersionHistory: React.FC<VersionHistoryProps> = ({ onClose, onLoadVersion }) => {
   const { fingerprint } = useSelector((state: RootState) => state.predictions);
+  const { user } = useSelector((state: RootState) => state.auth);
   const races = useSelector((state: RootState) => state.seasonData.races);
   const activeSeason = getActiveSeason();
   const [versions, setVersions] = useState<VersionSummary[]>([]);
@@ -20,18 +21,26 @@ const VersionHistory: React.FC<VersionHistoryProps> = ({ onClose, onLoadVersion 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  // Get identifier - prefer userId if logged in, fallback to fingerprint
+  const getIdentifier = (): UserIdentifier | null => {
+    if (user?.id) return { userId: user.id };
+    if (fingerprint) return { fingerprint };
+    return null;
+  };
+
   useEffect(() => {
-    if (!fingerprint) return;
+    const identifier = getIdentifier();
+    if (!identifier) return;
 
     const loadHistory = async () => {
       setLoading(true);
-      const history = await getVersionHistory(fingerprint, 20, activeSeason);
+      const history = await getVersionHistory(identifier, 20, activeSeason);
       setVersions(history);
       setLoading(false);
     };
 
     loadHistory();
-  }, [fingerprint, activeSeason]);
+  }, [fingerprint, user, activeSeason]);
 
   const formatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp);
@@ -85,11 +94,12 @@ const VersionHistory: React.FC<VersionHistoryProps> = ({ onClose, onLoadVersion 
   };
 
   const handleDeleteAll = async () => {
-    if (!fingerprint) return;
+    const identifier = getIdentifier();
+    if (!identifier) return;
 
     setIsDeleting(true);
     try {
-      const success = await deleteAllHistory(fingerprint, activeSeason);
+      const success = await deleteAllHistory(identifier, activeSeason);
 
       if (success) {
         setVersions([]);
