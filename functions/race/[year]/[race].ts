@@ -665,7 +665,7 @@ function generateRacePage(
         <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between space-y-6 sm:space-y-0">
           <div>
             <h3 class="text-lg font-medium mb-3">F1 Points Calculator</h3>
-            <p class="text-sm text-gray-400 mb-2">Created by <a href="https://yaaaang.com" class="text-gray-300 hover:text-white" target="_blank" rel="noopener noreferrer">Chyuang</a></p>
+            <p class="text-sm text-gray-400 mb-2">Created by <a href="https://chyuang.com" class="text-gray-300 hover:text-white" target="_blank" rel="noopener noreferrer">Chyuang</a></p>
             <p class="text-sm text-gray-400 mb-2"><a href="https://github.com/yuyangchee98/F1-Points-Calculator" class="text-gray-300 hover:text-white" target="_blank" rel="noopener noreferrer">Open source on GitHub</a></p>
           </div>
 
