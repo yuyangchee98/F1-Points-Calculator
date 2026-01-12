@@ -40,7 +40,6 @@ export const useAutoSave = () => {
     }
 
     try {
-      toastService.addToast('Saving predictions...', 'info', 2000, '#6b7280');
       const response = await savePrediction(fingerprint, positions, selectedPointsSystem, activeSeason);
 
       if (response.success) {
@@ -49,7 +48,6 @@ export const useAutoSave = () => {
           version: response.version
         }));
         lastSavedDataRef.current = currentData;
-        toastService.addToast('Predictions saved ✓', 'success', 2000, '#10b981');
       }
     } catch (error) {
       toastService.addToast('Failed to save predictions', 'warning', 3000, '#ef4444');
