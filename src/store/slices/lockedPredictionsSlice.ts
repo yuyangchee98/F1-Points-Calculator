@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import {
   LockedPrediction,
   LockedPosition,
+  UserIdentifier,
   getLockedPredictions,
   lockPrediction as lockPredictionApi,
   unlockPrediction as unlockPredictionApi,
@@ -23,8 +24,8 @@ const initialState: LockedPredictionsState = {
 
 export const fetchLockedPredictions = createAsyncThunk(
   'lockedPredictions/fetch',
-  async ({ fingerprint, season }: { fingerprint: string; season: number }) => {
-    const predictions = await getLockedPredictions(fingerprint, season);
+  async ({ identifier, season }: { identifier: UserIdentifier; season: number }) => {
+    const predictions = await getLockedPredictions(identifier, season);
     return predictions;
   }
 );
@@ -32,8 +33,8 @@ export const fetchLockedPredictions = createAsyncThunk(
 export const lockPrediction = createAsyncThunk(
   'lockedPredictions/lock',
   async (
-    { fingerprint, season, raceId, positions }: {
-      fingerprint: string;
+    { identifier, season, raceId, positions }: {
+      identifier: UserIdentifier;
       season: number;
       raceId: string;
       positions: LockedPosition[];
@@ -41,7 +42,7 @@ export const lockPrediction = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await lockPredictionApi(fingerprint, season, raceId, positions);
+      const response = await lockPredictionApi(identifier, season, raceId, positions);
       return {
         raceId,
         positions,
@@ -56,15 +57,15 @@ export const lockPrediction = createAsyncThunk(
 export const unlockPrediction = createAsyncThunk(
   'lockedPredictions/unlock',
   async (
-    { fingerprint, season, raceId }: {
-      fingerprint: string;
+    { identifier, season, raceId }: {
+      identifier: UserIdentifier;
       season: number;
       raceId: string;
     },
     { rejectWithValue }
   ) => {
     try {
-      await unlockPredictionApi(fingerprint, season, raceId);
+      await unlockPredictionApi(identifier, season, raceId);
       return raceId;
     } catch (error) {
       return rejectWithValue('Failed to unlock prediction');

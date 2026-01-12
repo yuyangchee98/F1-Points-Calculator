@@ -2,7 +2,7 @@ import { useEffect, useRef, useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { getBrowserFingerprint } from '../utils/fingerprint';
-import { savePrediction } from '../api/predictions';
+import { savePrediction, UserIdentifier } from '../api/predictions';
 import { setFingerprint, setSaveInfo } from '../store/slices/predictionSlice';
 import { useAppDispatch } from '../store';
 import { toastService } from '../components/common/ToastContainer';
@@ -13,6 +13,7 @@ export const useAutoSave = () => {
   const { positions } = useSelector((state: RootState) => state.grid);
   const { selectedPointsSystem } = useSelector((state: RootState) => state.ui);
   const { fingerprint, isDirty } = useSelector((state: RootState) => state.predictions);
+  const { user } = useSelector((state: RootState) => state.auth);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastSavedDataRef = useRef<string>('');
   const [isInitialized, setIsInitialized] = useState(false);
@@ -30,8 +31,20 @@ export const useAutoSave = () => {
     init();
   }, [dispatch]);
 
+  // Get identifier - prefer userId if logged in, fallback to fingerprint
+  const getIdentifier = useCallback((): UserIdentifier | null => {
+    if (user?.id) {
+      return { userId: user.id };
+    }
+    if (fingerprint) {
+      return { fingerprint };
+    }
+    return null;
+  }, [user, fingerprint]);
+
   const save = useCallback(async () => {
-    if (!fingerprint || !isDirty) return;
+    const identifier = getIdentifier();
+    if (!identifier || !isDirty) return;
 
     const activeSeason = getActiveSeason();
     const currentData = JSON.stringify({ positions, selectedPointsSystem, season: activeSeason });
@@ -40,7 +53,7 @@ export const useAutoSave = () => {
     }
 
     try {
-      const response = await savePrediction(fingerprint, positions, selectedPointsSystem, activeSeason);
+      const response = await savePrediction(identifier, positions, selectedPointsSystem, activeSeason);
 
       if (response.success) {
         dispatch(setSaveInfo({
@@ -52,10 +65,11 @@ export const useAutoSave = () => {
     } catch (error) {
       toastService.addToast('Failed to save predictions', 'warning', 3000, '#ef4444');
     }
-  }, [fingerprint, positions, selectedPointsSystem, isDirty, dispatch]);
+  }, [getIdentifier, positions, selectedPointsSystem, isDirty, dispatch]);
 
   useEffect(() => {
-    if (!fingerprint || !isDirty) return;
+    const identifier = getIdentifier();
+    if (!identifier || !isDirty) return;
 
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
@@ -70,7 +84,7 @@ export const useAutoSave = () => {
         clearTimeout(saveTimeoutRef.current);
       }
     };
-  }, [fingerprint, isDirty, save]);
+  }, [getIdentifier, isDirty, save]);
 
   return { save, isInitialized };
 };

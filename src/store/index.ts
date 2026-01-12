@@ -5,6 +5,7 @@ import gridReducer from './slices/gridSlice';
 import uiReducer from './slices/uiSlice';
 import predictionReducer from './slices/predictionSlice';
 import lockedPredictionsReducer from './slices/lockedPredictionsSlice';
+import authReducer from './slices/authSlice';
 import { predictionMiddleware } from './middleware/predictionMiddleware';
 
 export const store = configureStore({
@@ -14,6 +15,7 @@ export const store = configureStore({
     ui: uiReducer,
     predictions: predictionReducer,
     lockedPredictions: lockedPredictionsReducer,
+    auth: authReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(predictionMiddleware),

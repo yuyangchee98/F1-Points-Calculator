@@ -6,7 +6,7 @@ import { initializeUiState, setMobileView, toggleOfficialResults as toggleOffici
 import { RootState } from './store';
 import { moveDriver, resetGrid, toggleOfficialResults } from './store/slices/gridSlice';
 import { fetchLockedPredictions } from './store/slices/lockedPredictionsSlice';
-import { loadPrediction } from './api/predictions';
+import { loadPrediction, UserIdentifier } from './api/predictions';
 import useRaceResults from './hooks/useRaceResults';
 import { useAutoSave } from './hooks/useAutoSave';
 import { useDayAccess } from './hooks/useSubscription';
@@ -26,6 +26,7 @@ import DriverSelection from './components/drivers/DriverSelection';
 import SeasonSelector from './components/common/SeasonSelector';
 import LockConfirmationModal from './components/predictions/LockConfirmationModal';
 import MyPredictionsPanel from './components/predictions/MyPredictionsPanel';
+import UserMenu from './components/auth/UserMenu';
 import { useAppDispatch } from './store';
 import useWindowSize from './hooks/useWindowSize';
 import { trackBuyCoffeeClick, trackFeedbackClick, GA_EVENTS, trackEvent, trackVersionHistoryAction, trackExportAction } from './utils/analytics';
@@ -52,7 +53,15 @@ const App: React.FC = () => {
   const pastResults = useSelector((state: RootState) => state.seasonData.pastResults);
   const isLoading = useSelector((state: RootState) => state.seasonData.isLoading);
   const { fingerprint } = useSelector((state: RootState) => state.predictions);
+  const { user } = useSelector((state: RootState) => state.auth);
   const { isMobile } = useWindowSize();
+
+  // Get identifier - prefer userId if logged in, fallback to fingerprint
+  const getIdentifier = (): UserIdentifier | null => {
+    if (user?.id) return { userId: user.id };
+    if (fingerprint) return { fingerprint };
+    return null;
+  };
   const raceGridScrollRef = React.useRef<HTMLDivElement>(null);
   const { statusMessage } = useDayAccess();
   const { email, saveEmail } = useUserEmail();
@@ -63,12 +72,13 @@ const App: React.FC = () => {
   const [raceToLock, setRaceToLock] = useState<Race | null>(null);
   const races = useSelector((state: RootState) => state.seasonData.races);
 
-  // Fetch locked predictions when fingerprint is available
+  // Fetch locked predictions when identifier is available
   useEffect(() => {
-    if (fingerprint) {
-      dispatch(fetchLockedPredictions({ fingerprint, season: activeSeason }));
+    const identifier = getIdentifier();
+    if (identifier) {
+      dispatch(fetchLockedPredictions({ identifier, season: activeSeason }));
     }
-  }, [fingerprint, activeSeason, dispatch]);
+  }, [fingerprint, user, activeSeason, dispatch]);
 
   const handleLockRace = (raceId: string) => {
     const race = races.find(r => r.id === raceId);
@@ -96,10 +106,11 @@ const App: React.FC = () => {
   };
 
   const handleLoadVersion = async (version: string) => {
-    if (!fingerprint) return;
+    const identifier = getIdentifier();
+    if (!identifier) return;
 
     try {
-      const prediction = await loadPrediction(fingerprint, version, activeSeason);
+      const prediction = await loadPrediction(identifier, version, activeSeason);
       if (prediction && prediction.grid) {
         dispatch(resetGrid());
 
@@ -142,30 +153,33 @@ const App: React.FC = () => {
           content={
             <div className="px-4 py-6 max-w-5xl mx-auto">
               <div className="mb-3">
-                <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-gray-800 flex items-center mb-2 sm:mb-3">
-                  <span className="bg-red-600 text-white px-2 py-0.5 sm:px-3 sm:py-1 mr-2 sm:mr-3 rounded-md text-base sm:text-xl">F1</span>
-                  <span>Points Calculator</span>
-                  <Link
-                    to="/about"
-                    className="ml-2 sm:ml-3 w-8 h-8 sm:w-10 sm:h-10 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110 flex-shrink-0"
-                    aria-label="About and FAQ"
-                    title="About & FAQ"
-                  >
-                    <svg
-                      className="w-5 h-5 sm:w-6 sm:h-6"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                <div className="flex items-center justify-between mb-2 sm:mb-3">
+                  <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-gray-800 flex items-center">
+                    <span className="bg-red-600 text-white px-2 py-0.5 sm:px-3 sm:py-1 mr-2 sm:mr-3 rounded-md text-base sm:text-xl">F1</span>
+                    <span>Points Calculator</span>
+                    <Link
+                      to="/about"
+                      className="ml-2 sm:ml-3 w-8 h-8 sm:w-10 sm:h-10 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110 flex-shrink-0"
+                      aria-label="About and FAQ"
+                      title="About & FAQ"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                  </Link>
-                </h1>
+                      <svg
+                        className="w-5 h-5 sm:w-6 sm:h-6"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                    </Link>
+                  </h1>
+                  <UserMenu />
+                </div>
 
                 <div className="flex flex-wrap items-center gap-2">
                   <a

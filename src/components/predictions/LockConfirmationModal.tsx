@@ -5,7 +5,7 @@ import { Race } from '../../types';
 import { selectDriversByIdMap, selectTeamsByIdMap } from '../../store/selectors/dataSelectors';
 import { lockPrediction, clearLockError } from '../../store/slices/lockedPredictionsSlice';
 import { useCountdown, formatRaceDate } from '../../hooks/useCountdown';
-import { LockedPosition } from '../../api/predictions';
+import { LockedPosition, UserIdentifier } from '../../api/predictions';
 import { getActiveSeason } from '../../utils/constants';
 
 interface LockConfirmationModalProps {
@@ -20,12 +20,20 @@ const LockConfirmationModal: React.FC<LockConfirmationModalProps> = ({
   onSuccess,
 }) => {
   const dispatch = useAppDispatch();
-  const fingerprint = useSelector((state: RootState) => state.predictions.fingerprint);
+  const { fingerprint } = useSelector((state: RootState) => state.predictions);
+  const { user } = useSelector((state: RootState) => state.auth);
   const positions = useSelector((state: RootState) => state.grid.positions);
   const driverById = useSelector(selectDriversByIdMap);
   const teamById = useSelector(selectTeamsByIdMap);
   const isLocking = useSelector((state: RootState) => state.lockedPredictions.isLocking);
   const lockError = useSelector((state: RootState) => state.lockedPredictions.error);
+
+  // Get identifier - prefer userId if logged in, fallback to fingerprint
+  const getIdentifier = (): UserIdentifier | null => {
+    if (user?.id) return { userId: user.id };
+    if (fingerprint) return { fingerprint };
+    return null;
+  };
 
   // Clear any previous error when modal opens
   useEffect(() => {
@@ -47,7 +55,8 @@ const LockConfirmationModal: React.FC<LockConfirmationModalProps> = ({
   };
 
   const handleLock = async () => {
-    if (!fingerprint) return;
+    const identifier = getIdentifier();
+    if (!identifier) return;
 
     const lockedPositions: LockedPosition[] = racePositions
       .filter(p => p.driverId)
@@ -58,7 +67,7 @@ const LockConfirmationModal: React.FC<LockConfirmationModalProps> = ({
 
     try {
       await dispatch(lockPrediction({
-        fingerprint,
+        identifier,
         season: getActiveSeason(),
         raceId: race.id,
         positions: lockedPositions,

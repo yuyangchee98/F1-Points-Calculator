@@ -6,6 +6,7 @@ import useWindowSize from '../../hooks/useWindowSize';
 import { setMobileView } from '../../store/slices/uiSlice';
 import { useAppDispatch } from '../../store';
 import { getActiveSeason, CURRENT_SEASON } from '../../utils/constants';
+import AuthModal from '../auth/AuthModal';
 
 interface LayoutProps {
   sidebar: ReactNode;
@@ -184,6 +185,8 @@ const Layout: React.FC<LayoutProps> = ({ sidebar, content }) => {
           <MobileNavigation />
         </div>
       </div>
+
+      <AuthModal />
     </div>
   );
 };

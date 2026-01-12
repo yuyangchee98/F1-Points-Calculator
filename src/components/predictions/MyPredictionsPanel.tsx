@@ -42,7 +42,6 @@ const MyPredictionsPanel: React.FC<MyPredictionsPanelProps> = ({
   const awaitingResults = useSelector(selectAwaitingResultsRaces);
   const scoredRaces = useSelector(selectScoredRaces);
   const driverById = useSelector(selectDriversByIdMap);
-  const races = useSelector((state: RootState) => state.seasonData.races);
   const gridPositions = useSelector((state: RootState) => state.grid.positions);
 
   const nextRacePositions = nextRaceToLock
