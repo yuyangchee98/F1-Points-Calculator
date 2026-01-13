@@ -20,7 +20,6 @@ const LockConfirmationModal: React.FC<LockConfirmationModalProps> = ({
   onSuccess,
 }) => {
   const dispatch = useAppDispatch();
-  const { fingerprint } = useSelector((state: RootState) => state.predictions);
   const { user } = useSelector((state: RootState) => state.auth);
   const positions = useSelector((state: RootState) => state.grid.positions);
   const driverById = useSelector(selectDriversByIdMap);
@@ -28,10 +27,9 @@ const LockConfirmationModal: React.FC<LockConfirmationModalProps> = ({
   const isLocking = useSelector((state: RootState) => state.lockedPredictions.isLocking);
   const lockError = useSelector((state: RootState) => state.lockedPredictions.error);
 
-  // Get identifier - prefer userId if logged in, fallback to fingerprint
+  // Only allow locking for logged-in users
   const getIdentifier = (): UserIdentifier | null => {
     if (user?.id) return { userId: user.id };
-    if (fingerprint) return { fingerprint };
     return null;
   };
 

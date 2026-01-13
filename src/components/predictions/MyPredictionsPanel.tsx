@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../store';
+import { RootState, useAppDispatch } from '../../store';
+import { openAuthModal } from '../../store/slices/authSlice';
 import { selectDriversByIdMap } from '../../store/selectors/dataSelectors';
 import {
   selectOverallAccuracy,
@@ -32,9 +33,11 @@ const MyPredictionsPanel: React.FC<MyPredictionsPanelProps> = ({
   onClose,
   onLockRace,
 }) => {
+  const dispatch = useAppDispatch();
   const [expandedRaceId, setExpandedRaceId] = useState<string | null>(null);
   const [showInfo, setShowInfo] = useState(false);
 
+  const { user } = useSelector((state: RootState) => state.auth);
   const overallAccuracy = useSelector(selectOverallAccuracy);
   const lockedCount = useSelector(selectLockedRaceCount);
   const scoredCount = useSelector(selectScoredRaceCount);
@@ -56,6 +59,42 @@ const MyPredictionsPanel: React.FC<MyPredictionsPanelProps> = ({
     name.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
   const isNewUser = lockedCount === 0;
+
+  // Not logged in - show sign-in prompt
+  if (!user?.id) {
+    return (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-xl w-full max-w-sm overflow-hidden">
+          <div className="p-6">
+            <button
+              onClick={onClose}
+              className="absolute top-4 right-4 text-gray-300 hover:text-gray-500 text-2xl leading-none"
+            >
+              ×
+            </button>
+
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              Lock & Score
+            </h2>
+
+            <p className="text-gray-600 mb-6 leading-relaxed">
+              Sign in to lock your predictions before races start and track your accuracy over the season.
+            </p>
+
+            <button
+              onClick={() => {
+                onClose();
+                dispatch(openAuthModal('signup'));
+              }}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium transition-colors"
+            >
+              Sign in to get started
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // New user / intro state
   if (isNewUser) {

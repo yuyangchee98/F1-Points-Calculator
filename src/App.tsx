@@ -6,6 +6,7 @@ import { initializeUiState, setMobileView, toggleOfficialResults as toggleOffici
 import { RootState } from './store';
 import { moveDriver, resetGrid, toggleOfficialResults } from './store/slices/gridSlice';
 import { fetchLockedPredictions } from './store/slices/lockedPredictionsSlice';
+import { openAuthModal } from './store/slices/authSlice';
 import { loadPrediction, UserIdentifier } from './api/predictions';
 import useRaceResults from './hooks/useRaceResults';
 import { useAutoSave } from './hooks/useAutoSave';
@@ -81,6 +82,10 @@ const App: React.FC = () => {
   }, [fingerprint, user, activeSeason, dispatch]);
 
   const handleLockRace = (raceId: string) => {
+    if (!user?.id) {
+      dispatch(openAuthModal('signup'));
+      return;
+    }
     const race = races.find(r => r.id === raceId);
     if (race) {
       setRaceToLock(race);
