@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import { useSession, signIn, signUp, signOut } from '../lib/auth-client';
+import { useSession, signIn, signUp, signOut, sendVerificationEmail } from '../lib/auth-client';
 import { RootState, useAppDispatch } from '../store';
 import { setUser, setLoading, openAuthModal, closeAuthModal, logout } from '../store/slices/authSlice';
 import { claimFingerprint } from '../api/predictions';
@@ -56,11 +56,19 @@ export function useAuth() {
   };
 
   const handleSignUp = async (email: string, password: string, name: string) => {
-    const result = await signUp.email({ email, password, name });
+    const result = await signUp.email({ email, password, name, callbackURL: window.location.origin });
     if (result.error) {
       throw new Error(result.error.message);
     }
-    dispatch(closeAuthModal());
+    // Don't close modal - let AuthModal show verification message
+    return { ...result, needsVerification: true };
+  };
+
+  const handleResendVerification = async (email: string) => {
+    const result = await sendVerificationEmail({ email, callbackURL: window.location.origin });
+    if (result.error) {
+      throw new Error(result.error.message);
+    }
     return result;
   };
 
@@ -82,6 +90,7 @@ export function useAuth() {
     signIn: handleSignIn,
     signUp: handleSignUp,
     signOut: handleSignOut,
+    resendVerification: handleResendVerification,
     openSignIn,
     openSignUp,
     closeModal,
