@@ -1,17 +1,14 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useSession, signIn, signUp, signOut, sendVerificationEmail } from '../lib/auth-client';
 import { RootState, useAppDispatch } from '../store';
 import { setUser, setLoading, openAuthModal, closeAuthModal, logout } from '../store/slices/authSlice';
-import { claimFingerprint } from '../api/predictions';
 
 export function useAuth() {
   const dispatch = useAppDispatch();
   const { user, isLoading, isAuthenticated, showAuthModal, authModalMode } = useSelector(
     (state: RootState) => state.auth
   );
-  const { fingerprint } = useSelector((state: RootState) => state.predictions);
-  const hasClaimedRef = useRef<string | null>(null);
 
   // Sync Better Auth session with Redux
   const { data: session, isPending } = useSession();
@@ -34,17 +31,6 @@ export function useAuth() {
       dispatch(setUser(null));
     }
   }, [session, isPending, dispatch]);
-
-  // Claim fingerprint data when user logs in
-  useEffect(() => {
-    const userId = session?.user?.id;
-    if (userId && fingerprint && hasClaimedRef.current !== userId) {
-      hasClaimedRef.current = userId;
-      claimFingerprint(fingerprint, userId).catch(() => {
-        // Silent fail - claiming is best effort
-      });
-    }
-  }, [session?.user?.id, fingerprint]);
 
   const handleSignIn = async (email: string, password: string) => {
     const result = await signIn.email({ email, password });

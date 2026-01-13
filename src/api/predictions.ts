@@ -262,24 +262,3 @@ export async function getLockedPredictions(
     return [];
   }
 }
-
-// Claim fingerprint data to user account
-export async function claimFingerprint(
-  fingerprint: string,
-  userId: string
-): Promise<{ success: boolean; claimedPredictions: number; claimedLocks: number }> {
-  const response = await fetch(`${API_BASE_URL}/api/auth/claim-fingerprint`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-    body: JSON.stringify({ fingerprint, userId }),
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to claim fingerprint data');
-  }
-
-  return response.json();
-}
