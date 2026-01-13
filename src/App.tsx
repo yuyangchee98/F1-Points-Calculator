@@ -152,63 +152,59 @@ const App: React.FC = () => {
           sidebar={<StandingsSidebar />}
           content={
             <div className="px-4 py-6 max-w-5xl mx-auto">
-              <div className="mb-3">
-                <div className="flex items-center justify-between mb-2 sm:mb-3">
+              <div className="mb-4">
+                {/* Title Row */}
+                <div className="flex items-center justify-between mb-3">
                   <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-gray-800 flex items-center">
                     <span className="bg-red-600 text-white px-2 py-0.5 sm:px-3 sm:py-1 mr-2 sm:mr-3 rounded-md text-base sm:text-xl">F1</span>
                     <span>Points Calculator</span>
-                    <Link
-                      to="/about"
-                      className="ml-2 sm:ml-3 w-8 h-8 sm:w-10 sm:h-10 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110 flex-shrink-0"
-                      aria-label="About and FAQ"
-                      title="About & FAQ"
-                    >
-                      <svg
-                        className="w-5 h-5 sm:w-6 sm:h-6"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                    </Link>
                   </h1>
                   <UserMenu />
                 </div>
 
+                {/* Action Row */}
                 <div className="flex flex-wrap items-center gap-2">
-                  <a
-                    href="https://buymeacoffee.com/yaang"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center py-1.5 px-2.5 sm:py-3 sm:px-6 bg-red-600 text-white font-bold rounded-md shadow-lg hover:bg-red-700 transition-colors duration-200 text-xs sm:text-base whitespace-nowrap"
-                    onClick={trackBuyCoffeeClick}
+                  {/* App Controls - Left Group */}
+                  <SeasonSelector />
+
+                  <Link
+                    to="/about"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md transition-colors duration-200"
                   >
-                    <span className="mr-1 sm:mr-2">🔴</span>
-                    <span className="sm:hidden">Support</span>
-                    <span className="hidden sm:inline">Buy Chyuang a soft tyre</span>
-                  </a>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="hidden sm:inline">About</span>
+                  </Link>
 
                   <a
                     href="https://github.com/yuyangchee98/F1-Points-Calculator/issues"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center py-1.5 px-2.5 sm:py-3 sm:px-6 bg-gray-700 text-white font-bold rounded-md shadow-lg hover:bg-gray-800 transition-colors duration-200 text-xs sm:text-base whitespace-nowrap"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md transition-colors duration-200"
                     onClick={trackFeedbackClick}
                   >
-                    <span className="mr-1 sm:mr-2">💬</span>
-                    <span className="sm:hidden">Feedback</span>
-                    <span className="hidden sm:inline">Feature Requests / Report Bugs</span>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                    </svg>
+                    <span className="hidden sm:inline">Feedback</span>
                   </a>
 
-                  <SeasonSelector />
+                  <a
+                    href="https://buymeacoffee.com/yaang"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-md shadow-sm hover:shadow transition-all duration-200"
+                    onClick={trackBuyCoffeeClick}
+                  >
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                    <span>Support</span>
+                  </a>
 
-                  <DrawLineRacingPromo className="w-full sm:w-auto sm:ml-auto" />
+                  {/* Promo - Right Group */}
+                  <DrawLineRacingPromo className="sm:ml-auto" />
                 </div>
               </div>
 
