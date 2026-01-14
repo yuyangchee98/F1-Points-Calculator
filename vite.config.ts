@@ -96,5 +96,14 @@ export default defineConfig(async () => ({
     alias: {
       '@': resolve(__dirname, 'src')
     }
+  },
+  server: {
+    proxy: {
+      // Proxy /user/* to API worker for SSR profile pages
+      '/user': {
+        target: 'http://localhost:52313',
+        changeOrigin: true
+      }
+    }
   }
 }))
