@@ -163,7 +163,7 @@ const MyPredictionsPanel: React.FC<MyPredictionsPanelProps> = ({
                 </div>
                 <div className="text-sm text-gray-600 mt-2">
                   {filledCount > 0 ? (
-                    <span className="text-green-600">✓ {filledCount} of 10 positions filled</span>
+                    <span className="text-green-600">✓ {filledCount} of 22 positions filled</span>
                   ) : (
                     <span>No positions filled yet</span>
                   )}
@@ -222,7 +222,7 @@ const MyPredictionsPanel: React.FC<MyPredictionsPanelProps> = ({
                       <span className="text-amber-700 font-medium">⏰ <Countdown date={nextRaceToLock.date} /></span>
                     )}
                     {filledCount > 0 && (
-                      <span className="text-green-600 ml-2">· {filledCount}/10 filled</span>
+                      <span className="text-green-600 ml-2">· {filledCount}/22 filled</span>
                     )}
                   </div>
                 </div>
