@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import PointsSystemSelector from '../common/PointsSystemSelector';
 import useWindowSize from '../../hooks/useWindowSize';
+import { useAuth } from '../../hooks/useAuth';
 
 interface GridToolbarProps {
   onReset: () => void;
@@ -20,8 +21,13 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
   showOfficialResults,
 }) => {
   const { isMobile, isTablet } = useWindowSize();
+  const { user, isAuthenticated } = useAuth();
   const isCompact = isMobile || isTablet;
   const [showHowToUse, setShowHowToUse] = useState(false);
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
+  const [showCompeteMenu, setShowCompeteMenu] = useState(false);
+  const moreMenuRef = useRef<HTMLDivElement>(null);
+  const competeMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const savedState = localStorage.getItem('infoBannerExpanded');
@@ -30,17 +36,32 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
     }
   }, []);
 
+  // Close menus when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (moreMenuRef.current && !moreMenuRef.current.contains(event.target as Node)) {
+        setShowMoreMenu(false);
+      }
+      if (competeMenuRef.current && !competeMenuRef.current.contains(event.target as Node)) {
+        setShowCompeteMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const toggleHowToUse = () => {
     const newState = !showHowToUse;
     setShowHowToUse(newState);
     localStorage.setItem('infoBannerExpanded', newState.toString());
+    setShowMoreMenu(false);
   };
 
   return (
     <div className="bg-white border-b border-gray-200 rounded-t-lg">
       <div className="p-3 md:p-4">
         <div className="flex flex-wrap gap-2 items-center">
-          {/* View Controls */}
+          {/* View Settings */}
           <div className="flex items-center gap-2">
             {!isCompact && <span className="text-sm text-gray-500 font-medium">Points:</span>}
             <PointsSystemSelector />
@@ -68,54 +89,107 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
             {!isCompact && <span>Results</span>}
           </button>
 
-          {/* Utility Actions */}
-          <button
-            onClick={onOpenHistory}
-            className="bg-gray-50 border border-gray-300 text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-md transition-colors duration-200 flex items-center gap-2 font-medium text-sm"
-            title="Version History"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            {!isCompact && <span>History</span>}
-          </button>
+          {/* More Menu */}
+          <div className="relative" ref={moreMenuRef}>
+            <button
+              onClick={() => setShowMoreMenu(!showMoreMenu)}
+              className="bg-gray-50 border border-gray-300 text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-md transition-colors duration-200 flex items-center gap-2 font-medium text-sm"
+              title="More options"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
+              </svg>
+              {!isCompact && <span>More</span>}
+            </button>
 
-          <button
-            onClick={onOpenExport}
-            className="bg-gray-50 border border-gray-300 text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-md transition-colors duration-200 flex items-center gap-2 font-medium text-sm"
-            title="Export to Image"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
-            {!isCompact && <span>Export</span>}
-          </button>
-
-          <button
-            onClick={toggleHowToUse}
-            className="bg-gray-50 border border-gray-300 text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-md transition-colors duration-200 flex items-center gap-2 font-medium text-sm"
-            title="How to Use"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            {!isCompact && <span>Help</span>}
-          </button>
+            {showMoreMenu && (
+              <div className="absolute left-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                <button
+                  onClick={() => { onOpenHistory(); setShowMoreMenu(false); }}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Version History
+                </button>
+                <button
+                  onClick={() => { onOpenExport(); setShowMoreMenu(false); }}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Export Image
+                </button>
+                <button
+                  onClick={toggleHowToUse}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  How to Use
+                </button>
+              </div>
+            )}
+          </div>
 
           {/* Spacer */}
           <div className="flex-1" />
 
-          {/* Primary Actions */}
-          <button
-            onClick={onOpenPredictions}
-            className="bg-gray-50 border border-gray-300 text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-md transition-colors duration-200 flex items-center gap-2 font-medium text-sm"
-            title="Lock & Score"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            </svg>
-            {!isCompact && <span>Lock & Score</span>}
-          </button>
+          {/* Compete Menu */}
+          <div className="relative" ref={competeMenuRef}>
+            <button
+              onClick={() => setShowCompeteMenu(!showCompeteMenu)}
+              className="bg-amber-50 border border-amber-300 text-amber-700 hover:bg-amber-100 px-3 py-2 rounded-md transition-colors duration-200 flex items-center gap-2 font-medium text-sm"
+              title="Competition"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+              </svg>
+              <span>Compete</span>
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {showCompeteMenu && (
+              <div className="absolute right-0 mt-1 w-52 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                <button
+                  onClick={() => { onOpenPredictions(); setShowCompeteMenu(false); }}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  Lock Predictions
+                </button>
+                <a
+                  href="/leaderboard"
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                  onClick={() => setShowCompeteMenu(false)}
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                  Leaderboard
+                </a>
+                {isAuthenticated && (
+                  <a
+                    href={`/user/${user?.id}`}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                    onClick={() => setShowCompeteMenu(false)}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    My Profile
+                  </a>
+                )}
+              </div>
+            )}
+          </div>
 
           <button
             onClick={onReset}
@@ -131,10 +205,10 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
       </div>
 
       {showHowToUse && (
-        <div className="px-3 md:px-4 pb-3 md:pb-4 border-t border-gray-300 bg-blue-50">
+        <div className="px-3 md:px-4 pb-3 md:pb-4 border-t border-gray-200 bg-blue-50">
           <div className="pt-3">
             <p className="text-gray-700 text-sm">
-              💡 Click and drag drivers from the list to place them in their predicted finishing positions and get live points calculation.
+              Drag drivers from the list to place them in their predicted finishing positions and get live points calculation.
             </p>
           </div>
         </div>
