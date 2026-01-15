@@ -8,6 +8,7 @@ import TeamStandingsTable from './TeamStandingsTable';
 import TableSkeleton from '../common/TableSkeleton';
 import { DriverPointsChart, TeamPointsChart } from '../charts/LazyCharts';
 import { useAppDispatch } from '../../store';
+import CompetitionCard from './CompetitionCard';
 
 const StandingsSidebar: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -80,7 +81,7 @@ const StandingsSidebar: React.FC = () => {
                 )}
               </div>
             </div>
-            
+
             <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
               <h2 className="text-lg font-medium p-3 border-b border-gray-200 sticky top-0 bg-white flex items-center">
                 <span className="w-1 h-6 bg-red-600 mr-3 inline-block rounded-r-md"></span>
@@ -94,6 +95,8 @@ const StandingsSidebar: React.FC = () => {
                 )}
               </div>
             </div>
+
+            <CompetitionCard />
           </div>
         ) : (
           <div className="space-y-6">
@@ -128,6 +131,8 @@ const StandingsSidebar: React.FC = () => {
                 </Suspense>
               </div>
             </div>
+
+            <CompetitionCard />
           </div>
         )}
       </div>
