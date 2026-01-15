@@ -103,6 +103,11 @@ export default defineConfig(async () => ({
       '/user': {
         target: 'http://localhost:52313',
         changeOrigin: true
+      },
+      // Proxy /leaderboard to API worker for SSR leaderboard page
+      '/leaderboard': {
+        target: 'http://localhost:52313',
+        changeOrigin: true
       }
     }
   }

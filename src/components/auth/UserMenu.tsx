@@ -83,6 +83,14 @@ const UserMenu: React.FC = () => {
             View Profile
           </a>
 
+          <a
+            href="/leaderboard"
+            onClick={() => setIsOpen(false)}
+            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition"
+          >
+            Leaderboard
+          </a>
+
           <button
             onClick={() => {
               setIsOpen(false);
