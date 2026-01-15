@@ -108,6 +108,11 @@ export default defineConfig(async () => ({
       '/leaderboard': {
         target: 'http://localhost:52313',
         changeOrigin: true
+      },
+      // Proxy /race/* to API worker for SSR race pages
+      '/race': {
+        target: 'http://localhost:52313',
+        changeOrigin: true
       }
     }
   }

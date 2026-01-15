@@ -1,4 +1,4 @@
 {
   "version": 1,
-  "exclude": ["/user/*", "/leaderboard"]
+  "exclude": ["/user/*", "/leaderboard", "/race/*"]
 }
