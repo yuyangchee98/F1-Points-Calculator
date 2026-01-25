@@ -63,6 +63,18 @@ export function useAuth() {
     dispatch(logout());
   };
 
+  const handleGoogleSignIn = async () => {
+    const result = await signIn.social({
+      provider: 'google',
+      callbackURL: window.location.href,
+      errorCallbackURL: window.location.href + '?auth_error=true',
+    });
+    if (result.error) {
+      throw new Error(result.error.message);
+    }
+    // OAuth redirects away, so this won't run immediately
+  };
+
   const openSignIn = () => dispatch(openAuthModal('signin'));
   const openSignUp = () => dispatch(openAuthModal('signup'));
   const closeModal = () => dispatch(closeAuthModal());
@@ -76,6 +88,7 @@ export function useAuth() {
     signIn: handleSignIn,
     signUp: handleSignUp,
     signOut: handleSignOut,
+    signInWithGoogle: handleGoogleSignIn,
     resendVerification: handleResendVerification,
     openSignIn,
     openSignUp,
