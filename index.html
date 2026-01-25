@@ -67,7 +67,7 @@
         ],
         "author": {
           "@type": "Person",
-          "name": "Yaaaang",
+          "name": "Chyuang",
           "url": "https://chyuang.com"
         }
       }
@@ -78,17 +78,51 @@
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     
-    <!-- Fallback links for crawlers that don't execute JavaScript -->
+    <!-- Fallback content for crawlers and users without JavaScript -->
     <noscript>
-      <div style="padding: 20px; background: #f3f4f6;">
-        <p>This F1 Points Calculator requires JavaScript to run. Please enable JavaScript to use the interactive features.</p>
-        <p>Related F1 Resources:</p>
+      <div style="padding: 20px; max-width: 900px; margin: 0 auto; font-family: system-ui, sans-serif; line-height: 1.6;">
+        <h1 style="color: #dc2626;">F1 Points Calculator</h1>
+
+        <p>Welcome to the F1 Points Calculator - your ultimate free tool for predicting Formula 1 championship outcomes.
+        Simulate race results for the current F1 season by dragging and dropping drivers into their finishing positions,
+        and watch as the championship standings update in real-time.</p>
+
+        <h2>Features</h2>
         <ul>
-          <li><a href="https://f1-dash.com/" rel="noopener">F1 Dash - Race Analytics</a></li>
-          <li><a href="https://f1calendar.com/" rel="noopener">F1 Calendar - Race Schedule</a></li>
-          <li><a href="https://github.com/yuyangchee98/F1-Points-Calculator" rel="noopener">View on GitHub</a></li>
-          <li><a href="https://chyuang.com" rel="noopener">Created by Yaaaang</a></li>
+          <li><strong>Drag-and-drop predictions</strong> - Place drivers in finishing positions for any race</li>
+          <li><strong>Smart Input</strong> - AI-powered natural language commands like "Max P1 at Monaco"</li>
+          <li><strong>Real-time standings</strong> - Championship table updates instantly</li>
+          <li><strong>Official F1 points</strong> - Uses the 25-18-15-12-10-8-6-4-2-1 system</li>
+          <li><strong>Sprint race support</strong> - Includes sprint points for applicable races</li>
+          <li><strong>Constructor standings</strong> - Track team championships too</li>
         </ul>
+
+        <h2>Select a Season</h2>
+        <ul>
+          <li><a href="/2024">2024 F1 Season</a></li>
+          <li><a href="/2023">2023 F1 Season</a></li>
+          <li><a href="/2022">2022 F1 Season</a></li>
+        </ul>
+
+        <h2>Frequently Asked Questions</h2>
+
+        <h3>How does the F1 points calculator work?</h3>
+        <p>Drag drivers to their finishing positions for each race, and the calculator automatically updates
+        the championship standings based on the official F1 points system.</p>
+
+        <h3>How are F1 points calculated?</h3>
+        <p>Points are awarded to the top 10 finishers: 1st gets 25 points, 2nd gets 18, 3rd gets 15,
+        then 12, 10, 8, 6, 4, 2, and 1 point for 10th. Sprint races award approximately 1/3 of regular points to the top 8.</p>
+
+        <h3>Is this calculator free?</h3>
+        <p>Yes, completely free with no registration required.</p>
+
+        <p><a href="/about">View full FAQ & Help Guide</a></p>
+
+        <p style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666;">
+          Created by <a href="https://chyuang.com">Chyuang</a> |
+          <a href="https://github.com/yuyangchee98/F1-Points-Calculator">View on GitHub</a>
+        </p>
       </div>
     </noscript>
 
