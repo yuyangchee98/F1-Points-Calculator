@@ -262,3 +262,38 @@ export async function getLockedPredictions(
     return [];
   }
 }
+
+// Consensus Types and API
+
+export interface ConsensusEntry {
+  driverId: string;
+  count: number;
+  percentage: number;
+}
+
+export interface ConsensusData {
+  season: number;
+  raceId: string;
+  totalUsers: number;
+  positions: Record<number, ConsensusEntry[]>;
+}
+
+export async function getConsensus(
+  season: number,
+  raceId: string
+): Promise<ConsensusData | null> {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/consensus?season=${season}&raceId=${raceId}`,
+      { credentials: 'include' }
+    );
+
+    if (!response.ok) {
+      return null;
+    }
+
+    return response.json();
+  } catch (error) {
+    return null;
+  }
+}
