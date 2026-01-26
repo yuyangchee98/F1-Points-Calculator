@@ -102,5 +102,6 @@ export interface UiState {
   selectedPointsSystem: string;
   positionColumnMode: 'position' | 'standings';
   copiedDriver: string | null;
+  showConsensus: boolean;
 }
 

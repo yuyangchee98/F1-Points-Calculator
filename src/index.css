@@ -284,9 +284,15 @@ body {
   .race-slot.sprint {
     @apply bg-gray-50 border-gray-300;
   }
-  
+
   .race-header.sprint {
     @apply bg-gray-600 text-white italic;
+  }
+
+  /* Consensus hint for empty slots */
+  .consensus-hint {
+    @apply flex items-center justify-center text-gray-400 pointer-events-none select-none;
+    opacity: 0.5;
   }
   
   /* Apply styling for official results that indicates they're official but doesn't restrict functionality */

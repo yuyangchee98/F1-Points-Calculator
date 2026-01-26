@@ -9,7 +9,8 @@ const initialState: UiState = {
   selectedDriver: null,
   selectedPointsSystem: DEFAULT_POINTS_SYSTEM,
   positionColumnMode: 'position',
-  copiedDriver: null
+  copiedDriver: null,
+  showConsensus: false
 };
 
 export const uiSlice = createSlice({
@@ -52,6 +53,11 @@ export const uiSlice = createSlice({
       localStorage.setItem('position-column-mode', state.positionColumnMode);
     },
 
+    toggleConsensus: (state) => {
+      state.showConsensus = !state.showConsensus;
+      localStorage.setItem('show-consensus', state.showConsensus.toString());
+    },
+
     initializeUiState: (state) => {
       const hideOfficialResults = localStorage.getItem('hide-official-results');
       if (hideOfficialResults !== null) {
@@ -72,6 +78,11 @@ export const uiSlice = createSlice({
       if (savedPositionMode === 'position' || savedPositionMode === 'standings') {
         state.positionColumnMode = savedPositionMode;
       }
+
+      const savedShowConsensus = localStorage.getItem('show-consensus');
+      if (savedShowConsensus !== null) {
+        state.showConsensus = savedShowConsensus === 'true';
+      }
     }
   }
 });
@@ -84,6 +95,7 @@ export const {
   copyDriver,
   selectPointsSystem,
   togglePositionColumnMode,
+  toggleConsensus,
   initializeUiState
 } = uiSlice.actions;
 

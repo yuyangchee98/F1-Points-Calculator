@@ -5,6 +5,7 @@ import { RootState } from '../../store';
 import { selectDriverAtPosition, selectDriversByIdMap, getDriverLastName, getDriverDisplayName } from '../../store/selectors/dataSelectors';
 import DriverCard from '../drivers/DriverCard';
 import { selectDriver, copyDriver } from '../../store/slices/uiSlice';
+import { useConsensus, getTopConsensusDriver } from '../../hooks/useConsensus';
 import { placeDriver, clearPosition, fillRestOfSeason, resetGrid, clearEverything, setFastestLap } from '../../store/slices/gridSlice';
 import { selectDriverStandings } from '../../store/selectors/resultsSelectors';
 import { useAppDispatch } from '../../store';
@@ -31,10 +32,15 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position, style, classNam
   );
   const selectedDriverId = useSelector((state: RootState) => state.ui.selectedDriver);
   const copiedDriverId = useSelector((state: RootState) => state.ui.copiedDriver);
+  const showConsensus = useSelector((state: RootState) => state.ui.showConsensus);
   const positions = useSelector((state: RootState) => state.grid.positions);
   const driverById = useSelector(selectDriversByIdMap);
   const driverStandings = useSelector(selectDriverStandings);
   const races = useSelector((state: RootState) => state.seasonData.races);
+
+  // Consensus data for hints
+  const { data: consensusData } = useConsensus(race.id, showConsensus && !driverId);
+  const topConsensus = getTopConsensusDriver(consensusData, position);
 
   const [isHighlighted, setIsHighlighted] = useState(false);
   const [prevDriverId, setPrevDriverId] = useState<string | null>(null);
@@ -287,7 +293,7 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position, style, classNam
           ...(shouldShowFastestLapBorder ? { border: '3px solid #7D428E' } : {})
         }}
       >
-        {driver && (
+        {driver ? (
           <div className="animate-placement grid-card-wrapper">
             <DriverCard
               driver={driver}
@@ -298,7 +304,16 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position, style, classNam
               overrideTeamId={gridPosition?.teamId}
             />
           </div>
-        )}
+        ) : showConsensus && topConsensus && driverById[topConsensus.driverId] ? (
+          <div className="consensus-hint">
+            <span className="text-xs font-medium">
+              {getDriverLastName(topConsensus.driverId)}
+            </span>
+            <span className="text-[10px] ml-1">
+              {topConsensus.percentage}%
+            </span>
+          </div>
+        ) : null}
       </div>
 
       <ContextMenu

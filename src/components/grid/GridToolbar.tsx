@@ -11,6 +11,8 @@ interface GridToolbarProps {
   onOpenExport: () => void;
   onOpenPredictions: () => void;
   showOfficialResults: boolean;
+  onToggleConsensus: () => void;
+  showConsensus: boolean;
 }
 
 const GridToolbar: React.FC<GridToolbarProps> = ({
@@ -20,6 +22,8 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
   onOpenExport,
   onOpenPredictions,
   showOfficialResults,
+  onToggleConsensus,
+  showConsensus,
 }) => {
   const { isMobile, isTablet } = useWindowSize();
   const { user, isAuthenticated } = useAuth();
@@ -89,6 +93,21 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
               </svg>
             )}
             {!isCompact && <span>Results</span>}
+          </button>
+
+          <button
+            onClick={onToggleConsensus}
+            className={`${
+              showConsensus
+                ? 'bg-purple-50 border-purple-300 text-purple-700'
+                : 'bg-gray-50 border-gray-300 text-gray-700'
+            } border px-3 py-2 rounded-md hover:bg-opacity-80 transition-colors duration-200 flex items-center gap-2 font-medium text-sm`}
+            title={showConsensus ? 'Hide Consensus' : 'Show Consensus'}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            {!isCompact && <span>Consensus</span>}
           </button>
 
           {/* More Menu */}
