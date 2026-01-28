@@ -1,8 +1,10 @@
 import { API_BASE_URL } from '../utils/constants';
 
-interface DayAccessStatus {
+export type AccessTier = 'week' | 'season';
+
+interface AccessStatus {
   isActive: boolean;
-  customerId?: string;
+  tier?: AccessTier;
   purchaseTime?: number;
   expiresAt?: number;
 }
@@ -12,7 +14,7 @@ interface CheckoutSession {
   url: string;
 }
 
-export async function checkDayAccessStatus(email: string): Promise<DayAccessStatus> {
+export async function checkAccessStatus(email: string): Promise<AccessStatus> {
   const response = await fetch(`${API_BASE_URL}/api/subscription/check`, {
     method: 'POST',
     headers: {
@@ -22,13 +24,16 @@ export async function checkDayAccessStatus(email: string): Promise<DayAccessStat
   });
 
   if (!response.ok) {
-    throw new Error('Failed to check day access status');
+    throw new Error('Failed to check access status');
   }
 
   return response.json();
 }
 
-export async function createCheckoutSession(email: string): Promise<CheckoutSession> {
+export async function createCheckoutSession(
+  email: string,
+  tier: AccessTier
+): Promise<CheckoutSession> {
   const response = await fetch(`${API_BASE_URL}/api/subscription/create-checkout`, {
     method: 'POST',
     headers: {
@@ -36,6 +41,7 @@ export async function createCheckoutSession(email: string): Promise<CheckoutSess
     },
     body: JSON.stringify({
       email,
+      tier,
       successUrl: `${window.location.origin}?payment=success`,
       cancelUrl: `${window.location.origin}?payment=cancelled`,
     }),
@@ -47,4 +53,3 @@ export async function createCheckoutSession(email: string): Promise<CheckoutSess
 
   return response.json();
 }
-
