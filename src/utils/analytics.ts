@@ -44,15 +44,11 @@ export const GA_EVENTS = {
     DELETE_ALL_VERSIONS: 'delete_all_versions',
     CLOSE_HISTORY: 'close_version_history',
   },
-  SMART_INPUT: {
-    CLICK_TRY_NOW: 'smart_input_try_now',
-    OPEN_SUBSCRIPTION_MODAL: 'smart_input_open_modal',
-    CLOSE_SUBSCRIPTION_MODAL: 'smart_input_close_modal',
-    CLICK_SUBSCRIBE: 'smart_input_subscribe_click',
-    ENTER_EMAIL: 'smart_input_enter_email',
-    USE_COMMAND: 'smart_input_use_command',
-    COMMAND_SUCCESS: 'smart_input_command_success',
-    COMMAND_FAIL: 'smart_input_command_fail',
+  SUBSCRIPTION: {
+    OPEN_MODAL: 'subscription_open_modal',
+    CLOSE_MODAL: 'subscription_close_modal',
+    CLICK_SUBSCRIBE: 'subscription_subscribe_click',
+    PURCHASE_SUCCESS: 'subscription_purchase_success',
   },
   CONTEXT_MENU: {
     ACTION: 'context_menu_action',
@@ -110,21 +106,12 @@ export const trackVersionHistoryAction = (action: keyof typeof GA_EVENTS.VERSION
   );
 };
 
-export const trackSmartInputAction = (action: keyof typeof GA_EVENTS.SMART_INPUT, details?: string, value?: number) => {
+export const trackSubscriptionAction = (action: keyof typeof GA_EVENTS.SUBSCRIPTION, details?: string, value?: number) => {
   trackEvent(
-    GA_EVENTS.SMART_INPUT[action],
-    'Smart Input',
+    GA_EVENTS.SUBSCRIPTION[action],
+    'Subscription',
     details,
     value
-  );
-};
-
-export const trackSmartInputCommand = (command: string, success: boolean, placementCount?: number) => {
-  trackEvent(
-    success ? GA_EVENTS.SMART_INPUT.COMMAND_SUCCESS : GA_EVENTS.SMART_INPUT.COMMAND_FAIL,
-    'Smart Input',
-    command.substring(0, 50), // Truncate long commands
-    placementCount
   );
 };
 

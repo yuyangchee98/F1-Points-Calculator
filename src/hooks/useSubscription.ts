@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
-import { checkDayAccessStatus } from '../api/subscription';
+import { checkAccessStatus, AccessTier } from '../api/subscription';
 import { useUserEmail } from './useUserEmail';
 import { updateUserProperties } from '../utils/analytics';
 
-const ACCESS_KEY = 'f1_smart_input_access';
+const ACCESS_KEY = 'f1_consensus_access';
 const ACCESS_CHECK_INTERVAL = 1000 * 60 * 10; // Check every 10 minutes
 
-export const useDayAccess = () => {
+export const useConsensusAccess = () => {
   const [hasAccess, setHasAccess] = useState(false);
+  const [tier, setTier] = useState<AccessTier | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [statusMessage, setStatusMessage] = useState('');
   const { email } = useUserEmail();
@@ -23,6 +24,7 @@ export const useDayAccess = () => {
       try {
         const cacheKey = `${ACCESS_KEY}_${email}`;
         const cachedStatus = localStorage.getItem(cacheKey);
+        const cachedTier = localStorage.getItem(`${cacheKey}_tier`) as AccessTier | null;
         const lastCheck = localStorage.getItem(`${cacheKey}_lastCheck`);
         const now = Date.now();
 
@@ -30,18 +32,23 @@ export const useDayAccess = () => {
           const timeSinceLastCheck = now - parseInt(lastCheck);
           if (timeSinceLastCheck < ACCESS_CHECK_INTERVAL) {
             setHasAccess(cachedStatus === 'active');
+            setTier(cachedTier);
             setIsLoading(false);
             return;
           }
         }
 
-        const status = await checkDayAccessStatus(email);
+        const status = await checkAccessStatus(email);
         const isActive = status.isActive;
 
         localStorage.setItem(cacheKey, isActive ? 'active' : 'inactive');
         localStorage.setItem(`${cacheKey}_lastCheck`, now.toString());
+        if (status.tier) {
+          localStorage.setItem(`${cacheKey}_tier`, status.tier);
+        }
 
         setHasAccess(isActive);
+        setTier(status.tier || null);
       } catch (error) {
         const cacheKey = `${ACCESS_KEY}_${email}`;
         const cachedStatus = localStorage.getItem(cacheKey);
@@ -58,12 +65,12 @@ export const useDayAccess = () => {
       if (typeof window !== 'undefined' && window.gtag) {
         window.gtag('event', 'purchase', {
           transaction_id: `T_${Date.now()}_${email || 'unknown'}`,
-          value: 0.99,
+          value: 15,
           currency: 'USD',
           items: [{
-            item_id: 'smart_input_24hr',
-            item_name: 'Smart Input 24hr Access',
-            price: 0.99,
+            item_id: 'consensus_access',
+            item_name: 'Consensus Access',
+            price: 15,
             quantity: 1
           }]
         });
@@ -81,7 +88,7 @@ export const useDayAccess = () => {
       window.history.replaceState({}, document.title, window.location.pathname);
 
       if (email) {
-        setStatusMessage('🎉 Payment successful! Access granted for 24 hours.');
+        setStatusMessage('Payment successful! Consensus access granted.');
         setTimeout(() => setStatusMessage(''), 3000);
         checkStatus();
       }
@@ -100,13 +107,17 @@ export const useDayAccess = () => {
       setIsLoading(true);
 
       try {
-        const status = await checkDayAccessStatus(email);
+        const status = await checkAccessStatus(email);
         const isActive = status.isActive;
 
         localStorage.setItem(cacheKey, isActive ? 'active' : 'inactive');
         localStorage.setItem(`${cacheKey}_lastCheck`, Date.now().toString());
+        if (status.tier) {
+          localStorage.setItem(`${cacheKey}_tier`, status.tier);
+        }
 
         setHasAccess(isActive);
+        setTier(status.tier || null);
       } catch (error) {
       } finally {
         setIsLoading(false);
@@ -114,5 +125,8 @@ export const useDayAccess = () => {
     }
   };
 
-  return { hasAccess, isLoading, refreshStatus, statusMessage };
+  return { hasAccess, tier, isLoading, refreshStatus, statusMessage };
 };
+
+// Keep old export for backward compatibility during migration
+export const useDayAccess = useConsensusAccess;

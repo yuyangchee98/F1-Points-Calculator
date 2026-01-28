@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { createCheckoutSession } from '../../api/subscription';
-import { trackSmartInputAction } from '../../utils/analytics';
+import { createCheckoutSession, AccessTier } from '../../api/subscription';
+import { trackSubscriptionAction } from '../../utils/analytics';
 
 interface SubscriptionModalProps {
   isOpen: boolean;
@@ -9,18 +9,19 @@ interface SubscriptionModalProps {
   onEmailChange: (email: string) => void;
 }
 
-const SubscriptionModal: React.FC<SubscriptionModalProps> = ({ 
-  isOpen, 
-  onClose, 
+const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
+  isOpen,
+  onClose,
   email,
-  onEmailChange 
+  onEmailChange
 }) => {
   const [localEmail, setLocalEmail] = useState(email);
+  const [selectedTier, setSelectedTier] = useState<AccessTier>('season');
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
-      trackSmartInputAction('OPEN_SUBSCRIPTION_MODAL');
+      trackSubscriptionAction('OPEN_MODAL');
     }
   }, [isOpen]);
 
@@ -32,11 +33,11 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
       return;
     }
 
-    trackSmartInputAction('CLICK_SUBSCRIBE', localEmail);
+    trackSubscriptionAction('CLICK_SUBSCRIBE', `${selectedTier}_${localEmail}`);
     setIsLoading(true);
     try {
       onEmailChange(localEmail);
-      const session = await createCheckoutSession(localEmail);
+      const session = await createCheckoutSession(localEmail, selectedTier);
       window.location.href = session.url;
     } catch (error) {
       alert('Failed to start checkout process. Please try again.');
@@ -48,20 +49,56 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
         <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Get 24-Hour Access</h2>
+          <h2 className="text-2xl font-bold mb-2">Unlock Community Consensus</h2>
+          <p className="text-gray-600 mb-6">See what other fans predict before you lock in</p>
 
-          <div className="mb-6">
-            <p className="text-4xl font-bold text-red-600 mb-2">$0.99</p>
-            <p className="text-gray-600">One-time payment • Exactly 24 hours</p>
+          <div className="mb-6 space-y-3">
+            <button
+              onClick={() => setSelectedTier('season')}
+              className={`w-full p-4 rounded-lg border-2 text-left transition ${
+                selectedTier === 'season'
+                  ? 'border-red-600 bg-red-50'
+                  : 'border-gray-200 hover:border-gray-300'
+              }`}
+            >
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="font-semibold text-lg">Season Pass</p>
+                  <p className="text-sm text-gray-600">Full 2026 season access</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-bold text-red-600">$15</p>
+                  <p className="text-xs text-green-600 font-medium">Best value</p>
+                </div>
+              </div>
+            </button>
+
+            <button
+              onClick={() => setSelectedTier('week')}
+              className={`w-full p-4 rounded-lg border-2 text-left transition ${
+                selectedTier === 'week'
+                  ? 'border-red-600 bg-red-50'
+                  : 'border-gray-200 hover:border-gray-300'
+              }`}
+            >
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="font-semibold text-lg">1 Week</p>
+                  <p className="text-sm text-gray-600">7 days from purchase</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-bold">$3</p>
+                </div>
+              </div>
+            </button>
           </div>
 
-          <div className="mb-6 text-left">
+          <div className="mb-6 text-left bg-gray-50 p-4 rounded-lg">
             <h3 className="font-semibold mb-2">What you get:</h3>
             <ul className="text-sm text-gray-600 space-y-1">
-              <li>• Natural language predictions</li>
-              <li>• Instant grid updates</li>
-              <li>• Save hours of clicking</li>
-              <li>• Works across all devices</li>
+              <li>• See community prediction percentages</li>
+              <li>• Know what % picked each driver for each position</li>
+              <li>• Make informed predictions before locking in</li>
             </ul>
           </div>
 
@@ -82,14 +119,14 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
               }}
             />
             <p className="text-xs text-gray-500 mt-1">
-              Your 24-hour access will be tied to this email
+              Your access will be tied to this email
             </p>
           </div>
 
           <div className="flex gap-3">
             <button
               onClick={() => {
-                trackSmartInputAction('CLOSE_SUBSCRIPTION_MODAL', 'cancel_button');
+                trackSubscriptionAction('CLOSE_MODAL', 'cancel_button');
                 onClose();
               }}
               className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition"
@@ -105,7 +142,7 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                   : 'bg-red-600 text-white hover:bg-red-700'
               }`}
             >
-              {isLoading ? 'Processing...' : 'Get Access'}
+              {isLoading ? 'Processing...' : `Get Access - $${selectedTier === 'season' ? '15' : '3'}`}
             </button>
           </div>
         </div>
