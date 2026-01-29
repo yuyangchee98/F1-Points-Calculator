@@ -161,7 +161,46 @@ const App: React.FC = () => {
                 {/* Title Row */}
                 <div className="flex items-center justify-between mb-3">
                   <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-gray-800 flex items-center">
-                    <span className="bg-red-600 text-white px-2 py-0.5 sm:px-3 sm:py-1 mr-2 sm:mr-3 rounded-md text-base sm:text-xl">F1</span>
+                    <div className="relative group">
+                      <button className="bg-red-600 text-white px-2 py-0.5 sm:px-3 sm:py-1 mr-2 sm:mr-3 rounded-md text-base sm:text-xl font-bold flex items-center gap-1 hover:bg-red-700 transition-colors">
+                        F1
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-3 w-3 sm:h-4 sm:w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+
+                      <nav
+                        className="absolute left-0 top-full mt-1 hidden group-hover:block bg-white shadow-lg rounded-md border border-gray-200 py-1 min-w-[180px] z-50"
+                        role="menu"
+                        aria-label="Formula calculators"
+                      >
+                        <a
+                          href="/"
+                          className="flex items-center justify-between px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 font-medium"
+                          role="menuitem"
+                        >
+                          F1 Calculator
+                          <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                        </a>
+                        <a
+                          href="https://f2pointscalculator.chyuang.com"
+                          className="flex items-center justify-between px-4 py-2 text-sm text-gray-800 hover:bg-gray-100"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          role="menuitem"
+                        >
+                          F2 Calculator
+                        </a>
+                      </nav>
+                    </div>
                     <span>Points Calculator</span>
                   </h1>
                   <UserMenu />

@@ -64,10 +64,10 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
               <div className="flex justify-between items-center">
                 <div>
                   <p className="font-semibold text-lg">Season Pass</p>
-                  <p className="text-sm text-gray-600">Full 2026 season access</p>
+                  <p className="text-sm text-gray-600">$15/year, cancel anytime</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-red-600">$15</p>
+                  <p className="text-2xl font-bold text-red-600">$15<span className="text-sm font-normal">/yr</span></p>
                   <p className="text-xs text-green-600 font-medium">Best value</p>
                 </div>
               </div>
