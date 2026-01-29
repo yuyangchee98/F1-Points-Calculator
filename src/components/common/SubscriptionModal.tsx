@@ -167,11 +167,11 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
             >
               <div className="flex justify-between items-center">
                 <div>
-                  <p className="font-semibold text-lg">1 Week</p>
-                  <p className="text-sm text-gray-600">7 days from purchase</p>
+                  <p className="font-semibold text-lg">Weekly</p>
+                  <p className="text-sm text-gray-600">$2.99/week, cancel anytime</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold">$3</p>
+                  <p className="text-2xl font-bold">$2.99<span className="text-sm font-normal">/wk</span></p>
                 </div>
               </div>
             </button>
@@ -226,7 +226,7 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                   : 'bg-red-600 text-white hover:bg-red-700'
               }`}
             >
-              {isLoading ? 'Processing...' : `Get Access - $${selectedTier === 'season' ? '15' : '3'}`}
+              {isLoading ? 'Processing...' : `Get Access - $${selectedTier === 'season' ? '15' : '2.99'}`}
             </button>
           </div>
         </div>
