@@ -53,3 +53,23 @@ export async function createCheckoutSession(
 
   return response.json();
 }
+
+export async function openCustomerPortal(email: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/api/subscription/portal`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      email,
+      returnUrl: window.location.href,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to open customer portal');
+  }
+
+  const { url } = await response.json();
+  window.location.href = url;
+}

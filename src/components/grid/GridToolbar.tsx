@@ -13,6 +13,7 @@ interface GridToolbarProps {
   showOfficialResults: boolean;
   onToggleConsensus: () => void;
   showConsensus: boolean;
+  hasConsensusAccess: boolean;
 }
 
 const GridToolbar: React.FC<GridToolbarProps> = ({
@@ -24,6 +25,7 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
   showOfficialResults,
   onToggleConsensus,
   showConsensus,
+  hasConsensusAccess,
 }) => {
   const { isMobile, isTablet } = useWindowSize();
   const { user, isAuthenticated } = useAuth();
@@ -98,15 +100,21 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
           <button
             onClick={onToggleConsensus}
             className={`${
-              showConsensus
+              showConsensus && hasConsensusAccess
                 ? 'bg-purple-50 border-purple-300 text-purple-700'
                 : 'bg-gray-50 border-gray-300 text-gray-700'
             } border px-3 py-2 rounded-md hover:bg-opacity-80 transition-colors duration-200 flex items-center gap-2 font-medium text-sm`}
-            title={showConsensus ? 'Hide Consensus' : 'Show Consensus'}
+            title={hasConsensusAccess ? (showConsensus ? 'Hide Consensus' : 'Show Consensus') : 'Unlock Consensus'}
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
+            {hasConsensusAccess ? (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            )}
             {!isCompact && <span>Consensus</span>}
           </button>
 

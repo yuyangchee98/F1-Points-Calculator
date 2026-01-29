@@ -9,6 +9,7 @@ const ACCESS_CHECK_INTERVAL = 1000 * 60 * 10; // Check every 10 minutes
 export const useConsensusAccess = () => {
   const [hasAccess, setHasAccess] = useState(false);
   const [tier, setTier] = useState<AccessTier | null>(null);
+  const [expiresAt, setExpiresAt] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [statusMessage, setStatusMessage] = useState('');
   const { email } = useUserEmail();
@@ -49,6 +50,7 @@ export const useConsensusAccess = () => {
 
         setHasAccess(isActive);
         setTier(status.tier || null);
+        setExpiresAt(status.expiresAt || null);
       } catch (error) {
         const cacheKey = `${ACCESS_KEY}_${email}`;
         const cachedStatus = localStorage.getItem(cacheKey);
@@ -118,6 +120,7 @@ export const useConsensusAccess = () => {
 
         setHasAccess(isActive);
         setTier(status.tier || null);
+        setExpiresAt(status.expiresAt || null);
       } catch (error) {
       } finally {
         setIsLoading(false);
@@ -125,7 +128,7 @@ export const useConsensusAccess = () => {
     }
   };
 
-  return { hasAccess, tier, isLoading, refreshStatus, statusMessage };
+  return { hasAccess, tier, expiresAt, isLoading, refreshStatus, statusMessage };
 };
 
 // Keep old export for backward compatibility during migration

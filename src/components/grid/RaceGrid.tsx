@@ -20,6 +20,8 @@ interface RaceGridProps {
   onOpenExport: () => void;
   onOpenPredictions: () => void;
   showOfficialResults: boolean;
+  hasConsensusAccess: boolean;
+  onOpenSubscriptionModal: () => void;
 }
 
 const POSITION_COLUMN_WIDTH = 80;
@@ -36,6 +38,8 @@ const RaceGrid: React.FC<RaceGridProps> = ({
   onOpenExport,
   onOpenPredictions,
   showOfficialResults,
+  hasConsensusAccess,
+  onOpenSubscriptionModal,
 }) => {
   const dispatch = useAppDispatch();
   const races = useSelector((state: RootState) => state.seasonData.races);
@@ -93,8 +97,15 @@ const RaceGrid: React.FC<RaceGridProps> = ({
         onOpenExport={onOpenExport}
         onOpenPredictions={onOpenPredictions}
         showOfficialResults={showOfficialResults}
-        onToggleConsensus={() => dispatch(toggleConsensus())}
+        onToggleConsensus={() => {
+          if (hasConsensusAccess) {
+            dispatch(toggleConsensus());
+          } else {
+            onOpenSubscriptionModal();
+          }
+        }}
         showConsensus={showConsensus}
+        hasConsensusAccess={hasConsensusAccess}
       />
 
       <div
