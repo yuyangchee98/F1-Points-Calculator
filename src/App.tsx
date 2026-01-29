@@ -176,31 +176,35 @@ const App: React.FC = () => {
                         </svg>
                       </button>
 
-                      <nav
-                        className="absolute left-0 top-full mt-1 hidden group-hover:block bg-white shadow-lg rounded-md border border-gray-200 py-1 min-w-[180px] z-50"
-                        role="menu"
-                        aria-label="Formula calculators"
+                      <div
+                        className="absolute left-0 top-full pt-1 hidden group-hover:block z-50"
                       >
-                        <a
-                          href="/"
-                          className="flex items-center justify-between px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 font-medium"
-                          role="menuitem"
+                        <nav
+                          className="bg-white shadow-lg rounded-md border border-gray-200 py-1 min-w-[180px]"
+                          role="menu"
+                          aria-label="Formula calculators"
                         >
-                          F1 Calculator
-                          <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                        </a>
-                        <a
-                          href="https://f2pointscalculator.chyuang.com"
-                          className="flex items-center justify-between px-4 py-2 text-sm text-gray-800 hover:bg-gray-100"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          role="menuitem"
-                        >
-                          F2 Calculator
-                        </a>
-                      </nav>
+                          <a
+                            href="/"
+                            className="flex items-center justify-between px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 font-medium"
+                            role="menuitem"
+                          >
+                            F1 Calculator
+                            <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                          </a>
+                          <a
+                            href="https://f2pointscalculator.chyuang.com"
+                            className="flex items-center justify-between px-4 py-2 text-sm text-gray-800 hover:bg-gray-100"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            role="menuitem"
+                          >
+                            F2 Calculator
+                          </a>
+                        </nav>
+                      </div>
                     </div>
                     <span>Points Calculator</span>
                   </h1>

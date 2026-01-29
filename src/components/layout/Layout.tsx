@@ -110,6 +110,7 @@ const Layout: React.FC<LayoutProps> = ({ sidebar, content }) => {
                 <h3 className="text-lg font-medium mb-3">F1 Points Calculator</h3>
                 <p className="text-sm text-gray-400 mb-2">Created by <a href="https://chyuang.com" className="text-gray-300 hover:text-white" target="_blank" rel="noopener noreferrer">Chyuang</a></p>
                 <p className="text-sm text-gray-400 mb-2"><a href="https://github.com/yuyangchee98/F1-Points-Calculator" className="text-gray-300 hover:text-white" target="_blank" rel="noopener noreferrer">Open source on GitHub</a></p>
+                <p className="text-sm text-gray-400 mb-2"><a href="mailto:f1pointscalculator@chyuang.com" className="text-gray-300 hover:text-white">Email me for any issues</a></p>
               </div>
 
               <div>
