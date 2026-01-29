@@ -31,6 +31,7 @@ import UserMenu from './components/auth/UserMenu';
 import { useAppDispatch } from './store';
 import useWindowSize from './hooks/useWindowSize';
 import { trackBuyCoffeeClick, trackFeedbackClick, GA_EVENTS, trackEvent, trackVersionHistoryAction, trackExportAction } from './utils/analytics';
+import { openCustomerPortal } from './api/subscription';
 import { CURRENT_SEASON } from './utils/constants';
 import { Race } from './types';
 
@@ -64,7 +65,7 @@ const App: React.FC = () => {
     return null;
   };
   const raceGridScrollRef = React.useRef<HTMLDivElement>(null);
-  const { statusMessage } = useDayAccess();
+  const { hasAccess: hasConsensusAccess, tier: consensusTier, expiresAt: consensusExpiresAt, statusMessage } = useDayAccess();
   const { email, saveEmail } = useUserEmail();
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
@@ -203,7 +204,32 @@ const App: React.FC = () => {
                     </div>
                     <span>Points Calculator</span>
                   </h1>
-                  <UserMenu />
+                  <div className="flex items-center gap-2">
+                    {hasConsensusAccess && (
+                      <button
+                        onClick={async () => {
+                          if (email) {
+                            try {
+                              await openCustomerPortal(email);
+                            } catch (error) {
+                              alert('Failed to open subscription management.');
+                            }
+                          } else {
+                            setShowSubscriptionModal(true);
+                          }
+                        }}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium text-purple-700 bg-purple-50 border border-purple-200 hover:bg-purple-100 rounded-md transition-colors duration-200"
+                        title="Manage your consensus subscription"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <span className="hidden sm:inline">Subscription</span>
+                      </button>
+                    )}
+                    <UserMenu />
+                  </div>
                 </div>
 
                 {/* Action Row */}
@@ -293,6 +319,8 @@ const App: React.FC = () => {
                     }}
                     onOpenPredictions={() => setShowPredictions(true)}
                     showOfficialResults={showOfficialResults}
+                    hasConsensusAccess={hasConsensusAccess}
+                    onOpenSubscriptionModal={() => setShowSubscriptionModal(true)}
                   />
                 </>
               )}
@@ -306,6 +334,9 @@ const App: React.FC = () => {
           onClose={() => setShowSubscriptionModal(false)}
           email={email}
           onEmailChange={saveEmail}
+          hasAccess={hasConsensusAccess}
+          currentTier={consensusTier}
+          expiresAt={consensusExpiresAt}
         />
 
         {showHistory && (

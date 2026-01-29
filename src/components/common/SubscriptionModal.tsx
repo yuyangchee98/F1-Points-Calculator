@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { createCheckoutSession, AccessTier } from '../../api/subscription';
+import { createCheckoutSession, openCustomerPortal, AccessTier } from '../../api/subscription';
 import { trackSubscriptionAction } from '../../utils/analytics';
 
 interface SubscriptionModalProps {
@@ -7,13 +7,19 @@ interface SubscriptionModalProps {
   onClose: () => void;
   email: string;
   onEmailChange: (email: string) => void;
+  hasAccess?: boolean;
+  currentTier?: AccessTier | null;
+  expiresAt?: number | null;
 }
 
 const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
   isOpen,
   onClose,
   email,
-  onEmailChange
+  onEmailChange,
+  hasAccess = false,
+  currentTier = null,
+  expiresAt = null,
 }) => {
   const [localEmail, setLocalEmail] = useState(email);
   const [selectedTier, setSelectedTier] = useState<AccessTier>('season');
@@ -24,6 +30,10 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
       trackSubscriptionAction('OPEN_MODAL');
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    setLocalEmail(email);
+  }, [email]);
 
   if (!isOpen) return null;
 
@@ -45,6 +55,80 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
     }
   };
 
+  const handleManageSubscription = async () => {
+    if (!email) {
+      alert('Please enter your email address');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await openCustomerPortal(email);
+    } catch (error) {
+      alert('Failed to open subscription management. Please try again.');
+      setIsLoading(false);
+    }
+  };
+
+  const formatExpiryDate = (timestamp: number) => {
+    return new Date(timestamp).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
+
+  // Show management view if user has access
+  if (hasAccess) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+          <div className="text-center">
+            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold mb-2">Consensus Active</h2>
+            <p className="text-gray-600 mb-4">
+              You have access to community consensus data.
+            </p>
+
+            <div className="bg-gray-50 rounded-lg p-4 mb-6 text-left">
+              <div className="flex justify-between mb-2">
+                <span className="text-gray-600">Plan:</span>
+                <span className="font-medium">{currentTier === 'season' ? 'Season Pass' : '1 Week'}</span>
+              </div>
+              {expiresAt && (
+                <div className="flex justify-between">
+                  <span className="text-gray-600">{currentTier === 'season' ? 'Renews:' : 'Expires:'}</span>
+                  <span className="font-medium">{formatExpiryDate(expiresAt)}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={onClose}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition"
+              >
+                Close
+              </button>
+              <button
+                onClick={handleManageSubscription}
+                disabled={isLoading}
+                className="flex-1 px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-900 transition font-medium"
+              >
+                {isLoading ? 'Loading...' : 'Manage Subscription'}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show purchase view if user doesn't have access
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
