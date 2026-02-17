@@ -21,12 +21,15 @@ import useRaceResults from '../hooks/useRaceResults';
 import { CURRENT_SEASON, getGridPositions } from '../utils/constants';
 import { Race } from '../types';
 import LazyDndProvider from '../components/common/LazyDndProvider';
-import DriverSelection from '../components/drivers/DriverSelection';
+import DriverCard from '../components/drivers/DriverCard';
 import SingleRaceGrid from '../components/compete/SingleRaceGrid';
 import LockConfirmationModal from '../components/predictions/LockConfirmationModal';
 import ToastContainer from '../components/common/ToastContainer';
 import { getLeaderboard, LeaderboardEntry } from '../api/leaderboard';
 import AuthModal from '../components/auth/AuthModal';
+import { selectDriver } from '../store/slices/uiSlice';
+import { selectTeamsByIdMap, getDriverLastName } from '../store/selectors/dataSelectors';
+import useWindowSize from '../hooks/useWindowSize';
 
 // ─── Helpers ──────────────────────────────────────────
 
@@ -62,8 +65,12 @@ const Countdown: React.FC<{ date: string }> = ({ date }) => {
 const Compete: React.FC = () => {
   const dispatch = useAppDispatch();
   const { user, isAuthenticated } = useAuth();
+  const allDrivers = useSelector((state: RootState) => state.seasonData.drivers);
   const driverById = useSelector(selectDriversByIdMap);
+  const teamById = useSelector(selectTeamsByIdMap);
+  const selectedDriverId = useSelector((state: RootState) => state.ui.selectedDriver);
   const lockedPredictions = useSelector(selectLockedPredictions);
+  const { isMobile } = useWindowSize();
   const overallAccuracy = useSelector(selectOverallAccuracy);
   const lockedCount = useSelector(selectLockedRaceCount);
   const scoredCount = useSelector(selectScoredRaceCount);
@@ -136,6 +143,10 @@ const Compete: React.FC = () => {
     return () => { cancelled = true; };
   }, [leaderboardPage]);
 
+  const handleDriverClick = (driverId: string) => {
+    dispatch(selectDriver(selectedDriverId === driverId ? null : driverId));
+  };
+
   const handleLockRace = () => {
     if (!user?.id) {
       dispatch(openAuthModal('signup'));
@@ -198,7 +209,7 @@ const Compete: React.FC = () => {
 
         {/* Header */}
         <header className="bg-white border-b border-gray-200">
-          <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
             <Link to="/" className="flex items-center gap-2">
               <span className="bg-red-600 text-white text-sm font-bold px-2 py-1 rounded">F1</span>
               <span className="text-lg font-semibold text-gray-900">Compete</span>
@@ -215,11 +226,11 @@ const Compete: React.FC = () => {
           </div>
         </header>
 
-        <main className="max-w-3xl mx-auto px-4 py-6">
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
           {/* Sign-in banner */}
           {!isAuthenticated && (
-            <div className="bg-gradient-to-r from-red-600 to-red-700 rounded-lg p-5 mb-6 text-white">
+            <div className="max-w-3xl mx-auto bg-gradient-to-r from-red-600 to-red-700 rounded-lg p-5 mb-6 text-white">
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-lg font-bold">Join the Competition</h2>
@@ -239,7 +250,7 @@ const Compete: React.FC = () => {
 
           {/* Hero Card */}
           {nextRace && (
-            <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-5 mb-6">
+            <div className="max-w-3xl mx-auto bg-white rounded-lg border border-gray-200 shadow-sm p-5 mb-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   {nextRace.countryCode && (
@@ -285,13 +296,13 @@ const Compete: React.FC = () => {
           )}
 
           {!nextRace && (
-            <div className="bg-white rounded-lg border border-gray-200 p-5 mb-6 text-center">
+            <div className="max-w-3xl mx-auto bg-white rounded-lg border border-gray-200 p-5 mb-6 text-center">
               <p className="text-gray-500">No upcoming races. Season complete!</p>
             </div>
           )}
 
           {/* Tab Bar */}
-          <div className="flex border-b border-gray-200 mb-6">
+          <div className="flex border-b border-gray-200 mb-6 max-w-3xl mx-auto">
             {tabs.map(tab => (
               <button
                 key={tab.id}
@@ -327,9 +338,76 @@ const Compete: React.FC = () => {
                 </div>
               ) : (
                 <CompeteGridProvider>
-                  <DriverSelection />
+                  {/* Mobile: horizontal driver chip strip */}
+                  {isMobile && (
+                    <div className="mb-4 -mx-4 px-4">
+                      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                        {allDrivers.map(driver => {
+                          const team = teamById[driver.team];
+                          const isSelected = selectedDriverId === driver.id;
+                          return (
+                            <button
+                              key={driver.id}
+                              onClick={() => handleDriverClick(driver.id)}
+                              className={`flex-shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-bold transition-all ${
+                                isSelected
+                                  ? 'ring-2 ring-blue-500 shadow-md scale-105'
+                                  : 'hover:scale-105'
+                              }`}
+                              style={{
+                                borderLeft: `3px solid ${team?.color || '#ccc'}`,
+                                backgroundColor: isSelected ? `${team?.color}15` : 'white',
+                              }}
+                            >
+                              <span style={{ color: team?.color || '#555' }}>
+                                {getDriverLastName(driver.id).slice(0, 3).toUpperCase()}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                      {selectedDriverId && (
+                        <div className="flex items-center justify-between mt-2 px-2 py-1.5 bg-blue-50 rounded-md text-sm">
+                          <span className="text-blue-700 font-medium">
+                            {getDriverLastName(selectedDriverId)} selected — tap a position to place
+                          </span>
+                          <button
+                            onClick={() => dispatch(selectDriver(null))}
+                            className="text-blue-500 hover:text-blue-700 font-bold ml-2"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
-                  <SingleRaceGrid race={nextRaceToLock} />
+                  {/* Desktop: side-by-side layout */}
+                  {!isMobile ? (
+                    <div className="flex gap-4">
+                      {/* Drivers — responsive columns */}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Drivers</h3>
+                        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 max-h-[calc(100vh-240px)] overflow-y-auto pr-1 pb-2">
+                          {allDrivers.map(driver => (
+                            <DriverCard
+                              key={driver.id}
+                              driver={driver}
+                              isSelected={selectedDriverId === driver.id}
+                              onClick={() => handleDriverClick(driver.id)}
+                            />
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Grid — triple-column positions */}
+                      <div className="w-[500px] flex-shrink-0">
+                        <SingleRaceGrid race={nextRaceToLock} />
+                      </div>
+                    </div>
+                  ) : (
+                    <SingleRaceGrid race={nextRaceToLock} />
+                  )}
 
                   {/* Lock confirmation modal */}
                   {raceToLock && (
@@ -351,7 +429,7 @@ const Compete: React.FC = () => {
 
           {/* ─── Results Tab ─── */}
           {activeTab === 'results' && (
-            <>
+            <div className="max-w-3xl mx-auto">
               {!isAuthenticated ? (
                 <div className="text-center py-12">
                   <p className="text-gray-500 mb-4">Sign in to see your results.</p>
@@ -526,12 +604,12 @@ const Compete: React.FC = () => {
                   )}
                 </>
               )}
-            </>
+            </div>
           )}
 
           {/* ─── Leaderboard Tab ─── */}
           {activeTab === 'leaderboard' && (
-            <>
+            <div className="max-w-3xl mx-auto">
               {/* User rank summary */}
               {userRank && (
                 <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg border border-amber-200 p-4 mb-4 flex items-center justify-between">
@@ -639,7 +717,7 @@ const Compete: React.FC = () => {
                   )}
                 </div>
               )}
-            </>
+            </div>
           )}
         </main>
 
