@@ -10,7 +10,6 @@ import {
   selectLockedRaceCount,
   selectScoredRaceCount,
   selectNextRaceToLock,
-  selectUpcomingUnlockedRaces,
   selectAwaitingResultsRaces,
   selectScoredRaces,
   selectLockedPredictions,
@@ -27,6 +26,7 @@ import SingleRaceGrid from '../components/compete/SingleRaceGrid';
 import LockConfirmationModal from '../components/predictions/LockConfirmationModal';
 import ToastContainer from '../components/common/ToastContainer';
 import { getLeaderboard, LeaderboardEntry } from '../api/leaderboard';
+import AuthModal from '../components/auth/AuthModal';
 
 // ─── Helpers ──────────────────────────────────────────
 
@@ -68,12 +68,10 @@ const Compete: React.FC = () => {
   const lockedCount = useSelector(selectLockedRaceCount);
   const scoredCount = useSelector(selectScoredRaceCount);
   const nextRaceToLock = useSelector(selectNextRaceToLock);
-  const upcomingRaces = useSelector(selectUpcomingUnlockedRaces);
   const awaitingResults = useSelector(selectAwaitingResultsRaces);
   const scoredRaces = useSelector(selectScoredRaces);
 
   const [raceToLock, setRaceToLock] = useState<Race | null>(null);
-  const [selectedRaceId, setSelectedRaceId] = useState<string | null>(null);
   const [expandedRaceId, setExpandedRaceId] = useState<string | null>(null);
 
   // Leaderboard state
@@ -138,30 +136,18 @@ const Compete: React.FC = () => {
     return () => { cancelled = true; };
   }, [leaderboardPage]);
 
-  // Set default selected race for the predict tab
-  useEffect(() => {
-    if (!selectedRaceId && nextRaceToLock) {
-      setSelectedRaceId(nextRaceToLock.id);
-    }
-  }, [nextRaceToLock, selectedRaceId]);
-
-  const selectedRace = useMemo(
-    () => upcomingRaces.find(r => r.id === selectedRaceId) || upcomingRaces[0] || null,
-    [upcomingRaces, selectedRaceId]
-  );
-
   const handleLockRace = () => {
     if (!user?.id) {
       dispatch(openAuthModal('signup'));
       return;
     }
-    if (selectedRace) setRaceToLock(selectedRace);
+    if (nextRaceToLock) setRaceToLock(nextRaceToLock);
   };
 
-  // Count filled positions for the selected race in the compete grid
+  // Count filled positions for the next race in the compete grid
   const competeGridPositions = useSelector((state: RootState) => state.competeGrid.positions);
-  const filledCount = selectedRace
-    ? competeGridPositions.filter(p => p.raceId === selectedRace.id && p.driverId).length
+  const filledCount = nextRaceToLock
+    ? competeGridPositions.filter(p => p.raceId === nextRaceToLock.id && p.driverId).length
     : 0;
   const gridPositionCount = getGridPositions(CURRENT_SEASON);
 
@@ -335,36 +321,15 @@ const Compete: React.FC = () => {
                     Sign In
                   </button>
                 </div>
-              ) : upcomingRaces.length === 0 ? (
+              ) : !nextRaceToLock ? (
                 <div className="text-center py-12">
                   <p className="text-gray-500">No upcoming races to predict.</p>
                 </div>
               ) : (
                 <CompeteGridProvider>
-                  {/* Race Picker */}
-                  {upcomingRaces.length > 1 && (
-                    <div className="mb-4">
-                      <label htmlFor="race-picker" className="block text-sm font-medium text-gray-700 mb-1">
-                        Select Race
-                      </label>
-                      <select
-                        id="race-picker"
-                        value={selectedRace?.id || ''}
-                        onChange={e => setSelectedRaceId(e.target.value)}
-                        className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-red-500 focus:ring-red-500"
-                      >
-                        {upcomingRaces.map(race => (
-                          <option key={race.id} value={race.id}>
-                            {formatName(race.name)} {race.isSprint ? '(Sprint)' : ''}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
-
                   <DriverSelection />
 
-                  {selectedRace && <SingleRaceGrid race={selectedRace} />}
+                  <SingleRaceGrid race={nextRaceToLock} />
 
                   {/* Lock confirmation modal */}
                   {raceToLock && (
@@ -677,6 +642,8 @@ const Compete: React.FC = () => {
             </>
           )}
         </main>
+
+        <AuthModal />
       </div>
     </LazyDndProvider>
   );
