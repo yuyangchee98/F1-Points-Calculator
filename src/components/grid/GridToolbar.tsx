@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import PointsSystemSelector from '../common/PointsSystemSelector';
 import useWindowSize from '../../hooks/useWindowSize';
-import { useAuth } from '../../hooks/useAuth';
 import { getActiveSeason, CURRENT_SEASON } from '../../utils/constants';
 
 interface GridToolbarProps {
@@ -9,7 +9,6 @@ interface GridToolbarProps {
   onToggleOfficialResults: () => void;
   onOpenHistory: () => void;
   onOpenExport: () => void;
-  onOpenPredictions: () => void;
   showOfficialResults: boolean;
   onToggleConsensus: () => void;
   showConsensus: boolean;
@@ -21,21 +20,17 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
   onToggleOfficialResults,
   onOpenHistory,
   onOpenExport,
-  onOpenPredictions,
   showOfficialResults,
   onToggleConsensus,
   showConsensus,
   hasConsensusAccess,
 }) => {
   const { isMobile, isTablet } = useWindowSize();
-  const { user, isAuthenticated } = useAuth();
   const isCompact = isMobile || isTablet;
   const isCurrentSeason = getActiveSeason() === CURRENT_SEASON;
   const [showHowToUse, setShowHowToUse] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
-  const [showCompeteMenu, setShowCompeteMenu] = useState(false);
   const moreMenuRef = useRef<HTMLDivElement>(null);
-  const competeMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const savedState = localStorage.getItem('infoBannerExpanded');
@@ -49,9 +44,6 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
     const handleClickOutside = (event: MouseEvent) => {
       if (moreMenuRef.current && !moreMenuRef.current.contains(event.target as Node)) {
         setShowMoreMenu(false);
-      }
-      if (competeMenuRef.current && !competeMenuRef.current.contains(event.target as Node)) {
-        setShowCompeteMenu(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -167,59 +159,17 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
           {/* Spacer */}
           <div className="flex-1" />
 
-          {/* Compete Menu - only show for current season */}
+          {/* Compete Button - only show for current season */}
           {isCurrentSeason && (
-            <div className="relative" ref={competeMenuRef}>
-              <button
-                onClick={() => setShowCompeteMenu(!showCompeteMenu)}
-                className="bg-amber-50 border border-amber-300 text-amber-700 hover:bg-amber-100 px-3 py-2 rounded-md transition-colors duration-200 flex items-center gap-2 font-medium text-sm"
-                title="Competition"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                </svg>
-                <span>Compete</span>
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-
-              {showCompeteMenu && (
-                <div className="absolute right-0 mt-1 w-52 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
-                  <button
-                    onClick={() => { onOpenPredictions(); setShowCompeteMenu(false); }}
-                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                    Lock Predictions
-                  </button>
-                  <a
-                    href="/leaderboard"
-                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                    onClick={() => setShowCompeteMenu(false)}
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                    </svg>
-                    Leaderboard
-                  </a>
-                  {isAuthenticated && (
-                    <a
-                      href={`/user/${user?.id}`}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                      onClick={() => setShowCompeteMenu(false)}
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                      My Profile
-                    </a>
-                  )}
-                </div>
-              )}
-            </div>
+            <Link
+              to="/compete"
+              className="bg-amber-50 border border-amber-300 text-amber-700 hover:bg-amber-100 px-3 py-2 rounded-md transition-colors duration-200 flex items-center gap-2 font-medium text-sm"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+              </svg>
+              <span>Compete</span>
+            </Link>
           )}
 
           <button

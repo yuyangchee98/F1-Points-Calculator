@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { store } from './store'
 import App from './App'
 import About from './pages/About'
+import Compete from './pages/Compete'
 import './index.css'
 
 // ChartJS registration moved to chart components for lazy loading
@@ -16,6 +17,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <Routes>
           <Route path="/" element={<App />} />
           <Route path="/about" element={<About />} />
+          <Route path="/compete" element={<Compete />} />
           <Route path="/:year" element={<App />} />
         </Routes>
       </BrowserRouter>

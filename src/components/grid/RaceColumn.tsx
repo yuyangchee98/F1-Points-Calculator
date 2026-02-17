@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Race } from '../../types';
 import { RootState } from '../../store';
-import { selectDriverAtPosition, selectDriversByIdMap, getDriverLastName, getDriverDisplayName } from '../../store/selectors/dataSelectors';
+import { selectDriversByIdMap, getDriverLastName, getDriverDisplayName } from '../../store/selectors/dataSelectors';
 import DriverCard from '../drivers/DriverCard';
 import { selectDriver, copyDriver } from '../../store/slices/uiSlice';
 import { useConsensus, getTopConsensusDriver } from '../../hooks/useConsensus';
-import { placeDriver, clearPosition, fillRestOfSeason, resetGrid, clearEverything, setFastestLap } from '../../store/slices/gridSlice';
+import { useGridContext } from '../../contexts/GridContext';
 import { selectDriverStandings } from '../../store/selectors/resultsSelectors';
 import { useAppDispatch } from '../../store';
 import { useDriverDrop } from '../../hooks/useDriverDragDrop';
@@ -27,13 +27,24 @@ interface RaceColumnProps {
 
 const RaceColumn: React.FC<RaceColumnProps> = ({ race, position, style, className }) => {
   const dispatch = useAppDispatch();
-  const driverId = useSelector((state: RootState) =>
-    selectDriverAtPosition(state, race.id, position)
-  );
+  const {
+    positions,
+    placeDriver,
+    clearPosition,
+    fillRestOfSeason,
+    resetGrid,
+    clearEverything,
+    setFastestLap,
+  } = useGridContext();
+
+  const driverId = (() => {
+    const pos = positions.find(p => p.raceId === race.id && p.position === position);
+    return pos ? pos.driverId : null;
+  })();
+
   const selectedDriverId = useSelector((state: RootState) => state.ui.selectedDriver);
   const copiedDriverId = useSelector((state: RootState) => state.ui.copiedDriver);
   const showConsensus = useSelector((state: RootState) => state.ui.showConsensus);
-  const positions = useSelector((state: RootState) => state.grid.positions);
   const driverById = useSelector(selectDriversByIdMap);
   const driverStandings = useSelector(selectDriverStandings);
   const races = useSelector((state: RootState) => state.seasonData.races);
@@ -91,10 +102,10 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position, style, classNam
             label: 'Set Fastest Lap',
             icon: '⚡',
             onClick: () => {
-              dispatch(setFastestLap({
+              setFastestLap({
                 raceId: race.id,
                 driverId: driverId
-              }));
+              });
               toastService.addToast(
                 `Set fastest lap for ${getDriverDisplayName(driver)}`,
                 'info'
@@ -111,7 +122,7 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position, style, classNam
           label: 'Remove Driver',
           icon: '✕',
           onClick: () => {
-            dispatch(clearPosition({ raceId: race.id, position }));
+            clearPosition({ raceId: race.id, position });
             toastService.addToast(`Removed ${getDriverDisplayName(driver)} from P${position}`, 'info');
             trackContextMenuAction('ACTION', 'remove_driver');
           },
@@ -123,12 +134,12 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position, style, classNam
           icon: '📅',
           onClick: () => {
             const raceIds = races.map(r => r.id);
-            dispatch(fillRestOfSeason({
+            fillRestOfSeason({
               driverId,
               position,
               startRaceId: race.id,
               raceIds,
-            }));
+            });
 
             const remainingCount = raceIds.slice(raceIds.indexOf(race.id)).length;
             toastService.addToast(
@@ -148,11 +159,11 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position, style, classNam
             label: 'Paste Driver',
             icon: '📋',
             onClick: () => {
-              dispatch(placeDriver({
+              placeDriver({
                 raceId: race.id,
                 position,
                 driverId: copiedDriverId,
-              }));
+              });
               toastService.addToast(`Pasted ${getDriverDisplayName(copiedDriver)} at P${position}`, 'success');
               trackContextMenuAction('ACTION', 'paste_driver');
             },
@@ -169,11 +180,11 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position, style, classNam
           label: `P${standing.position}: ${getDriverDisplayName(standingDriver)} (${standing.points} pts)`,
           icon: icons[index],
           onClick: () => {
-            dispatch(placeDriver({
+            placeDriver({
               raceId: race.id,
               position,
               driverId: standing.driverId,
-            }));
+            });
             toastService.addToast(
               `Placed ${getDriverDisplayName(standingDriver)} at P${position}`,
               'success'
@@ -208,7 +219,7 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position, style, classNam
             id: 'clear-predictions',
             label: 'Clear Predictions Only',
             onClick: () => {
-              dispatch(resetGrid());
+              resetGrid();
               toastService.addToast('Cleared all predictions', 'info');
               trackContextMenuAction('ACTION', 'clear_predictions');
             },
@@ -217,7 +228,7 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position, style, classNam
             id: 'clear-everything',
             label: 'Clear Everything (Including Official Results)',
             onClick: () => {
-              dispatch(clearEverything());
+              clearEverything();
               toastService.addToast('Cleared everything', 'warning');
               trackContextMenuAction('ACTION', 'clear_everything');
             },
@@ -248,11 +259,11 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position, style, classNam
 
   const handleSlotClick = () => {
     if (selectedDriverId) {
-      dispatch(placeDriver({
+      placeDriver({
         raceId: race.id,
         position,
         driverId: selectedDriverId
-      }));
+      });
 
       dispatch(selectDriver(null));
     }

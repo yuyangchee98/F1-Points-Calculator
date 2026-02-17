@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import { useDispatch } from 'react-redux';
 import seasonDataReducer from './slices/seasonDataSlice';
 import gridReducer from './slices/gridSlice';
+import competeGridReducer from './slices/competeGridSlice';
 import uiReducer from './slices/uiSlice';
 import predictionReducer from './slices/predictionSlice';
 import lockedPredictionsReducer from './slices/lockedPredictionsSlice';
@@ -12,6 +13,7 @@ export const store = configureStore({
   reducer: {
     seasonData: seasonDataReducer,
     grid: gridReducer,
+    competeGrid: competeGridReducer,
     ui: uiReducer,
     predictions: predictionReducer,
     lockedPredictions: lockedPredictionsReducer,

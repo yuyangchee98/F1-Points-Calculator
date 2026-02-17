@@ -11,6 +11,7 @@ import { selectDriverStandings } from '../../store/selectors/resultsSelectors';
 import { selectLockedPredictions } from '../../store/selectors/lockedPredictionsSelectors';
 import { useAppDispatch } from '../../store';
 import { getActiveSeason, getGridPositions } from '../../utils/constants';
+import { Race } from '../../types';
 
 interface RaceGridProps {
   scrollRef?: React.RefObject<HTMLDivElement>;
@@ -18,10 +19,12 @@ interface RaceGridProps {
   onToggleOfficialResults: () => void;
   onOpenHistory: () => void;
   onOpenExport: () => void;
-  onOpenPredictions: () => void;
   showOfficialResults: boolean;
   hasConsensusAccess: boolean;
   onOpenSubscriptionModal: () => void;
+  toolbar?: React.ReactNode;
+  racesOverride?: Race[];
+  gridPositionCount?: number;
 }
 
 const POSITION_COLUMN_WIDTH = 80;
@@ -36,13 +39,16 @@ const RaceGrid: React.FC<RaceGridProps> = ({
   onToggleOfficialResults,
   onOpenHistory,
   onOpenExport,
-  onOpenPredictions,
   showOfficialResults,
   hasConsensusAccess,
   onOpenSubscriptionModal,
+  toolbar,
+  racesOverride,
+  gridPositionCount,
 }) => {
   const dispatch = useAppDispatch();
-  const races = useSelector((state: RootState) => state.seasonData.races);
+  const allRaces = useSelector((state: RootState) => state.seasonData.races);
+  const races = racesOverride || allRaces;
   const positionColumnMode = useSelector((state: RootState) => state.ui.positionColumnMode);
   const showConsensus = useSelector((state: RootState) => state.ui.showConsensus);
   const driverStandings = useSelector(selectDriverStandings);
@@ -88,25 +94,30 @@ const RaceGrid: React.FC<RaceGridProps> = ({
   const virtualColumns = columnVirtualizer.getVirtualItems();
   const totalVirtualWidth = columnVirtualizer.getTotalSize();
 
+  const posCount = gridPositionCount ?? getGridPositions(getActiveSeason());
+
+  const toolbarContent = toolbar !== undefined ? toolbar : (
+    <GridToolbar
+      onReset={onReset}
+      onToggleOfficialResults={onToggleOfficialResults}
+      onOpenHistory={onOpenHistory}
+      onOpenExport={onOpenExport}
+      showOfficialResults={showOfficialResults}
+      onToggleConsensus={() => {
+        if (hasConsensusAccess) {
+          dispatch(toggleConsensus());
+        } else {
+          onOpenSubscriptionModal();
+        }
+      }}
+      showConsensus={showConsensus}
+      hasConsensusAccess={hasConsensusAccess}
+    />
+  );
+
   return (
     <div className="shadow-md rounded-lg border border-gray-200">
-      <GridToolbar
-        onReset={onReset}
-        onToggleOfficialResults={onToggleOfficialResults}
-        onOpenHistory={onOpenHistory}
-        onOpenExport={onOpenExport}
-        onOpenPredictions={onOpenPredictions}
-        showOfficialResults={showOfficialResults}
-        onToggleConsensus={() => {
-          if (hasConsensusAccess) {
-            dispatch(toggleConsensus());
-          } else {
-            onOpenSubscriptionModal();
-          }
-        }}
-        showConsensus={showConsensus}
-        hasConsensusAccess={hasConsensusAccess}
-      />
+      {toolbarContent}
 
       <div
         ref={actualScrollRef}
@@ -205,7 +216,7 @@ const RaceGrid: React.FC<RaceGridProps> = ({
             </div>
           </div>
 
-          {Array.from({ length: getGridPositions(getActiveSeason()) }, (_, i) => i + 1).map(position => {
+          {Array.from({ length: posCount }, (_, i) => i + 1).map(position => {
             const animationClass = !hasInitiallyRendered
               ? `animate-grid-entry grid-row-${Math.min(position, 10)}`
               : '';

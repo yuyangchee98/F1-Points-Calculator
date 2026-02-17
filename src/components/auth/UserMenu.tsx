@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 
 const UserMenu: React.FC = () => {
@@ -75,21 +76,21 @@ const UserMenu: React.FC = () => {
             <p className="text-xs text-gray-500 truncate">{user?.email}</p>
           </div>
 
-          <a
-            href={`/user/${user?.id}`}
+          <Link
+            to="/compete"
             onClick={() => setIsOpen(false)}
             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition"
           >
-            View Profile
-          </a>
+            My Predictions
+          </Link>
 
-          <a
-            href="/leaderboard"
+          <Link
+            to="/compete"
             onClick={() => setIsOpen(false)}
             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition"
           >
             Leaderboard
-          </a>
+          </Link>
 
           <button
             onClick={() => {

@@ -7,6 +7,7 @@ import { lockPrediction, clearLockError } from '../../store/slices/lockedPredict
 import { useCountdown, formatRaceDate } from '../../hooks/useCountdown';
 import { LockedPosition, UserIdentifier } from '../../api/predictions';
 import { getActiveSeason } from '../../utils/constants';
+import { useGridContext } from '../../contexts/GridContext';
 
 interface LockConfirmationModalProps {
   race: Race;
@@ -21,7 +22,7 @@ const LockConfirmationModal: React.FC<LockConfirmationModalProps> = ({
 }) => {
   const dispatch = useAppDispatch();
   const { user } = useSelector((state: RootState) => state.auth);
-  const positions = useSelector((state: RootState) => state.grid.positions);
+  const { positions } = useGridContext();
   const driverById = useSelector(selectDriversByIdMap);
   const teamById = useSelector(selectTeamsByIdMap);
   const isLocking = useSelector((state: RootState) => state.lockedPredictions.isLocking);
