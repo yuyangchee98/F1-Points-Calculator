@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { RootState, useAppDispatch } from '../store';
@@ -13,6 +13,7 @@ import {
   selectUpcomingUnlockedRaces,
   selectAwaitingResultsRaces,
   selectScoredRaces,
+  selectLockedPredictions,
 } from '../store/selectors/lockedPredictionsSelectors';
 import { selectDriversByIdMap } from '../store/selectors/dataSelectors';
 import { useAuth } from '../hooks/useAuth';
@@ -21,33 +22,26 @@ import useRaceResults from '../hooks/useRaceResults';
 import { CURRENT_SEASON, getGridPositions } from '../utils/constants';
 import { Race } from '../types';
 import LazyDndProvider from '../components/common/LazyDndProvider';
-import RaceGrid from '../components/grid/RaceGrid';
 import DriverSelection from '../components/drivers/DriverSelection';
+import SingleRaceGrid from '../components/compete/SingleRaceGrid';
 import LockConfirmationModal from '../components/predictions/LockConfirmationModal';
 import ToastContainer from '../components/common/ToastContainer';
-import { getLeaderboard, LeaderboardEntry, PendingEntry } from '../api/leaderboard';
+import { getLeaderboard, LeaderboardEntry } from '../api/leaderboard';
+
+// ─── Helpers ──────────────────────────────────────────
+
+type Tab = 'predict' | 'results' | 'leaderboard';
+
+const formatName = (name: string) =>
+  name.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
 const getDriverCode = (driver: { code?: string; familyName: string } | undefined): string => {
   if (!driver) return '---';
   return driver.code || driver.familyName.substring(0, 3).toUpperCase();
 };
 
-const Countdown: React.FC<{ date: string }> = ({ date }) => {
-  const countdown = useCountdown(date);
-  if (!countdown || countdown.isPast) return null;
-  return <span className="text-gray-500">{countdown.formatted}</span>;
-};
-
-const formatName = (name: string) =>
-  name.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-
 function getInitials(name: string): string {
-  return name
-    .split(' ')
-    .map(n => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
+  return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
 }
 
 function getRankBadge(rank: number): string {
@@ -57,11 +51,19 @@ function getRankBadge(rank: number): string {
   return `#${rank}`;
 }
 
+const Countdown: React.FC<{ date: string }> = ({ date }) => {
+  const countdown = useCountdown(date);
+  if (!countdown || countdown.isPast) return null;
+  return <span>{countdown.formatted}</span>;
+};
+
+// ─── Component ────────────────────────────────────────
+
 const Compete: React.FC = () => {
   const dispatch = useAppDispatch();
   const { user, isAuthenticated } = useAuth();
-  const races = useSelector((state: RootState) => state.seasonData.races);
   const driverById = useSelector(selectDriversByIdMap);
+  const lockedPredictions = useSelector(selectLockedPredictions);
   const overallAccuracy = useSelector(selectOverallAccuracy);
   const lockedCount = useSelector(selectLockedRaceCount);
   const scoredCount = useSelector(selectScoredRaceCount);
@@ -71,15 +73,43 @@ const Compete: React.FC = () => {
   const scoredRaces = useSelector(selectScoredRaces);
 
   const [raceToLock, setRaceToLock] = useState<Race | null>(null);
+  const [selectedRaceId, setSelectedRaceId] = useState<string | null>(null);
   const [expandedRaceId, setExpandedRaceId] = useState<string | null>(null);
 
   // Leaderboard state
   const [leaderboardEntries, setLeaderboardEntries] = useState<LeaderboardEntry[]>([]);
-  const [pendingEntries, setPendingEntries] = useState<PendingEntry[]>([]);
   const [leaderboardPage, setLeaderboardPage] = useState(1);
   const [leaderboardTotalPages, setLeaderboardTotalPages] = useState(1);
   const [leaderboardTotalUsers, setLeaderboardTotalUsers] = useState(0);
   const [leaderboardLoading, setLeaderboardLoading] = useState(false);
+
+  // Smart default tab
+  const getDefaultTab = (): Tab => {
+    const hash = window.location.hash.replace('#', '') as Tab;
+    if (['predict', 'results', 'leaderboard'].includes(hash)) return hash;
+    if (nextRaceToLock) return 'predict';
+    if (scoredRaces.length > 0) return 'results';
+    return 'leaderboard';
+  };
+
+  const [activeTab, setActiveTab] = useState<Tab>(getDefaultTab);
+
+  // Sync hash
+  useEffect(() => {
+    window.location.hash = activeTab;
+  }, [activeTab]);
+
+  // Listen for hash changes (browser back/forward)
+  useEffect(() => {
+    const onHashChange = () => {
+      const hash = window.location.hash.replace('#', '') as Tab;
+      if (['predict', 'results', 'leaderboard'].includes(hash)) {
+        setActiveTab(hash);
+      }
+    };
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
 
   useRaceResults(CURRENT_SEASON);
 
@@ -98,7 +128,6 @@ const Compete: React.FC = () => {
       .then(data => {
         if (cancelled) return;
         setLeaderboardEntries(data.entries);
-        setPendingEntries(data.pendingEntries);
         setLeaderboardTotalPages(data.totalPages);
         setLeaderboardTotalUsers(data.totalUsers);
       })
@@ -109,22 +138,72 @@ const Compete: React.FC = () => {
     return () => { cancelled = true; };
   }, [leaderboardPage]);
 
-  const handleLockRace = (raceId: string) => {
+  // Set default selected race for the predict tab
+  useEffect(() => {
+    if (!selectedRaceId && nextRaceToLock) {
+      setSelectedRaceId(nextRaceToLock.id);
+    }
+  }, [nextRaceToLock, selectedRaceId]);
+
+  const selectedRace = useMemo(
+    () => upcomingRaces.find(r => r.id === selectedRaceId) || upcomingRaces[0] || null,
+    [upcomingRaces, selectedRaceId]
+  );
+
+  const handleLockRace = () => {
     if (!user?.id) {
       dispatch(openAuthModal('signup'));
       return;
     }
-    const race = races.find(r => r.id === raceId);
-    if (race) setRaceToLock(race);
+    if (selectedRace) setRaceToLock(selectedRace);
   };
 
+  // Count filled positions for the selected race in the compete grid
   const competeGridPositions = useSelector((state: RootState) => state.competeGrid.positions);
-  const nextRacePositions = nextRaceToLock
-    ? competeGridPositions
-        .filter(p => p.raceId === nextRaceToLock.id && p.driverId)
-        .sort((a, b) => a.position - b.position)
-    : [];
-  const filledCount = nextRacePositions.length;
+  const filledCount = selectedRace
+    ? competeGridPositions.filter(p => p.raceId === selectedRace.id && p.driverId).length
+    : 0;
+  const gridPositionCount = getGridPositions(CURRENT_SEASON);
+
+  // Hero card status
+  const nextRace = nextRaceToLock || awaitingResults[0]?.race;
+  const isNextRaceLocked = nextRace ? !!lockedPredictions[nextRace.id] : false;
+
+  // User's leaderboard rank
+  const userRank = useMemo(() => {
+    if (!user?.id) return null;
+    return leaderboardEntries.find(e => e.userId === user.id) || null;
+  }, [leaderboardEntries, user]);
+
+  const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
+    {
+      id: 'predict',
+      label: 'Predict',
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+      ),
+    },
+    {
+      id: 'results',
+      label: 'Results',
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+      ),
+    },
+    {
+      id: 'leaderboard',
+      label: 'Leaderboard',
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+      ),
+    },
+  ];
 
   return (
     <LazyDndProvider>
@@ -133,379 +212,471 @@ const Compete: React.FC = () => {
 
         {/* Header */}
         <header className="bg-white border-b border-gray-200">
-          <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
             <Link to="/" className="flex items-center gap-2">
               <span className="bg-red-600 text-white text-sm font-bold px-2 py-1 rounded">F1</span>
-              <span className="text-xl font-semibold text-gray-900">Points Calculator</span>
+              <span className="text-lg font-semibold text-gray-900">Compete</span>
             </Link>
             <Link
               to="/"
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 transition-colors"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
-              Back to Sandbox
+              Sandbox
             </Link>
           </div>
         </header>
 
-        <main className="max-w-5xl mx-auto px-4 py-8">
-          {/* Page Header */}
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">Compete</h1>
-            <p className="text-sm text-gray-500 mt-1">
-              Lock predictions before races start, get scored on accuracy, climb the leaderboard.
-            </p>
-          </div>
+        <main className="max-w-3xl mx-auto px-4 py-6">
 
-          {/* Sign-in CTA if unauthenticated */}
+          {/* Sign-in banner */}
           {!isAuthenticated && (
-            <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg border border-amber-200 p-6 mb-6">
-              <div className="flex items-center gap-3 mb-3">
-                <span className="text-2xl">🏆</span>
-                <h2 className="text-lg font-bold text-gray-900">Join the Competition</h2>
-              </div>
-              <p className="text-sm text-gray-600 mb-4">
-                Sign in to lock your predictions before races start and track your accuracy over the season.
-              </p>
-              <button
-                onClick={() => dispatch(openAuthModal('signup'))}
-                className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-6 rounded-md transition-colors"
-              >
-                Sign in to get started
-              </button>
-            </div>
-          )}
-
-          {/* Stats bar */}
-          {isAuthenticated && (
-            <div className="grid grid-cols-3 gap-4 mb-6">
-              <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
-                <div className="text-2xl font-bold text-gray-900">
-                  {scoredCount > 0 ? `${overallAccuracy.percentage}%` : '--'}
+            <div className="bg-gradient-to-r from-red-600 to-red-700 rounded-lg p-5 mb-6 text-white">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-bold">Join the Competition</h2>
+                  <p className="text-red-100 text-sm mt-1">
+                    Lock predictions before races, get scored on accuracy, climb the leaderboard.
+                  </p>
                 </div>
-                <div className="text-xs text-gray-500 mt-1">Overall Accuracy</div>
-              </div>
-              <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
-                <div className="text-2xl font-bold text-gray-900">{lockedCount}</div>
-                <div className="text-xs text-gray-500 mt-1">Races Locked</div>
-              </div>
-              <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
-                <div className="text-2xl font-bold text-gray-900">{scoredCount}</div>
-                <div className="text-xs text-gray-500 mt-1">Races Scored</div>
+                <button
+                  onClick={() => dispatch(openAuthModal('signup'))}
+                  className="flex-shrink-0 bg-white text-red-600 font-semibold py-2 px-5 rounded-md hover:bg-red-50 transition-colors"
+                >
+                  Sign In
+                </button>
               </div>
             </div>
           )}
 
-          {/* Prediction Grid */}
-          {upcomingRaces.length > 0 && (
-            <div className="mb-6">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">Set Your Predictions</h2>
-              <CompeteGridProvider>
-                <DriverSelection />
-                <RaceGrid
-                  onReset={() => {}}
-                  onToggleOfficialResults={() => {}}
-                  onOpenHistory={() => {}}
-                  onOpenExport={() => {}}
-                  showOfficialResults={false}
-                  hasConsensusAccess={false}
-                  onOpenSubscriptionModal={() => {}}
-                  toolbar={null}
-                  racesOverride={upcomingRaces}
-                  gridPositionCount={getGridPositions(CURRENT_SEASON)}
-                />
-
-                {/* Lock Button */}
-                {nextRaceToLock && isAuthenticated && (
-                  <div className="mt-4 flex items-center justify-between bg-white rounded-lg border border-gray-200 p-4">
-                    <div>
-                      <div className="font-medium text-gray-900">{formatName(nextRaceToLock.name)}</div>
-                      <div className="text-sm text-gray-500">
-                        {filledCount > 0 ? (
-                          <span className="text-green-600">{filledCount} positions filled</span>
-                        ) : (
-                          <span>Drag drivers above to set predictions</span>
-                        )}
-                        {nextRaceToLock.date && (
-                          <span className="ml-2">
-                            · Locks in <Countdown date={nextRaceToLock.date} />
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => handleLockRace(nextRaceToLock.id)}
-                      disabled={filledCount === 0}
-                      className="bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium py-2 px-6 rounded-md transition-colors flex items-center gap-2"
-                    >
-                      🔒 Lock Prediction
-                    </button>
-                  </div>
-                )}
-
-                {/* Lock confirmation modal */}
-                {raceToLock && (
-                  <LockConfirmationModal
-                    race={raceToLock}
-                    onClose={() => setRaceToLock(null)}
-                    onSuccess={() => {
-                      setRaceToLock(null);
-                      if (user?.id) {
-                        dispatch(fetchLockedPredictions({ identifier: { userId: user.id }, season: CURRENT_SEASON }));
-                      }
-                    }}
-                  />
-                )}
-              </CompeteGridProvider>
-            </div>
-          )}
-
-          {/* Awaiting Results */}
-          {awaitingResults.length > 0 && (
-            <div className="mb-6">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">Awaiting Results</h2>
-              <div className="bg-white rounded-lg border border-gray-200 divide-y divide-gray-100">
-                {awaitingResults.map(({ race, lockedPrediction }) => (
-                  <div key={race.id} className="p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-medium text-gray-900">{formatName(race.name)}</span>
-                      {race.date && <Countdown date={race.date} />}
-                    </div>
-                    <div className="flex flex-wrap gap-1">
-                      {[...lockedPrediction.positions]
-                        .sort((a, b) => a.position - b.position)
-                        .map((pos) => {
-                          const driver = driverById[pos.driverId];
-                          return (
-                            <span key={pos.position} className="text-xs bg-gray-100 px-2 py-0.5 rounded">
-                              P{pos.position} {getDriverCode(driver)}
-                            </span>
-                          );
-                        })}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Scored Races */}
-          {scoredRaces.length > 0 && (
-            <div className="mb-6">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">Scored Races</h2>
-              <div className="bg-white rounded-lg border border-gray-200 divide-y divide-gray-100">
-                {scoredRaces.map(({ race, lockedPrediction }) => {
-                  const isExpanded = expandedRaceId === race.id;
-                  const score = lockedPrediction.score;
-                  return (
-                    <div key={race.id}>
-                      <button
-                        onClick={() => setExpandedRaceId(isExpanded ? null : race.id)}
-                        className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 transition-colors"
-                      >
-                        <span className="font-medium text-gray-900">{formatName(race.name)}</span>
-                        <div className="flex items-center gap-2">
-                          <span className={`inline-flex items-center px-2 py-1 rounded text-sm font-semibold ${
-                            (score?.percentage ?? 0) >= 40 ? 'bg-green-100 text-green-700' :
-                            (score?.percentage ?? 0) >= 25 ? 'bg-amber-100 text-amber-700' :
-                            'bg-gray-100 text-gray-700'
-                          }`}>
-                            {score?.percentage}%
-                          </span>
-                          <svg className={`w-4 h-4 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          {/* Hero Card */}
+          {nextRace && (
+            <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-5 mb-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  {nextRace.countryCode && (
+                    <img
+                      src={`/flags/${nextRace.countryCode}.webp`}
+                      alt={nextRace.country}
+                      className="w-8 h-6 object-cover rounded shadow-sm"
+                    />
+                  )}
+                  <div>
+                    <h2 className="text-lg font-bold text-gray-900">{formatName(nextRace.name)}</h2>
+                    <div className="flex items-center gap-2 text-sm text-gray-500 mt-0.5">
+                      {nextRace.date && <Countdown date={nextRace.date} />}
+                      {isNextRaceLocked ? (
+                        <span className="inline-flex items-center gap-1 text-green-600 font-medium">
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                           </svg>
-                        </div>
-                      </button>
-
-                      {isExpanded && lockedPrediction.breakdown && (
-                        <div className="px-4 pb-4">
-                          <div className="grid grid-cols-5 sm:grid-cols-10 gap-x-3 gap-y-1 text-sm">
-                            {lockedPrediction.breakdown.map((item) => {
-                              const driver = driverById[item.predictedDriverId];
-                              return (
-                                <div key={item.position} className="flex items-center gap-1">
-                                  <span className={item.isExact ? 'text-green-600' : 'text-gray-300'}>
-                                    {item.isExact ? '●' : '○'}
-                                  </span>
-                                  <span className="text-gray-500 text-xs">
-                                    {getDriverCode(driver)}
-                                  </span>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
+                          Locked
+                        </span>
+                      ) : filledCount > 0 ? (
+                        <span className="text-amber-600 font-medium">
+                          {filledCount}/{gridPositionCount} filled
+                        </span>
+                      ) : (
+                        <span className="text-gray-400">No predictions yet</span>
                       )}
                     </div>
-                  );
-                })}
+                  </div>
+                </div>
+
+                {!isNextRaceLocked && nextRaceToLock && isAuthenticated && (
+                  <button
+                    onClick={handleLockRace}
+                    disabled={filledCount === 0}
+                    className="flex-shrink-0 bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-2 px-5 rounded-md transition-colors flex items-center gap-2"
+                  >
+                    Lock Prediction
+                  </button>
+                )}
               </div>
             </div>
           )}
 
-          {/* Leaderboard */}
-          <div className="mb-8">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">
-              Leaderboard
-              {leaderboardTotalUsers > 0 && (
-                <span className="text-sm font-normal text-gray-500 ml-2">
-                  {leaderboardTotalUsers} predictor{leaderboardTotalUsers !== 1 ? 's' : ''}
-                </span>
-              )}
-            </h2>
+          {!nextRace && (
+            <div className="bg-white rounded-lg border border-gray-200 p-5 mb-6 text-center">
+              <p className="text-gray-500">No upcoming races. Season complete!</p>
+            </div>
+          )}
 
-            {leaderboardLoading ? (
-              <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
-                <p className="text-gray-500 mt-3 text-sm">Loading leaderboard...</p>
+          {/* Tab Bar */}
+          <div className="flex border-b border-gray-200 mb-6">
+            {tabs.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                  activeTab === tab.id
+                    ? 'border-red-600 text-red-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                {tab.icon}
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* ─── Predict Tab ─── */}
+          {activeTab === 'predict' && (
+            <>
+              {!isAuthenticated ? (
+                <div className="text-center py-12">
+                  <p className="text-gray-500 mb-4">Sign in to set your predictions.</p>
+                  <button
+                    onClick={() => dispatch(openAuthModal('signup'))}
+                    className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-6 rounded-md transition-colors"
+                  >
+                    Sign In
+                  </button>
+                </div>
+              ) : upcomingRaces.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-gray-500">No upcoming races to predict.</p>
+                </div>
+              ) : (
+                <CompeteGridProvider>
+                  {/* Race Picker */}
+                  {upcomingRaces.length > 1 && (
+                    <div className="mb-4">
+                      <label htmlFor="race-picker" className="block text-sm font-medium text-gray-700 mb-1">
+                        Select Race
+                      </label>
+                      <select
+                        id="race-picker"
+                        value={selectedRace?.id || ''}
+                        onChange={e => setSelectedRaceId(e.target.value)}
+                        className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-red-500 focus:ring-red-500"
+                      >
+                        {upcomingRaces.map(race => (
+                          <option key={race.id} value={race.id}>
+                            {formatName(race.name)} {race.isSprint ? '(Sprint)' : ''}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  <DriverSelection />
+
+                  {selectedRace && <SingleRaceGrid race={selectedRace} />}
+
+                  {/* Lock confirmation modal */}
+                  {raceToLock && (
+                    <LockConfirmationModal
+                      race={raceToLock}
+                      onClose={() => setRaceToLock(null)}
+                      onSuccess={() => {
+                        setRaceToLock(null);
+                        if (user?.id) {
+                          dispatch(fetchLockedPredictions({ identifier: { userId: user.id }, season: CURRENT_SEASON }));
+                        }
+                      }}
+                    />
+                  )}
+                </CompeteGridProvider>
+              )}
+            </>
+          )}
+
+          {/* ─── Results Tab ─── */}
+          {activeTab === 'results' && (
+            <>
+              {!isAuthenticated ? (
+                <div className="text-center py-12">
+                  <p className="text-gray-500 mb-4">Sign in to see your results.</p>
+                  <button
+                    onClick={() => dispatch(openAuthModal('signup'))}
+                    className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-6 rounded-md transition-colors"
+                  >
+                    Sign In
+                  </button>
+                </div>
+              ) : (
+                <>
+                  {/* Stats */}
+                  <div className="grid grid-cols-3 gap-3 mb-6">
+                    <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
+                      <div className="text-2xl font-bold text-gray-900">
+                        {scoredCount > 0 ? `${overallAccuracy.percentage}%` : '--'}
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">Accuracy</div>
+                    </div>
+                    <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
+                      <div className="text-2xl font-bold text-gray-900">{lockedCount}</div>
+                      <div className="text-xs text-gray-500 mt-1">Locked</div>
+                    </div>
+                    <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
+                      <div className="text-2xl font-bold text-gray-900">{scoredCount}</div>
+                      <div className="text-xs text-gray-500 mt-1">Scored</div>
+                    </div>
+                  </div>
+
+                  {/* Scored Races */}
+                  {scoredRaces.length > 0 && (
+                    <div className="mb-6">
+                      <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Scored Races</h3>
+                      <div className="space-y-3">
+                        {scoredRaces.map(({ race, lockedPrediction }) => {
+                          const isExpanded = expandedRaceId === race.id;
+                          const score = lockedPrediction.score;
+                          return (
+                            <div key={race.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                              <button
+                                onClick={() => setExpandedRaceId(isExpanded ? null : race.id)}
+                                className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 transition-colors"
+                              >
+                                <div className="flex items-center gap-3">
+                                  {race.countryCode && (
+                                    <img
+                                      src={`/flags/${race.countryCode}.webp`}
+                                      alt={race.country}
+                                      className="w-6 h-4 object-cover rounded shadow-sm"
+                                    />
+                                  )}
+                                  <span className="font-medium text-gray-900">{formatName(race.name)}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
+                                    (score?.percentage ?? 0) >= 40 ? 'bg-green-100 text-green-700' :
+                                    (score?.percentage ?? 0) >= 25 ? 'bg-amber-100 text-amber-700' :
+                                    'bg-gray-100 text-gray-600'
+                                  }`}>
+                                    {score?.exact}/{score?.total} exact ({score?.percentage}%)
+                                  </span>
+                                  <svg className={`w-4 h-4 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                  </svg>
+                                </div>
+                              </button>
+
+                              {isExpanded && lockedPrediction.breakdown && (
+                                <div className="border-t border-gray-100">
+                                  <table className="w-full text-sm">
+                                    <thead>
+                                      <tr className="bg-gray-50 text-xs text-gray-500 uppercase">
+                                        <th className="px-4 py-2 text-left w-14">Pos</th>
+                                        <th className="px-4 py-2 text-left">Your Pick</th>
+                                        <th className="px-4 py-2 text-left">Actual</th>
+                                        <th className="px-4 py-2 text-center w-12"></th>
+                                      </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-50">
+                                      {lockedPrediction.breakdown.map(item => {
+                                        const predicted = driverById[item.predictedDriverId];
+                                        const actual = item.actualDriverId ? driverById[item.actualDriverId] : null;
+                                        return (
+                                          <tr
+                                            key={item.position}
+                                            className={item.isExact ? 'bg-green-50' : ''}
+                                          >
+                                            <td className="px-4 py-2 font-medium text-gray-500">P{item.position}</td>
+                                            <td className="px-4 py-2 font-medium text-gray-900">
+                                              {getDriverCode(predicted)}
+                                            </td>
+                                            <td className="px-4 py-2 text-gray-600">
+                                              {actual ? getDriverCode(actual) : '--'}
+                                            </td>
+                                            <td className="px-4 py-2 text-center">
+                                              {item.isExact ? (
+                                                <svg className="w-4 h-4 text-green-600 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                </svg>
+                                              ) : (
+                                                <svg className="w-4 h-4 text-gray-300 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                              )}
+                                            </td>
+                                          </tr>
+                                        );
+                                      })}
+                                    </tbody>
+                                  </table>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Awaiting Results */}
+                  {awaitingResults.length > 0 && (
+                    <div className="mb-6">
+                      <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Awaiting Results</h3>
+                      <div className="space-y-3">
+                        {awaitingResults.map(({ race, lockedPrediction }) => (
+                          <div key={race.id} className="bg-white rounded-lg border border-gray-200 p-4">
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center gap-3">
+                                {race.countryCode && (
+                                  <img
+                                    src={`/flags/${race.countryCode}.webp`}
+                                    alt={race.country}
+                                    className="w-6 h-4 object-cover rounded shadow-sm"
+                                  />
+                                )}
+                                <span className="font-medium text-gray-900">{formatName(race.name)}</span>
+                              </div>
+                              {race.date && (
+                                <span className="text-sm text-gray-500"><Countdown date={race.date} /></span>
+                              )}
+                            </div>
+                            <div className="flex flex-wrap gap-1">
+                              {[...lockedPrediction.positions]
+                                .sort((a, b) => a.position - b.position)
+                                .slice(0, 10)
+                                .map(pos => {
+                                  const driver = driverById[pos.driverId];
+                                  return (
+                                    <span key={pos.position} className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded font-medium">
+                                      P{pos.position} {getDriverCode(driver)}
+                                    </span>
+                                  );
+                                })}
+                              {lockedPrediction.positions.length > 10 && (
+                                <span className="text-xs text-gray-400 px-2 py-0.5">
+                                  +{lockedPrediction.positions.length - 10} more
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {scoredRaces.length === 0 && awaitingResults.length === 0 && (
+                    <div className="text-center py-12">
+                      <p className="text-gray-500 mb-2">No results yet.</p>
+                      <p className="text-sm text-gray-400">Lock a prediction and wait for the race to finish.</p>
+                    </div>
+                  )}
+                </>
+              )}
+            </>
+          )}
+
+          {/* ─── Leaderboard Tab ─── */}
+          {activeTab === 'leaderboard' && (
+            <>
+              {/* User rank summary */}
+              {userRank && (
+                <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg border border-amber-200 p-4 mb-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">{getRankBadge(userRank.rank || 0)}</span>
+                    <div>
+                      <div className="font-bold text-gray-900">Your Rank</div>
+                      <div className="text-sm text-gray-600">
+                        {userRank.accuracy}% accuracy · {userRank.exactMatches}/{userRank.totalPositions} exact
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="text-sm text-gray-500 mb-3">
+                {leaderboardTotalUsers} predictor{leaderboardTotalUsers !== 1 ? 's' : ''} this season
               </div>
-            ) : leaderboardEntries.length === 0 && pendingEntries.length === 0 ? (
-              <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
-                <p className="text-gray-500">No predictions yet. Be the first!</p>
-              </div>
-            ) : (
-              <>
-                {leaderboardEntries.length > 0 && (
-                  <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                    <table className="w-full">
-                      <thead className="bg-gray-50 border-b border-gray-200">
-                        <tr>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide w-16">Rank</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Predictor</th>
-                          <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wide w-20">Races</th>
-                          <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wide w-24">Accuracy</th>
-                          <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wide w-28">Exact</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-100">
-                        {leaderboardEntries.map(entry => (
-                          <tr key={entry.userId} className="hover:bg-gray-50 transition-colors">
+
+              {leaderboardLoading ? (
+                <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
+                  <p className="text-gray-500 mt-3 text-sm">Loading leaderboard...</p>
+                </div>
+              ) : leaderboardEntries.length === 0 ? (
+                <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
+                  <p className="text-gray-500">No predictions scored yet. Be the first!</p>
+                </div>
+              ) : (
+                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                  <table className="w-full">
+                    <thead className="bg-gray-50 border-b border-gray-200">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide w-14">Rank</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Predictor</th>
+                        <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wide w-16">Races</th>
+                        <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wide w-24">Accuracy</th>
+                        <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wide w-20">Exact</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {leaderboardEntries.map(entry => {
+                        const isCurrentUser = user?.id === entry.userId;
+                        return (
+                          <tr
+                            key={entry.userId}
+                            className={`transition-colors ${isCurrentUser ? 'bg-amber-50' : 'hover:bg-gray-50'}`}
+                          >
                             <td className="px-4 py-3">
                               <span className="text-lg">{getRankBadge(entry.rank || 0)}</span>
                             </td>
                             <td className="px-4 py-3">
                               <div className="flex items-center gap-3">
                                 {entry.image ? (
-                                  <img src={entry.image} alt={entry.name} className="w-8 h-8 rounded-full object-cover" />
+                                  <img src={entry.image} alt={entry.name} className="w-7 h-7 rounded-full object-cover" />
                                 ) : (
-                                  <div className="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center text-xs font-bold">
+                                  <div className="w-7 h-7 rounded-full bg-red-600 text-white flex items-center justify-center text-xs font-bold">
                                     {getInitials(entry.name)}
                                   </div>
                                 )}
-                                <span className="font-medium text-gray-900">{entry.name}</span>
+                                <span className={`font-medium ${isCurrentUser ? 'text-amber-700' : 'text-gray-900'}`}>
+                                  {entry.name} {isCurrentUser && <span className="text-xs text-amber-500">(you)</span>}
+                                </span>
                               </div>
                             </td>
                             <td className="px-4 py-3 text-right text-sm text-gray-600">{entry.racesScored}</td>
                             <td className="px-4 py-3 text-right">
-                              <span className={`inline-flex items-center px-2 py-1 rounded text-sm font-semibold ${
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${
                                 entry.accuracy >= 40 ? 'bg-green-100 text-green-700' :
                                 entry.accuracy >= 25 ? 'bg-amber-100 text-amber-700' :
-                                'bg-gray-100 text-gray-700'
+                                'bg-gray-100 text-gray-600'
                               }`}>
                                 {entry.accuracy}%
                               </span>
                             </td>
-                            <td className="px-4 py-3 text-right text-sm text-gray-600">{entry.exactMatches}/{entry.totalPositions}</td>
+                            <td className="px-4 py-3 text-right text-sm text-gray-600">
+                              {entry.exactMatches}/{entry.totalPositions}
+                            </td>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        );
+                      })}
+                    </tbody>
+                  </table>
 
-                    {/* Pagination */}
-                    {leaderboardTotalPages > 1 && (
-                      <div className="flex items-center justify-center gap-1 p-4 border-t border-gray-200">
-                        <button
-                          onClick={() => setLeaderboardPage(p => Math.max(1, p - 1))}
-                          disabled={leaderboardPage <= 1}
-                          className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          Prev
-                        </button>
-                        <span className="px-3 py-2 text-sm text-gray-600">
-                          Page {leaderboardPage} of {leaderboardTotalPages}
-                        </span>
-                        <button
-                          onClick={() => setLeaderboardPage(p => Math.min(leaderboardTotalPages, p + 1))}
-                          disabled={leaderboardPage >= leaderboardTotalPages}
-                          className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          Next
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Pending predictions */}
-                {pendingEntries.length > 0 && (
-                  <div className="mt-6">
-                    <h3 className="text-md font-bold text-gray-900 mb-3">Upcoming Predictions</h3>
-                    <div className="space-y-3">
-                      {pendingEntries.map(entry => (
-                        <div key={entry.userId} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                          <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-3">
-                            {entry.image ? (
-                              <img src={entry.image} alt={entry.name} className="w-8 h-8 rounded-full object-cover" />
-                            ) : (
-                              <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold">
-                                {getInitials(entry.name)}
-                              </div>
-                            )}
-                            <span className="font-medium text-gray-900">{entry.name}</span>
-                          </div>
-                          <div className="px-4 py-3 space-y-2">
-                            {entry.predictions.map((pred, i) => (
-                              <div key={i} className="flex items-center gap-3">
-                                <span className="text-sm font-medium text-gray-600 w-32 flex-shrink-0">{formatName(pred.raceName)}</span>
-                                <div className="flex gap-1 flex-wrap">
-                                  {pred.drivers.map((driver, j) => (
-                                    <span
-                                      key={j}
-                                      className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded ${
-                                        j === 0 ? 'bg-yellow-100 text-yellow-800' :
-                                        j === 1 ? 'bg-gray-200 text-gray-700' :
-                                        j === 2 ? 'bg-orange-100 text-orange-800' :
-                                        'bg-gray-100 text-gray-600'
-                                      }`}
-                                    >
-                                      <span className="font-medium">{j + 1}.</span>
-                                      <span>{driver}</span>
-                                    </span>
-                                  ))}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
+                  {leaderboardTotalPages > 1 && (
+                    <div className="flex items-center justify-center gap-2 p-4 border-t border-gray-200">
+                      <button
+                        onClick={() => setLeaderboardPage(p => Math.max(1, p - 1))}
+                        disabled={leaderboardPage <= 1}
+                        className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Prev
+                      </button>
+                      <span className="px-3 py-1.5 text-sm text-gray-500">
+                        {leaderboardPage} / {leaderboardTotalPages}
+                      </span>
+                      <button
+                        onClick={() => setLeaderboardPage(p => Math.min(leaderboardTotalPages, p + 1))}
+                        disabled={leaderboardPage >= leaderboardTotalPages}
+                        className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Next
+                      </button>
                     </div>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-
-          {/* CTA */}
-          <div className="text-center py-4">
-            <p className="text-sm text-gray-500 mb-3">Think you can do better?</p>
-            <Link
-              to="/"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-red-600 text-white font-medium rounded-md hover:bg-red-700 transition-colors"
-            >
-              Make Your Predictions
-            </Link>
-          </div>
+                  )}
+                </div>
+              )}
+            </>
+          )}
         </main>
-
-        {/* Footer */}
-        <footer className="max-w-5xl mx-auto px-4 py-6 text-center text-sm text-gray-500">
-          <Link to="/" className="text-red-600 hover:underline">F1 Points Calculator</Link>
-          <span className="mx-2">&mdash;</span>
-          Predict F1 race results and track your accuracy
-        </footer>
       </div>
     </LazyDndProvider>
   );
