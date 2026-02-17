@@ -6,7 +6,6 @@ import { initializeUiState, setMobileView, toggleOfficialResults as toggleOffici
 import { RootState } from './store';
 import { moveDriver, resetGrid, toggleOfficialResults } from './store/slices/gridSlice';
 import { fetchLockedPredictions } from './store/slices/lockedPredictionsSlice';
-import { openAuthModal } from './store/slices/authSlice';
 import { loadPrediction, UserIdentifier } from './api/predictions';
 import useRaceResults from './hooks/useRaceResults';
 import { useAutoSave } from './hooks/useAutoSave';
@@ -25,15 +24,14 @@ import GridSkeleton from './components/common/GridSkeleton';
 import DriverSelectionSkeleton from './components/common/DriverSelectionSkeleton';
 import DriverSelection from './components/drivers/DriverSelection';
 import SeasonSelector from './components/common/SeasonSelector';
-import LockConfirmationModal from './components/predictions/LockConfirmationModal';
-import MyPredictionsPanel from './components/predictions/MyPredictionsPanel';
 import UserMenu from './components/auth/UserMenu';
+import { SandboxGridProvider } from './contexts/GridContext';
 import { useAppDispatch } from './store';
 import useWindowSize from './hooks/useWindowSize';
 import { trackBuyCoffeeClick, trackFeedbackClick, GA_EVENTS, trackEvent, trackVersionHistoryAction, trackExportAction } from './utils/analytics';
 import { openCustomerPortal } from './api/subscription';
 import { CURRENT_SEASON } from './utils/constants';
-import { Race } from './types';
+
 
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -70,10 +68,6 @@ const App: React.FC = () => {
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [showExport, setShowExport] = useState(false);
-  const [showPredictions, setShowPredictions] = useState(false);
-  const [raceToLock, setRaceToLock] = useState<Race | null>(null);
-  const races = useSelector((state: RootState) => state.seasonData.races);
-
   // Fetch locked predictions when identifier is available
   useEffect(() => {
     const identifier = getIdentifier();
@@ -81,17 +75,6 @@ const App: React.FC = () => {
       dispatch(fetchLockedPredictions({ identifier, season: activeSeason }));
     }
   }, [fingerprint, user, activeSeason, dispatch]);
-
-  const handleLockRace = (raceId: string) => {
-    if (!user?.id) {
-      dispatch(openAuthModal('signup'));
-      return;
-    }
-    const race = races.find(r => r.id === raceId);
-    if (race) {
-      setRaceToLock(race);
-    }
-  };
 
   const handleReset = () => {
     if (window.confirm('Are you sure you want to reset your predictions?')) {
@@ -306,6 +289,7 @@ const App: React.FC = () => {
                 ) : (
                   <>
                 {/* TODO: Smart Input feature disabled for now - just show DriverSelection */}
+                <SandboxGridProvider>
                 <DriverSelection />
 
                   <HorizontalScrollBar scrollContainerRef={raceGridScrollRef} />
@@ -321,11 +305,11 @@ const App: React.FC = () => {
                       trackExportAction('OPEN_MODAL');
                       setShowExport(true);
                     }}
-                    onOpenPredictions={() => setShowPredictions(true)}
                     showOfficialResults={showOfficialResults}
                     hasConsensusAccess={hasConsensusAccess}
                     onOpenSubscriptionModal={() => setShowSubscriptionModal(true)}
                   />
+                </SandboxGridProvider>
                 </>
               )}
               </div>
@@ -355,23 +339,7 @@ const App: React.FC = () => {
           onClose={() => setShowExport(false)}
         />
 
-        {raceToLock && (
-          <LockConfirmationModal
-            race={raceToLock}
-            onClose={() => setRaceToLock(null)}
-            onSuccess={() => setRaceToLock(null)}
-          />
-        )}
 
-        {showPredictions && (
-          <MyPredictionsPanel
-            onClose={() => setShowPredictions(false)}
-            onLockRace={(raceId) => {
-              setShowPredictions(false);
-              handleLockRace(raceId);
-            }}
-          />
-        )}
 
       </div>
     </LazyDndProvider>

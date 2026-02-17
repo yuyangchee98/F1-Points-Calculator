@@ -3,10 +3,9 @@ import { useDrop, useDrag } from 'react-dnd';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { DriverDragItem, ItemTypes } from '../types/dragTypes';
-import { moveDriver } from '../store/slices/gridSlice';
+import { useGridContext } from '../contexts/GridContext';
 import { toastService } from '../components/common/ToastContainer';
 import { selectDriversByIdMap, selectTeamsByIdMap } from '../store/selectors/dataSelectors';
-import { useAppDispatch } from '../store';
 import { trackDriverDrop, incrementPredictionCount, updateUserProperties } from '../utils/analytics';
 
 interface UseDriverDropParams {
@@ -15,16 +14,12 @@ interface UseDriverDropParams {
 }
 
 export function useDriverDrop({ raceId, position }: UseDriverDropParams) {
-  const dispatch = useAppDispatch();
+  const { positions, moveDriver } = useGridContext();
   const driverById = useSelector(selectDriversByIdMap);
   const teamById = useSelector(selectTeamsByIdMap);
-  const currentDriverId = useSelector((state: RootState) =>
-    state.grid.positions.find(p => p.raceId === raceId && p.position === position)?.driverId
-  );
+  const currentDriverId = positions.find(p => p.raceId === raceId && p.position === position)?.driverId ?? null;
 
   const races = useSelector((state: RootState) => state.seasonData.races);
-
-  const allPositions = useSelector((state: RootState) => state.grid.positions);
 
   const recentDropRef = useRef<{driverId: string, timestamp: number} | null>(null);
 
@@ -113,18 +108,18 @@ export function useDriverDrop({ raceId, position }: UseDriverDropParams) {
       }
     }
 
-    dispatch(moveDriver({
+    moveDriver({
       driverId,
       toRaceId: raceId,
       toPosition: position,
       fromRaceId: sourceRaceId,
       fromPosition: sourcePosition
-    }));
+    });
 
     trackDriverDrop(driverId, raceId, position);
 
     const totalPredictions = incrementPredictionCount();
-    const completionRate = Math.round((allPositions.length / 480) * 100);
+    const completionRate = Math.round((positions.length / 480) * 100);
 
     updateUserProperties({
       total_predictions: totalPredictions,
@@ -132,8 +127,8 @@ export function useDriverDrop({ raceId, position }: UseDriverDropParams) {
     });
 
     return { driverId, raceId, position };
-  }, [raceId, position, currentDriverId, dispatch, races, driverById, teamById, recentDropRef, allPositions]);
-  
+  }, [raceId, position, currentDriverId, moveDriver, races, driverById, teamById, recentDropRef, positions]);
+
   const [{ isOver, canDrop }, drop] = useDrop({
     accept: ItemTypes.DRIVER,
     drop: handleDrop,
@@ -142,7 +137,7 @@ export function useDriverDrop({ raceId, position }: UseDriverDropParams) {
       canDrop: monitor.canDrop(),
     }),
   });
-  
+
   return {
     drop,
     isOver,
@@ -154,7 +149,7 @@ export function useDriverDrop({ raceId, position }: UseDriverDropParams) {
 export function useDriverDrag(driverId: string, raceId?: string, position?: number) {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: ItemTypes.DRIVER,
-    item: { 
+    item: {
       type: ItemTypes.DRIVER,
       driverId,
       sourceRaceId: raceId,
@@ -166,7 +161,7 @@ export function useDriverDrag(driverId: string, raceId?: string, position?: numb
     end: () => {
     },
   }), [driverId, raceId, position]);
-  
+
   return {
     drag,
     isDragging

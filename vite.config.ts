@@ -66,7 +66,8 @@ export default defineConfig(async () => ({
         '2024': resolve(__dirname, '2024.html'),
         '2023': resolve(__dirname, '2023.html'),
         '2022': resolve(__dirname, '2022.html'),
-        'about': resolve(__dirname, 'about.html')
+        'about': resolve(__dirname, 'about.html'),
+        'compete': resolve(__dirname, 'compete.html')
       },
       output: {
         entryFileNames: 'assets/[name].[hash].js',
