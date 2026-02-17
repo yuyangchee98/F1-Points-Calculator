@@ -406,7 +406,7 @@ const Compete: React.FC = () => {
                       </div>
                     </div>
                   ) : (
-                    <SingleRaceGrid race={nextRaceToLock} />
+                    <SingleRaceGrid race={nextRaceToLock} columns={2} />
                   )}
 
                   {/* Lock confirmation modal */}
