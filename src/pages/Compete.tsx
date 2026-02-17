@@ -54,10 +54,10 @@ function getRankBadge(rank: number): string {
   return `#${rank}`;
 }
 
-const Countdown: React.FC<{ date: string }> = ({ date }) => {
+const Countdown: React.FC<{ date: string; prefix?: string }> = ({ date, prefix }) => {
   const countdown = useCountdown(date);
   if (!countdown || countdown.isPast) return null;
-  return <span>{countdown.formatted}</span>;
+  return <span>{prefix && `${prefix} `}{countdown.formatted}</span>;
 };
 
 // ─── Component ────────────────────────────────────────
@@ -228,9 +228,14 @@ const Compete: React.FC = () => {
 
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
+          {/* How it works */}
+          <p className="max-w-3xl mx-auto mb-6 text-sm text-gray-500">
+            Predict the finishing order for each race and lock your prediction before it starts. After the race, you're scored on how many positions you got exactly right. Compete against other fans on the season leaderboard.
+          </p>
+
           {/* Sign-in banner */}
           {!isAuthenticated && (
-            <div className="max-w-3xl mx-auto bg-gradient-to-r from-red-600 to-red-700 rounded-lg p-5 mb-6 text-white">
+            <div className="max-w-3xl mx-auto bg-red-600 rounded-lg p-5 mb-6 text-white">
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-lg font-bold">Join the Competition</h2>
@@ -263,7 +268,7 @@ const Compete: React.FC = () => {
                   <div>
                     <h2 className="text-lg font-bold text-gray-900">{formatName(nextRace.name)}</h2>
                     <div className="flex items-center gap-2 text-sm text-gray-500 mt-0.5">
-                      {nextRace.date && <Countdown date={nextRace.date} />}
+                      {nextRace.date && <Countdown date={nextRace.date} prefix="Locks in" />}
                       {isNextRaceLocked ? (
                         <span className="inline-flex items-center gap-1 text-green-600 font-medium">
                           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
