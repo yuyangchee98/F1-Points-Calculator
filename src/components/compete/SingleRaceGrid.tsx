@@ -5,6 +5,7 @@ import { getGridPositions, CURRENT_SEASON } from '../../utils/constants';
 
 interface SingleRaceGridProps {
   race: Race;
+  columns?: 2 | 3;
 }
 
 const ROW_HEIGHT = 56;
@@ -12,12 +13,12 @@ const ROW_HEIGHT = 56;
 const formatName = (name: string) =>
   name.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
-const SingleRaceGrid: React.FC<SingleRaceGridProps> = ({ race }) => {
+const SingleRaceGrid: React.FC<SingleRaceGridProps> = ({ race, columns = 3 }) => {
   const posCount = getGridPositions(CURRENT_SEASON);
-  const colSize = Math.ceil(posCount / 3);
-  const col1 = Array.from({ length: colSize }, (_, i) => i + 1);
-  const col2 = Array.from({ length: colSize }, (_, i) => colSize + i + 1).filter(p => p <= posCount);
-  const col3 = Array.from({ length: colSize }, (_, i) => colSize * 2 + i + 1).filter(p => p <= posCount);
+  const colSize = Math.ceil(posCount / columns);
+  const cols = Array.from({ length: columns }, (_, c) =>
+    Array.from({ length: colSize }, (_, i) => colSize * c + i + 1).filter(p => p <= posCount)
+  );
 
   const renderPosition = (position: number) => (
     <div key={position} className="flex items-center gap-1.5">
@@ -56,17 +57,13 @@ const SingleRaceGrid: React.FC<SingleRaceGridProps> = ({ race }) => {
         <span className="text-sm">{formatName(race.name)}</span>
       </div>
 
-      {/* Triple-column positions */}
-      <div className="grid grid-cols-3 gap-x-3">
-        <div className="space-y-1.5">
-          {col1.map(renderPosition)}
-        </div>
-        <div className="space-y-1.5">
-          {col2.map(renderPosition)}
-        </div>
-        <div className="space-y-1.5">
-          {col3.map(renderPosition)}
-        </div>
+      {/* Position columns */}
+      <div className={`grid gap-x-3 ${columns === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
+        {cols.map((positions, c) => (
+          <div key={c} className="space-y-1.5">
+            {positions.map(renderPosition)}
+          </div>
+        ))}
       </div>
     </div>
   );
