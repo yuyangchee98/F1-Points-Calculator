@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
+import { API_BASE_URL } from '../../utils/constants';
 
 // Google Icon SVG component
 const GoogleIcon: React.FC<{ className?: string }> = ({ className }) => (
@@ -23,11 +24,28 @@ const AuthModal: React.FC = () => {
   const [verificationSent, setVerificationSent] = useState(false);
   const [verificationEmail, setVerificationEmail] = useState('');
 
-  // Check for OAuth error in URL on mount
+  // Check for OAuth callback or error in URL on mount
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
+    const authCode = params.get('auth_code');
     const authError = params.get('auth_error');
     const errorMessage = params.get('error');
+
+    // Exchange one-time auth code for session cookies (fixes cookie partitioning)
+    if (authCode) {
+      fetch(`${API_BASE_URL}/api/auth/token-exchange?code=${authCode}`, {
+        credentials: 'include',
+      })
+        .catch((err) => {
+          console.error('Token exchange error:', err);
+        })
+        .finally(() => {
+          const url = new URL(window.location.href);
+          url.searchParams.delete('auth_code');
+          window.history.replaceState({}, '', url.toString());
+        });
+      return;
+    }
 
     if (authError || errorMessage) {
       setError(errorMessage || 'Authentication failed. Please try again.');
