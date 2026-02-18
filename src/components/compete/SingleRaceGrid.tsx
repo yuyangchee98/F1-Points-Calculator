@@ -33,7 +33,7 @@ const SingleRaceGrid: React.FC<SingleRaceGridProps> = ({ race, columns = 3 }) =>
       >
         P{position}
       </div>
-      <div className="flex-1" style={{ height: ROW_HEIGHT }}>
+      <div className="flex-1 min-w-0 overflow-hidden" style={{ height: ROW_HEIGHT }}>
         <RaceColumn
           race={race}
           position={position}
