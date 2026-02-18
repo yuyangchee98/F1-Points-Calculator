@@ -25,7 +25,7 @@ import DriverCard from '../components/drivers/DriverCard';
 import SingleRaceGrid from '../components/compete/SingleRaceGrid';
 import LockConfirmationModal from '../components/predictions/LockConfirmationModal';
 import ToastContainer from '../components/common/ToastContainer';
-import { getLeaderboard, LeaderboardEntry } from '../api/leaderboard';
+import { getLeaderboard, LeaderboardEntry, PendingEntry } from '../api/leaderboard';
 import AuthModal from '../components/auth/AuthModal';
 import { selectDriver } from '../store/slices/uiSlice';
 import { selectTeamsByIdMap, getDriverLastName } from '../store/selectors/dataSelectors';
@@ -83,6 +83,7 @@ const Compete: React.FC = () => {
 
   // Leaderboard state
   const [leaderboardEntries, setLeaderboardEntries] = useState<LeaderboardEntry[]>([]);
+  const [leaderboardPending, setLeaderboardPending] = useState<PendingEntry[]>([]);
   const [leaderboardPage, setLeaderboardPage] = useState(1);
   const [leaderboardTotalPages, setLeaderboardTotalPages] = useState(1);
   const [leaderboardTotalUsers, setLeaderboardTotalUsers] = useState(0);
@@ -133,6 +134,7 @@ const Compete: React.FC = () => {
       .then(data => {
         if (cancelled) return;
         setLeaderboardEntries(data.entries);
+        setLeaderboardPending(data.pendingEntries);
         setLeaderboardTotalPages(data.totalPages);
         setLeaderboardTotalUsers(data.totalUsers);
       })
@@ -729,9 +731,13 @@ const Compete: React.FC = () => {
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
                   <p className="text-gray-500 mt-3 text-sm">Loading leaderboard...</p>
                 </div>
-              ) : leaderboardEntries.length === 0 ? (
+              ) : leaderboardEntries.length === 0 && leaderboardPending.length === 0 ? (
                 <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
-                  <p className="text-gray-500">No predictions scored yet. Be the first!</p>
+                  <p className="text-gray-500">No predictions yet. Be the first!</p>
+                </div>
+              ) : leaderboardEntries.length === 0 ? (
+                <div className="bg-white rounded-lg border border-gray-200 p-6 text-center mb-6">
+                  <p className="text-gray-500">No races scored yet. Check back after the first race!</p>
                 </div>
               ) : (
                 <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
@@ -810,6 +816,54 @@ const Compete: React.FC = () => {
                       </button>
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* Pending predictions */}
+              {leaderboardPending.length > 0 && (
+                <div className="mt-6">
+                  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Upcoming Predictions</h3>
+                  <div className="space-y-3">
+                    {leaderboardPending.map(entry => (
+                      <div key={entry.userId} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                        <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-3">
+                          {entry.image ? (
+                            <img src={entry.image} alt={entry.name} className="w-7 h-7 rounded-full object-cover" />
+                          ) : (
+                            <div className="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold">
+                              {getInitials(entry.name)}
+                            </div>
+                          )}
+                          <span className="font-medium text-gray-900">{entry.name}</span>
+                        </div>
+                        <div className="px-4 py-3 space-y-2">
+                          {entry.predictions.map(pred => (
+                            <div key={pred.raceName} className="flex items-center gap-3">
+                              <span className="text-sm font-medium text-gray-600 w-32 flex-shrink-0">{pred.raceName}</span>
+                              <div className="flex gap-1 flex-wrap">
+                                {pred.drivers.slice(0, 5).map((driver, i) => (
+                                  <span
+                                    key={i}
+                                    className={`text-xs px-2 py-0.5 rounded font-medium ${
+                                      i === 0 ? 'bg-yellow-100 text-yellow-800' :
+                                      i === 1 ? 'bg-gray-200 text-gray-700' :
+                                      i === 2 ? 'bg-amber-100 text-amber-800' :
+                                      'bg-gray-100 text-gray-600'
+                                    }`}
+                                  >
+                                    {i === 0 ? 'P1' : i === 1 ? 'P2' : i === 2 ? 'P3' : `P${i + 1}`} {driver}
+                                  </span>
+                                ))}
+                                {pred.drivers.length > 5 && (
+                                  <span className="text-xs text-gray-400 px-2 py-0.5">+{pred.drivers.length - 5} more</span>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
