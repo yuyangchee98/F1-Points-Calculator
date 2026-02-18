@@ -162,8 +162,8 @@ const Compete: React.FC = () => {
     : 0;
   const gridPositionCount = getGridPositions(CURRENT_SEASON);
 
-  // Hero card status
-  const nextRace = nextRaceToLock || awaitingResults[0]?.race;
+  // Hero card status — prioritize awaiting results over next-to-lock
+  const nextRace = awaitingResults[0]?.race || nextRaceToLock;
   const isNextRaceLocked = nextRace ? !!lockedPredictions[nextRace.id] : false;
 
   // User's leaderboard rank
@@ -296,8 +296,8 @@ const Compete: React.FC = () => {
             </div>
           )}
 
-          {/* Hero Card */}
-          {nextRace && (
+          {/* Hero Card — only show when there's an unlocked race to act on */}
+          {nextRace && !isNextRaceLocked && (
             <div className="max-w-3xl mx-auto bg-white rounded-lg border border-gray-200 shadow-sm p-5 mb-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -311,7 +311,7 @@ const Compete: React.FC = () => {
                   <div>
                     <h2 className="text-lg font-bold text-gray-900">{formatName(nextRace.name)}</h2>
                     <div className="flex items-center gap-2 text-sm text-gray-500 mt-0.5">
-                      {nextRace.date && <Countdown date={nextRace.date} prefix="Locks in" />}
+                      {nextRace.date && !isNextRaceLocked && <Countdown date={nextRace.date} prefix="Locks in" />}
                       {isNextRaceLocked ? (
                         <span className="inline-flex items-center gap-1 text-green-600 font-medium">
                           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -383,6 +383,53 @@ const Compete: React.FC = () => {
               ) : !nextRaceToLock ? (
                 <div className="text-center py-12">
                   <p className="text-gray-500">No upcoming races to predict.</p>
+                </div>
+              ) : awaitingResults.length > 0 ? (
+                <div className="max-w-3xl mx-auto">
+                  {awaitingResults.map(({ race, lockedPrediction }) => (
+                    <div key={race.id} className="bg-white rounded-lg border border-gray-200 p-5 mb-4">
+                      <div className="flex items-center gap-3 mb-3">
+                        {race.countryCode && (
+                          <img
+                            src={`/flags/${race.countryCode}.webp`}
+                            alt={race.country}
+                            className="w-6 h-4 object-cover rounded shadow-sm"
+                          />
+                        )}
+                        <span className="font-semibold text-gray-900">{formatName(race.name)}</span>
+                        <span className="inline-flex items-center gap-1 text-green-600 text-sm font-medium">
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          Locked
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-500 mb-3">
+                        Your prediction is locked. Results will be scored after the race finishes.
+                        {nextRaceToLock && (
+                          <> Predictions for {formatName(nextRaceToLock.name)} will open once results are in.</>
+                        )}
+                      </p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {[...lockedPrediction.positions]
+                          .sort((a, b) => a.position - b.position)
+                          .slice(0, 5)
+                          .map(pos => {
+                            const driver = driverById[pos.driverId];
+                            return (
+                              <span key={pos.position} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md font-medium">
+                                P{pos.position} {getDriverCode(driver)}
+                              </span>
+                            );
+                          })}
+                        {lockedPrediction.positions.length > 5 && (
+                          <span className="text-xs text-gray-400 px-2 py-1">
+                            +{lockedPrediction.positions.length - 5} more
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               ) : (
                 <CompeteGridProvider>
