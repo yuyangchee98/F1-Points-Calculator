@@ -229,9 +229,52 @@ const Compete: React.FC = () => {
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
           {/* How it works */}
-          <p className="max-w-3xl mx-auto mb-6 text-sm text-gray-500">
-            Predict the finishing order for each race and lock your prediction before it starts. After the race, you're scored on how many positions you got exactly right. Compete against other fans on the season leaderboard.
-          </p>
+          <div className="max-w-3xl mx-auto mb-6 bg-white rounded-lg border border-gray-200 p-4 flex gap-5 items-center">
+            {/* Explanation */}
+            <div className="text-sm text-gray-600 min-w-0">
+              <div className="font-semibold text-gray-900 mb-1">Predict. Lock. Score.</div>
+              <p>
+                Drag drivers into your predicted finishing order and lock your prediction before the race starts. After the race, you score a point for every position you got exactly right. Lock every race to climb the season leaderboard.
+              </p>
+            </div>
+
+            {/* Mini prediction vs actual visual */}
+            <div className="flex-shrink-0 hidden sm:block">
+              <div className="flex gap-2 text-[10px] text-gray-400 font-medium mb-1.5 pl-7">
+                <span className="w-16 text-center">Your pick</span>
+                <span className="w-16 text-center">Actual</span>
+              </div>
+              {[
+                { pos: 1, pick: 'VER', actual: 'VER', color: '#3671C6', exact: true },
+                { pos: 2, pick: 'NOR', actual: 'LEC', color: '#FF8000', actualColor: '#E80020', exact: false },
+                { pos: 3, pick: 'PIA', actual: 'PIA', color: '#FF8000', exact: true },
+                { pos: 4, pick: 'SAI', actual: 'HAM', color: '#E80020', actualColor: '#27F4D2', exact: false },
+              ].map(row => (
+                <div key={row.pos} className={`flex items-center gap-2 mb-1 rounded px-1 py-0.5 ${row.exact ? 'bg-green-50' : ''}`}>
+                  <span className={`w-5 text-[10px] font-bold text-center rounded py-px ${row.pos <= 3 ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-500'}`}>
+                    {row.pos}
+                  </span>
+                  <div className="w-16 flex items-center gap-1 bg-white rounded border border-gray-200 px-1.5 py-1 shadow-sm">
+                    <div className="w-1 h-3 rounded-sm" style={{ backgroundColor: row.color }} />
+                    <span className="text-[10px] font-bold text-gray-700">{row.pick}</span>
+                  </div>
+                  <div className="w-16 flex items-center gap-1 bg-white rounded border border-gray-200 px-1.5 py-1 shadow-sm">
+                    <div className="w-1 h-3 rounded-sm" style={{ backgroundColor: row.exact ? row.color : row.actualColor }} />
+                    <span className="text-[10px] font-bold text-gray-700">{row.actual}</span>
+                  </div>
+                  {row.exact ? (
+                    <svg className="w-3 h-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : (
+                    <svg className="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
 
           {/* Sign-in banner */}
           {!isAuthenticated && (
