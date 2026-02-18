@@ -143,7 +143,7 @@ const Compete: React.FC = () => {
         if (!cancelled) setLeaderboardLoading(false);
       });
     return () => { cancelled = true; };
-  }, [leaderboardPage]);
+  }, [leaderboardPage, activeTab]);
 
   const handleDriverClick = (driverId: string) => {
     dispatch(selectDriver(selectedDriverId === driverId ? null : driverId));
