@@ -29,6 +29,7 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position, style, classNam
   const dispatch = useAppDispatch();
   const {
     positions,
+    sliceName,
     placeDriver,
     clearPosition,
     fillRestOfSeason,
@@ -44,7 +45,7 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position, style, classNam
 
   const selectedDriverId = useSelector((state: RootState) => state.ui.selectedDriver);
   const copiedDriverId = useSelector((state: RootState) => state.ui.copiedDriver);
-  const showConsensus = useSelector((state: RootState) => state.ui.showConsensus);
+  const showConsensus = useSelector((state: RootState) => state.ui.showConsensus) && sliceName !== 'competeGrid';
   const driverById = useSelector(selectDriversByIdMap);
   const driverStandings = useSelector(selectDriverStandings);
   const races = useSelector((state: RootState) => state.seasonData.races);
