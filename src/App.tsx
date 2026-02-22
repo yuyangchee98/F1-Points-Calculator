@@ -288,7 +288,6 @@ const App: React.FC = () => {
                   </>
                 ) : (
                   <>
-                {/* TODO: Smart Input feature disabled for now - just show DriverSelection */}
                 <SandboxGridProvider>
                 <DriverSelection />
 
