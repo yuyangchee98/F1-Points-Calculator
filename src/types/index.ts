@@ -78,15 +78,6 @@ export interface PastRaceResult {
   [race: string]: RaceResult[];
 }
 
-export interface SeasonDataState {
-  drivers: Driver[];
-  teams: Team[];
-  races: Race[];
-  pastResults: Record<string, RaceResult[]>;
-  isLoading: boolean;
-  isLoaded: boolean;
-}
-
 export interface GridState {
   positions: GridPosition[];
 }

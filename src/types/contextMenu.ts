@@ -13,8 +13,3 @@ export interface ContextMenuPosition {
   y: number;
 }
 
-export interface ContextMenuState {
-  isOpen: boolean;
-  position: ContextMenuPosition;
-  items: ContextMenuItem[];
-}

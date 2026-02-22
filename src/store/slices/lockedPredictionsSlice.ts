@@ -77,15 +77,8 @@ export const lockedPredictionsSlice = createSlice({
   name: 'lockedPredictions',
   initialState,
   reducers: {
-    clearLockedPredictions: (state) => {
-      state.lockedPredictions = {};
-      state.error = null;
-    },
     clearLockError: (state) => {
       state.error = null;
-    },
-    setLockedPrediction: (state, action: PayloadAction<LockedPrediction>) => {
-      state.lockedPredictions[action.payload.raceId] = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -139,5 +132,5 @@ export const lockedPredictionsSlice = createSlice({
   },
 });
 
-export const { clearLockedPredictions, clearLockError, setLockedPrediction } = lockedPredictionsSlice.actions;
+export const { clearLockError } = lockedPredictionsSlice.actions;
 export default lockedPredictionsSlice.reducer;

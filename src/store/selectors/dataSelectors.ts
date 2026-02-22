@@ -4,28 +4,12 @@ import { Driver, Team } from '../../types';
 
 export const selectDrivers = (state: RootState): Driver[] => state.seasonData.drivers;
 
-export const selectDriverById = createSelector(
-  [selectDrivers, (_state: RootState, driverId: string) => driverId],
-  (drivers, driverId) => drivers.find(driver => driver.id === driverId)
-);
-
 export const selectDriversByIdMap = createSelector(
   [selectDrivers],
   (drivers) => {
     const map: Record<string, Driver> = {};
     drivers.forEach(driver => {
       map[driver.id] = driver;
-    });
-    return map;
-  }
-);
-
-export const selectDriverTeamsMap = createSelector(
-  [selectDrivers],
-  (drivers) => {
-    const map: Record<string, string> = {};
-    drivers.forEach(driver => {
-      map[driver.id] = driver.team;
     });
     return map;
   }
@@ -47,18 +31,6 @@ const getDisplayName = (name: string): string => {
 
 export const selectTeams = (state: RootState): Team[] => state.seasonData.teams;
 
-export const selectTeamById = createSelector(
-  [selectTeams, (_state: RootState, teamId: string) => teamId],
-  (teams, teamId) => {
-    const team = teams.find(team => team.id === teamId);
-    if (!team) return undefined;
-    return {
-      ...team,
-      name: getDisplayName(team.name)
-    };
-  }
-);
-
 export const selectTeamsByIdMap = createSelector(
   [selectTeams],
   (teams) => {
@@ -74,18 +46,6 @@ export const selectTeamsByIdMap = createSelector(
 );
 
 export const selectGridPositions = (state: RootState) => state.grid.positions;
-
-export const selectRacePositionKey = (_: RootState, raceId: string, position: number) => `${raceId}::${position}`;
-
-export const selectDriverAtPosition = createSelector(
-  [selectGridPositions, selectRacePositionKey],
-  (positions, racePositionKey) => {
-    const [raceId, positionStr] = racePositionKey.split('::');
-    const position = parseInt(positionStr, 10);
-    const gridPosition = positions.find(p => p.raceId === raceId && p.position === position);
-    return gridPosition ? gridPosition.driverId : null;
-  }
-);
 
 export const selectRaces = (state: RootState) => state.seasonData.races;
 
