@@ -15,6 +15,3 @@ export const {
   sendVerificationEmail,
 } = authClient;
 
-// Types
-export type Session = typeof authClient.$Infer.Session;
-export type User = Session['user'];
