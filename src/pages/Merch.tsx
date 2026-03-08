@@ -28,6 +28,7 @@ const MerchInner: React.FC = () => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [previewExpanded, setPreviewExpanded] = useState(false);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
   const prevBlobUrlRef = useRef<string | null>(null);
 
