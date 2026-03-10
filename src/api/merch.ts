@@ -27,6 +27,27 @@ export async function getMerchPosterPreview(
   return response.blob();
 }
 
+export async function getMockupPreview(
+  grid: GridEntry[],
+  season: number
+): Promise<{ mockupUrl: string }> {
+  const response = await fetch(`${API_BASE_URL}/api/merch/poster/mockup`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify({ grid, season }),
+  });
+
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({})) as { error?: string };
+    throw new Error(data.error || 'Failed to generate mockup');
+  }
+
+  return response.json();
+}
+
 export async function createMerchCheckout(
   identifier: UserIdentifier,
   season: number,
