@@ -7,7 +7,7 @@ import { fetchSeasonData } from '../store/slices/seasonDataSlice';
 import { getBrowserFingerprint } from '../utils/fingerprint';
 import { CURRENT_SEASON } from '../utils/constants';
 import { UserIdentifier } from '../api/predictions';
-import { getMerchPosterPreview, createMerchCheckout } from '../api/merch';
+import { getMerchPosterPreview, getMockupPreview, createMerchCheckout } from '../api/merch';
 import RaceGrid from '../components/grid/RaceGrid';
 import LazyDndProvider from '../components/common/LazyDndProvider';
 import DriverSelection from '../components/drivers/DriverSelection';
@@ -29,6 +29,11 @@ const MerchInner: React.FC = () => {
   const [previewLoading, setPreviewLoading] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [previewExpanded, setPreviewExpanded] = useState(false);
+  const [mockupUrl, setMockupUrl] = useState<string | null>(null);
+  const [mockupLoading, setMockupLoading] = useState(false);
+  const [, setMockupError] = useState<string | null>(null);
+  const [mockupGridHash, setMockupGridHash] = useState<string | null>(null);
+  const [showMockupInModal, setShowMockupInModal] = useState(false);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
   const prevBlobUrlRef = useRef<string | null>(null);
 
@@ -53,6 +58,22 @@ const MerchInner: React.FC = () => {
         driverId: p.driverId!,
       }));
   }, [positions]);
+
+  // Hash of current grid for mockup cache invalidation
+  const gridHash = useMemo(
+    () => JSON.stringify(gridEntries.map(e => `${e.raceId}:${e.position}:${e.driverId}`).sort()),
+    [gridEntries]
+  );
+
+  // Invalidate cached mockup when predictions change
+  useEffect(() => {
+    if (mockupGridHash && gridHash !== mockupGridHash) {
+      setMockupUrl(null);
+      setMockupGridHash(null);
+      setMockupError(null);
+      setShowMockupInModal(false);
+    }
+  }, [gridHash, mockupGridHash]);
 
   // Debounced poster preview
   const fetchPreview = useCallback(async () => {
@@ -122,6 +143,31 @@ const MerchInner: React.FC = () => {
     } catch {
       toastService.addToast('Failed to start checkout. Please try again.', 'warning', 3000, '#ef4444');
       setCheckoutLoading(false);
+    }
+  };
+
+  const handleGenerateMockup = async () => {
+    // If we already have a cached mockup for this grid, just open modal
+    if (mockupUrl && mockupGridHash === gridHash) {
+      setShowMockupInModal(true);
+      setPreviewExpanded(true);
+      return;
+    }
+
+    setMockupLoading(true);
+    setMockupError(null);
+    try {
+      const { mockupUrl: url } = await getMockupPreview(gridEntries, season);
+      setMockupUrl(url);
+      setMockupGridHash(gridHash);
+      setShowMockupInModal(true);
+      setPreviewExpanded(true);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Mockup generation failed';
+      setMockupError(message);
+      toastService.addToast(message, 'warning', 5000, '#ef4444');
+    } finally {
+      setMockupLoading(false);
     }
   };
 
@@ -220,6 +266,42 @@ const MerchInner: React.FC = () => {
                 )}
               </div>
 
+              {/* See on poster button */}
+              {previewUrl && (
+                <button
+                  onClick={handleGenerateMockup}
+                  disabled={mockupLoading}
+                  className={`w-full mb-4 py-2 px-3 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 ${
+                    mockupLoading
+                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      : mockupUrl && mockupGridHash === gridHash
+                        ? 'bg-green-50 text-green-700 hover:bg-green-100 border border-green-200'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200'
+                  }`}
+                >
+                  {mockupLoading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400"></div>
+                      Generating realistic preview... (10-30s)
+                    </>
+                  ) : mockupUrl && mockupGridHash === gridHash ? (
+                    <>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      View realistic mockup
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      See on poster
+                    </>
+                  )}
+                </button>
+              )}
+
               {/* Product info */}
               <div className="mb-4">
                 <div className="flex items-baseline justify-between">
@@ -266,22 +348,47 @@ const MerchInner: React.FC = () => {
       {previewExpanded && previewUrl && (
         <div
           className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-6 cursor-pointer"
-          onClick={() => setPreviewExpanded(false)}
+          onClick={() => { setPreviewExpanded(false); setShowMockupInModal(false); }}
         >
           {/* Close button */}
           <button
             className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors z-10"
-            onClick={() => setPreviewExpanded(false)}
+            onClick={() => { setPreviewExpanded(false); setShowMockupInModal(false); }}
           >
             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
 
-          {/* Poster image - fit to viewport */}
+          {/* Flat / Realistic toggle */}
+          {mockupUrl && (
+            <div
+              className="absolute top-4 left-1/2 -translate-x-1/2 z-10 flex bg-white/10 backdrop-blur-sm rounded-full p-1"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                  !showMockupInModal ? 'bg-white text-gray-900' : 'text-white/70 hover:text-white'
+                }`}
+                onClick={() => setShowMockupInModal(false)}
+              >
+                Flat design
+              </button>
+              <button
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                  showMockupInModal ? 'bg-white text-gray-900' : 'text-white/70 hover:text-white'
+                }`}
+                onClick={() => setShowMockupInModal(true)}
+              >
+                Realistic mockup
+              </button>
+            </div>
+          )}
+
+          {/* Image - flat or mockup */}
           <img
-            src={previewUrl}
-            alt="Poster preview (full size)"
+            src={showMockupInModal && mockupUrl ? mockupUrl : previewUrl}
+            alt={showMockupInModal ? 'Realistic poster mockup' : 'Poster preview (full size)'}
             className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           />
