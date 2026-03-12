@@ -234,6 +234,7 @@ const App: React.FC = () => {
                     <span className="hidden sm:inline">About</span>
                   </Link>
 
+                  {/* Merch button hidden until ready
                   <Link
                     to="/merch"
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-md shadow-sm hover:shadow transition-all duration-200"
@@ -243,6 +244,7 @@ const App: React.FC = () => {
                     </svg>
                     <span className="hidden sm:inline">Poster</span>
                   </Link>
+                  */}
 
                   <a
                     href="https://github.com/yuyangchee98/F1-Points-Calculator/issues"
