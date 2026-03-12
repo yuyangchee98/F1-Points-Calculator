@@ -45,6 +45,35 @@ export const selectNextRaceToLock = createSelector(
   }
 );
 
+// All races for the next weekend that can be predicted (grouped by round)
+export const selectNextWeekendRacesToLock = createSelector(
+  [(state: RootState) => state.seasonData.races, selectLockedPredictions],
+  (races, lockedPredictions) => {
+    const now = new Date();
+
+    // Find the first upcoming, unlocked, not-completed race
+    const firstUnlocked = races.find(race =>
+      !race.completed &&
+      !lockedPredictions[race.id] &&
+      race.date &&
+      new Date(race.date) > now
+    );
+
+    if (!firstUnlocked || !firstUnlocked.round) return [];
+
+    // Return ALL races in that same round that are not completed and in the future
+    // Includes already-locked races so the UI can show them as locked tabs
+    return races
+      .filter(race =>
+        race.round === firstUnlocked.round &&
+        !race.completed &&
+        race.date &&
+        new Date(race.date) > now
+      )
+      .sort((a, b) => a.order - b.order);
+  }
+);
+
 // Races that are locked but not yet completed (awaiting results)
 export const selectAwaitingResultsRaces = createSelector(
   [(state: RootState) => state.seasonData.races, selectLockedPredictions],
