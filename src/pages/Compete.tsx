@@ -10,6 +10,7 @@ import {
   selectLockedRaceCount,
   selectScoredRaceCount,
   selectNextRaceToLock,
+  selectNextWeekendRacesToLock,
   selectAwaitingResultsRaces,
   selectScoredRaces,
   selectLockedPredictions,
@@ -75,11 +76,13 @@ const Compete: React.FC = () => {
   const lockedCount = useSelector(selectLockedRaceCount);
   const scoredCount = useSelector(selectScoredRaceCount);
   const nextRaceToLock = useSelector(selectNextRaceToLock);
+  const nextWeekendRaces = useSelector(selectNextWeekendRacesToLock);
   const awaitingResults = useSelector(selectAwaitingResultsRaces);
   const scoredRaces = useSelector(selectScoredRaces);
 
   const [raceToLock, setRaceToLock] = useState<Race | null>(null);
   const [expandedRaceId, setExpandedRaceId] = useState<string | null>(null);
+  const [activeRaceIndex, setActiveRaceIndex] = useState(0);
 
   // Leaderboard state
   const [leaderboardEntries, setLeaderboardEntries] = useState<LeaderboardEntry[]>([]);
@@ -149,24 +152,41 @@ const Compete: React.FC = () => {
     dispatch(selectDriver(selectedDriverId === driverId ? null : driverId));
   };
 
+  // Weekend-aware state
+  const isSprintWeekend = nextWeekendRaces.length > 1;
+  const activeRace = nextWeekendRaces[activeRaceIndex] || null;
+  const isActiveRaceLocked = activeRace ? !!lockedPredictions[activeRace.id] : false;
+  const allWeekendLocked = nextWeekendRaces.length > 0 &&
+    nextWeekendRaces.every(r => !!lockedPredictions[r.id]);
+
+  // Default to the first unlocked race in the weekend (e.g., skip locked sprint)
+  useEffect(() => {
+    if (nextWeekendRaces.length === 0) return;
+    if (activeRaceIndex >= nextWeekendRaces.length) {
+      setActiveRaceIndex(0);
+      return;
+    }
+    // On initial load or when locked state changes, jump to first unlocked race
+    const firstUnlockedIdx = nextWeekendRaces.findIndex(r => !lockedPredictions[r.id]);
+    if (firstUnlockedIdx >= 0 && lockedPredictions[nextWeekendRaces[activeRaceIndex]?.id]) {
+      setActiveRaceIndex(firstUnlockedIdx);
+    }
+  }, [nextWeekendRaces, lockedPredictions]);
+
   const handleLockRace = () => {
     if (!user?.id) {
       dispatch(openAuthModal('signup'));
       return;
     }
-    if (nextRaceToLock) setRaceToLock(nextRaceToLock);
+    if (activeRace && !isActiveRaceLocked) setRaceToLock(activeRace);
   };
 
-  // Count filled positions for the next race in the compete grid
+  // Count filled positions for the active race in the compete grid
   const competeGridPositions = useSelector((state: RootState) => state.competeGrid.positions);
-  const filledCount = nextRaceToLock
-    ? competeGridPositions.filter(p => p.raceId === nextRaceToLock.id && p.driverId).length
+  const filledCount = activeRace
+    ? competeGridPositions.filter(p => p.raceId === activeRace.id && p.driverId).length
     : 0;
   const gridPositionCount = getGridPositions(CURRENT_SEASON);
-
-  // Hero card status — prioritize awaiting results over next-to-lock
-  const nextRace = awaitingResults[0]?.race || nextRaceToLock;
-  const isNextRaceLocked = nextRace ? !!lockedPredictions[nextRace.id] : false;
 
   // User's leaderboard rank
   const userRank = useMemo(() => {
@@ -298,23 +318,23 @@ const Compete: React.FC = () => {
             </div>
           )}
 
-          {/* Hero Card — only show when there's an unlocked race to act on */}
-          {nextRace && !isNextRaceLocked && (
+          {/* Hero Card — show for the active race in the weekend */}
+          {activeRace && !allWeekendLocked && (
             <div className="max-w-3xl mx-auto bg-white rounded-lg border border-gray-200 shadow-sm p-5 mb-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  {nextRace.countryCode && (
+                  {activeRace.countryCode && (
                     <img
-                      src={`/flags/${nextRace.countryCode}.webp`}
-                      alt={nextRace.country}
+                      src={`/flags/${activeRace.countryCode}.webp`}
+                      alt={activeRace.country}
                       className="w-8 h-6 object-cover rounded shadow-sm"
                     />
                   )}
                   <div>
-                    <h2 className="text-lg font-bold text-gray-900">{formatName(nextRace.name)}</h2>
+                    <h2 className="text-lg font-bold text-gray-900">{formatName(activeRace.name)}</h2>
                     <div className="flex items-center gap-2 text-sm text-gray-500 mt-0.5">
-                      {nextRace.date && !isNextRaceLocked && <Countdown date={nextRace.date} prefix="Locks in" />}
-                      {isNextRaceLocked ? (
+                      {activeRace.date && !isActiveRaceLocked && <Countdown date={activeRace.date} prefix="Locks in" />}
+                      {isActiveRaceLocked ? (
                         <span className="inline-flex items-center gap-1 text-green-600 font-medium">
                           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -332,7 +352,7 @@ const Compete: React.FC = () => {
                   </div>
                 </div>
 
-                {!isNextRaceLocked && nextRaceToLock && isAuthenticated && (
+                {!isActiveRaceLocked && activeRace && isAuthenticated && (
                   <button
                     onClick={handleLockRace}
                     disabled={filledCount === 0}
@@ -345,7 +365,7 @@ const Compete: React.FC = () => {
             </div>
           )}
 
-          {!nextRace && (
+          {nextWeekendRaces.length === 0 && (
             <div className="max-w-3xl mx-auto bg-white rounded-lg border border-gray-200 p-5 mb-6 text-center">
               <p className="text-gray-500">No upcoming races. Season complete!</p>
             </div>
@@ -382,128 +402,169 @@ const Compete: React.FC = () => {
                     Sign In
                   </button>
                 </div>
-              ) : !nextRaceToLock ? (
+              ) : nextWeekendRaces.length === 0 ? (
                 <div className="text-center py-12">
                   <p className="text-gray-500">No upcoming races to predict.</p>
                 </div>
-              ) : awaitingResults.length > 0 ? (
+              ) : allWeekendLocked ? (
                 <div className="max-w-3xl mx-auto">
-                  {awaitingResults.map(({ race, lockedPrediction }) => (
-                    <div key={race.id} className="bg-white rounded-lg border border-gray-200 p-5 mb-4">
-                      <div className="flex items-center gap-3 mb-3">
-                        {race.countryCode && (
-                          <img
-                            src={`/flags/${race.countryCode}.webp`}
-                            alt={race.country}
-                            className="w-6 h-4 object-cover rounded shadow-sm"
-                          />
-                        )}
-                        <span className="font-semibold text-gray-900">{formatName(race.name)}</span>
-                        <span className="inline-flex items-center gap-1 text-green-600 text-sm font-medium">
-                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                          Locked
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-500 mb-3">
-                        Your prediction is locked. Results will be scored after the race finishes.
-                        {nextRaceToLock && (
-                          <> Predictions for {formatName(nextRaceToLock.name)} will open once results are in.</>
-                        )}
-                      </p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {[...lockedPrediction.positions]
-                          .sort((a, b) => a.position - b.position)
-                          .slice(0, 5)
-                          .map(pos => {
-                            const driver = driverById[pos.driverId];
-                            return (
-                              <span key={pos.position} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md font-medium">
-                                P{pos.position} {getDriverCode(driver)}
-                              </span>
-                            );
-                          })}
-                        {lockedPrediction.positions.length > 5 && (
-                          <span className="text-xs text-gray-400 px-2 py-1">
-                            +{lockedPrediction.positions.length - 5} more
+                  {nextWeekendRaces.map(race => {
+                    const lp = lockedPredictions[race.id];
+                    if (!lp) return null;
+                    return (
+                      <div key={race.id} className="bg-white rounded-lg border border-gray-200 p-5 mb-4">
+                        <div className="flex items-center gap-3 mb-3">
+                          {race.countryCode && (
+                            <img
+                              src={`/flags/${race.countryCode}.webp`}
+                              alt={race.country}
+                              className="w-6 h-4 object-cover rounded shadow-sm"
+                            />
+                          )}
+                          <span className="font-semibold text-gray-900">{formatName(race.name)}</span>
+                          <span className="inline-flex items-center gap-1 text-green-600 text-sm font-medium">
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                            Locked
                           </span>
-                        )}
+                        </div>
+                        <p className="text-sm text-gray-500 mb-3">
+                          Your prediction is locked. Results will be scored after the race finishes.
+                        </p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {[...lp.positions]
+                            .sort((a, b) => a.position - b.position)
+                            .slice(0, 5)
+                            .map(pos => {
+                              const driver = driverById[pos.driverId];
+                              return (
+                                <span key={pos.position} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md font-medium">
+                                  P{pos.position} {getDriverCode(driver)}
+                                </span>
+                              );
+                            })}
+                          {lp.positions.length > 5 && (
+                            <span className="text-xs text-gray-400 px-2 py-1">
+                              +{lp.positions.length - 5} more
+                            </span>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <CompeteGridProvider>
-                  {/* Mobile: horizontal driver chip strip */}
-                  {isMobile && (
-                    <div className="mb-4 -mx-4 px-4">
-                      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                        {allDrivers.map(driver => {
-                          const team = teamById[driver.team];
-                          const isSelected = selectedDriverId === driver.id;
-                          return (
-                            <button
-                              key={driver.id}
-                              onClick={() => handleDriverClick(driver.id)}
-                              className={`flex-shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-bold transition-all ${
-                                isSelected
-                                  ? 'ring-2 ring-blue-500 shadow-md scale-105'
-                                  : 'hover:scale-105'
-                              }`}
-                              style={{
-                                borderLeft: `3px solid ${team?.color || '#ccc'}`,
-                                backgroundColor: isSelected ? `${team?.color}15` : 'white',
-                              }}
-                            >
-                              <span style={{ color: team?.color || '#555' }}>
-                                {getDriverLastName(driver.id).slice(0, 3).toUpperCase()}
-                              </span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                      {selectedDriverId && (
-                        <div className="flex items-center justify-between mt-2 px-2 py-1.5 bg-blue-50 rounded-md text-sm">
-                          <span className="text-blue-700 font-medium">
-                            {getDriverLastName(selectedDriverId)} selected — tap a position to place
+                  {/* Active race is locked — show compact summary */}
+                  {isActiveRaceLocked && activeRace && lockedPredictions[activeRace.id] && (
+                    <div className="max-w-3xl mx-auto">
+                      <div className="bg-white rounded-lg border border-gray-200 p-5 mb-4">
+                        <div className="flex items-center gap-3 mb-3">
+                          <span className="font-semibold text-gray-900">{formatName(activeRace.name)}</span>
+                          <span className="inline-flex items-center gap-1 text-green-600 text-sm font-medium">
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                            Locked
                           </span>
-                          <button
-                            onClick={() => dispatch(selectDriver(null))}
-                            className="text-blue-500 hover:text-blue-700 font-bold ml-2"
-                          >
-                            Cancel
-                          </button>
                         </div>
-                      )}
+                        <p className="text-sm text-gray-500 mb-3">
+                          Your prediction is locked. Results will be scored after the race finishes.
+                        </p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {[...lockedPredictions[activeRace.id].positions]
+                            .sort((a, b) => a.position - b.position)
+                            .slice(0, 5)
+                            .map(pos => {
+                              const driver = driverById[pos.driverId];
+                              return (
+                                <span key={pos.position} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md font-medium">
+                                  P{pos.position} {getDriverCode(driver)}
+                                </span>
+                              );
+                            })}
+                          {lockedPredictions[activeRace.id].positions.length > 5 && (
+                            <span className="text-xs text-gray-400 px-2 py-1">
+                              +{lockedPredictions[activeRace.id].positions.length - 5} more
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   )}
 
-                  {/* Desktop: side-by-side layout */}
-                  {!isMobile ? (
-                    <div className="flex gap-4">
-                      {/* Drivers — responsive columns */}
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Drivers</h3>
-                        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 max-h-[calc(100vh-240px)] overflow-y-auto pr-1 pb-2">
-                          {allDrivers.map(driver => (
-                            <DriverCard
-                              key={driver.id}
-                              driver={driver}
-                              isSelected={selectedDriverId === driver.id}
-                              onClick={() => handleDriverClick(driver.id)}
-                            />
-                          ))}
+                  {/* Active race is unlocked — show prediction grid */}
+                  {!isActiveRaceLocked && activeRace && (
+                    <>
+                      {/* Mobile: horizontal driver chip strip */}
+                      {isMobile && (
+                        <div className="mb-4 -mx-4 px-4">
+                          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                            {allDrivers.map(driver => {
+                              const team = teamById[driver.team];
+                              const isSelected = selectedDriverId === driver.id;
+                              return (
+                                <button
+                                  key={driver.id}
+                                  onClick={() => handleDriverClick(driver.id)}
+                                  className={`flex-shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-bold transition-all ${
+                                    isSelected
+                                      ? 'ring-2 ring-blue-500 shadow-md scale-105'
+                                      : 'hover:scale-105'
+                                  }`}
+                                  style={{
+                                    borderLeft: `3px solid ${team?.color || '#ccc'}`,
+                                    backgroundColor: isSelected ? `${team?.color}15` : 'white',
+                                  }}
+                                >
+                                  <span style={{ color: team?.color || '#555' }}>
+                                    {getDriverLastName(driver.id).slice(0, 3).toUpperCase()}
+                                  </span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                          {selectedDriverId && (
+                            <div className="flex items-center justify-between mt-2 px-2 py-1.5 bg-blue-50 rounded-md text-sm">
+                              <span className="text-blue-700 font-medium">
+                                {getDriverLastName(selectedDriverId)} selected — tap a position to place
+                              </span>
+                              <button
+                                onClick={() => dispatch(selectDriver(null))}
+                                className="text-blue-500 hover:text-blue-700 font-bold ml-2"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          )}
                         </div>
-                      </div>
+                      )}
 
-                      {/* Grid — triple-column positions */}
-                      <div className="w-[500px] flex-shrink-0">
-                        <SingleRaceGrid race={nextRaceToLock} />
-                      </div>
-                    </div>
-                  ) : (
-                    <SingleRaceGrid race={nextRaceToLock} columns={2} />
+                      {/* Desktop: side-by-side layout */}
+                      {!isMobile ? (
+                        <div className="flex gap-4">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Drivers</h3>
+                            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 max-h-[calc(100vh-240px)] overflow-y-auto pr-1 pb-2">
+                              {allDrivers.map(driver => (
+                                <DriverCard
+                                  key={driver.id}
+                                  driver={driver}
+                                  isSelected={selectedDriverId === driver.id}
+                                  onClick={() => handleDriverClick(driver.id)}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                          <div className="w-[500px] flex-shrink-0">
+                            <SingleRaceGrid race={activeRace} weekendRaces={isSprintWeekend ? nextWeekendRaces : undefined} onRaceSwitch={isSprintWeekend ? setActiveRaceIndex : undefined} />
+                          </div>
+                        </div>
+                      ) : (
+                        <SingleRaceGrid race={activeRace} columns={2} weekendRaces={isSprintWeekend ? nextWeekendRaces : undefined} onRaceSwitch={isSprintWeekend ? setActiveRaceIndex : undefined} />
+                      )}
+                    </>
                   )}
 
                   {/* Lock confirmation modal */}
@@ -515,6 +576,10 @@ const Compete: React.FC = () => {
                         setRaceToLock(null);
                         if (user?.id) {
                           dispatch(fetchLockedPredictions({ identifier: { userId: user.id }, season: CURRENT_SEASON }));
+                        }
+                        // Auto-switch to the other race tab on sprint weekends
+                        if (isSprintWeekend && nextWeekendRaces.length === 2) {
+                          setActiveRaceIndex(activeRaceIndex === 0 ? 1 : 0);
                         }
                       }}
                     />
