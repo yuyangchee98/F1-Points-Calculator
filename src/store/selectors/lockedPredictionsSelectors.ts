@@ -46,6 +46,7 @@ export const selectNextRaceToLock = createSelector(
 );
 
 // All races for the next weekend that can be predicted (grouped by round)
+// Returns empty if there are locked races still awaiting results (previous weekend not done yet)
 export const selectNextWeekendRacesToLock = createSelector(
   [(state: RootState) => state.seasonData.races, selectLockedPredictions],
   (races, lockedPredictions) => {
@@ -60,6 +61,15 @@ export const selectNextWeekendRacesToLock = createSelector(
     );
 
     if (!firstUnlocked || !firstUnlocked.round) return [];
+
+    // Don't open the next weekend if there are locked races still awaiting results
+    // from a different round (previous weekend not scored yet)
+    const hasAwaitingResults = races.some(race =>
+      lockedPredictions[race.id] &&
+      !race.completed &&
+      race.round !== firstUnlocked.round
+    );
+    if (hasAwaitingResults) return [];
 
     // Return ALL races in that same round that are not completed and in the future
     // Includes already-locked races so the UI can show them as locked tabs
