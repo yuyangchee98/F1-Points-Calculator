@@ -38,30 +38,29 @@ const schemaData = {
   schemaData={schemaData}
   initialYear={yearNum}
 >
+  <!-- SEO content — always in HTML, hidden once React mounts -->
+  <div id="seo-content" style="padding: 20px; max-width: 900px; margin: 0 auto; font-family: system-ui, sans-serif; line-height: 1.6;">
+    <h1 style="color: #dc2626;">F1 Points Calculator - {year} Season</h1>
+
+    <p>Simulate and predict the {year} Formula 1 World Championship standings.
+    Use our drag-and-drop calculator to place drivers in finishing positions and watch
+    the championship table update in real-time.</p>
+
+    <h2>Other Seasons</h2>
+    <ul>
+      <li><a href="/">Current Season Calculator</a></li>
+      <li><a href="/2024">2024 F1 Season</a></li>
+      <li><a href="/2023">2023 F1 Season</a></li>
+      <li><a href="/2022">2022 F1 Season</a></li>
+    </ul>
+
+    <p><a href="/about">FAQ & Help Guide</a></p>
+
+    <p style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666;">
+      Created by <a href="https://chyuang.com">Chyuang</a> |
+      <a href="https://github.com/yuyangchee98/F1-Points-Calculator">View on GitHub</a>
+    </p>
+  </div>
   <AppIsland year={year} client:only="react" />
-
-  <noscript>
-    <div style="padding: 20px; max-width: 900px; margin: 0 auto; font-family: system-ui, sans-serif; line-height: 1.6;">
-      <h1 style="color: #dc2626;">F1 Points Calculator - {year} Season</h1>
-
-      <p>Simulate and predict the {year} Formula 1 World Championship standings.
-      Use our drag-and-drop calculator to place drivers in finishing positions and watch
-      the championship table update in real-time.</p>
-
-      <h2>Other Seasons</h2>
-      <ul>
-        <li><a href="/">Current Season Calculator</a></li>
-        <li><a href="/2024">2024 F1 Season</a></li>
-        <li><a href="/2023">2023 F1 Season</a></li>
-        <li><a href="/2022">2022 F1 Season</a></li>
-      </ul>
-
-      <p><a href="/about">FAQ & Help Guide</a></p>
-
-      <p style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666;">
-        Created by <a href="https://chyuang.com">Chyuang</a> |
-        <a href="https://github.com/yuyangchee98/F1-Points-Calculator">View on GitHub</a>
-      </p>
-    </div>
-  </noscript>
+  <script is:inline>document.getElementById('seo-content').style.display='none';</script>
 </BaseLayout>

@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import AboutIsland from '../components/AboutIsland';
+
+const CURRENT_SEASON = 2026;
 
 const schemaData = {
   "@context": "https://schema.org",
@@ -10,26 +11,50 @@ const schemaData = {
   "mainEntity": [
     {
       "@type": "Question",
-      "name": "How do I use the F1 Points Calculator?",
+      "name": "How does the F1 points calculator work?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Drag and drop drivers onto the race grid to make predictions. Lock in your predictions and compete against other fans to see who predicts best."
+        "text": "Our F1 championship calculator uses a drag-and-drop interface to let you predict race results. Simply drag drivers to their finishing positions for each race, and the calculator automatically updates the championship standings based on the official F1 points system."
       }
     },
     {
       "@type": "Question",
-      "name": "Can I compete with other users?",
+      "name": "What is an F1 championship calculator?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes! Lock in your predictions before a race and compare your results with other fans. You can also view public sentiment to see how others are predicting."
+        "text": "An F1 championship calculator is a tool that simulates Formula 1 season standings by allowing you to predict race results. It calculates driver and constructor points based on your predictions, helping you visualize different championship scenarios."
       }
     },
     {
       "@type": "Question",
-      "name": "Can I view historical F1 seasons?",
+      "name": `How are F1 points calculated in ${CURRENT_SEASON}?`,
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes! Use the season selector to view data from previous F1 seasons including 2024, 2023, and 2022."
+        "text": `In ${CURRENT_SEASON}, F1 points are awarded to the top 10 finishers: 1st place gets 25 points, 2nd gets 18, 3rd gets 15, then 12, 10, 8, 6, 4, 2, and 1 point for 10th place. Sprint races award approximately 1/3 of regular race points to the top 8 finishers.`
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I simulate different F1 points systems?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes! Our calculator supports multiple points systems including the current F1 system, historical systems, and alternative scoring methods. You can switch between them to see how different systems would affect the championship."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I predict F1 standings?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "To predict F1 standings, use our drag-and-drop interface to place drivers in their predicted finishing positions for upcoming races. The calculator instantly updates the championship table, showing you how your predictions would affect the final standings."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is this F1 calculator free to use?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, our F1 points calculator is completely free. No registration required - just visit the site and start predicting race results and championship outcomes immediately."
       }
     }
   ],
@@ -39,6 +64,33 @@ const schemaData = {
     "url": "https://chyuang.com"
   }
 };
+
+const faqData = [
+  {
+    question: "How does the F1 points calculator work?",
+    answer: "Our F1 championship calculator uses a drag-and-drop interface to let you predict race results. Simply drag drivers to their finishing positions for each race, and the calculator automatically updates the championship standings based on the official F1 points system."
+  },
+  {
+    question: "What is an F1 championship calculator?",
+    answer: "An F1 championship calculator is a tool that simulates Formula 1 season standings by allowing you to predict race results. It calculates driver and constructor points based on your predictions, helping you visualize different championship scenarios."
+  },
+  {
+    question: `How are F1 points calculated in ${CURRENT_SEASON}?`,
+    answer: `In ${CURRENT_SEASON}, F1 points are awarded to the top 10 finishers: 1st place gets 25 points, 2nd gets 18, 3rd gets 15, then 12, 10, 8, 6, 4, 2, and 1 point for 10th place. Sprint races award approximately 1/3 of regular race points to the top 8 finishers.`
+  },
+  {
+    question: "Can I simulate different F1 points systems?",
+    answer: "Yes! Our calculator supports multiple points systems including the current F1 system, historical systems, and alternative scoring methods. You can switch between them to see how different systems would affect the championship."
+  },
+  {
+    question: "How do I predict F1 standings?",
+    answer: "To predict F1 standings, use our drag-and-drop interface to place drivers in their predicted finishing positions for upcoming races. The calculator instantly updates the championship table, showing you how your predictions would affect the final standings."
+  },
+  {
+    question: "Is this F1 calculator free to use?",
+    answer: "Yes, our F1 points calculator is completely free. No registration required - just visit the site and start predicting race results and championship outcomes immediately."
+  }
+];
 ---
 
 <BaseLayout
@@ -50,33 +102,104 @@ const schemaData = {
   ogDescription="Learn how to use the F1 Points Calculator and find answers to frequently asked questions"
   schemaData={schemaData}
 >
-  <AboutIsland client:only="react" />
+  <div class="min-h-screen bg-gray-100 py-6">
+    <div class="max-w-5xl mx-auto px-4">
+      <div class="mb-6">
+        <a
+          href="/"
+          class="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium"
+        >
+          <svg
+            class="w-5 h-5 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M10 19l-7-7m0 0l7-7m-7 7h18"
+            />
+          </svg>
+          Back to Calculator
+        </a>
+      </div>
 
-  <noscript>
-    <div style="padding: 20px; background: #f3f4f6;">
-      <h1>About F1 Points Calculator</h1>
-      <p>The F1 Points Calculator is an interactive web tool for predicting Formula 1 championship standings.</p>
+      <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6 flex items-center flex-wrap">
+        <span class="bg-red-600 text-white px-3 py-1 mr-3 rounded-md">F1</span>
+        <span class="mr-3">Points Calculator</span>
+        <span class="text-gray-600">- About & FAQ</span>
+      </h1>
 
-      <h2>Features:</h2>
-      <ul>
-        <li>Interactive drag-and-drop race predictions</li>
-        <li>Lock predictions and compete against other fans</li>
-        <li>View public sentiment on race outcomes</li>
-        <li>Multiple points systems support</li>
-        <li>Real-time championship standings calculation</li>
-        <li>Historical season data (2022-2024)</li>
-      </ul>
+      <!-- Introduction Section -->
+      <div class="mb-6 p-4 bg-white rounded-lg shadow-sm">
+        <div class="text-gray-700 leading-relaxed">
+          <p>
+            Welcome to the F1 Points Calculator {CURRENT_SEASON} - your ultimate tool for predicting Formula 1 championship outcomes.
+          </p>
+          <details id="intro-details">
+            <summary class="text-blue-600 hover:text-blue-800 font-medium cursor-pointer mt-1 list-none inline-flex items-center gap-1">
+              Read more
+              <svg class="w-4 h-4 intro-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <p class="text-gray-700 leading-relaxed mt-3">
+              This interactive calculator allows you to simulate race results for the entire {CURRENT_SEASON} F1 season by simply dragging
+              and dropping drivers into their finishing positions. Watch as the championship standings update in real-time,
+              helping you analyze different scenarios and predict who might become the next F1 World Champion.
+            </p>
+            <p class="text-gray-700 leading-relaxed mt-3">
+              Perfect for F1 fans who want to explore &ldquo;what-if&rdquo; scenarios, track their favorite drivers&apos; championship chances,
+              or make predictions for upcoming races. The calculator uses the official F1 points system (25-18-15-12-10-8-6-4-2-1)
+              and includes all drivers and teams from the {CURRENT_SEASON} Formula 1 season.
+            </p>
+          </details>
+        </div>
+      </div>
 
-      <p>This application requires JavaScript to run. Please enable JavaScript to use the interactive features.</p>
+      <!-- FAQ Section -->
+      <section class="faq-section mt-8 mb-8 px-4">
+        <h2 class="text-2xl font-bold mb-6 text-gray-800">Frequently Asked Questions</h2>
 
-      <h2>Related F1 Resources:</h2>
-      <ul>
-        <li><a href="https://f1-dash.com/" rel="noopener">F1 Dash - Race Analytics</a></li>
-        <li><a href="https://f1calendar.com/" rel="noopener">F1 Calendar - Race Schedule</a></li>
-        <li><a href="https://github.com/yuyangchee98/F1-Points-Calculator" rel="noopener">View on GitHub</a></li>
-        <li><a href="https://chyuang.com" rel="noopener">Created by Chyuang</a></li>
-        <li><a href="/" rel="noopener">Back to Calculator</a></li>
-      </ul>
+        <div class="max-w-3xl mx-auto">
+          {faqData.map((item) => (
+            <details class="mb-4 border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm group">
+              <summary class="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 transition-colors cursor-pointer list-none">
+                <h3 class="text-lg font-medium text-gray-800 pr-4">{item.question}</h3>
+                <svg
+                  class="w-5 h-5 text-gray-500 transition-transform group-open:rotate-180 shrink-0"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </summary>
+              <div class="px-6 py-4 border-t border-gray-100">
+                <p class="text-gray-600">{item.answer}</p>
+              </div>
+            </details>
+          ))}
+        </div>
+      </section>
     </div>
-  </noscript>
+  </div>
+
+  <script is:inline>
+    // Persist intro expand/collapse state
+    var d = document.getElementById('intro-details');
+    if (d) {
+      if (localStorage.getItem('introExpanded') === 'true') d.open = true;
+      d.addEventListener('toggle', function() {
+        localStorage.setItem('introExpanded', d.open ? 'true' : 'false');
+      });
+    }
+  </script>
 </BaseLayout>
