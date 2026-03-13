@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../../store';
+import type { RootState } from '../../store';
 import { selectPointsSystem } from '../../store/slices/uiSlice';
 import { POINTS_SYSTEMS } from '../../data/pointsSystems';
 import { trackPointsSystemChange } from '../../utils/analytics';

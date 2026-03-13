@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../store';
-import { getVersionHistory, deleteAllHistory, VersionSummary, UserIdentifier } from '../../api/predictions';
+import type { RootState } from '../../store';
+import { getVersionHistory, deleteAllHistory, type VersionSummary, type UserIdentifier } from '../../api/predictions';
 import { trackVersionHistoryAction } from '../../utils/analytics';
 import { getActiveSeason } from '../../utils/constants';
 

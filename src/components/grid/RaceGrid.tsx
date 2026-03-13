@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { RootState } from '../../store';
+import type { RootState } from '../../store';
 import PositionColumn from './PositionColumn';
 import RaceColumn from './RaceColumn';
 import GridToolbar from './GridToolbar';
@@ -11,7 +11,7 @@ import { selectDriverStandings } from '../../store/selectors/resultsSelectors';
 import { selectLockedPredictions } from '../../store/selectors/lockedPredictionsSelectors';
 import { useAppDispatch } from '../../store';
 import { getActiveSeason, getGridPositions } from '../../utils/constants';
-import { Race } from '../../types';
+import type { Race } from '../../types';
 
 interface RaceGridProps {
   scrollRef?: React.RefObject<HTMLDivElement>;

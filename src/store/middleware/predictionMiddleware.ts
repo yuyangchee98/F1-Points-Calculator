@@ -1,4 +1,4 @@
-import { Middleware, isAction } from '@reduxjs/toolkit';
+import { type Middleware, isAction } from '@reduxjs/toolkit';
 import { markDirty } from '../slices/predictionSlice';
 
 export const predictionMiddleware: Middleware = (store) => (next) => (action) => {

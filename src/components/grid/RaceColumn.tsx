@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { Race } from '../../types';
-import { RootState } from '../../store';
+import type { Race } from '../../types';
+import type { RootState } from '../../store';
 import { selectDriversByIdMap, getDriverLastName, getDriverDisplayName } from '../../store/selectors/dataSelectors';
 import DriverCard from '../drivers/DriverCard';
 import { selectDriver, copyDriver } from '../../store/slices/uiSlice';
@@ -12,7 +12,7 @@ import { useAppDispatch } from '../../store';
 import { useDriverDrop } from '../../hooks/useDriverDragDrop';
 import { useContextMenu, useLongPress } from '../../hooks/useContextMenu';
 import ContextMenu from '../common/ContextMenu';
-import { ContextMenuItem } from '../../types/contextMenu';
+import type { ContextMenuItem } from '../../types/contextMenu';
 import { toastService } from '../common/ToastContainer';
 import { trackContextMenuAction } from '../../utils/analytics';
 import { getActiveSeason } from '../../utils/constants';

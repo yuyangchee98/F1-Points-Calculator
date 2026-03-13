@@ -1,6 +1,6 @@
 import { createSelector } from '@reduxjs/toolkit';
-import { RootState } from '../index';
-import { Driver, Team } from '../../types';
+import type { RootState } from '../index';
+import type { Driver, Team } from '../../types';
 
 export const selectDrivers = (state: RootState): Driver[] => state.seasonData.drivers;
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { DriverStanding } from '../../types';
+import type { DriverStanding } from '../../types';
 import { selectDriversByIdMap, getDriverLastName, selectTeamsByIdMap } from '../../store/selectors/dataSelectors';
 
 interface PositionColumnProps {

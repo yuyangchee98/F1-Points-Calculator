@@ -1,4 +1,4 @@
-import { GridPosition } from '../types';
+import type { GridPosition } from '../types';
 import { API_BASE_URL } from '../utils/constants';
 
 // User identifier - either fingerprint (anonymous) or userId (logged in)

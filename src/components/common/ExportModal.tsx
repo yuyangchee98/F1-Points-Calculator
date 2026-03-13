@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../store';
+import type { RootState } from '../../store';
 import { exportPrediction } from '../../api/export';
 import { formatExportData } from '../../utils/exportFormatter';
 import ExportPreview from './ExportPreview';

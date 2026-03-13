@@ -1,8 +1,8 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { RootState } from '../store';
+import type { RootState } from '../store';
 import { getBrowserFingerprint } from '../utils/fingerprint';
-import { savePrediction, UserIdentifier } from '../api/predictions';
+import { savePrediction, type UserIdentifier } from '../api/predictions';
 import { setFingerprint, setSaveInfo } from '../store/slices/predictionSlice';
 import { useAppDispatch } from '../store';
 import { toastService } from '../components/common/ToastContainer';

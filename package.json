@@ -4,14 +4,19 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --port 5173",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
+    "dev": "astro dev --port 5173",
+    "build": "astro check && astro build",
+    "preview": "astro preview",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
+    "@astrojs/check": "^0.9.7",
+    "@astrojs/react": "^4.2.0",
+    "@astrojs/sitemap": "^3.3.0",
+    "@astrojs/tailwind": "^6.0.2",
     "@reduxjs/toolkit": "^2.2.1",
     "@tanstack/react-virtual": "^3.13.12",
+    "astro": "^5.5.0",
     "better-auth": "^1.4.11",
     "chart.js": "^4.4.1",
     "react": "^18.2.0",
@@ -19,25 +24,20 @@
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.2.0",
-    "react-redux": "^9.1.0",
-    "react-router-dom": "^7.9.6"
+    "react-redux": "^9.1.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.55",
     "@types/react-dom": "^18.2.19",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
-    "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.17",
     "eslint": "^8.57.1",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.5",
     "postcss": "^8.4.35",
-    "terser": "^5.42.0",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5.2.2",
-    "vite": "^5.1.0",
-    "vite-plugin-sitemap": "^0.8.2"
+    "typescript": "^5.9.3"
   }
 }

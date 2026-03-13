@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { ContextMenuItem, ContextMenuPosition } from '../types/contextMenu';
+import type { ContextMenuItem, ContextMenuPosition } from '../types/contextMenu';
 
 interface UseContextMenuReturn {
   isOpen: boolean;

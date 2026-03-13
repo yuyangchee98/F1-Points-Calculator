@@ -1,5 +1,5 @@
 import { API_BASE_URL } from '../utils/constants';
-import { UserIdentifier } from './predictions';
+import type { UserIdentifier } from './predictions';
 
 interface GridEntry {
   raceId: string;

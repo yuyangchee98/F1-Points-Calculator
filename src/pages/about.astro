@@ -1,0 +1,82 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import AboutIsland from '../components/AboutIsland';
+
+const schemaData = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "name": "F1 Points Calculator - About & FAQ",
+  "description": "Frequently asked questions and help guide for the F1 Points Calculator web application.",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How do I use the F1 Points Calculator?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Drag and drop drivers onto the race grid to make predictions. Lock in your predictions and compete against other fans to see who predicts best."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I compete with other users?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes! Lock in your predictions before a race and compare your results with other fans. You can also view public sentiment to see how others are predicting."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I view historical F1 seasons?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes! Use the season selector to view data from previous F1 seasons including 2024, 2023, and 2022."
+      }
+    }
+  ],
+  "author": {
+    "@type": "Person",
+    "name": "Chyuang",
+    "url": "https://chyuang.com"
+  }
+};
+---
+
+<BaseLayout
+  title="About F1 Points Calculator - FAQ & Help Guide"
+  description="Learn how to use the F1 Points Calculator. Find answers to frequently asked questions about predicting race results, competing with others, and championship standings calculation."
+  keywords="F1 calculator help, F1 FAQ, how to use F1 points calculator, F1 predictions guide, Formula 1 calculator instructions"
+  canonicalPath="/about"
+  ogTitle="About F1 Points Calculator - FAQ & Help Guide"
+  ogDescription="Learn how to use the F1 Points Calculator and find answers to frequently asked questions"
+  schemaData={schemaData}
+>
+  <AboutIsland client:only="react" />
+
+  <noscript>
+    <div style="padding: 20px; background: #f3f4f6;">
+      <h1>About F1 Points Calculator</h1>
+      <p>The F1 Points Calculator is an interactive web tool for predicting Formula 1 championship standings.</p>
+
+      <h2>Features:</h2>
+      <ul>
+        <li>Interactive drag-and-drop race predictions</li>
+        <li>Lock predictions and compete against other fans</li>
+        <li>View public sentiment on race outcomes</li>
+        <li>Multiple points systems support</li>
+        <li>Real-time championship standings calculation</li>
+        <li>Historical season data (2022-2024)</li>
+      </ul>
+
+      <p>This application requires JavaScript to run. Please enable JavaScript to use the interactive features.</p>
+
+      <h2>Related F1 Resources:</h2>
+      <ul>
+        <li><a href="https://f1-dash.com/" rel="noopener">F1 Dash - Race Analytics</a></li>
+        <li><a href="https://f1calendar.com/" rel="noopener">F1 Calendar - Race Schedule</a></li>
+        <li><a href="https://github.com/yuyangchee98/F1-Points-Calculator" rel="noopener">View on GitHub</a></li>
+        <li><a href="https://chyuang.com" rel="noopener">Created by Chyuang</a></li>
+        <li><a href="/" rel="noopener">Back to Calculator</a></li>
+      </ul>
+    </div>
+  </noscript>
+</BaseLayout>

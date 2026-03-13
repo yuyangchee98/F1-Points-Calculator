@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
 import { CURRENT_SEASON } from '../../utils/constants';
 
 interface Season {
@@ -16,9 +15,7 @@ const SEASONS: Season[] = [
   { year: 2022, label: '2022 Season', isHistorical: true }
 ];
 
-const SeasonSelector: React.FC = () => {
-  const { year } = useParams<{ year?: string }>();
-  const activeSeason = year ? parseInt(year, 10) : CURRENT_SEASON;
+const SeasonSelector: React.FC<{ activeSeason: number }> = ({ activeSeason }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -64,9 +61,9 @@ const SeasonSelector: React.FC = () => {
         <div className="absolute z-20 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl w-full sm:w-64 left-0 sm:left-auto sm:right-0 min-w-[200px]">
           <div className="py-1">
             {SEASONS.map(season => (
-              <Link
+              <a
                 key={season.year}
-                to={getSeasonUrl(season.year)}
+                href={getSeasonUrl(season.year)}
                 className={`block w-full px-3 py-2 sm:px-4 sm:py-3 text-left hover:bg-gray-50 transition-colors ${
                   season.year === activeSeason ? 'bg-red-50' : ''
                 }`}
@@ -85,7 +82,7 @@ const SeasonSelector: React.FC = () => {
                     )}
                   </div>
                 </div>
-              </Link>
+              </a>
             ))}
           </div>
         </div>

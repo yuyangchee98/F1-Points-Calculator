@@ -1,12 +1,11 @@
 import React, { useEffect, useState, useCallback, useRef, useMemo } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { RootState, useAppDispatch } from '../store';
+import { type RootState, useAppDispatch } from '../store';
 import { MerchGridProvider, useGridContext } from '../contexts/GridContext';
 import { fetchSeasonData } from '../store/slices/seasonDataSlice';
 import { getBrowserFingerprint } from '../utils/fingerprint';
 import { CURRENT_SEASON } from '../utils/constants';
-import { UserIdentifier } from '../api/predictions';
+import type { UserIdentifier } from '../api/predictions';
 import { getMerchPosterPreview, getMockupPreview, createMerchCheckout } from '../api/merch';
 import RaceGrid from '../components/grid/RaceGrid';
 import LazyDndProvider from '../components/common/LazyDndProvider';
@@ -16,8 +15,7 @@ import ToastContainer, { toastService } from '../components/common/ToastContaine
 const POSTER_PRICE = '$24.99';
 
 const MerchInner: React.FC = () => {
-  const [searchParams] = useSearchParams();
-  const status = searchParams.get('status');
+  const status = new URLSearchParams(window.location.search).get('status');
   const season = CURRENT_SEASON;
 
   const { positions } = useGridContext();
@@ -412,15 +410,15 @@ const Merch: React.FC = () => {
       <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Back link */}
         <div className="mb-6">
-          <Link
-            to="/"
+          <a
+            href="/"
             className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium"
           >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
             Back to Calculator
-          </Link>
+          </a>
         </div>
 
         {/* Title */}

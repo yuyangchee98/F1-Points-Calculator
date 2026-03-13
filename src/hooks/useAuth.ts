@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useSession, signIn, signUp, signOut, sendVerificationEmail } from '../lib/auth-client';
-import { RootState, useAppDispatch } from '../store';
+import { type RootState, useAppDispatch } from '../store';
 import { setUser, setLoading, openAuthModal, closeAuthModal, logout } from '../store/slices/authSlice';
 import { API_BASE_URL } from '../utils/constants';
 

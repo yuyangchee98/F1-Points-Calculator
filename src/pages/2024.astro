@@ -1,0 +1,96 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import AppIsland from '../components/AppIsland';
+
+const schemaData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "F1 Points Calculator 2024 - Championship Predictor",
+  "description": "F1 championship calculator and standings predictor. Simulate Formula 1 race results and calculate driver points for the 2024 season.",
+  "applicationCategory": "Sports Calculator",
+  "operatingSystem": "Web Browser",
+  "author": {
+    "@type": "Person",
+    "name": "Chyuang",
+    "url": "https://chyuang.com"
+  }
+};
+---
+
+<BaseLayout
+  title="F1 Points Calculator 2024 - Championship Predictor"
+  description="F1 points calculator for 2024. Predict Formula 1 race results, calculate driver points, and simulate championship standings with our interactive drag-and-drop tool."
+  keywords="F1, Formula 1, 2024 season, points calculator, championship predictor, race simulator, F1 standings, predictions"
+  canonicalPath="/2024"
+  ogTitle="F1 Points Calculator 2024 - Championship Predictor"
+  ogDescription="Predict F1 race results and championship standings with our interactive calculator"
+  schemaData={schemaData}
+  initialYear={2024}
+>
+  <AppIsland year="2024" client:only="react" />
+
+  <noscript>
+    <div style="padding: 20px; max-width: 900px; margin: 0 auto; font-family: system-ui, sans-serif; line-height: 1.6;">
+      <h1 style="color: #dc2626;">F1 Points Calculator - 2024 Season</h1>
+
+      <p>Simulate and predict the 2024 Formula 1 World Championship standings.
+      Use our drag-and-drop calculator to place drivers in finishing positions and watch
+      the championship table update in real-time.</p>
+
+      <h2>2024 F1 Season Highlights</h2>
+      <ul>
+        <li>24 races across 21 countries</li>
+        <li>6 Sprint race weekends</li>
+        <li>Official F1 points system (25-18-15-12-10-8-6-4-2-1)</li>
+      </ul>
+
+      <h2>Other Seasons</h2>
+      <ul>
+        <li><a href="/">Current Season Calculator</a></li>
+        <li><a href="/2023">2023 F1 Season</a></li>
+        <li><a href="/2022">2022 F1 Season</a></li>
+      </ul>
+
+      <h2>2024 Race Calendar</h2>
+      <ul>
+        <li><a href="/race/2024/bahrain">Bahrain GP</a></li>
+        <li><a href="/race/2024/saudi-arabian">Saudi Arabian GP</a></li>
+        <li><a href="/race/2024/australian">Australian GP</a></li>
+        <li><a href="/race/2024/japanese">Japanese GP</a></li>
+        <li><a href="/race/2024/chinese-sprint">Chinese GP Sprint</a></li>
+        <li><a href="/race/2024/chinese">Chinese GP</a></li>
+        <li><a href="/race/2024/miami-sprint">Miami GP Sprint</a></li>
+        <li><a href="/race/2024/miami">Miami GP</a></li>
+        <li><a href="/race/2024/emilia-romagna">Emilia Romagna GP</a></li>
+        <li><a href="/race/2024/monaco">Monaco GP</a></li>
+        <li><a href="/race/2024/canadian">Canadian GP</a></li>
+        <li><a href="/race/2024/spanish">Spanish GP</a></li>
+        <li><a href="/race/2024/austrian-sprint">Austrian GP Sprint</a></li>
+        <li><a href="/race/2024/austrian">Austrian GP</a></li>
+        <li><a href="/race/2024/british">British GP</a></li>
+        <li><a href="/race/2024/hungarian">Hungarian GP</a></li>
+        <li><a href="/race/2024/belgian">Belgian GP</a></li>
+        <li><a href="/race/2024/dutch">Dutch GP</a></li>
+        <li><a href="/race/2024/italian">Italian GP</a></li>
+        <li><a href="/race/2024/azerbaijan">Azerbaijan GP</a></li>
+        <li><a href="/race/2024/singapore">Singapore GP</a></li>
+        <li><a href="/race/2024/united-states-sprint">United States GP Sprint</a></li>
+        <li><a href="/race/2024/united-states">United States GP</a></li>
+        <li><a href="/race/2024/mexico-city">Mexico City GP</a></li>
+        <li><a href="/race/2024/são-paulo-sprint">São Paulo GP Sprint</a></li>
+        <li><a href="/race/2024/são-paulo">São Paulo GP</a></li>
+        <li><a href="/race/2024/las-vegas">Las Vegas GP</a></li>
+        <li><a href="/race/2024/qatar-sprint">Qatar GP Sprint</a></li>
+        <li><a href="/race/2024/qatar">Qatar GP</a></li>
+        <li><a href="/race/2024/abu-dhabi">Abu Dhabi GP</a></li>
+      </ul>
+
+      <p><a href="/about">FAQ & Help Guide</a></p>
+
+      <p style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666;">
+        Created by <a href="https://chyuang.com">Chyuang</a> |
+        <a href="https://github.com/yuyangchee98/F1-Points-Calculator">View on GitHub</a>
+      </p>
+    </div>
+  </noscript>
+</BaseLayout>

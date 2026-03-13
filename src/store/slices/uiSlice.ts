@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { UiState, StandingsTab, MobileView } from '../../types';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { UiState, StandingsTab, MobileView } from '../../types';
 import { DEFAULT_POINTS_SYSTEM } from '../../data/pointsSystems';
 
 const initialState: UiState = {

@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import IntroductionSection from '../components/common/IntroductionSection';
 import FAQ from '../components/common/FAQ';
 
@@ -8,8 +7,8 @@ const About: React.FC = () => {
     <div className="min-h-screen bg-gray-100 py-6">
       <div className="max-w-5xl mx-auto px-4">
         <div className="mb-6">
-          <Link
-            to="/"
+          <a
+            href="/"
             className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium"
           >
             <svg
@@ -26,7 +25,7 @@ const About: React.FC = () => {
               />
             </svg>
             Back to Calculator
-          </Link>
+          </a>
         </div>
 
         <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-6 flex items-center flex-wrap">

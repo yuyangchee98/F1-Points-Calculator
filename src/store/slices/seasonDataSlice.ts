@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { Driver, Team, Race, RaceResult } from '../../types';
+import type { Driver, Team, Race, RaceResult } from '../../types';
 import { API_BASE_URL, CURRENT_SEASON, COUNTRY_CODE_MAP } from '../../utils/constants';
 
 export interface SeasonDataState {

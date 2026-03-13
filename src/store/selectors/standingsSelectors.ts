@@ -1,6 +1,6 @@
 import { createSelector } from '@reduxjs/toolkit';
-import { RootState } from '../index';
-import { DriverStanding, TeamStanding, PointsHistory, TeamPointsHistory } from '../../types';
+import type { RootState } from '../index';
+import type { DriverStanding, TeamStanding, PointsHistory, TeamPointsHistory } from '../../types';
 import { getPointsForPositionWithSystem } from '../../data/pointsSystems';
 import { getSprintPoints, getFastestLapPoints } from '../../data/seasonRules';
 import { getActiveSeason } from '../../utils/constants';

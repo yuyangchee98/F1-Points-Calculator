@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ExportData } from '../../utils/exportFormatter';
+import type { ExportData } from '../../utils/exportFormatter';
 
 interface ExportPreviewProps {
   data: ExportData;
