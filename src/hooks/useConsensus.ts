@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { getConsensus, ConsensusData } from '../api/predictions';
+import { getConsensus, type ConsensusData } from '../api/predictions';
 import { getActiveSeason } from '../utils/constants';
 
 // Global cache for consensus data per race

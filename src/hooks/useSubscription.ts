@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { checkAccessStatus, AccessTier } from '../api/subscription';
+import { checkAccessStatus, type AccessTier } from '../api/subscription';
 import { useUserEmail } from './useUserEmail';
 import { updateUserProperties } from '../utils/analytics';
 

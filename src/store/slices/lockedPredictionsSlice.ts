@@ -1,8 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import {
-  LockedPrediction,
-  LockedPosition,
-  UserIdentifier,
+  type LockedPrediction,
+  type LockedPosition,
+  type UserIdentifier,
   getLockedPredictions,
   lockPrediction as lockPredictionApi,
   unlockPrediction as unlockPredictionApi,

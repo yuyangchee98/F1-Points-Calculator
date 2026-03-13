@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../store';
+import type { RootState } from '../../store';
 import { selectDriver } from '../../store/slices/uiSlice';
 import DriverCard from './DriverCard';
 import { useAppDispatch } from '../../store';

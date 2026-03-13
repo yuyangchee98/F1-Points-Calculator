@@ -1,5 +1,5 @@
 import { createSelector } from '@reduxjs/toolkit';
-import { RootState } from '../index';
+import type { RootState } from '../index';
 
 export const selectLockedPredictions = (state: RootState) =>
   state.lockedPredictions.lockedPredictions;

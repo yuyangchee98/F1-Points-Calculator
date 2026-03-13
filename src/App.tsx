@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Link, useParams } from 'react-router-dom';
 import LazyDndProvider from './components/common/LazyDndProvider';
 import { initializeUiState, setMobileView, toggleOfficialResults as toggleOfficialResultsUI } from './store/slices/uiSlice';
-import { RootState } from './store';
+import type { RootState } from './store';
 import { moveDriver, resetGrid, toggleOfficialResults } from './store/slices/gridSlice';
 import { fetchLockedPredictions } from './store/slices/lockedPredictionsSlice';
-import { loadPrediction, UserIdentifier } from './api/predictions';
+import { loadPrediction, type UserIdentifier } from './api/predictions';
 import useRaceResults from './hooks/useRaceResults';
 import { useAutoSave } from './hooks/useAutoSave';
 import { useDayAccess } from './hooks/useSubscription';
@@ -33,9 +32,8 @@ import { openCustomerPortal } from './api/subscription';
 import { CURRENT_SEASON } from './utils/constants';
 
 
-const App: React.FC = () => {
+const App: React.FC<{ year?: string }> = ({ year }) => {
   const dispatch = useAppDispatch();
-  const { year } = useParams<{ year?: string }>();
 
   const activeSeason = year ? parseInt(year, 10) : CURRENT_SEASON;
 
@@ -222,28 +220,28 @@ const App: React.FC = () => {
                 {/* Action Row */}
                 <div className="flex flex-wrap items-center gap-2">
                   {/* App Controls - Left Group */}
-                  <SeasonSelector />
+                  <SeasonSelector activeSeason={activeSeason} />
 
-                  <Link
-                    to="/about"
+                  <a
+                    href="/about"
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md transition-colors duration-200"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <span className="hidden sm:inline">About</span>
-                  </Link>
+                  </a>
 
                   {/* Merch button hidden until ready
-                  <Link
-                    to="/merch"
+                  <a
+                    href="/merch"
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-md shadow-sm hover:shadow transition-all duration-200"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                     <span className="hidden sm:inline">Poster</span>
-                  </Link>
+                  </a>
                   */}
 
                   <a

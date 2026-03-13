@@ -2,7 +2,7 @@ export const CURRENT_SEASON = 2026;
 
 export const getActiveSeason = () => window.INITIAL_YEAR || CURRENT_SEASON;
 
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+export const API_BASE_URL = import.meta.env.PUBLIC_API_BASE_URL;
 
 const SEASON_DRIVER_COUNT: { [key: number]: number } = {
   2026: 22,

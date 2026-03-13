@@ -1,0 +1,67 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import AppIsland from '../components/AppIsland';
+
+export function getStaticPaths() {
+  // Generate paths for years that don't have dedicated pages (2022-2024 have their own)
+  return [
+    { params: { year: '2025' } },
+    { params: { year: '2026' } },
+  ];
+}
+
+const { year } = Astro.params;
+const yearNum = parseInt(year!, 10);
+
+const schemaData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": `F1 Points Calculator ${year} - Championship Predictor`,
+  "description": `F1 championship calculator and standings predictor. Simulate Formula 1 race results and calculate driver points for the ${year} season.`,
+  "applicationCategory": "Sports Calculator",
+  "operatingSystem": "Web Browser",
+  "author": {
+    "@type": "Person",
+    "name": "Chyuang",
+    "url": "https://chyuang.com"
+  }
+};
+---
+
+<BaseLayout
+  title={`F1 Points Calculator ${year} - Championship Predictor`}
+  description={`F1 points calculator for ${year}. Predict Formula 1 race results, calculate driver points, and simulate championship standings with our interactive drag-and-drop tool.`}
+  keywords={`F1, Formula 1, ${year} season, points calculator, championship predictor, race simulator, F1 standings, predictions`}
+  canonicalPath={`/${year}`}
+  ogTitle={`F1 Points Calculator ${year} - Championship Predictor`}
+  ogDescription="Predict F1 race results and championship standings with our interactive calculator"
+  schemaData={schemaData}
+  initialYear={yearNum}
+>
+  <AppIsland year={year} client:only="react" />
+
+  <noscript>
+    <div style="padding: 20px; max-width: 900px; margin: 0 auto; font-family: system-ui, sans-serif; line-height: 1.6;">
+      <h1 style="color: #dc2626;">F1 Points Calculator - {year} Season</h1>
+
+      <p>Simulate and predict the {year} Formula 1 World Championship standings.
+      Use our drag-and-drop calculator to place drivers in finishing positions and watch
+      the championship table update in real-time.</p>
+
+      <h2>Other Seasons</h2>
+      <ul>
+        <li><a href="/">Current Season Calculator</a></li>
+        <li><a href="/2024">2024 F1 Season</a></li>
+        <li><a href="/2023">2023 F1 Season</a></li>
+        <li><a href="/2022">2022 F1 Season</a></li>
+      </ul>
+
+      <p><a href="/about">FAQ & Help Guide</a></p>
+
+      <p style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666;">
+        Created by <a href="https://chyuang.com">Chyuang</a> |
+        <a href="https://github.com/yuyangchee98/F1-Points-Calculator">View on GitHub</a>
+      </p>
+    </div>
+  </noscript>
+</BaseLayout>

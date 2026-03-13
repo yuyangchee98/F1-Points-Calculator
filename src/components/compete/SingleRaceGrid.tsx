@@ -1,5 +1,5 @@
 import React from 'react';
-import { Race } from '../../types';
+import type { Race } from '../../types';
 import RaceColumn from '../grid/RaceColumn';
 import { getGridPositions, CURRENT_SEASON } from '../../utils/constants';
 

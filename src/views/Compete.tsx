@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
-import { RootState, useAppDispatch } from '../store';
+import { type RootState, useAppDispatch } from '../store';
 import { CompeteGridProvider } from '../contexts/GridContext';
 import { openAuthModal } from '../store/slices/authSlice';
 import { fetchLockedPredictions } from '../store/slices/lockedPredictionsSlice';
@@ -20,13 +19,13 @@ import { useAuth } from '../hooks/useAuth';
 import { useCountdown } from '../hooks/useCountdown';
 import useRaceResults from '../hooks/useRaceResults';
 import { CURRENT_SEASON, getGridPositions } from '../utils/constants';
-import { Race } from '../types';
+import type { Race } from '../types';
 import LazyDndProvider from '../components/common/LazyDndProvider';
 import DriverCard from '../components/drivers/DriverCard';
 import SingleRaceGrid from '../components/compete/SingleRaceGrid';
 import LockConfirmationModal from '../components/predictions/LockConfirmationModal';
 import ToastContainer from '../components/common/ToastContainer';
-import { getLeaderboard, LeaderboardEntry, PendingEntry } from '../api/leaderboard';
+import { getLeaderboard, type LeaderboardEntry, type PendingEntry } from '../api/leaderboard';
 import AuthModal from '../components/auth/AuthModal';
 import { selectDriver } from '../store/slices/uiSlice';
 import { selectTeamsByIdMap, getDriverLastName } from '../store/selectors/dataSelectors';
@@ -232,19 +231,19 @@ const Compete: React.FC = () => {
         {/* Header */}
         <header className="bg-white border-b border-gray-200">
           <div className="mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-2">
+            <a href="/" className="flex items-center gap-2">
               <span className="bg-red-600 text-white text-sm font-bold px-2 py-1 rounded">F1</span>
               <span className="text-lg font-semibold text-gray-900">Compete</span>
-            </Link>
-            <Link
-              to="/"
+            </a>
+            <a
+              href="/"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 transition-colors"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
               Sandbox
-            </Link>
+            </a>
           </div>
         </header>
 

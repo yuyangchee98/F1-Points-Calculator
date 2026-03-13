@@ -1,8 +1,8 @@
 import { useCallback, useRef } from 'react';
 import { useDrop, useDrag } from 'react-dnd';
 import { useSelector } from 'react-redux';
-import { RootState } from '../store';
-import { DriverDragItem, ItemTypes } from '../types/dragTypes';
+import type { RootState } from '../store';
+import { type DriverDragItem, ItemTypes } from '../types/dragTypes';
 import { useGridContext } from '../contexts/GridContext';
 import { toastService } from '../components/common/ToastContainer';
 import { selectDriversByIdMap, selectTeamsByIdMap } from '../store/selectors/dataSelectors';

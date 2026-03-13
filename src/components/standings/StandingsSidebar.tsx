@@ -1,6 +1,6 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../store';
+import type { RootState } from '../../store';
 import { selectDriverStandings, selectTeamStandings } from '../../store/selectors/resultsSelectors';
 import { setActiveTab } from '../../store/slices/uiSlice';
 import DriverStandingsTable from './DriverStandingsTable';

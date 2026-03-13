@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ContextMenuItem, ContextMenuPosition } from '../../types/contextMenu';
+import type { ContextMenuItem, ContextMenuPosition } from '../../types/contextMenu';
 
 interface ContextMenuProps {
   isOpen: boolean;

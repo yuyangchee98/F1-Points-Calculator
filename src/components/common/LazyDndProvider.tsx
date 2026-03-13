@@ -1,4 +1,4 @@
-import React, { useEffect, useState, ReactNode } from 'react';
+import React, { useEffect, useState, type ReactNode } from 'react';
 import type { DndProvider as DndProviderType } from 'react-dnd';
 import type { BackendFactory } from 'dnd-core';
 

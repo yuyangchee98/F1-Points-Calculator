@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { createCheckoutSession, openCustomerPortal, AccessTier } from '../../api/subscription';
+import { createCheckoutSession, openCustomerPortal, type AccessTier } from '../../api/subscription';
 import { trackSubscriptionAction } from '../../utils/analytics';
 
 interface SubscriptionModalProps {

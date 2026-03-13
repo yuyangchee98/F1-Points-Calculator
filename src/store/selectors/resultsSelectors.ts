@@ -1,6 +1,6 @@
 import { createSelector } from '@reduxjs/toolkit';
-import { RootState } from '../index';
-import { DriverStanding, TeamStanding } from '../../types';
+import type { RootState } from '../index';
+import type { DriverStanding, TeamStanding } from '../../types';
 import { selectRaces } from './dataSelectors';
 
 export {

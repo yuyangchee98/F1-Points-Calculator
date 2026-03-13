@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { RootState, useAppDispatch } from '../../store';
-import { Race } from '../../types';
+import { type RootState, useAppDispatch } from '../../store';
+import type { Race } from '../../types';
 import { selectDriversByIdMap, selectTeamsByIdMap } from '../../store/selectors/dataSelectors';
 import { lockPrediction, clearLockError } from '../../store/slices/lockedPredictionsSlice';
 import { useCountdown, formatRaceDate } from '../../hooks/useCountdown';
-import { LockedPosition, UserIdentifier } from '../../api/predictions';
+import type { LockedPosition, UserIdentifier } from '../../api/predictions';
 import { getActiveSeason } from '../../utils/constants';
 import { useGridContext } from '../../contexts/GridContext';
 

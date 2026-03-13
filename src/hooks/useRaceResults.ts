@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { toggleOfficialResults } from '../store/slices/gridSlice';
 import { fetchSeasonData } from '../store/slices/seasonDataSlice';
-import { RootState } from '../store';
+import type { RootState } from '../store';
 import { useAppDispatch } from '../store';
 
 export const useRaceResults = (season: number) => {

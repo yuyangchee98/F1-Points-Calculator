@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 
 const CompetitionCard: React.FC = () => {
@@ -29,12 +28,12 @@ const CompetitionCard: React.FC = () => {
           Lock predictions before races, get scored on accuracy, and climb the leaderboard.
         </p>
 
-        <Link
-          to="/compete"
+        <a
+          href="/compete"
           className="block w-full text-center bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
         >
           {isAuthenticated ? 'Go to Compete' : 'Sign in to compete'}
-        </Link>
+        </a>
       </div>
     </div>
   );

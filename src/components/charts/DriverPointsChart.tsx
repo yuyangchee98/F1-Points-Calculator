@@ -10,10 +10,10 @@ import {
   Title,
   Tooltip,
   Legend,
-  ChartDataset,
-  TooltipItem
+  type ChartDataset,
+  type TooltipItem
 } from 'chart.js';
-import { RootState } from '../../store';
+import type { RootState } from '../../store';
 
 import { selectDriverPointsForCharts, selectTopDrivers } from '../../store/selectors/resultsSelectors';
 import { selectDriversByIdMap, getDriverLastName, selectTeamsByIdMap } from '../../store/selectors/dataSelectors';

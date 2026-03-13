@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useMemo, useReducer, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { RootState, useAppDispatch } from '../store';
-import { GridPosition, Race } from '../types';
+import { type RootState, useAppDispatch } from '../store';
+import type { GridPosition, Race } from '../types';
 import { gridSlice,
   moveDriver as sandboxMoveDriver,
   placeDriver as sandboxPlaceDriver,

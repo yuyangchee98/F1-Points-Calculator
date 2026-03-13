@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { GridState, GridPosition, Race } from '../../types';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { GridState, GridPosition, Race } from '../../types';
 import { fetchSeasonData } from './seasonDataSlice';
 import { getActiveSeason, getGridPositions } from '../../utils/constants';
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../store';
-import { MobileView } from '../../types';
+import type { RootState } from '../../store';
+import type { MobileView } from '../../types';
 import { setMobileView } from '../../store/slices/uiSlice';
 import { useAppDispatch } from '../../store';
 

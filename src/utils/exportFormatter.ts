@@ -1,5 +1,5 @@
-import { SeasonDataState } from '../store/slices/seasonDataSlice';
-import { GridState, DriverStanding, TeamStanding, PointsHistory, GridPosition } from '../types';
+import type { SeasonDataState } from '../store/slices/seasonDataSlice';
+import type { GridState, DriverStanding, TeamStanding, PointsHistory, GridPosition } from '../types';
 
 // Custom type for export data input - accepts computed results
 export interface ExportStateInput {
