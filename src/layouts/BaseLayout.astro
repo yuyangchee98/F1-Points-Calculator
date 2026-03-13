@@ -74,6 +74,42 @@ const ogImage = `${siteUrl}/og-image.jpg`;
   <body class="bg-gray-100">
     <slot />
 
+    <!-- Static footer for crawlers — hidden once React renders its own footer -->
+    <footer id="static-footer" class="bg-gray-900 text-white py-8 pb-24 sm:pb-8">
+      <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between space-y-6 sm:space-y-0">
+        <div>
+          <h3 class="text-lg font-medium mb-3">F1 Points Calculator</h3>
+          <p class="text-sm text-gray-400 mb-2">Created by <a href="https://chyuang.com" class="text-gray-300 hover:text-white" target="_blank" rel="noopener noreferrer">Chyuang</a></p>
+          <p class="text-sm text-gray-400 mb-2"><a href="https://github.com/yuyangchee98/F1-Points-Calculator" class="text-gray-300 hover:text-white" target="_blank" rel="noopener noreferrer">Open source on GitHub</a></p>
+          <p class="text-sm text-gray-400 mb-2"><a href="mailto:f1pointscalculator@chyuang.com" class="text-gray-300 hover:text-white">Email me for any issues</a></p>
+        </div>
+        <div>
+          <h3 class="text-lg font-medium mb-3">Seasons</h3>
+          <ul class="text-sm text-gray-400 space-y-1">
+            <li><a href="/" class="text-gray-300 hover:text-white">2026 Season</a></li>
+            <li><a href="/2025" class="text-gray-300 hover:text-white">2025 Season</a></li>
+            <li><a href="/2024" class="text-gray-300 hover:text-white">2024 Season</a></li>
+            <li><a href="/2023" class="text-gray-300 hover:text-white">2023 Season</a></li>
+            <li><a href="/2022" class="text-gray-300 hover:text-white">2022 Season</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-lg font-medium mb-3">F1 Resources</h3>
+          <ul class="text-sm text-gray-400 space-y-1">
+            <li><a href="https://f1-dash.com/" class="text-gray-300 hover:text-white" target="_blank" rel="noopener noreferrer">F1 Dash</a></li>
+            <li><a href="https://f1calendar.com/" class="text-gray-300 hover:text-white" target="_blank" rel="noopener noreferrer">F1 Calendar</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-lg font-medium mb-3">Other Projects</h3>
+          <ul class="text-sm text-gray-400 space-y-1">
+            <li><a href="https://drawlineracing.chyuang.com/" class="text-gray-300 hover:text-white" target="_blank" rel="noopener noreferrer">Draw Line Racing</a></li>
+          </ul>
+        </div>
+      </div>
+    </footer>
+    <script is:inline>document.getElementById('static-footer').style.display='none';</script>
+
     <!-- Google Analytics - Deferred to not block rendering -->
     <script is:inline>
       window.addEventListener('load', function() {
