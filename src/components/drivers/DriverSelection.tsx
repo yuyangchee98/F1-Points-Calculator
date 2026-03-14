@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../store';
 import { selectDriver } from '../../store/slices/uiSlice';
@@ -8,22 +8,14 @@ import useWindowSize from '../../hooks/useWindowSize';
 import { GA_EVENTS, trackEvent } from '../../utils/analytics';
 import { getDriverLastName } from '../../store/selectors/dataSelectors';
 
-interface DriverSelectionProps {
-  forceExpanded?: boolean;
-}
-
-const DriverSelection: React.FC<DriverSelectionProps> = ({ forceExpanded = false }) => {
+const DriverSelection: React.FC = () => {
   const dispatch = useAppDispatch();
   const allDrivers = useSelector((state: RootState) => state.seasonData.drivers);
   const selectedDriverId = useSelector((state: RootState) => state.ui.selectedDriver);
-  const [isExpanded, setIsExpanded] = useState(forceExpanded);
+  const [isExpanded, setIsExpanded] = useState(false);
   const { isMobile } = useWindowSize();
 
   const drivers = allDrivers;
-
-  useEffect(() => {
-    setIsExpanded(forceExpanded);
-  }, [forceExpanded]);
 
   const handleDriverClick = (driverId: string) => {
     if (selectedDriverId === driverId) {
@@ -77,7 +69,7 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({ forceExpanded = false
           grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 
           ${isExpanded ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0 sm:max-h-[800px] sm:opacity-100'}
           overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out
-          ${forceExpanded ? 'overflow-y-auto pb-20' : 'sm:overflow-visible sm:max-h-full'} 
+          sm:overflow-visible sm:max-h-full
           p-4 bg-gray-50 rounded-lg shadow-sm border border-gray-200
         `}
       >

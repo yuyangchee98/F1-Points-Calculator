@@ -2,7 +2,7 @@ import { createSelector } from '@reduxjs/toolkit';
 import type { RootState } from '../index';
 import type { Driver, Team } from '../../types';
 
-export const selectDrivers = (state: RootState): Driver[] => state.seasonData.drivers;
+const selectDrivers = (state: RootState): Driver[] => state.seasonData.drivers;
 
 export const selectDriversByIdMap = createSelector(
   [selectDrivers],
@@ -29,7 +29,7 @@ const getDisplayName = (name: string): string => {
   return name.replace(/\s*F1\s+Team\s*$/i, '').trim();
 };
 
-export const selectTeams = (state: RootState): Team[] => state.seasonData.teams;
+const selectTeams = (state: RootState): Team[] => state.seasonData.teams;
 
 export const selectTeamsByIdMap = createSelector(
   [selectTeams],
@@ -45,8 +45,4 @@ export const selectTeamsByIdMap = createSelector(
   }
 );
 
-export const selectGridPositions = (state: RootState) => state.grid.positions;
-
 export const selectRaces = (state: RootState) => state.seasonData.races;
-
-export const selectPastResults = (state: RootState) => state.seasonData.pastResults;

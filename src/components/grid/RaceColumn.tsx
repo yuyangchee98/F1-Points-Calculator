@@ -22,10 +22,9 @@ interface RaceColumnProps {
   race: Race;
   position: number;
   style?: React.CSSProperties;
-  className?: string;
 }
 
-const RaceColumn: React.FC<RaceColumnProps> = ({ race, position, style, className }) => {
+const RaceColumn: React.FC<RaceColumnProps> = ({ race, position, style }) => {
   const dispatch = useAppDispatch();
   const {
     positions,
@@ -280,7 +279,6 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position, style, classNam
     isOver ? 'drag-over' : '',
     canDrop ? 'can-drop' : '',
     selectedDriverId ? 'cursor-pointer' : '',
-    className || '',
   ].filter(Boolean).join(' ');
 
   const hasFastestLap = gridPosition?.hasFastestLap || false;
