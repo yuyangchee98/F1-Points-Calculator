@@ -25,9 +25,6 @@ export const predictionSlice = createSlice({
     setFingerprint: (state, action: PayloadAction<string>) => {
       state.fingerprint = action.payload;
     },
-    setSaveStatus: (state, action: PayloadAction<SaveStatus>) => {
-      state.saveStatus = action.payload;
-    },
     setSaveInfo: (state, action: PayloadAction<{ timestamp: string; version: number }>) => {
       state.lastSaveTimestamp = action.payload.timestamp;
       state.lastSaveVersion = action.payload.version;
@@ -43,5 +40,5 @@ export const predictionSlice = createSlice({
   },
 });
 
-export const { setFingerprint, setSaveStatus, setSaveInfo, markDirty } = predictionSlice.actions;
+export const { setFingerprint, setSaveInfo, markDirty } = predictionSlice.actions;
 export default predictionSlice.reducer;
