@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* cache bust */
 
 /* Hide scrollbar but keep scroll functionality */
 .scrollbar-hide {
