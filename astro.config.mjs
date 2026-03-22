@@ -50,24 +50,6 @@ export default defineConfig({
   vite: {
     build: {
       chunkSizeWarningLimit: 500,
-      rollupOptions: {
-        output: {
-          manualChunks: (id) => {
-            if (id.includes('chart.js') || id.includes('react-chartjs-2')) {
-              return undefined;
-            }
-            if (id.includes('react-dnd') || id.includes('dnd-core')) {
-              return 'dnd';
-            }
-            if (id.includes('react')) {
-              return 'react-vendor';
-            }
-            if (id.includes('@reduxjs/toolkit') || id.includes('redux')) {
-              return 'redux';
-            }
-          },
-        },
-      },
     },
     server: {
       proxy: {
