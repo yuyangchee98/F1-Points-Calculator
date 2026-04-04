@@ -61,10 +61,6 @@ export default defineConfig({
           target: 'http://localhost:52313',
           changeOrigin: true,
         },
-        '/race': {
-          target: 'http://localhost:52313',
-          changeOrigin: true,
-        },
       },
     },
   },

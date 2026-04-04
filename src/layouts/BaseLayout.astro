@@ -8,8 +8,10 @@ interface Props {
   canonicalPath: string;
   ogTitle?: string;
   ogDescription?: string;
+  ogType?: string;
   schemaData?: object;
   initialYear?: number;
+  hideFooterScript?: boolean;
 }
 
 const {
@@ -19,8 +21,10 @@ const {
   canonicalPath,
   ogTitle,
   ogDescription,
+  ogType = 'website',
   schemaData,
   initialYear,
+  hideFooterScript = false,
 } = Astro.props;
 
 const siteUrl = 'https://f1pointscalculator.chyuang.com';
@@ -41,7 +45,7 @@ const ogImage = `${siteUrl}/og-image.jpg`;
     <link rel="canonical" href={canonicalUrl} />
 
     <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:title" content={ogTitleFinal} />
     <meta property="og:description" content={ogDescFinal} />
@@ -108,7 +112,7 @@ const ogImage = `${siteUrl}/og-image.jpg`;
         </div>
       </div>
     </footer>
-    <script is:inline>document.getElementById('static-footer').style.display='none';</script>
+    {!hideFooterScript && <script is:inline>document.getElementById('static-footer').style.display='none';</script>}
 
     <!-- Google Analytics - Deferred to not block rendering -->
     <script is:inline>
