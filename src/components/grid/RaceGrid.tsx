@@ -167,18 +167,8 @@ const RaceGrid: React.FC<RaceGridProps> = ({
                 const isLocked = !!lockedPrediction;
                 const hasScore = lockedPrediction?.score !== undefined;
 
-                return (
-                  <div
-                    key={race.id}
-                    className={`race-header ${race.isSprint ? 'sprint' : ''} ${race.completed ? 'completed-race-header' : ''}`}
-                    style={{
-                      position: 'absolute',
-                      left: virtualColumn.start,
-                      top: 0,
-                      width: columnWidth - GAP,
-                      height: HEADER_HEIGHT,
-                    }}
-                  >
+                const headerContent = (
+                  <>
                     {race.countryCode && (
                       <img
                         src={`/flags/${race.countryCode}.webp`}
@@ -210,6 +200,39 @@ const RaceGrid: React.FC<RaceGridProps> = ({
                     ) : race.completed ? (
                       <span className="completed-indicator" title="Completed Race">✓</span>
                     ) : null}
+                  </>
+                );
+
+                const headerStyle = {
+                  position: 'absolute' as const,
+                  left: virtualColumn.start,
+                  top: 0,
+                  width: columnWidth - GAP,
+                  height: HEADER_HEIGHT,
+                };
+
+                const headerClassName = `race-header ${race.isSprint ? 'sprint' : ''} ${race.completed ? 'completed-race-header' : ''}`;
+
+                const season = getActiveSeason();
+                const hasRacePage = race.completed && season >= 2022 && season <= 2024;
+
+                return hasRacePage ? (
+                  <a
+                    key={race.id}
+                    href={`/race/${season}/${race.id}`}
+                    className={headerClassName}
+                    style={headerStyle}
+                    title="View race results"
+                  >
+                    {headerContent}
+                  </a>
+                ) : (
+                  <div
+                    key={race.id}
+                    className={headerClassName}
+                    style={headerStyle}
+                  >
+                    {headerContent}
                   </div>
                 );
               })}
