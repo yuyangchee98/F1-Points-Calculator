@@ -1,6 +1,25 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import AppIsland from '../components/AppIsland';
+import type { RaceResult } from '../types';
+import { type RaceScheduleItem } from '../lib/race-utils';
+
+const API_BASE = 'https://f1-points-calculator-api.yuyangchee98.workers.dev';
+
+let raceRows: RaceScheduleItem[] = [];
+try {
+  const res = await fetch(`${API_BASE}/api/init?year=2022`);
+  if (res.ok) {
+    const data = await res.json() as {
+      schedule: RaceScheduleItem[];
+      raceResults: Record<string, RaceResult[]>;
+    };
+    raceRows = data.schedule.filter(race => {
+      const results = data.raceResults?.[race.id];
+      return results && results.length > 0;
+    });
+  }
+} catch {}
 
 const schemaData = {
   "@context": "https://schema.org",
@@ -49,35 +68,6 @@ const schemaData = {
       <li><a href="/2023">2023 F1 Season</a></li>
     </ul>
 
-    <h2>2022 Race Results</h2>
-    <ul>
-      <li><a href="/race/2022/bahrain">Bahrain GP</a></li>
-      <li><a href="/race/2022/saudi-arabian">Saudi Arabian GP</a></li>
-      <li><a href="/race/2022/australian">Australian GP</a></li>
-      <li><a href="/race/2022/emilia-romagna-sprint">Emilia Romagna GP Sprint</a></li>
-      <li><a href="/race/2022/emilia-romagna">Emilia Romagna GP</a></li>
-      <li><a href="/race/2022/miami">Miami GP</a></li>
-      <li><a href="/race/2022/spanish">Spanish GP</a></li>
-      <li><a href="/race/2022/monaco">Monaco GP</a></li>
-      <li><a href="/race/2022/azerbaijan">Azerbaijan GP</a></li>
-      <li><a href="/race/2022/canadian">Canadian GP</a></li>
-      <li><a href="/race/2022/british">British GP</a></li>
-      <li><a href="/race/2022/austrian-sprint">Austrian GP Sprint</a></li>
-      <li><a href="/race/2022/austrian">Austrian GP</a></li>
-      <li><a href="/race/2022/french">French GP</a></li>
-      <li><a href="/race/2022/hungarian">Hungarian GP</a></li>
-      <li><a href="/race/2022/belgian">Belgian GP</a></li>
-      <li><a href="/race/2022/dutch">Dutch GP</a></li>
-      <li><a href="/race/2022/italian">Italian GP</a></li>
-      <li><a href="/race/2022/singapore">Singapore GP</a></li>
-      <li><a href="/race/2022/japanese">Japanese GP</a></li>
-      <li><a href="/race/2022/united-states">United States GP</a></li>
-      <li><a href="/race/2022/mexico-city">Mexico City GP</a></li>
-      <li><a href="/race/2022/são-paulo-sprint">São Paulo GP Sprint</a></li>
-      <li><a href="/race/2022/são-paulo">São Paulo GP</a></li>
-      <li><a href="/race/2022/abu-dhabi">Abu Dhabi GP</a></li>
-    </ul>
-
     <p><a href="/about">FAQ & Help Guide</a></p>
 
     <p style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666;">
@@ -85,6 +75,23 @@ const schemaData = {
       <a href="https://github.com/yuyangchee98/F1-Points-Calculator">View on GitHub</a>
     </p>
   </div>
+
+  {raceRows.length > 0 && (
+    <nav class="mx-auto px-4 pt-3 pb-1" aria-label="2022 Race Results">
+      <div class="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-2">
+        <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap shrink-0">2022 Results</span>
+        {raceRows.map(race => (
+          <a
+            href={`/race/2022/${race.id}`}
+            class="inline-block text-xs px-2.5 py-1 rounded-full whitespace-nowrap shrink-0 bg-gray-100 text-gray-700 hover:bg-red-600 hover:text-white transition-colors"
+          >
+            {race.displayName}{race.isSprint ? ' Sprint' : ''}
+          </a>
+        ))}
+      </div>
+    </nav>
+  )}
+
   <AppIsland year="2022" client:only="react" />
   <script is:inline>document.getElementById('seo-content').style.display='none';</script>
 </BaseLayout>
