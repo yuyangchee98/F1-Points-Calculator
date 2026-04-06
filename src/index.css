@@ -204,7 +204,7 @@ body {
   
   /* Driver Card Styling */
   .driver-card {
-    @apply flex items-center p-3 rounded-md bg-white relative w-full shadow-md transition-transform duration-200;
+    @apply flex items-center p-2 rounded-md bg-white relative w-full shadow-md transition-transform duration-200;
   }
 
   .driver-card:hover {
