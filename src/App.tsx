@@ -13,6 +13,7 @@ import { useUserEmail } from './hooks/useUserEmail';
 import Layout from './components/layout/Layout';
 import StandingsSidebar from './components/standings/StandingsSidebar';
 import RaceGrid from './components/grid/RaceGrid';
+import MobileRaceCardView from './components/grid/MobileRaceCardView';
 import ToastContainer from './components/common/ToastContainer';
 import HorizontalScrollBar from './components/common/HorizontalScrollBar';
 import SubscriptionModal from './components/common/SubscriptionModal';
@@ -299,27 +300,49 @@ const App: React.FC<{ year?: string }> = ({ year }) => {
                 ) : (
                   <>
                 <SandboxGridProvider>
-                <div className="shrink-0"><DriverSelection /></div>
+                {!isMobile && <div className="shrink-0"><DriverSelection /></div>}
 
-                  <div className="shrink-0"><HorizontalScrollBar scrollContainerRef={raceGridScrollRef} /></div>
-                  <div className="flex-1 min-h-0 overflow-hidden">
-                  <RaceGrid
-                    scrollRef={raceGridScrollRef}
-                    onReset={handleReset}
-                    onToggleOfficialResults={handleToggleOfficialResults}
-                    onOpenHistory={() => {
-                      setShowHistory(true);
-                      trackVersionHistoryAction('OPEN_HISTORY');
-                    }}
-                    onOpenExport={() => {
-                      trackExportAction('OPEN_MODAL');
-                      setShowExport(true);
-                    }}
-                    showOfficialResults={showOfficialResults}
-                    hasConsensusAccess={hasConsensusAccess}
-                    onOpenSubscriptionModal={() => setShowSubscriptionModal(true)}
-                  />
-                  </div>
+                  {isMobile ? (
+                    <div className="flex-1 min-h-0 overflow-hidden">
+                      <MobileRaceCardView
+                        onReset={handleReset}
+                        onToggleOfficialResults={handleToggleOfficialResults}
+                        onOpenHistory={() => {
+                          setShowHistory(true);
+                          trackVersionHistoryAction('OPEN_HISTORY');
+                        }}
+                        onOpenExport={() => {
+                          trackExportAction('OPEN_MODAL');
+                          setShowExport(true);
+                        }}
+                        showOfficialResults={showOfficialResults}
+                        hasConsensusAccess={hasConsensusAccess}
+                        onOpenSubscriptionModal={() => setShowSubscriptionModal(true)}
+                      />
+                    </div>
+                  ) : (
+                    <>
+                      <div className="shrink-0"><HorizontalScrollBar scrollContainerRef={raceGridScrollRef} /></div>
+                      <div className="flex-1 min-h-0 overflow-hidden">
+                        <RaceGrid
+                          scrollRef={raceGridScrollRef}
+                          onReset={handleReset}
+                          onToggleOfficialResults={handleToggleOfficialResults}
+                          onOpenHistory={() => {
+                            setShowHistory(true);
+                            trackVersionHistoryAction('OPEN_HISTORY');
+                          }}
+                          onOpenExport={() => {
+                            trackExportAction('OPEN_MODAL');
+                            setShowExport(true);
+                          }}
+                          showOfficialResults={showOfficialResults}
+                          hasConsensusAccess={hasConsensusAccess}
+                          onOpenSubscriptionModal={() => setShowSubscriptionModal(true)}
+                        />
+                      </div>
+                    </>
+                  )}
                 </SandboxGridProvider>
                 </>
               )}
