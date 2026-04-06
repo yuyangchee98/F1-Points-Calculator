@@ -4,7 +4,6 @@ import type { RootState } from '../../store';
 import { selectDriver } from '../../store/slices/uiSlice';
 import DriverCard from './DriverCard';
 import { useAppDispatch } from '../../store';
-import useWindowSize from '../../hooks/useWindowSize';
 import { GA_EVENTS, trackEvent } from '../../utils/analytics';
 import { getDriverLastName } from '../../store/selectors/dataSelectors';
 
@@ -12,8 +11,7 @@ const DriverSelection: React.FC = () => {
   const dispatch = useAppDispatch();
   const allDrivers = useSelector((state: RootState) => state.seasonData.drivers);
   const selectedDriverId = useSelector((state: RootState) => state.ui.selectedDriver);
-  const [isExpanded, setIsExpanded] = useState(false);
-  const { isMobile } = useWindowSize();
+  const [isExpanded, setIsExpanded] = useState(true);
 
   const drivers = allDrivers;
 
@@ -24,9 +22,7 @@ const DriverSelection: React.FC = () => {
       dispatch(selectDriver(driverId));
     }
 
-    if (isMobile) {
-      setIsExpanded(false);
-    }
+    setIsExpanded(false);
   };
 
   return (
@@ -35,7 +31,7 @@ const DriverSelection: React.FC = () => {
         <h2 className="text-2xl font-bold">DRIVERS</h2>
         <button
           id="driver-toggle-button"
-          className="sm:hidden bg-red-600 hover:bg-red-700 text-white px-5 py-3 rounded-md shadow-lg transition-colors duration-200 flex items-center"
+          className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-md shadow-sm transition-colors duration-200 flex items-center text-sm"
           onClick={() => {
             setIsExpanded(!isExpanded);
             trackEvent(
@@ -66,10 +62,9 @@ const DriverSelection: React.FC = () => {
       <div 
         id="driver-selection"
         className={`
-          grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 
-          ${isExpanded ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0 sm:max-h-[800px] sm:opacity-100'}
+          grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4
+          ${isExpanded ? 'max-h-[50vh] opacity-100 overflow-y-auto' : 'max-h-0 opacity-0'}
           overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out
-          sm:overflow-visible sm:max-h-full
           p-4 bg-gray-50 rounded-lg shadow-sm border border-gray-200
         `}
       >

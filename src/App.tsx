@@ -132,14 +132,14 @@ const App: React.FC<{ year?: string }> = ({ year }) => {
 
   return (
     <LazyDndProvider>
-      <div className="app min-h-screen">
+      <div className="app">
         <ToastContainer />
 
         <Layout
           sidebar={<StandingsSidebar />}
           content={
-            <div className="px-4 py-6 max-w-5xl mx-auto">
-              <div className="mb-4">
+            <div className="flex-1 min-h-0 flex flex-col px-4 pt-4 pb-16 sm:pb-0 max-w-5xl mx-auto w-full">
+              <div className="mb-2 shrink-0">
                 {/* Title Row */}
                 <div className="flex items-center justify-between mb-3">
                   <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-gray-800 flex items-center">
@@ -275,7 +275,7 @@ const App: React.FC<{ year?: string }> = ({ year }) => {
                 </div>
               </div>
 
-              <div className={`mb-6 transition-all duration-300 ${statusMessage ? 'p-4 bg-blue-50 border border-blue-200 rounded-lg' : 'h-0 overflow-hidden'}`}>
+              <div className={`mb-2 shrink-0 transition-all duration-300 ${statusMessage ? 'p-4 bg-blue-50 border border-blue-200 rounded-lg' : 'h-0 overflow-hidden'}`}>
                 {statusMessage && (
                   <p className="text-center text-blue-700 font-medium">
                     {statusMessage}
@@ -283,25 +283,26 @@ const App: React.FC<{ year?: string }> = ({ year }) => {
                 )}
               </div>
 
-              <div className={`${(mobileView === 'grid' || !isMobile) ? 'block' : 'hidden'}`}>
+              <div className={`flex-1 min-h-0 flex flex-col ${(mobileView === 'grid' || !isMobile) ? '' : 'hidden'}`}>
                 {isLoading ? (
                   <>
-                    <DriverSelectionSkeleton />
-                    <div className="w-full py-2 px-4 hidden sm:block">
+                    <div className="shrink-0"><DriverSelectionSkeleton /></div>
+                    <div className="shrink-0 w-full py-2 px-4 hidden sm:block">
                       <div className="bg-white rounded-md p-2 shadow-sm border border-gray-200">
                         <div className="relative w-full h-2.5 bg-gray-200 rounded-full">
                           <div className="absolute top-0 h-full w-1/4 bg-gray-300 rounded-full" style={{ left: '0%' }} />
                         </div>
                       </div>
                     </div>
-                    <GridSkeleton />
+                    <div className="flex-1 min-h-0 overflow-hidden"><GridSkeleton /></div>
                   </>
                 ) : (
                   <>
                 <SandboxGridProvider>
-                <DriverSelection />
+                <div className="shrink-0"><DriverSelection /></div>
 
-                  <HorizontalScrollBar scrollContainerRef={raceGridScrollRef} />
+                  <div className="shrink-0"><HorizontalScrollBar scrollContainerRef={raceGridScrollRef} /></div>
+                  <div className="flex-1 min-h-0 overflow-hidden">
                   <RaceGrid
                     scrollRef={raceGridScrollRef}
                     onReset={handleReset}
@@ -318,6 +319,7 @@ const App: React.FC<{ year?: string }> = ({ year }) => {
                     hasConsensusAccess={hasConsensusAccess}
                     onOpenSubscriptionModal={() => setShowSubscriptionModal(true)}
                   />
+                  </div>
                 </SandboxGridProvider>
                 </>
               )}

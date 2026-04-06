@@ -78,8 +78,8 @@ const ogImage = `${siteUrl}/og-image.jpg`;
   <body class="bg-gray-100">
     <slot />
 
-    <!-- Static footer for crawlers — hidden once React renders its own footer -->
-    <footer id="static-footer" class="bg-gray-900 text-white py-8 pb-24 sm:pb-8">
+    <!-- Static footer for crawlers — visually hidden but accessible to crawlers -->
+    <footer id="static-footer" class="bg-gray-900 text-white py-8 pb-24 sm:pb-8" style="display:none;">
       <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between space-y-6 sm:space-y-0">
         <div>
           <h3 class="text-lg font-medium mb-3">F1 Points Calculator</h3>
