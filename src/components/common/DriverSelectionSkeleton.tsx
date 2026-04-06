@@ -17,25 +17,24 @@ const DriverSelectionSkeleton: React.FC = () => {
 
       <div
         className={`
-          grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4
+          grid gap-2
           ${isExpanded ? 'max-h-[800px]' : 'max-h-0 sm:max-h-[800px]'}
           overflow-hidden transition-all duration-300 ease-in-out
           sm:overflow-visible sm:max-h-full
           p-4 bg-gray-50 rounded-lg shadow-sm border border-gray-200
         `}
+        style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 1fr))' }}
       >
         {Array.from({ length: drivers }).map((_, index) => (
           <div
             key={index}
             className="driver-card flex items-center justify-between rounded-md overflow-hidden
-                       bg-white border-l-4 border-gray-300 h-[60px] p-3"
+                       bg-white border-l-4 border-gray-300 h-[52px] p-2"
           >
-            <div className="flex flex-col flex-grow space-y-2">
-              <div className="h-4 w-24 bg-gray-200 rounded" />
-              <div className="h-3 w-16 bg-gray-200 rounded" />
+            <div className="flex flex-col flex-grow space-y-1.5">
+              <div className="h-3.5 w-16 bg-gray-200 rounded" />
+              <div className="h-2.5 w-12 bg-gray-200 rounded" />
             </div>
-
-            <div className="h-6 w-10 bg-gray-300 rounded" />
           </div>
         ))}
       </div>

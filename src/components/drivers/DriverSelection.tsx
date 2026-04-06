@@ -62,11 +62,12 @@ const DriverSelection: React.FC = () => {
       <div 
         id="driver-selection"
         className={`
-          grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4
+          grid gap-2
           ${isExpanded ? 'max-h-[50vh] opacity-100 overflow-y-auto' : 'max-h-0 opacity-0'}
           overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out
           p-4 bg-gray-50 rounded-lg shadow-sm border border-gray-200
         `}
+        style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 1fr))' }}
       >
         {drivers.map(driver => (
           <DriverCard
@@ -74,6 +75,7 @@ const DriverSelection: React.FC = () => {
             driver={driver}
             isSelected={selectedDriverId === driver.id}
             onClick={() => handleDriverClick(driver.id)}
+            hideCode
           />
         ))}
       </div>
