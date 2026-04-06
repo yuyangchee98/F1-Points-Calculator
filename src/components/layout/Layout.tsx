@@ -5,7 +5,6 @@ import MobileNavigation from '../navigation/MobileNavigation';
 import useWindowSize from '../../hooks/useWindowSize';
 import { setMobileView } from '../../store/slices/uiSlice';
 import { useAppDispatch } from '../../store';
-import { getActiveSeason, CURRENT_SEASON } from '../../utils/constants';
 import AuthModal from '../auth/AuthModal';
 
 interface LayoutProps {
@@ -19,8 +18,6 @@ const Layout: React.FC<LayoutProps> = ({ sidebar, content }) => {
   const { isMobile } = useWindowSize();
 
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const activeSeason = getActiveSeason();
-
   const SIDEBAR_COLLAPSED_KEY = 'f1-calc-sidebar-collapsed';
 
   useEffect(() => {
@@ -45,15 +42,15 @@ const Layout: React.FC<LayoutProps> = ({ sidebar, content }) => {
   }, [isMobile, mobileView, dispatch]);
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="flex flex-col sm:flex-row">
+    <div className="h-full bg-gray-100">
+      <div className="flex flex-col sm:flex-row h-full">
         <aside
           className={`
-            ${mobileView === 'standings' ? 'block w-full h-[calc(100vh-64px)] z-30' : 'hidden'}
+            ${mobileView === 'standings' ? 'block w-full h-[calc(100dvh-64px)] z-30' : 'hidden'}
             sm:block bg-white border-r border-gray-200 overflow-hidden shadow-md
             transition-[width,min-width,max-width] duration-300 ease-in-out
             ${isSidebarCollapsed ? 'sm:w-16' : 'sm:w-72 lg:w-1/4 min-w-[280px] max-w-[450px]'}
-            sm:sticky sm:top-0 sm:h-screen sm:z-20
+            sm:h-full sm:z-20
           `}
         >
           <button 
@@ -97,89 +94,13 @@ const Layout: React.FC<LayoutProps> = ({ sidebar, content }) => {
 
         <main
           className={`
-            flex-1 relative ${mobileView !== 'standings' ? 'block' : 'hidden sm:block'}
-            pt-0 min-h-screen
+            flex-1 flex flex-col overflow-hidden relative
+            ${mobileView !== 'standings' ? '' : 'hidden sm:flex'}
           `}
         >
-          <div className="py-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+          <div className="flex-1 min-h-0 flex flex-col">
             {content}
           </div>
-          <footer className="bg-gray-900 text-white py-8 mt-12 pb-24 sm:pb-8 sm:mt-auto">
-            <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between space-y-6 sm:space-y-0">
-              <div>
-                <h3 className="text-lg font-medium mb-3">F1 Points Calculator</h3>
-                <p className="text-sm text-gray-400 mb-2">Created by <a href="https://chyuang.com" className="text-gray-300 hover:text-white" target="_blank" rel="noopener noreferrer">Chyuang</a></p>
-                <p className="text-sm text-gray-400 mb-2"><a href="https://github.com/yuyangchee98/F1-Points-Calculator" className="text-gray-300 hover:text-white" target="_blank" rel="noopener noreferrer">Open source on GitHub</a></p>
-                <p className="text-sm text-gray-400 mb-2"><a href="mailto:f1pointscalculator@chyuang.com" className="text-gray-300 hover:text-white">Email me for any issues</a></p>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-medium mb-3">Seasons</h3>
-                <ul className="text-sm text-gray-400 space-y-1">
-                  <li>
-                    <a
-                      href="/"
-                      className={`${activeSeason === CURRENT_SEASON ? 'text-white font-medium' : 'text-gray-300 hover:text-white'}`}
-                      aria-current={activeSeason === CURRENT_SEASON ? 'page' : undefined}
-                    >
-                      {CURRENT_SEASON} Season
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="/2025"
-                      className={`${activeSeason === 2025 ? 'text-white font-medium' : 'text-gray-300 hover:text-white'}`}
-                      aria-current={activeSeason === 2025 ? 'page' : undefined}
-                    >
-                      2025 Season
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="/2024"
-                      className={`${activeSeason === 2024 ? 'text-white font-medium' : 'text-gray-300 hover:text-white'}`}
-                      aria-current={activeSeason === 2024 ? 'page' : undefined}
-                    >
-                      2024 Season
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="/2023"
-                      className={`${activeSeason === 2023 ? 'text-white font-medium' : 'text-gray-300 hover:text-white'}`}
-                      aria-current={activeSeason === 2023 ? 'page' : undefined}
-                    >
-                      2023 Season
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="/2022"
-                      className={`${activeSeason === 2022 ? 'text-white font-medium' : 'text-gray-300 hover:text-white'}`}
-                      aria-current={activeSeason === 2022 ? 'page' : undefined}
-                    >
-                      2022 Season
-                    </a>
-                  </li>
-                </ul>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-medium mb-3">F1 Resources</h3>
-                <ul className="text-sm text-gray-400 space-y-1">
-                  <li><a href="https://f1-dash.com/" className="text-gray-300 hover:text-white" target="_blank" rel="noopener noreferrer">F1 Dash</a></li>
-                  <li><a href="https://f1calendar.com/" className="text-gray-300 hover:text-white" target="_blank" rel="noopener noreferrer">F1 Calendar</a></li>
-                </ul>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-medium mb-3">Other Projects</h3>
-                <ul className="text-sm text-gray-400 space-y-1">
-                  <li><a href="https://drawlineracing.chyuang.com/" className="text-gray-300 hover:text-white" target="_blank" rel="noopener noreferrer">Draw Line Racing</a></li>
-                </ul>
-              </div>
-            </div>
-          </footer>
         </main>
 
         <div className="sm:hidden">

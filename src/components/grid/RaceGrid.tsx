@@ -116,14 +116,13 @@ const RaceGrid: React.FC<RaceGridProps> = ({
   );
 
   return (
-    <div className="shadow-md rounded-lg border border-gray-200">
-      {toolbarContent}
+    <div className="shadow-md rounded-lg border border-gray-200 flex flex-col h-full overflow-hidden">
+      <div className="shrink-0">{toolbarContent}</div>
 
       <div
         ref={actualScrollRef}
         id="race-grid"
-        className="overflow-x-auto p-4"
-        style={{ maxHeight: `calc(100vh - 180px)` }}
+        className="flex-1 min-h-0 overflow-auto p-4"
       >
         <div
           style={{
