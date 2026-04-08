@@ -43,9 +43,7 @@ const MobileRaceCardView: React.FC<MobileRaceCardViewProps> = ({
   const teamById = useSelector(selectTeamsByIdMap);
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [driverStripExpanded, setDriverStripExpanded] = useState(false);
-  const dotContainerRef = useRef<HTMLDivElement>(null);
-  const dotRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const [driverStripExpanded, setDriverStripExpanded] = useState(true);
   const selectedDriverRef = useRef<HTMLButtonElement | null>(null);
 
   // Initialize to first upcoming race
@@ -57,25 +55,10 @@ const MobileRaceCardView: React.FC<MobileRaceCardViewProps> = ({
     }
   }, [races]);
 
-  // Scroll active dot into view
-  useEffect(() => {
-    const dot = dotRefs.current[currentIndex];
-    if (dot && dotContainerRef.current) {
-      dot.scrollIntoView({ inline: 'center', behavior: 'smooth', block: 'nearest' });
-    }
-  }, [currentIndex]);
-
   // Scroll selected driver chip into view
   useEffect(() => {
     if (selectedDriverRef.current) {
       selectedDriverRef.current.scrollIntoView({ inline: 'center', behavior: 'smooth', block: 'nearest' });
-    }
-  }, [selectedDriverId]);
-
-  // Collapse driver strip after selecting
-  useEffect(() => {
-    if (selectedDriverId) {
-      setDriverStripExpanded(false);
     }
   }, [selectedDriverId]);
 
@@ -131,26 +114,77 @@ const MobileRaceCardView: React.FC<MobileRaceCardViewProps> = ({
         />
       </div>
 
-      {/* Driver strip */}
+      {/* Compact race navigation: single row */}
+      <div className="shrink-0 flex items-center px-1 bg-gray-50 border-b border-gray-200">
+        <button
+          onClick={goToPrev}
+          disabled={currentIndex === 0}
+          className="w-8 h-8 flex items-center justify-center rounded-full text-gray-600 disabled:text-gray-300 active:bg-gray-200 transition-colors shrink-0"
+          aria-label="Previous race"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+
+        <div className="flex-1 flex items-center justify-center gap-1.5 min-w-0 px-1 overflow-hidden">
+          {race.countryCode && (
+            <img
+              src={`/flags/${race.countryCode}.webp`}
+              alt={race.country}
+              className="flag !mr-0 shrink-0"
+            />
+          )}
+          <span className="font-bold text-sm text-gray-800 truncate min-w-0">
+            {formatName(race.name)}
+          </span>
+          {race.isSprint && (
+            <span className="text-[9px] bg-gray-600 text-white px-1 py-px rounded font-medium shrink-0">
+              SPRINT
+            </span>
+          )}
+          {hasScore ? (
+            <span className="text-[9px] bg-amber-100 text-amber-700 px-1 py-px rounded font-medium shrink-0">
+              {lockedPrediction.score?.percentage}%
+            </span>
+          ) : isLocked ? (
+            <span className="text-xs shrink-0" title="Prediction locked">🔒</span>
+          ) : race.completed ? (
+            <span className="text-[9px] bg-green-100 text-green-700 px-1 py-px rounded font-medium shrink-0">✓</span>
+          ) : null}
+        </div>
+
+        <button
+          onClick={goToNext}
+          disabled={currentIndex === races.length - 1}
+          className="w-8 h-8 flex items-center justify-center rounded-full text-gray-600 disabled:text-gray-300 active:bg-gray-200 transition-colors shrink-0"
+          aria-label="Next race"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Driver grid — expandable, default open, wraps so all drivers are visible at once */}
       <div className="shrink-0 border-b border-gray-200 bg-white">
-        {/* Header row with toggle */}
         <button
           onClick={() => setDriverStripExpanded(!driverStripExpanded)}
-          className="w-full flex items-center justify-between px-3 py-1.5 text-xs font-semibold text-gray-600 active:bg-gray-50"
+          className="w-full flex items-center justify-between px-2.5 py-1 text-[11px] font-semibold text-gray-600 active:bg-gray-50"
         >
-          <span className="flex items-center gap-1.5">
+          <span className="flex items-center gap-1.5 min-w-0">
             {selectedDriverId ? (
               <>
-                <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-                <span className="text-blue-700">
-                  {getDriverLastName(selectedDriverId)} selected — tap a slot
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse shrink-0" />
+                <span className="text-blue-700 truncate">
+                  {getDriverLastName(selectedDriverId)} — tap a slot
                 </span>
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     dispatch(selectDriver(null));
                   }}
-                  className="ml-1 text-gray-400 hover:text-gray-600 bg-gray-100 rounded-full w-4 h-4 flex items-center justify-center text-[10px] leading-none"
+                  className="ml-1 text-gray-400 hover:text-gray-600 bg-gray-100 rounded-full w-4 h-4 flex items-center justify-center text-[10px] leading-none shrink-0"
                 >
                   x
                 </button>
@@ -160,20 +194,19 @@ const MobileRaceCardView: React.FC<MobileRaceCardViewProps> = ({
             )}
           </span>
           <svg
-            className={`w-3.5 h-3.5 text-gray-400 transition-transform duration-200 ${driverStripExpanded ? 'rotate-180' : ''}`}
+            className={`w-3 h-3 text-gray-400 transition-transform duration-200 shrink-0 ${driverStripExpanded ? 'rotate-180' : ''}`}
             fill="none" stroke="currentColor" viewBox="0 0 24 24"
           >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </svg>
         </button>
 
-        {/* Expandable driver chips */}
         <div
           className={`overflow-hidden transition-[max-height] duration-300 ease-in-out ${
-            driverStripExpanded ? 'max-h-40' : 'max-h-0'
+            driverStripExpanded ? 'max-h-60' : 'max-h-0'
           }`}
         >
-          <div className="flex flex-wrap gap-1.5 px-3 pb-2">
+          <div className="flex flex-wrap gap-1.5 px-2.5 pb-2">
             {drivers.map(driver => {
               const team = teamById[driver.team];
               const isSelected = selectedDriverId === driver.id;
@@ -182,7 +215,7 @@ const MobileRaceCardView: React.FC<MobileRaceCardViewProps> = ({
                   key={driver.id}
                   ref={isSelected ? selectedDriverRef : undefined}
                   onClick={() => handleDriverTap(driver.id)}
-                  className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium transition-all duration-150 ${
+                  className={`flex items-center gap-1 px-2.5 py-2 rounded-md text-sm font-medium transition-all duration-150 ${
                     isSelected
                       ? 'bg-blue-100 ring-2 ring-blue-500 text-blue-800 shadow-sm'
                       : 'bg-gray-100 text-gray-700 active:bg-gray-200'
@@ -195,85 +228,6 @@ const MobileRaceCardView: React.FC<MobileRaceCardViewProps> = ({
             })}
           </div>
         </div>
-      </div>
-
-      {/* Race navigation header */}
-      <div className="shrink-0 flex items-center px-2 py-2 bg-gray-50 border-b border-gray-200">
-        <button
-          onClick={goToPrev}
-          disabled={currentIndex === 0}
-          className="w-10 h-10 flex items-center justify-center rounded-full text-gray-600 disabled:text-gray-300 active:bg-gray-200 transition-colors shrink-0"
-          aria-label="Previous race"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-
-        <div className="flex-1 flex flex-col items-center min-w-0 px-1">
-          <div className="flex items-center gap-1.5 w-full min-w-0 justify-center overflow-hidden">
-            {race.countryCode && (
-              <img
-                src={`/flags/${race.countryCode}.webp`}
-                alt={race.country}
-                className="flag shrink-0"
-              />
-            )}
-            <span className="font-bold text-sm text-gray-800 truncate min-w-0">
-              {formatName(race.name)}
-            </span>
-            {race.isSprint && (
-              <span className="text-[10px] bg-gray-600 text-white px-1.5 py-0.5 rounded font-medium shrink-0">
-                SPRINT
-              </span>
-            )}
-            {hasScore ? (
-              <span className="text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-medium shrink-0">
-                {lockedPrediction.score?.percentage}%
-              </span>
-            ) : isLocked ? (
-              <span className="text-xs shrink-0" title="Prediction locked">🔒</span>
-            ) : race.completed ? (
-              <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-medium shrink-0">Done</span>
-            ) : null}
-          </div>
-          <span className="text-[11px] text-gray-500">
-            Race {currentIndex + 1} of {races.length}
-          </span>
-        </div>
-
-        <button
-          onClick={goToNext}
-          disabled={currentIndex === races.length - 1}
-          className="w-10 h-10 flex items-center justify-center rounded-full text-gray-600 disabled:text-gray-300 active:bg-gray-200 transition-colors shrink-0"
-          aria-label="Next race"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </button>
-      </div>
-
-      {/* Dot indicators */}
-      <div
-        ref={dotContainerRef}
-        className="shrink-0 flex items-center gap-1 px-3 py-1.5 overflow-x-auto scrollbar-hide bg-gray-50 border-b border-gray-200"
-      >
-        {races.map((r, i) => (
-          <button
-            key={r.id}
-            ref={el => { dotRefs.current[i] = el; }}
-            onClick={() => setCurrentIndex(i)}
-            className={`shrink-0 rounded-full transition-all duration-200 ${
-              i === currentIndex
-                ? 'w-4 h-2.5 bg-red-500'
-                : r.completed
-                ? 'w-2 h-2 bg-green-400'
-                : 'w-2 h-2 bg-gray-300'
-            }`}
-            aria-label={`Go to ${formatName(r.name)}`}
-          />
-        ))}
       </div>
 
       {/* Swipeable card body */}
