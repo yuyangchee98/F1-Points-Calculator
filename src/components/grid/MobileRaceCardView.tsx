@@ -210,31 +210,31 @@ const MobileRaceCardView: React.FC<MobileRaceCardViewProps> = ({
           </svg>
         </button>
 
-        <div className="flex-1 flex flex-col items-center min-w-0">
-          <div className="flex items-center gap-1.5">
+        <div className="flex-1 flex flex-col items-center min-w-0 px-1">
+          <div className="flex items-center gap-1.5 w-full min-w-0 justify-center overflow-hidden">
             {race.countryCode && (
               <img
                 src={`/flags/${race.countryCode}.webp`}
                 alt={race.country}
-                className="flag"
+                className="flag shrink-0"
               />
             )}
-            <span className="font-bold text-sm text-gray-800 truncate">
+            <span className="font-bold text-sm text-gray-800 truncate min-w-0">
               {formatName(race.name)}
             </span>
             {race.isSprint && (
-              <span className="text-[10px] bg-gray-600 text-white px-1.5 py-0.5 rounded font-medium">
+              <span className="text-[10px] bg-gray-600 text-white px-1.5 py-0.5 rounded font-medium shrink-0">
                 SPRINT
               </span>
             )}
             {hasScore ? (
-              <span className="text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-medium">
+              <span className="text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-medium shrink-0">
                 {lockedPrediction.score?.percentage}%
               </span>
             ) : isLocked ? (
-              <span className="text-xs" title="Prediction locked">🔒</span>
+              <span className="text-xs shrink-0" title="Prediction locked">🔒</span>
             ) : race.completed ? (
-              <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-medium">Done</span>
+              <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-medium shrink-0">Done</span>
             ) : null}
           </div>
           <span className="text-[11px] text-gray-500">
