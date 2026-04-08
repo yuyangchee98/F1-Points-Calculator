@@ -4,7 +4,7 @@ import type { RootState } from '../../store';
 import { selectPointsSystem } from '../../store/slices/uiSlice';
 import { POINTS_SYSTEMS } from '../../data/pointsSystems';
 import { trackPointsSystemChange } from '../../utils/analytics';
-import { BREAKPOINTS } from '../../utils/constants';
+import useWindowSize from '../../hooks/useWindowSize';
 
 const PointsSystemSelector: React.FC = () => {
   const dispatch = useDispatch();
@@ -13,6 +13,8 @@ const PointsSystemSelector: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const { isMobile, isTablet } = useWindowSize();
+  const isCompact = isMobile || isTablet;
 
   const currentSystem = POINTS_SYSTEMS[selectedSystem];
 
@@ -123,16 +125,23 @@ const PointsSystemSelector: React.FC = () => {
         onClick={() => {
           setIsOpen(!isOpen);
         }}
-        className="flex items-center gap-2 px-4 py-2 text-sm bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-500"
+        className={`flex items-center gap-1 md:gap-2 ${isCompact ? 'p-2' : 'px-4 py-2'} text-sm bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-500`}
         aria-expanded={isOpen}
         aria-haspopup="true"
+        title={isCompact ? `Points: ${currentSystem.name}` : undefined}
       >
-        <span>{currentSystem.name}</span>
-        <svg 
-          xmlns="http://www.w3.org/2000/svg" 
-          className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} 
-          fill="none" 
-          viewBox="0 0 24 24" 
+        {isCompact ? (
+          <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+        ) : (
+          <span>{currentSystem.name}</span>
+        )}
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className={`h-3 w-3 md:h-4 md:w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          fill="none"
+          viewBox="0 0 24 24"
           stroke="currentColor"
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -140,13 +149,13 @@ const PointsSystemSelector: React.FC = () => {
       </button>
 
       {isOpen && (
-        <div className="absolute z-20 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl"
-             style={{ 
-               width: 'min(24rem, calc(100vw - 2rem))',
-               maxWidth: '100vw',
-               right: window.innerWidth < BREAKPOINTS.mobile ? '50%' : 'auto',
-               transform: window.innerWidth < BREAKPOINTS.mobile ? 'translateX(50%)' : 'none'
-             }}>
+        <div
+          className="absolute z-20 mt-2 left-0 bg-white border border-gray-200 rounded-lg shadow-xl"
+          style={{
+            width: '24rem',
+            maxWidth: 'calc(100vw - 1rem)',
+          }}
+        >
           <div className="p-3 border-b border-gray-200">
             <input
               ref={searchInputRef}

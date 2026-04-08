@@ -63,7 +63,7 @@ const DriverSelection: React.FC = () => {
         id="driver-selection"
         className={`
           grid gap-2
-          ${isExpanded ? 'max-h-[30vh] sm:max-h-[50vh] opacity-100 overflow-y-auto' : 'max-h-0 opacity-0'}
+          ${isExpanded ? 'max-h-[45vh] sm:max-h-[55vh] opacity-100 overflow-y-auto' : 'max-h-0 opacity-0'}
           overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out
           p-4 bg-gray-50 rounded-lg shadow-sm border border-gray-200
         `}
