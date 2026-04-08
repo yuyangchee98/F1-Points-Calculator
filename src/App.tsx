@@ -20,6 +20,8 @@ import SubscriptionModal from './components/common/SubscriptionModal';
 import VersionHistory from './components/common/VersionHistory';
 import ExportModal from './components/common/ExportModal';
 import DrawLineRacingPromo from './components/common/DrawLineRacingPromo';
+import HeaderMenu from './components/common/HeaderMenu';
+import CalculatorDropdown from './components/common/CalculatorDropdown';
 import GridSkeleton from './components/common/GridSkeleton';
 import DriverSelectionSkeleton from './components/common/DriverSelectionSkeleton';
 import DriverSelection from './components/drivers/DriverSelection';
@@ -28,7 +30,7 @@ import UserMenu from './components/auth/UserMenu';
 import { SandboxGridProvider } from './contexts/GridContext';
 import { useAppDispatch } from './store';
 import useWindowSize from './hooks/useWindowSize';
-import { trackBuyCoffeeClick, trackFeedbackClick, GA_EVENTS, trackEvent, trackVersionHistoryAction, trackExportAction } from './utils/analytics';
+import { GA_EVENTS, trackEvent, trackVersionHistoryAction, trackExportAction } from './utils/analytics';
 import { openCustomerPortal } from './api/subscription';
 import { CURRENT_SEASON } from './utils/constants';
 
@@ -139,140 +141,41 @@ const App: React.FC<{ year?: string }> = ({ year }) => {
         <Layout
           sidebar={<StandingsSidebar />}
           content={
-            <div className="flex-1 min-h-0 flex flex-col px-4 pt-4 pb-16 sm:pb-0 max-w-5xl mx-auto w-full">
+            <div className="flex-1 min-h-0 flex flex-col px-2 sm:px-3 lg:px-4 pt-2 sm:pt-3 lg:pt-4 pb-16 sm:pb-0 max-w-5xl mx-auto w-full">
               <div className="mb-2 shrink-0">
-                {/* Title Row */}
-                <div className="flex items-center justify-between mb-3">
-                  <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-gray-800 flex items-center">
-                    <div className="relative group">
-                      <button className="bg-red-600 text-white px-2 py-0.5 sm:px-3 sm:py-1 mr-2 sm:mr-3 rounded-md text-base sm:text-xl font-bold flex items-center gap-1 hover:bg-red-700 transition-colors">
-                        F1
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-3 w-3 sm:h-4 sm:w-4"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </button>
-
-                      <div
-                        className="absolute left-0 top-full pt-1 hidden group-hover:block z-50"
-                      >
-                        <nav
-                          className="bg-white shadow-lg rounded-md border border-gray-200 py-1 min-w-[180px]"
-                          role="menu"
-                          aria-label="Formula calculators"
-                        >
-                          <a
-                            href="/"
-                            className="flex items-center justify-between px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 font-medium"
-                            role="menuitem"
-                          >
-                            F1 Calculator
-                            <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
-                          </a>
-                          <a
-                            href="https://f2pointscalculator.chyuang.com"
-                            className="flex items-center justify-between px-4 py-2 text-sm text-gray-800 hover:bg-gray-100"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            role="menuitem"
-                          >
-                            F2 Calculator
-                          </a>
-                        </nav>
-                      </div>
-                    </div>
-                    <span>Points Calculator</span>
+                {/* Single header row — responsive, never wraps */}
+                <div className="flex items-center gap-1 lg:gap-2 flex-nowrap">
+                  <h1 className="text-sm sm:text-base md:text-lg lg:text-2xl font-bold text-gray-800 flex items-center min-w-0 shrink">
+                    <CalculatorDropdown />
+                    <span className="truncate">Points Calculator</span>
                   </h1>
-                  <div className="flex items-center gap-2">
-                    {hasConsensusAccess && (
-                      <button
-                        onClick={async () => {
-                          if (email) {
-                            try {
-                              await openCustomerPortal(email);
-                            } catch (error) {
-                              alert('Failed to open subscription management.');
-                            }
-                          } else {
-                            setShowSubscriptionModal(true);
+
+                  {/* Right-side controls — push to right with ml-auto */}
+                  <div className="flex items-center gap-1 lg:gap-2 ml-auto shrink-0">
+                    <SeasonSelector activeSeason={activeSeason} />
+
+                    {/* Promo only visible at lg+ where there's room */}
+                    <div className="hidden lg:inline-flex">
+                      <DrawLineRacingPromo />
+                    </div>
+
+                    <HeaderMenu
+                      hasConsensusAccess={hasConsensusAccess}
+                      onOpenSubscription={async () => {
+                        if (hasConsensusAccess && email) {
+                          try {
+                            await openCustomerPortal(email);
+                          } catch (error) {
+                            alert('Failed to open subscription management.');
                           }
-                        }}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium text-purple-700 bg-purple-50 border border-purple-200 hover:bg-purple-100 rounded-md transition-colors duration-200"
-                        title="Manage your consensus subscription"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        <span className="hidden sm:inline">Subscription</span>
-                      </button>
-                    )}
+                        } else {
+                          setShowSubscriptionModal(true);
+                        }
+                      }}
+                    />
+
                     <UserMenu />
                   </div>
-                </div>
-
-                {/* Action Row */}
-                <div className="flex flex-wrap items-center gap-2">
-                  {/* App Controls - Left Group */}
-                  <SeasonSelector activeSeason={activeSeason} />
-
-                  <a
-                    href="/about"
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md transition-colors duration-200"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span className="hidden sm:inline">About</span>
-                  </a>
-
-                  {/* Merch button hidden until ready
-                  <a
-                    href="/merch"
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-md shadow-sm hover:shadow transition-all duration-200"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <span className="hidden sm:inline">Poster</span>
-                  </a>
-                  */}
-
-                  <a
-                    href="https://github.com/yuyangchee98/F1-Points-Calculator/issues"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md transition-colors duration-200"
-                    onClick={trackFeedbackClick}
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                    </svg>
-                    <span className="hidden sm:inline">Feedback</span>
-                  </a>
-
-                  <a
-                    href="https://buymeacoffee.com/yaang"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-md shadow-sm hover:shadow transition-all duration-200"
-                    onClick={trackBuyCoffeeClick}
-                  >
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                    </svg>
-                    <span>Support</span>
-                  </a>
-
-                  {/* Promo - Right Group */}
-                  <DrawLineRacingPromo className="sm:ml-auto" />
                 </div>
               </div>
 
