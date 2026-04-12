@@ -400,17 +400,3 @@ body {
   }
 }
 
-/* Race Page Styles */
-.podium-first { background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); }
-.podium-second { background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%); }
-.podium-third { background: linear-gradient(135deg, #cd7f32 0%, #e6a85c 100%); }
-
-.blur-overlay { position: relative; }
-.blur-overlay::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  pointer-events: none;
-}

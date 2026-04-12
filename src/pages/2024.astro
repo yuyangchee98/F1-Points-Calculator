@@ -1,26 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import AppIsland from '../components/AppIsland';
-import type { RaceResult, Driver } from '../types';
-import { type RaceScheduleItem } from '../lib/race-utils';
-
-const API_BASE = 'https://f1-points-calculator-api.yuyangchee98.workers.dev';
-
-let raceRows: RaceScheduleItem[] = [];
-try {
-  const res = await fetch(`${API_BASE}/api/init?year=2024`);
-  if (res.ok) {
-    const data = await res.json() as {
-      schedule: RaceScheduleItem[];
-      raceResults: Record<string, RaceResult[]>;
-    };
-    raceRows = data.schedule.filter(race => {
-      const results = data.raceResults?.[race.id];
-      return results && results.length > 0;
-    });
-  }
-} catch {}
-
 const schemaData = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
@@ -75,22 +55,6 @@ const schemaData = {
       <a href="https://github.com/yuyangchee98/F1-Points-Calculator">View on GitHub</a>
     </p>
   </div>
-
-  {raceRows.length > 0 && (
-    <nav class="mx-auto px-4 pt-3 pb-1" aria-label="2024 Race Results">
-      <div class="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-2">
-        <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap shrink-0">2024 Results</span>
-        {raceRows.map(race => (
-          <a
-            href={`/race/2024/${race.id}`}
-            class="inline-block text-xs px-2.5 py-1 rounded-full whitespace-nowrap shrink-0 bg-gray-100 text-gray-700 hover:bg-red-600 hover:text-white transition-colors"
-          >
-            {race.displayName}{race.isSprint ? ' Sprint' : ''}
-          </a>
-        ))}
-      </div>
-    </nav>
-  )}
 
   <AppIsland year="2024" client:only="react" />
   <script is:inline>document.getElementById('seo-content').style.display='none';</script>

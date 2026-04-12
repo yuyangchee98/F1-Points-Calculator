@@ -212,20 +212,7 @@ const RaceGrid: React.FC<RaceGridProps> = ({
 
                 const headerClassName = `race-header ${race.isSprint ? 'sprint' : ''} ${race.completed ? 'completed-race-header' : ''}`;
 
-                const season = getActiveSeason();
-                const hasRacePage = race.completed && season >= 2022 && season <= 2024;
-
-                return hasRacePage ? (
-                  <a
-                    key={race.id}
-                    href={`/race/${season}/${race.id}`}
-                    className={headerClassName}
-                    style={headerStyle}
-                    title="View race results"
-                  >
-                    {headerContent}
-                  </a>
-                ) : (
+                return (
                   <div
                     key={race.id}
                     className={headerClassName}
