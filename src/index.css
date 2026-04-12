@@ -80,8 +80,9 @@
   box-shadow: inset 0 0 0 2px rgba(52, 152, 219, 0.5);
 }
 
-/* App shell — viewport lock for app-like feel */
-html, body { height: 100%; overflow: hidden; margin: 0; }
+/* App shell — viewport lock for app-like feel (scoped to .app pages only) */
+html, body { height: 100%; margin: 0; }
+body:has(.app) { overflow: hidden; }
 .app { height: 100vh; height: 100dvh; overflow: hidden; }
 
 /* Base styles */
