@@ -11,7 +11,6 @@ interface Props {
   ogType?: string;
   schemaData?: object;
   initialYear?: number;
-  hideFooterScript?: boolean;
 }
 
 const {
@@ -24,7 +23,6 @@ const {
   ogType = 'website',
   schemaData,
   initialYear,
-  hideFooterScript = false,
 } = Astro.props;
 
 const siteUrl = 'https://f1pointscalculator.chyuang.com';
@@ -112,7 +110,7 @@ const ogImage = `${siteUrl}/og-image.jpg`;
         </div>
       </div>
     </footer>
-    {!hideFooterScript && <script is:inline>document.getElementById('static-footer').style.display='none';</script>}
+    <script is:inline>document.getElementById('static-footer').style.display='none';</script>
 
     <!-- Google Analytics - Deferred to not block rendering -->
     <script is:inline>
