@@ -1,8 +1,8 @@
-import React, { createContext, useContext, useMemo, useReducer, useEffect } from 'react';
+import React, { createContext, useContext, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { type RootState, useAppDispatch } from '../store';
-import type { GridPosition, Race } from '../types';
-import { gridSlice,
+import type { GridPosition } from '../types';
+import {
   moveDriver as sandboxMoveDriver,
   placeDriver as sandboxPlaceDriver,
   clearPosition as sandboxClearPosition,
@@ -20,9 +20,8 @@ import {
   competeGridSetFastestLap,
   competeGridClearEverything,
 } from '../store/slices/competeGridSlice';
-import { getGridPositions, getActiveSeason } from '../utils/constants';
 
-type SliceName = 'grid' | 'competeGrid' | 'merchGrid';
+type SliceName = 'grid' | 'competeGrid';
 
 interface GridContextValue {
   positions: GridPosition[];
@@ -72,59 +71,6 @@ export const SandboxGridProvider: React.FC<{ children: React.ReactNode }> = ({ c
     setFastestLap: (p) => dispatch(sandboxSetFastestLap(p)),
     clearEverything: () => dispatch(sandboxClearEverything()),
   }), [dispatch, positions]);
-
-  return <GridContext.Provider value={value}>{children}</GridContext.Provider>;
-};
-
-function initializeGridPositions(races: Race[], driverCount: number): GridPosition[] {
-  const positions: GridPosition[] = [];
-  races.forEach(race => {
-    for (let position = 1; position <= driverCount; position++) {
-      positions.push({ raceId: race.id, position, driverId: null, isOfficialResult: false });
-    }
-  });
-  return positions;
-}
-
-export const MerchGridProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const races = useSelector((state: RootState) => state.seasonData.races);
-  const gridSize = getGridPositions(getActiveSeason());
-
-  const initialPositions = useMemo(
-    () => races.length > 0 ? initializeGridPositions(races, gridSize) : [],
-    [races, gridSize]
-  );
-
-  const [state, localDispatch] = useReducer(
-    gridSlice.reducer,
-    { positions: initialPositions }
-  );
-
-  // Re-initialize if races load after mount
-  const prevRacesLen = React.useRef(races.length);
-  useEffect(() => {
-    if (races.length > 0 && prevRacesLen.current === 0) {
-      // Races just loaded — we need a fresh state. Reset by clearing everything
-      // then re-creating. Since extraReducers don't fire with useReducer,
-      // we force re-mount via key in the parent instead.
-    }
-    prevRacesLen.current = races.length;
-  }, [races.length]);
-
-  // If positions are empty but races are loaded, use initialPositions
-  const positions = state.positions.length > 0 ? state.positions : initialPositions;
-
-  const value = useMemo<GridContextValue>(() => ({
-    positions,
-    sliceName: 'merchGrid',
-    placeDriver: (p) => localDispatch(gridSlice.actions.placeDriver(p)),
-    moveDriver: (p) => localDispatch(gridSlice.actions.moveDriver(p)),
-    clearPosition: (p) => localDispatch(gridSlice.actions.clearPosition(p)),
-    resetGrid: () => localDispatch(gridSlice.actions.resetGrid()),
-    fillRestOfSeason: (p) => localDispatch(gridSlice.actions.fillRestOfSeason(p)),
-    setFastestLap: (p) => localDispatch(gridSlice.actions.setFastestLap(p)),
-    clearEverything: () => localDispatch(gridSlice.actions.clearEverything()),
-  }), [localDispatch, positions]);
 
   return <GridContext.Provider value={value}>{children}</GridContext.Provider>;
 };
