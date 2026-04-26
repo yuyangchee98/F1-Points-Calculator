@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import type { Race } from '../../types';
 import type { RootState } from '../../store';
-import { selectDriversByIdMap, getDriverLastName, getDriverDisplayName } from '../../store/selectors/dataSelectors';
+import { selectDriversByIdMap, selectTeamsByIdMap, getDriverLastName, getDriverDisplayName } from '../../store/selectors/dataSelectors';
 import DriverCard from '../drivers/DriverCard';
 import { selectDriver, copyDriver } from '../../store/slices/uiSlice';
 import { useConsensus, getTopConsensusDriver } from '../../hooks/useConsensus';
@@ -46,6 +46,7 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position, style }) => {
   const copiedDriverId = useSelector((state: RootState) => state.ui.copiedDriver);
   const showConsensus = useSelector((state: RootState) => state.ui.showConsensus) && sliceName !== 'competeGrid';
   const driverById = useSelector(selectDriversByIdMap);
+  const teamById = useSelector(selectTeamsByIdMap);
   const driverStandings = useSelector(selectDriverStandings);
   const races = useSelector((state: RootState) => state.seasonData.races);
 
@@ -171,44 +172,47 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position, style }) => {
         }
       }
 
-      const groups = [
-        { id: 'top5', label: 'Top 5', icon: '🏆', start: 0, end: 5 },
-        { id: 'p6-10', label: 'P6–P10', icon: '🔵', start: 5, end: 10 },
-        { id: 'p11-15', label: 'P11–P15', icon: '🟡', start: 10, end: 15 },
-        { id: 'p16-20', label: 'P16–P20', icon: '⚪', start: 15, end: 20 },
-      ];
+      const driverSubmenu: ContextMenuItem[] = [];
+      const groupBoundaries = [5, 10, 15];
 
-      for (const group of groups) {
-        const groupDrivers = driverStandings.slice(group.start, group.end);
-        if (groupDrivers.length === 0) continue;
+      driverStandings.forEach((standing, index) => {
+        if (groupBoundaries.includes(index)) {
+          driverSubmenu.push({
+            id: `divider-${index}`,
+            label: '',
+            divider: true,
+          });
+        }
 
-        const submenu: ContextMenuItem[] = groupDrivers.map((standing) => {
-          const standingDriver = driverById[standing.driverId];
-          return {
-            id: `place-p${standing.position}`,
-            label: `P${standing.position}: ${getDriverDisplayName(standingDriver)} (${standing.points} pts)`,
-            onClick: () => {
-              placeDriver({
-                raceId: race.id,
-                position,
-                driverId: standing.driverId,
-              });
-              toastService.addToast(
-                `Placed ${getDriverDisplayName(standingDriver)} at P${position}`,
-                'success'
-              );
-              trackContextMenuAction('ACTION', `place_standing_p${standing.position}`);
-            },
-          };
+        const standingDriver = driverById[standing.driverId];
+        const team = standingDriver ? teamById[standingDriver.team] : null;
+        driverSubmenu.push({
+          id: `place-p${standing.position}`,
+          label: getDriverDisplayName(standingDriver),
+          groupLabel: `P${standing.position} · ${standing.points} pts`,
+          icon: team?.color,
+          onClick: () => {
+            placeDriver({
+              raceId: race.id,
+              position,
+              driverId: standing.driverId,
+            });
+            toastService.addToast(
+              `Placed ${getDriverDisplayName(standingDriver)} at P${position}`,
+              'success'
+            );
+            trackContextMenuAction('ACTION', `place_standing_p${standing.position}`);
+          },
         });
+      });
 
-        items.push({
-          id: `place-${group.id}`,
-          label: group.label,
-          icon: group.icon,
-          submenu,
-        });
-      }
+      items.push({
+        id: 'place-driver',
+        label: 'Place Driver',
+        icon: '🏁',
+        submenu: driverSubmenu,
+        searchable: true,
+      });
     }
 
     if (items.length > 0) {

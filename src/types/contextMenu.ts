@@ -6,6 +6,8 @@ export interface ContextMenuItem {
   disabled?: boolean;
   divider?: boolean;
   submenu?: ContextMenuItem[];
+  searchable?: boolean;
+  groupLabel?: string;
 }
 
 export interface ContextMenuPosition {

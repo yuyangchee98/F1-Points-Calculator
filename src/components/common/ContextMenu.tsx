@@ -9,18 +9,155 @@ interface ContextMenuProps {
   onClose: () => void;
 }
 
+const SearchableSubmenu: React.FC<{
+  items: ContextMenuItem[];
+  position: ContextMenuPosition;
+  parentRect: DOMRect | null;
+  onSelect: (item: ContextMenuItem) => void;
+}> = ({ items, position, parentRect, onSelect }) => {
+  const [search, setSearch] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Small delay so the input doesn't steal focus from the menu open animation
+    const t = setTimeout(() => inputRef.current?.focus(), 50);
+    return () => clearTimeout(t);
+  }, []);
+
+  // Compute responsive position
+  const [pos, setPos] = useState(position);
+  useEffect(() => {
+    if (!panelRef.current || !parentRect) return;
+    const panel = panelRef.current;
+    const rect = panel.getBoundingClientRect();
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const isMobile = vw < 640;
+
+    if (isMobile) {
+      // Center on mobile
+      setPos({
+        x: Math.max(8, (vw - Math.min(rect.width, vw - 16)) / 2),
+        y: Math.max(8, Math.min(position.y, vh - rect.height - 8)),
+      });
+    } else {
+      // Position to the right of parent, or left if no room
+      let x = parentRect.right + 5;
+      if (x + rect.width > vw - 8) {
+        x = parentRect.left - rect.width - 5;
+      }
+      x = Math.max(8, x);
+
+      let y = parentRect.top;
+      if (y + rect.height > vh - 8) {
+        y = vh - rect.height - 8;
+      }
+      y = Math.max(8, y);
+
+      setPos({ x, y });
+    }
+  }, [parentRect, position]);
+
+  const query = search.toLowerCase().trim();
+  const filtered = query
+    ? items.filter(item => !item.divider && item.label.toLowerCase().includes(query))
+    : items;
+
+  return (
+    <div
+      ref={panelRef}
+      className="context-menu context-submenu fixed z-[51] animate-fadeInScale"
+      style={{ left: pos.x, top: pos.y }}
+      role="menu"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div className="bg-white rounded-lg shadow-xl border border-gray-200 w-[240px] sm:w-[260px] max-w-[calc(100vw-16px)] flex flex-col overflow-hidden">
+        {/* Search */}
+        <div className="p-2 border-b border-gray-100">
+          <input
+            ref={inputRef}
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search driver..."
+            className="w-full px-2.5 py-1.5 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-400 focus:border-red-400 bg-gray-50"
+          />
+        </div>
+
+        {/* Driver list */}
+        <div className="overflow-y-auto overscroll-contain max-h-[min(320px,50vh)]">
+          {filtered.length === 0 ? (
+            <div className="px-4 py-6 text-center text-sm text-gray-400">
+              No drivers found
+            </div>
+          ) : (
+            filtered.map((item) => {
+              if (item.divider) {
+                return <div key={item.id} className="my-0.5 border-t border-gray-100" />;
+              }
+
+              // item.icon is team color hex string for driver items
+              const isColorIcon = item.icon && item.icon.startsWith('#');
+
+              return (
+                <button
+                  key={item.id}
+                  className="w-full text-left px-3 py-2 text-sm transition-colors duration-100 flex items-center gap-2.5 hover:bg-gray-50 active:bg-gray-100"
+                  onClick={() => onSelect(item)}
+                  role="menuitem"
+                >
+                  {isColorIcon ? (
+                    <span
+                      className="w-1 h-8 rounded-full shrink-0"
+                      style={{ backgroundColor: item.icon }}
+                    />
+                  ) : item.icon ? (
+                    <span className="text-base shrink-0">{item.icon}</span>
+                  ) : null}
+                  <span className="flex-1 min-w-0 font-medium text-gray-800 truncate">
+                    {item.label}
+                  </span>
+                  {item.groupLabel && (
+                    <span className="text-xs text-gray-400 shrink-0 tabular-nums">
+                      {item.groupLabel}
+                    </span>
+                  )}
+                </button>
+              );
+            })
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const ContextMenu: React.FC<ContextMenuProps> = ({ isOpen, position, items, onClose }) => {
   const menuRef = useRef<HTMLDivElement>(null);
   const [focusedIndex, setFocusedIndex] = useState(0);
   const [openSubmenuId, setOpenSubmenuId] = useState<string | null>(null);
   const [submenuPosition, setSubmenuPosition] = useState<ContextMenuPosition>({ x: 0, y: 0 });
+  const [submenuParentRect, setSubmenuParentRect] = useState<DOMRect | null>(null);
 
   useEffect(() => {
     if (!isOpen) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
+      // If a searchable submenu is open, let it handle its own keyboard events
+      if (openSubmenuId) {
+        const openItem = items.find(i => i.id === openSubmenuId);
+        if (openItem?.searchable) {
+          if (event.key === 'Escape') {
+            event.preventDefault();
+            setOpenSubmenuId(null);
+          }
+          return;
+        }
+      }
+
       switch (event.key) {
-        case 'ArrowDown':
+        case 'ArrowDown': {
           event.preventDefault();
           let nextIndex = focusedIndex + 1;
           while (nextIndex < items.length && (items[nextIndex].divider || items[nextIndex].disabled)) {
@@ -31,8 +168,9 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ isOpen, position, items, onCl
             setOpenSubmenuId(null);
           }
           break;
+        }
 
-        case 'ArrowUp':
+        case 'ArrowUp': {
           event.preventDefault();
           let prevIndex = focusedIndex - 1;
           while (prevIndex >= 0 && (items[prevIndex].divider || items[prevIndex].disabled)) {
@@ -43,14 +181,16 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ isOpen, position, items, onCl
             setOpenSubmenuId(null);
           }
           break;
+        }
 
-        case 'ArrowRight':
+        case 'ArrowRight': {
           event.preventDefault();
           const currentItem = items[focusedIndex];
           if (currentItem?.submenu && currentItem.submenu.length > 0) {
             setOpenSubmenuId(currentItem.id);
           }
           break;
+        }
 
         case 'ArrowLeft':
         case 'Escape':
@@ -63,7 +203,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ isOpen, position, items, onCl
           break;
 
         case 'Enter':
-        case ' ':
+        case ' ': {
           event.preventDefault();
           const focusedItem = items[focusedIndex];
           if (focusedItem && !focusedItem.disabled && !focusedItem.divider) {
@@ -75,6 +215,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ isOpen, position, items, onCl
             }
           }
           break;
+        }
       }
     };
 
@@ -99,17 +240,8 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ isOpen, position, items, onCl
       if (event) {
         const target = event.currentTarget as HTMLElement;
         const rect = target.getBoundingClientRect();
-        const newPos = {
-          x: rect.right + 5,
-          y: rect.top,
-        };
-
-        const submenuWidth = 200;
-        if (newPos.x + submenuWidth > window.innerWidth) {
-          newPos.x = rect.left - submenuWidth - 5;
-        }
-
-        setSubmenuPosition(newPos);
+        setSubmenuParentRect(rect);
+        setSubmenuPosition({ x: rect.right + 5, y: rect.top });
       }
       setOpenSubmenuId(openSubmenuId === item.id ? null : item.id);
     } else if (item.onClick) {
@@ -125,8 +257,13 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ isOpen, position, items, onCl
     }
   };
 
+  const openItem = openSubmenuId ? items.find(i => i.id === openSubmenuId) : null;
+
   return createPortal(
     <>
+      {/* Backdrop — closes menu on outside click */}
+      <div className="fixed inset-0 z-[49]" onClick={onClose} onContextMenu={(e) => { e.preventDefault(); onClose(); }} />
+
       <div
         ref={menuRef}
         className="context-menu fixed z-50 animate-fadeInScale"
@@ -186,7 +323,18 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ isOpen, position, items, onCl
         </div>
       </div>
 
-      {openSubmenuId && items.find(item => item.id === openSubmenuId)?.submenu && (
+      {/* Searchable submenu */}
+      {openItem?.searchable && openItem.submenu && (
+        <SearchableSubmenu
+          items={openItem.submenu}
+          position={submenuPosition}
+          parentRect={submenuParentRect}
+          onSelect={handleSubmenuItemClick}
+        />
+      )}
+
+      {/* Regular submenu */}
+      {openItem && !openItem.searchable && openItem.submenu && (
         <div
           className="context-menu context-submenu fixed z-[51] animate-fadeInScale"
           style={{
@@ -197,7 +345,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ isOpen, position, items, onCl
           aria-orientation="vertical"
         >
           <div className="bg-white rounded-md shadow-lg border border-gray-200 py-1 min-w-[200px] max-w-[280px]">
-            {items.find(item => item.id === openSubmenuId)?.submenu?.map((subItem) => {
+            {openItem.submenu.map((subItem) => {
               if (subItem.divider) {
                 return <div key={subItem.id} className="context-menu-divider my-1 border-t border-gray-200" />;
               }
