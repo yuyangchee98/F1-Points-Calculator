@@ -10,7 +10,7 @@ const DrawLineRacingPromo: React.FC<DrawLineRacingPromoProps> = ({ className = '
       href="https://drawlineracing.chyuang.com/"
       target="_blank"
       rel="noopener noreferrer"
-      className={`group inline-flex items-center gap-1 sm:gap-2 p-2 sm:px-4 sm:py-2 bg-gradient-to-r from-red-600 to-red-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl hover:from-red-700 hover:to-red-800 transition-all duration-300 transform hover:scale-105 ${className}`}
+      className={`group inline-flex items-center gap-1.5 h-8 px-3 bg-red-50 text-red-700 border border-red-200 font-medium rounded-md hover:bg-red-100 transition-colors text-sm ${className}`}
       aria-label="Try Draw Line Racing"
       title="Try my new game: Draw Line Racing!"
       onClick={() => {
@@ -22,14 +22,11 @@ const DrawLineRacingPromo: React.FC<DrawLineRacingPromoProps> = ({ className = '
         }
       }}
     >
-      <span className="text-base sm:text-2xl leading-none">🏎️</span>
-      <div className="hidden sm:flex flex-col items-start">
-        <span className="text-xs font-normal opacity-90">Try my new game!</span>
-        <span className="text-sm font-bold leading-tight">Draw Line Racing</span>
-      </div>
+      <span className="text-sm leading-none">🏎️</span>
+      <span>Draw Line Racing</span>
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        className="hidden sm:block h-4 w-4 group-hover:translate-x-1 transition-transform"
+        className="h-3 w-3 group-hover:translate-x-0.5 transition-transform"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"

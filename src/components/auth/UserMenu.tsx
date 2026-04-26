@@ -20,7 +20,7 @@ const UserMenu: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse" />
+      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gray-200 animate-pulse" />
     );
   }
 
@@ -28,7 +28,7 @@ const UserMenu: React.FC = () => {
     return (
       <button
         onClick={openSignIn}
-        className="inline-flex items-center gap-1.5 p-2 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md transition-colors duration-200"
+        className="inline-flex items-center gap-1.5 h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md transition-colors"
         aria-label="Sign In"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -58,10 +58,10 @@ const UserMenu: React.FC = () => {
           <img
             src={user.image}
             alt={user.name || 'User'}
-            className="w-8 h-8 rounded-full"
+            className="w-7 h-7 sm:w-8 sm:h-8 rounded-full"
           />
         ) : (
-          <div className="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center text-sm font-medium">
+          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-red-600 text-white flex items-center justify-center text-xs sm:text-sm font-medium">
             {initials}
           </div>
         )}

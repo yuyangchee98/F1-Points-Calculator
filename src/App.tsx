@@ -143,15 +143,15 @@ const App: React.FC<{ year?: string }> = ({ year }) => {
           content={
             <div className="flex-1 min-h-0 flex flex-col px-2 sm:px-3 lg:px-4 pt-2 sm:pt-3 lg:pt-4 pb-16 sm:pb-0 max-w-5xl mx-auto w-full">
               <div className="mb-2 shrink-0">
-                {/* Single header row — responsive, never wraps */}
-                <div className="flex items-center gap-1 lg:gap-2 flex-nowrap">
-                  <h1 className="text-sm sm:text-base md:text-lg lg:text-2xl font-bold text-gray-800 flex items-center min-w-0 shrink">
+                {/* Single header row — unified sizing */}
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-nowrap">
+                  <h1 className="text-sm sm:text-base lg:text-lg font-bold text-gray-800 flex items-center min-w-0 shrink">
                     <CalculatorDropdown />
                     <span className="truncate">Points Calculator</span>
                   </h1>
 
-                  {/* Right-side controls — push to right with ml-auto */}
-                  <div className="flex items-center gap-1 lg:gap-2 ml-auto shrink-0">
+                  {/* Right-side controls */}
+                  <div className="flex items-center gap-1.5 sm:gap-2 ml-auto shrink-0">
                     <SeasonSelector activeSeason={activeSeason} />
 
                     {/* Promo only visible at lg+ where there's room */}
