@@ -171,35 +171,44 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position, style }) => {
         }
       }
 
-      const topDrivers = driverStandings.slice(0, 5);
-      const leaderSubmenu: ContextMenuItem[] = topDrivers.map((standing, index) => {
-        const standingDriver = driverById[standing.driverId];
-        const icons = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
-        return {
-          id: `place-leader-${index + 1}`,
-          label: `P${standing.position}: ${getDriverDisplayName(standingDriver)} (${standing.points} pts)`,
-          icon: icons[index],
-          onClick: () => {
-            placeDriver({
-              raceId: race.id,
-              position,
-              driverId: standing.driverId,
-            });
-            toastService.addToast(
-              `Placed ${getDriverDisplayName(standingDriver)} at P${position}`,
-              'success'
-            );
-            trackContextMenuAction('ACTION', `place_leader_${index + 1}`);
-          },
-        };
-      });
+      const groups = [
+        { id: 'top5', label: 'Top 5', icon: '🏆', start: 0, end: 5 },
+        { id: 'p6-10', label: 'P6–P10', icon: '🔵', start: 5, end: 10 },
+        { id: 'p11-15', label: 'P11–P15', icon: '🟡', start: 10, end: 15 },
+        { id: 'p16-20', label: 'P16–P20', icon: '⚪', start: 15, end: 20 },
+      ];
 
-      items.push({
-        id: 'place-top5',
-        label: 'Place Top 5',
-        icon: '🏆',
-        submenu: leaderSubmenu,
-      });
+      for (const group of groups) {
+        const groupDrivers = driverStandings.slice(group.start, group.end);
+        if (groupDrivers.length === 0) continue;
+
+        const submenu: ContextMenuItem[] = groupDrivers.map((standing) => {
+          const standingDriver = driverById[standing.driverId];
+          return {
+            id: `place-p${standing.position}`,
+            label: `P${standing.position}: ${getDriverDisplayName(standingDriver)} (${standing.points} pts)`,
+            onClick: () => {
+              placeDriver({
+                raceId: race.id,
+                position,
+                driverId: standing.driverId,
+              });
+              toastService.addToast(
+                `Placed ${getDriverDisplayName(standingDriver)} at P${position}`,
+                'success'
+              );
+              trackContextMenuAction('ACTION', `place_standing_p${standing.position}`);
+            },
+          };
+        });
+
+        items.push({
+          id: `place-${group.id}`,
+          label: group.label,
+          icon: group.icon,
+          submenu,
+        });
+      }
     }
 
     if (items.length > 0) {
