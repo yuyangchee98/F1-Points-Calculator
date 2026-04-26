@@ -14,7 +14,7 @@ import Layout from './components/layout/Layout';
 import StandingsSidebar from './components/standings/StandingsSidebar';
 import RaceGrid from './components/grid/RaceGrid';
 import MobileRaceCardView from './components/grid/MobileRaceCardView';
-import ToastContainer from './components/common/ToastContainer';
+import ToastContainer, { toastService } from './components/common/ToastContainer';
 import HorizontalScrollBar from './components/common/HorizontalScrollBar';
 import SubscriptionModal from './components/common/SubscriptionModal';
 import VersionHistory from './components/common/VersionHistory';
@@ -166,7 +166,7 @@ const App: React.FC<{ year?: string }> = ({ year }) => {
                           try {
                             await openCustomerPortal(email);
                           } catch (error) {
-                            alert('Failed to open subscription management.');
+                            toastService.addToast('Failed to open subscription management.', 'warning');
                           }
                         } else {
                           setShowSubscriptionModal(true);
