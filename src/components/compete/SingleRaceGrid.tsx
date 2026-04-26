@@ -51,7 +51,7 @@ const SingleRaceGrid: React.FC<SingleRaceGridProps> = ({ race, columns = 3, week
     <div>
       {/* Race header — becomes a selector on sprint weekends */}
       {hasSelector ? (
-        <div className="race-header mb-3 flex-row gap-2" style={{ height: 56 }}>
+        <div className="race-header mb-3 flex flex-row gap-2" style={{ height: 56 }}>
           {race.countryCode && (
             <img
               src={`/flags/${race.countryCode}.webp`}
