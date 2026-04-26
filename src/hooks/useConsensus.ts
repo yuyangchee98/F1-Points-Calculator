@@ -9,7 +9,9 @@ const fetchingRaces: Set<string> = new Set();
 const pendingListeners: Record<string, Set<(data: ConsensusData) => void>> = {};
 
 export function useConsensus(raceId: string, enabled: boolean) {
-  const [data, setData] = useState<ConsensusData | null>(consensusCache[raceId] || null);
+  const season = getActiveSeason();
+  const cacheKey = `${season}:${raceId}`;
+  const [data, setData] = useState<ConsensusData | null>(consensusCache[cacheKey] || null);
   const [loading, setLoading] = useState(false);
   const mountedRef = useRef(true);
 
@@ -29,48 +31,48 @@ export function useConsensus(raceId: string, enabled: boolean) {
     if (!enabled) return;
 
     // Already cached
-    if (consensusCache[raceId]) {
-      setData(consensusCache[raceId]);
+    if (consensusCache[cacheKey]) {
+      setData(consensusCache[cacheKey]);
       return;
     }
 
     // Already fetching - subscribe to get notified when done
-    if (fetchingRaces.has(raceId)) {
-      if (!pendingListeners[raceId]) {
-        pendingListeners[raceId] = new Set();
+    if (fetchingRaces.has(cacheKey)) {
+      if (!pendingListeners[cacheKey]) {
+        pendingListeners[cacheKey] = new Set();
       }
-      pendingListeners[raceId].add(handleDataReceived);
+      pendingListeners[cacheKey].add(handleDataReceived);
       setLoading(true);
 
       return () => {
-        pendingListeners[raceId]?.delete(handleDataReceived);
+        pendingListeners[cacheKey]?.delete(handleDataReceived);
       };
     }
 
     const fetchData = async () => {
-      fetchingRaces.add(raceId);
+      fetchingRaces.add(cacheKey);
       setLoading(true);
 
-      const result = await getConsensus(getActiveSeason(), raceId);
+      const result = await getConsensus(season, raceId);
 
       if (result) {
-        consensusCache[raceId] = result;
+        consensusCache[cacheKey] = result;
         if (mountedRef.current) {
           setData(result);
         }
         // Notify all waiting listeners
-        pendingListeners[raceId]?.forEach(listener => listener(result));
-        delete pendingListeners[raceId];
+        pendingListeners[cacheKey]?.forEach(listener => listener(result));
+        delete pendingListeners[cacheKey];
       }
 
-      fetchingRaces.delete(raceId);
+      fetchingRaces.delete(cacheKey);
       if (mountedRef.current) {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [raceId, enabled, handleDataReceived]);
+  }, [cacheKey, raceId, season, enabled, handleDataReceived]);
 
   return { data, loading };
 }
