@@ -203,7 +203,7 @@ const App: React.FC<{ year?: string }> = ({ year }) => {
                 ) : (
                   <>
                 <SandboxGridProvider>
-                {!isMobile && <div className="shrink-0"><DriverSelection /></div>}
+                {!isMobile && <div className="shrink min-h-0 overflow-hidden"><DriverSelection /></div>}
 
                   {isMobile ? (
                     <div className="flex-1 min-h-0 overflow-hidden">

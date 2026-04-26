@@ -11,7 +11,8 @@ const DriverSelection: React.FC = () => {
   const dispatch = useAppDispatch();
   const allDrivers = useSelector((state: RootState) => state.seasonData.drivers);
   const selectedDriverId = useSelector((state: RootState) => state.ui.selectedDriver);
-  const [isExpanded, setIsExpanded] = useState(true);
+  // Start collapsed on smaller screens to preserve grid space
+  const [isExpanded, setIsExpanded] = useState(() => window.innerWidth >= 1024);
 
   const drivers = allDrivers;
 
@@ -26,8 +27,8 @@ const DriverSelection: React.FC = () => {
   };
 
   return (
-    <div className="mb-6">
-      <div className="flex justify-between items-center mb-4">
+    <div className="mb-2 lg:mb-4">
+      <div className="flex justify-between items-center mb-1.5 lg:mb-2">
         <h2 className="text-2xl font-bold">DRIVERS</h2>
         <button
           id="driver-toggle-button"
@@ -63,7 +64,7 @@ const DriverSelection: React.FC = () => {
         id="driver-selection"
         className={`
           grid gap-2
-          ${isExpanded ? 'max-h-[45vh] sm:max-h-[55vh] opacity-100 overflow-y-auto' : 'max-h-0 opacity-0'}
+          ${isExpanded ? 'max-h-[25vh] lg:max-h-[35vh] opacity-100 overflow-y-auto' : 'max-h-0 opacity-0'}
           overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out
           p-4 bg-gray-50 rounded-lg shadow-sm border border-gray-200
         `}
