@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux';
 import { useSession, signIn, signUp, signOut, sendVerificationEmail } from '../lib/auth-client';
 import { type RootState, useAppDispatch } from '../store';
 import { setUser, setLoading, openAuthModal, closeAuthModal, logout } from '../store/slices/authSlice';
-import { API_BASE_URL } from '../utils/constants';
 
 export function useAuth() {
   const dispatch = useAppDispatch();
@@ -64,10 +63,12 @@ export function useAuth() {
     dispatch(logout());
   };
 
-  const handleGoogleSignIn = () => {
-    const callbackURL = encodeURIComponent(window.location.href);
-    const errorCallbackURL = encodeURIComponent(window.location.href + '?auth_error=true');
-    window.location.href = `${API_BASE_URL}/api/auth/social-redirect?provider=google&callbackURL=${callbackURL}&errorCallbackURL=${errorCallbackURL}`;
+  const handleGoogleSignIn = async () => {
+    await signIn.social({
+      provider: 'google',
+      callbackURL: window.location.href,
+      errorCallbackURL: window.location.href + '?auth_error=true',
+    });
   };
 
   const openSignIn = () => dispatch(openAuthModal('signin'));
