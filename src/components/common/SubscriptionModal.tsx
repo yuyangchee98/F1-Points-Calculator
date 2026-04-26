@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createCheckoutSession, openCustomerPortal, type AccessTier } from '../../api/subscription';
 import { trackSubscriptionAction } from '../../utils/analytics';
+import { toastService } from './ToastContainer';
 
 interface SubscriptionModalProps {
   isOpen: boolean;
@@ -39,7 +40,7 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
 
   const handleSubmit = async () => {
     if (!localEmail || !localEmail.includes('@')) {
-      alert('Please enter a valid email address');
+      toastService.addToast('Please enter a valid email address', 'warning');
       return;
     }
 
@@ -50,14 +51,14 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
       const session = await createCheckoutSession(localEmail, selectedTier);
       window.location.href = session.url;
     } catch (error) {
-      alert('Failed to start checkout process. Please try again.');
+      toastService.addToast('Failed to start checkout process. Please try again.', 'warning');
       setIsLoading(false);
     }
   };
 
   const handleManageSubscription = async () => {
     if (!email) {
-      alert('Please enter your email address');
+      toastService.addToast('Please enter your email address', 'warning');
       return;
     }
 
@@ -65,7 +66,7 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
     try {
       await openCustomerPortal(email);
     } catch (error) {
-      alert('Failed to open subscription management. Please try again.');
+      toastService.addToast('Failed to open subscription management. Please try again.', 'warning');
       setIsLoading(false);
     }
   };
