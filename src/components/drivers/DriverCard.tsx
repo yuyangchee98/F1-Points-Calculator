@@ -58,11 +58,11 @@ const DriverCard: React.FC<DriverCardProps> = ({
         }}
       />
 
-      <div className="flex flex-col ml-3 flex-grow relative" style={{ zIndex: 1 }}>
-        <span className="text-sm font-bold flex items-center gap-1">
+      <div className="flex flex-col ml-2 flex-grow relative" style={{ zIndex: 1 }}>
+        <span className="text-xs font-bold flex items-center gap-1">
           {getDriverDisplayName(driver)}
         </span>
-        <span className="text-xs text-gray-600" style={{ color: team?.color || '#555' }}>
+        <span className="text-xs text-gray-600 leading-tight" style={{ color: team?.color || '#555' }}>
           {team?.name || driver.team}
         </span>
       </div>
