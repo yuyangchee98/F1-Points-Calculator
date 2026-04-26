@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Toast from './Toast';
 
 export interface ToastMessage {
@@ -40,22 +40,24 @@ export const toastService = {
 
 const ToastContainer: React.FC<ToastContainerProps> = ({ position = 'bottom-right' }) => {
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
+  const toastsRef = useRef(toasts);
+  toastsRef.current = toasts;
 
-  React.useEffect(() => {
+  useEffect(() => {
     const removeListener = toastService.addListener((toast) => {
       const now = Date.now();
-      const recentToastWithSameMessage = toasts.find(t =>
+      const isDuplicate = toastsRef.current.some(t =>
         t.message === toast.message &&
         t._addedAt !== undefined && (now - t._addedAt < 500)
       );
 
-      if (!recentToastWithSameMessage) {
-        setToasts(prev => [...prev, {...toast, _addedAt: now}]);
+      if (!isDuplicate) {
+        setToasts(prev => [...prev, { ...toast, _addedAt: now }]);
       }
     });
 
     return () => removeListener();
-  }, [toasts]);
+  }, []);
 
   const getPositionClasses = () => {
     switch (position) {
@@ -67,9 +69,9 @@ const ToastContainer: React.FC<ToastContainerProps> = ({ position = 'bottom-righ
     }
   };
 
-  const removeToast = (id: string) => {
-    setToasts(toasts.filter(t => t.id !== id));
-  };
+  const removeToast = useCallback((id: string) => {
+    setToasts(prev => prev.filter(t => t.id !== id));
+  }, []);
   
   return (
     <div className={`fixed ${getPositionClasses()} z-50 flex flex-col gap-3 pointer-events-none w-80`}>

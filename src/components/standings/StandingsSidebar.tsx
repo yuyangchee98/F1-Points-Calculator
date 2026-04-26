@@ -97,17 +97,6 @@ const StandingsSidebar: React.FC = () => {
             </div>
 
             <CompetitionCard />
-
-            <div className="mt-6 pt-4 border-t border-gray-200 text-xs text-gray-400 space-y-1.5">
-              <p>Created by <a href="https://chyuang.com" className="hover:text-gray-600" target="_blank" rel="noopener noreferrer">Chyuang</a></p>
-              <p><a href="https://github.com/yuyangchee98/F1-Points-Calculator" className="hover:text-gray-600" target="_blank" rel="noopener noreferrer">Open source on GitHub</a></p>
-              <p><a href="mailto:f1pointscalculator@chyuang.com" className="hover:text-gray-600">Contact</a></p>
-              <div className="flex gap-3 pt-1">
-                <a href="https://f1-dash.com/" className="hover:text-gray-600" target="_blank" rel="noopener noreferrer">F1 Dash</a>
-                <a href="https://f1calendar.com/" className="hover:text-gray-600" target="_blank" rel="noopener noreferrer">F1 Calendar</a>
-                <a href="https://drawlineracing.chyuang.com/" className="hover:text-gray-600" target="_blank" rel="noopener noreferrer">Draw Line Racing</a>
-              </div>
-            </div>
           </div>
         ) : (
           <div className="space-y-6">
@@ -126,7 +115,7 @@ const StandingsSidebar: React.FC = () => {
                 </Suspense>
               </div>
             </div>
-            
+
             <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
               <h3 className="text-lg font-medium p-3 border-b border-gray-200 sticky top-0 bg-white flex items-center">
                 <span className="w-1 h-6 bg-red-600 mr-3 inline-block rounded-r-md"></span>
@@ -144,19 +133,19 @@ const StandingsSidebar: React.FC = () => {
             </div>
 
             <CompetitionCard />
-
-            <div className="mt-6 pt-4 border-t border-gray-200 text-xs text-gray-400 space-y-1.5">
-              <p>Created by <a href="https://chyuang.com" className="hover:text-gray-600" target="_blank" rel="noopener noreferrer">Chyuang</a></p>
-              <p><a href="https://github.com/yuyangchee98/F1-Points-Calculator" className="hover:text-gray-600" target="_blank" rel="noopener noreferrer">Open source on GitHub</a></p>
-              <p><a href="mailto:f1pointscalculator@chyuang.com" className="hover:text-gray-600">Contact</a></p>
-              <div className="flex gap-3 pt-1">
-                <a href="https://f1-dash.com/" className="hover:text-gray-600" target="_blank" rel="noopener noreferrer">F1 Dash</a>
-                <a href="https://f1calendar.com/" className="hover:text-gray-600" target="_blank" rel="noopener noreferrer">F1 Calendar</a>
-                <a href="https://drawlineracing.chyuang.com/" className="hover:text-gray-600" target="_blank" rel="noopener noreferrer">Draw Line Racing</a>
-              </div>
-            </div>
           </div>
         )}
+
+        <div className="mt-6 pt-4 border-t border-gray-200 text-xs text-gray-400 space-y-1.5">
+          <p>Created by <a href="https://chyuang.com" className="hover:text-gray-600" target="_blank" rel="noopener noreferrer">Chyuang</a></p>
+          <p><a href="https://github.com/yuyangchee98/F1-Points-Calculator" className="hover:text-gray-600" target="_blank" rel="noopener noreferrer">Open source on GitHub</a></p>
+          <p><a href="mailto:f1pointscalculator@chyuang.com" className="hover:text-gray-600">Contact</a></p>
+          <div className="flex gap-3 pt-1">
+            <a href="https://f1-dash.com/" className="hover:text-gray-600" target="_blank" rel="noopener noreferrer">F1 Dash</a>
+            <a href="https://f1calendar.com/" className="hover:text-gray-600" target="_blank" rel="noopener noreferrer">F1 Calendar</a>
+            <a href="https://drawlineracing.chyuang.com/" className="hover:text-gray-600" target="_blank" rel="noopener noreferrer">Draw Line Racing</a>
+          </div>
+        </div>
       </div>
     </div>
   );
