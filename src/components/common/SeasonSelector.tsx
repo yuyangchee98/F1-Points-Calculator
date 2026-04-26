@@ -40,15 +40,15 @@ const SeasonSelector: React.FC<{ activeSeason: number }> = ({ activeSeason }) =>
     <div className="season-selector relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1 lg:gap-2 px-2 py-1 lg:px-4 lg:py-2 text-xs lg:text-sm bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-500"
+        className="flex items-center gap-1 sm:gap-1.5 h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-500"
         aria-expanded={isOpen}
         aria-haspopup="true"
       >
-        <span className="lg:hidden">{currentSeason.year}</span>
-        <span className="hidden lg:inline">{currentSeason.label}</span>
+        <span className="sm:hidden">{currentSeason.year}</span>
+        <span className="hidden sm:inline">{currentSeason.label}</span>
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className={`h-3 w-3 lg:h-4 lg:w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          className={`h-3 w-3 transition-transform ${isOpen ? 'rotate-180' : ''}`}
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"

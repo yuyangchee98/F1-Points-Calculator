@@ -34,7 +34,7 @@ const HeaderMenu: React.FC<HeaderMenuProps> = ({ hasConsensusAccess, onOpenSubsc
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="inline-flex items-center justify-center p-1.5 lg:p-2 text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md transition-colors"
+        className="inline-flex items-center justify-center h-7 sm:h-8 w-7 sm:w-8 text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md transition-colors"
         aria-label="Menu"
         aria-expanded={isOpen}
       >

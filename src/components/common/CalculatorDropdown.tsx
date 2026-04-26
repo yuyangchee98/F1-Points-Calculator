@@ -18,7 +18,7 @@ const CalculatorDropdown: React.FC = () => {
     <div className="relative shrink-0" ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="bg-red-600 text-white px-1.5 py-0.5 lg:px-3 lg:py-1 mr-1.5 lg:mr-3 rounded-md text-xs sm:text-sm lg:text-xl font-bold flex items-center gap-0.5 lg:gap-1 hover:bg-red-700 transition-colors"
+        className="bg-red-600 text-white h-7 sm:h-8 px-2 sm:px-2.5 mr-1.5 sm:mr-2 rounded-md text-xs sm:text-sm font-bold flex items-center gap-1 hover:bg-red-700 transition-colors"
         aria-expanded={isOpen}
         aria-haspopup="true"
         aria-label="Switch calculator"
@@ -26,7 +26,7 @@ const CalculatorDropdown: React.FC = () => {
         F1
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className={`h-3 w-3 lg:h-4 lg:w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          className={`h-3 w-3 transition-transform ${isOpen ? 'rotate-180' : ''}`}
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
