@@ -27,12 +27,12 @@ const DriverSelection: React.FC = () => {
   };
 
   return (
-    <div className="mb-2 lg:mb-4">
-      <div className="flex justify-between items-center mb-1.5 lg:mb-2">
-        <h2 className="text-2xl font-bold">DRIVERS</h2>
+    <div className="mb-1.5">
+      <div className="flex justify-between items-center mb-1">
+        <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Drivers</h2>
         <button
           id="driver-toggle-button"
-          className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-md shadow-sm transition-colors duration-200 flex items-center text-sm"
+          className="text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1 transition-colors"
           onClick={() => {
             setIsExpanded(!isExpanded);
             trackEvent(
@@ -44,17 +44,17 @@ const DriverSelection: React.FC = () => {
         >
           {isExpanded ? (
             <>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M5 10a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z" clipRule="evenodd" />
               </svg>
-              HIDE DRIVERS
+              Hide
             </>
           ) : (
             <>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
               </svg>
-              SELECT DRIVER
+              Show
             </>
           )}
         </button>
@@ -63,12 +63,12 @@ const DriverSelection: React.FC = () => {
       <div 
         id="driver-selection"
         className={`
-          grid gap-2
+          grid gap-1.5
           ${isExpanded ? 'max-h-[25vh] lg:max-h-[35vh] opacity-100 overflow-y-auto' : 'max-h-0 opacity-0'}
           overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out
-          p-4 bg-gray-50 rounded-lg shadow-sm border border-gray-200
+          p-2 bg-gray-50 rounded-lg shadow-sm border border-gray-200
         `}
-        style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 1fr))' }}
+        style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))' }}
       >
         {drivers.map(driver => (
           <DriverCard
