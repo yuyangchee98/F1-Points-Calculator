@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useSelector } from 'react-redux';
 import PointsSystemSelector from '../common/PointsSystemSelector';
 import useWindowSize from '../../hooks/useWindowSize';
+import { useAuth } from '../../hooks/useAuth';
+import { selectNextRaceToLock } from '../../store/selectors/lockedPredictionsSelectors';
 import { getActiveSeason, CURRENT_SEASON } from '../../utils/constants';
 
 interface GridToolbarProps {
@@ -27,6 +30,9 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
   const { isMobile, isTablet } = useWindowSize();
   const isCompact = isMobile || isTablet;
   const isCurrentSeason = getActiveSeason() === CURRENT_SEASON;
+  const { isAuthenticated } = useAuth();
+  const nextRaceToLock = useSelector(selectNextRaceToLock);
+  const showNotification = isAuthenticated && !!nextRaceToLock;
   const [showHowToUse, setShowHowToUse] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const moreMenuRef = useRef<HTMLDivElement>(null);
@@ -162,9 +168,12 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
           {isCurrentSeason && (
             <a
               href="/compete"
-              className="shrink-0 bg-amber-50 border border-amber-300 text-amber-700 hover:bg-amber-100 p-2 md:px-3 md:py-2 rounded-md transition-colors duration-200 flex items-center gap-2 font-medium text-sm"
+              className="relative shrink-0 bg-amber-50 border border-amber-300 text-amber-700 hover:bg-amber-100 p-2 md:px-3 md:py-2 rounded-md transition-colors duration-200 flex items-center gap-2 font-medium text-sm"
               title="Compete"
             >
+              {showNotification && (
+                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse" />
+              )}
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
               </svg>
