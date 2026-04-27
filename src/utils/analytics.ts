@@ -44,12 +44,6 @@ export const GA_EVENTS = {
     DELETE_ALL_VERSIONS: 'delete_all_versions',
     CLOSE_HISTORY: 'close_version_history',
   },
-  SUBSCRIPTION: {
-    OPEN_MODAL: 'subscription_open_modal',
-    CLOSE_MODAL: 'subscription_close_modal',
-    CLICK_SUBSCRIBE: 'subscription_subscribe_click',
-    PURCHASE_SUCCESS: 'subscription_purchase_success',
-  },
   CONTEXT_MENU: {
     ACTION: 'context_menu_action',
   },
@@ -106,14 +100,6 @@ export const trackVersionHistoryAction = (action: keyof typeof GA_EVENTS.VERSION
   );
 };
 
-export const trackSubscriptionAction = (action: keyof typeof GA_EVENTS.SUBSCRIPTION, details?: string, value?: number) => {
-  trackEvent(
-    GA_EVENTS.SUBSCRIPTION[action],
-    'Subscription',
-    details,
-    value
-  );
-};
 
 export const trackContextMenuAction = (action: keyof typeof GA_EVENTS.CONTEXT_MENU, details?: string, value?: number) => {
   trackEvent(

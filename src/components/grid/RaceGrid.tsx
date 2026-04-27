@@ -20,8 +20,6 @@ interface RaceGridProps {
   onOpenHistory: () => void;
   onOpenExport: () => void;
   showOfficialResults: boolean;
-  hasConsensusAccess: boolean;
-  onOpenSubscriptionModal: () => void;
   toolbar?: React.ReactNode;
   racesOverride?: Race[];
   gridPositionCount?: number;
@@ -40,8 +38,6 @@ const RaceGrid: React.FC<RaceGridProps> = ({
   onOpenHistory,
   onOpenExport,
   showOfficialResults,
-  hasConsensusAccess,
-  onOpenSubscriptionModal,
   toolbar,
   racesOverride,
   gridPositionCount,
@@ -103,15 +99,8 @@ const RaceGrid: React.FC<RaceGridProps> = ({
       onOpenHistory={onOpenHistory}
       onOpenExport={onOpenExport}
       showOfficialResults={showOfficialResults}
-      onToggleConsensus={() => {
-        if (hasConsensusAccess) {
-          dispatch(toggleConsensus());
-        } else {
-          onOpenSubscriptionModal();
-        }
-      }}
+      onToggleConsensus={() => dispatch(toggleConsensus())}
       showConsensus={showConsensus}
-      hasConsensusAccess={hasConsensusAccess}
     />
   );
 

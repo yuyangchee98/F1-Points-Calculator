@@ -8,15 +8,12 @@ import { fetchLockedPredictions } from './store/slices/lockedPredictionsSlice';
 import { loadPrediction, type UserIdentifier } from './api/predictions';
 import useRaceResults from './hooks/useRaceResults';
 import { useAutoSave } from './hooks/useAutoSave';
-import { useDayAccess } from './hooks/useSubscription';
-import { useUserEmail } from './hooks/useUserEmail';
 import Layout from './components/layout/Layout';
 import StandingsSidebar from './components/standings/StandingsSidebar';
 import RaceGrid from './components/grid/RaceGrid';
 import MobileRaceCardView from './components/grid/MobileRaceCardView';
-import ToastContainer, { toastService } from './components/common/ToastContainer';
+import ToastContainer from './components/common/ToastContainer';
 import HorizontalScrollBar from './components/common/HorizontalScrollBar';
-import SubscriptionModal from './components/common/SubscriptionModal';
 import VersionHistory from './components/common/VersionHistory';
 import ExportModal from './components/common/ExportModal';
 import DrawLineRacingPromo from './components/common/DrawLineRacingPromo';
@@ -31,7 +28,6 @@ import { SandboxGridProvider } from './contexts/GridContext';
 import { useAppDispatch } from './store';
 import useWindowSize from './hooks/useWindowSize';
 import { GA_EVENTS, trackEvent, trackVersionHistoryAction, trackExportAction } from './utils/analytics';
-import { openCustomerPortal } from './api/subscription';
 import { CURRENT_SEASON } from './utils/constants';
 
 
@@ -64,9 +60,6 @@ const App: React.FC<{ year?: string }> = ({ year }) => {
     return null;
   };
   const raceGridScrollRef = React.useRef<HTMLDivElement>(null);
-  const { hasAccess: hasConsensusAccess, tier: consensusTier, expiresAt: consensusExpiresAt, statusMessage } = useDayAccess();
-  const { email, saveEmail } = useUserEmail();
-  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [showExport, setShowExport] = useState(false);
   // Fetch locked predictions when identifier is available
@@ -159,33 +152,13 @@ const App: React.FC<{ year?: string }> = ({ year }) => {
                       <DrawLineRacingPromo />
                     </div>
 
-                    <HeaderMenu
-                      hasConsensusAccess={hasConsensusAccess}
-                      onOpenSubscription={async () => {
-                        if (hasConsensusAccess && email) {
-                          try {
-                            await openCustomerPortal(email);
-                          } catch (error) {
-                            toastService.addToast('Failed to open subscription management.', 'warning');
-                          }
-                        } else {
-                          setShowSubscriptionModal(true);
-                        }
-                      }}
-                    />
+                    <HeaderMenu />
 
                     <UserMenu />
                   </div>
                 </div>
               </div>
 
-              <div className={`mb-2 shrink-0 transition-all duration-300 ${statusMessage ? 'p-4 bg-blue-50 border border-blue-200 rounded-lg' : 'h-0 overflow-hidden'}`}>
-                {statusMessage && (
-                  <p className="text-center text-blue-700 font-medium">
-                    {statusMessage}
-                  </p>
-                )}
-              </div>
 
               <div className={`flex-1 min-h-0 flex flex-col ${(mobileView === 'grid' || !isMobile) ? '' : 'hidden'}`}>
                 {isLoading ? (
@@ -219,8 +192,6 @@ const App: React.FC<{ year?: string }> = ({ year }) => {
                           setShowExport(true);
                         }}
                         showOfficialResults={showOfficialResults}
-                        hasConsensusAccess={hasConsensusAccess}
-                        onOpenSubscriptionModal={() => setShowSubscriptionModal(true)}
                       />
                     </div>
                   ) : (
@@ -240,8 +211,6 @@ const App: React.FC<{ year?: string }> = ({ year }) => {
                             setShowExport(true);
                           }}
                           showOfficialResults={showOfficialResults}
-                          hasConsensusAccess={hasConsensusAccess}
-                          onOpenSubscriptionModal={() => setShowSubscriptionModal(true)}
                         />
                       </div>
                     </>
@@ -254,15 +223,6 @@ const App: React.FC<{ year?: string }> = ({ year }) => {
           }
         />
 
-        <SubscriptionModal
-          isOpen={showSubscriptionModal}
-          onClose={() => setShowSubscriptionModal(false)}
-          email={email}
-          onEmailChange={saveEmail}
-          hasAccess={hasConsensusAccess}
-          currentTier={consensusTier}
-          expiresAt={consensusExpiresAt}
-        />
 
         {showHistory && (
           <VersionHistory
