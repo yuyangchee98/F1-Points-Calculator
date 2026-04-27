@@ -16,8 +16,6 @@ interface MobileRaceCardViewProps {
   onOpenHistory: () => void;
   onOpenExport: () => void;
   showOfficialResults: boolean;
-  hasConsensusAccess: boolean;
-  onOpenSubscriptionModal: () => void;
 }
 
 const ROW_HEIGHT = 56;
@@ -31,8 +29,6 @@ const MobileRaceCardView: React.FC<MobileRaceCardViewProps> = ({
   onOpenHistory,
   onOpenExport,
   showOfficialResults,
-  hasConsensusAccess,
-  onOpenSubscriptionModal,
 }) => {
   const dispatch = useAppDispatch();
   const races = useSelector((state: RootState) => state.seasonData.races);
@@ -102,15 +98,8 @@ const MobileRaceCardView: React.FC<MobileRaceCardViewProps> = ({
           onOpenHistory={onOpenHistory}
           onOpenExport={onOpenExport}
           showOfficialResults={showOfficialResults}
-          onToggleConsensus={() => {
-            if (hasConsensusAccess) {
-              dispatch(toggleConsensus());
-            } else {
-              onOpenSubscriptionModal();
-            }
-          }}
+          onToggleConsensus={() => dispatch(toggleConsensus())}
           showConsensus={showConsensus}
-          hasConsensusAccess={hasConsensusAccess}
         />
       </div>
 
