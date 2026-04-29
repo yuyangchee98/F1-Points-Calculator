@@ -1,0 +1,639 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// Add new entries at the top (newest first)
+const changelogEntries = [
+  // ── April 2026 ──
+  {
+    date: "Apr 27, 2026",
+    title: "Consensus & Compete Dots",
+    changes: [
+      "Community consensus feature improvements",
+      "Added indicator dots to the compete view",
+    ],
+  },
+  {
+    date: "Apr 26, 2026",
+    title: "iPad Layout, Context Menus & Unified Footer",
+    changes: [
+      "Improved layout for iPad and tablet-sized screens with tighter spacing",
+      "Smaller, more consistent header and driver panel sizing",
+      "Added right-click context menu with new items: copy, paste, and driver swap",
+      "Alert toast notifications system",
+      "Unified footer with integrated toast container across all pages",
+      "Collapse button cleanup",
+      "Updated SEO metadata for 2026 (25-driver field)",
+      "New URL and cache updates",
+    ],
+  },
+  {
+    date: "Apr 12–13, 2026",
+    title: "Scroll & Redirects",
+    changes: [
+      "Fixed scroll behavior issues",
+      "Added URL redirects for old routes",
+    ],
+  },
+  {
+    date: "Apr 5–8, 2026",
+    title: "Mobile & Layout Tightening",
+    changes: [
+      "Tighter layout with reduced whitespace",
+      "Smaller header across all views",
+      "Mobile-specific layout fixes",
+      "Historical seasons top bar navigation",
+      "Autolinking for URLs in text content",
+    ],
+  },
+  {
+    date: "Apr 4, 2026",
+    title: "Post-Migration Fixes",
+    changes: [
+      "Final migration cleanup and route fixes from the Astro move",
+    ],
+  },
+  // ── March 2026 ──
+  {
+    date: "Mar 22, 2026",
+    title: "Astro Post-Migration Polish",
+    changes: [
+      "Fixed hydration issues from the Astro migration",
+      "Route and cache optimizations for static pages",
+    ],
+  },
+  {
+    date: "Mar 13, 2026",
+    title: "Migrated to Astro",
+    changes: [
+      "Migrated the entire frontend to Astro for faster static page loads",
+      "Converted About page to fully static — zero client-side JavaScript",
+    ],
+  },
+  {
+    date: "Mar 12, 2026",
+    title: "Lock Next Race & Compete Fixes",
+    changes: [
+      "Added \"lock next race\" button for quick pre-race prediction locking",
+      "Frontend fixes for the compete system",
+      "Temporarily removed merch features",
+    ],
+  },
+  // ── February 2026 ──
+  {
+    date: "Feb 17–22, 2026",
+    title: "New Compete UI",
+    changes: [
+      "Rebuilt the Compete predictions interface from scratch",
+      "New driver selection and removal flow for compete mode",
+      "Pending state indicators for locked predictions",
+      "Overflow and sizing fixes on mobile",
+      "Removed consensus data from compete view",
+      "Login and authentication flow improvements",
+    ],
+  },
+  // ── January 2026 ──
+  {
+    date: "Jan 25–29, 2026",
+    title: "Google SSO, Historical Pages & Community Consensus",
+    changes: [
+      "Google Single Sign-On for one-click login",
+      "Historical season pages — browse 2022, 2023, and 2024 seasons",
+      "Community consensus view — see what everyone else predicts",
+      "Officially removed Smart Input feature",
+      "SEO improvements for historical pages",
+    ],
+  },
+  {
+    date: "Jan 15, 2026",
+    title: "Leaderboard, Scoring & 22-Position Grid",
+    changes: [
+      "Lock, score, and leaderboard system — get scored on prediction accuracy",
+      "Expanded grid from 10 to full 22-position fields",
+      "Removed competition for historical seasons (compete is current-season only)",
+      "Toolbar UI improvements",
+      "Route and function cleanup",
+    ],
+  },
+  {
+    date: "Jan 13–14, 2026",
+    title: "Login, Lock & Profiles",
+    changes: [
+      "Login and signup system",
+      "Lock and store predictions on the server",
+      "User profile pages to track prediction history",
+      "Header visual refresh",
+    ],
+  },
+  {
+    date: "Jan 11–12, 2026",
+    title: "Save & Lock, Autosave",
+    changes: [
+      "Save and lock in predictions before race start",
+      "Autosave with debouncing — no more lost predictions",
+      "URL rename for cleaner links",
+    ],
+  },
+  {
+    date: "Jan 5, 2026",
+    title: "Prediction Lock-In",
+    changes: [
+      "Prediction lock-in feature — deadline countdown before each race",
+      "UI improvements for the lock-in flow",
+    ],
+  },
+  {
+    date: "Jan 1–2, 2026",
+    title: "New Year Cleanup",
+    changes: [
+      "Updated page descriptions and favicon",
+      "Season rows display improvements",
+      "Removed unused code",
+    ],
+  },
+  // ── December 2025 ──
+  {
+    date: "Dec 25, 2025",
+    title: "2026 Season Data",
+    changes: [
+      "Updated all driver and team data for the 2026 F1 season",
+      "Set 2026 as the default season",
+      "Temporarily removed Smart Input while rethinking the feature",
+      "Auto-load latest race data on a weekly schedule",
+    ],
+  },
+  {
+    date: "Dec 7–10, 2025",
+    title: "License, SEO & Domain",
+    changes: [
+      "Added AGPL open-source license",
+      "SEO improvements using new route structure",
+      "New domain URL and footer updates",
+    ],
+  },
+  {
+    date: "Dec 2–4, 2025",
+    title: "Infrastructure Fixes",
+    changes: [
+      "Draw Line Racing cross-promotion added to the menu",
+      "Drag-and-drop error fixes",
+      "Dark mode styling fixes",
+      "Smart input loading delay fix",
+      "Mobile gap spacing fix",
+    ],
+  },
+  // ── November 2025 ──
+  {
+    date: "Nov 29–30, 2025",
+    title: "Grid Virtualization & Performance Sprint",
+    changes: [
+      "Virtualized the race grid for much smoother scrolling on large grids",
+      "Skeleton loading speed improvements",
+      "Parallel API calls for faster initial data load",
+      "Lazy-loaded charts to reduce initial page weight",
+      "Chart loading placeholders",
+    ],
+  },
+  {
+    date: "Nov 24–25, 2025",
+    title: "SEO Schema & Tiebreakers",
+    changes: [
+      "JSON-LD structured data schema markup for search engines",
+      "Tiebreaker logic — standings now correctly handle drivers on equal points",
+      "Updated page titles and descriptions across all routes",
+    ],
+  },
+  {
+    date: "Nov 15–17, 2025",
+    title: "Historical Seasons & Skeleton Loading",
+    changes: [
+      "Added 2022 and 2023 historical season pages",
+      "About & FAQ page with expandable answers",
+      "Skeleton loading for historical pages and mobile views",
+      "Mobile header improvements",
+      "API call ordering optimization",
+    ],
+  },
+  {
+    date: "Nov 10–12, 2025",
+    title: "2024 Data Fixes & History",
+    changes: [
+      "Fixed fastest lap data for the 2024 season",
+      "Driver swap now works correctly with official results",
+      "History navigation between seasons",
+      "Environment variable cleanup",
+    ],
+  },
+  {
+    date: "Nov 5–8, 2025",
+    title: "Skeleton Loading & Analytics",
+    changes: [
+      "Skeleton loading placeholders for the grid and cards",
+      "Google Analytics event tracking improvements",
+      "Mobile preview for sharing",
+    ],
+  },
+  {
+    date: "Nov 1–3, 2025",
+    title: "Context Menu & Sharing",
+    changes: [
+      "Right-click context menu for driver cells",
+      "Copy and paste drivers between race positions",
+      "Icons and actions bar above the grid",
+      "Mobile sharing UI improvements",
+      "Points calculation fixes",
+    ],
+  },
+  // ── October 2025 ──
+  {
+    date: "Oct 28–29, 2025",
+    title: "Export Images & Filter View",
+    changes: [
+      "Export predictions as images with styled templates",
+      "Full-size image preview before exporting",
+      "Filter view to focus on specific drivers or teams",
+      "Championship standings limiter (show top N)",
+      "Teams standings view",
+      "Dropdown menu for export options",
+    ],
+  },
+  {
+    date: "Oct 25–27, 2025",
+    title: "Points Increment View & Export Styling",
+    changes: [
+      "New points increment view showing how points change race by race",
+      "Improved export template styling to match the app design",
+      "Layout swap between grid and standings",
+      "Title and subtitle display updates",
+      "Flag opacity changes for readability",
+    ],
+  },
+  {
+    date: "Oct 19–25, 2025",
+    title: "Major Code Cleanup Sprint",
+    changes: [
+      "ESLint linter setup and configuration",
+      "Dead code removal across the entire codebase",
+      "Driver, team, and race schedule data files cleaned up and simplified",
+      "API call files consolidated into organized modules",
+      "Redux selector and slice cleanup",
+      "Breakpoint unification — consistent responsive behavior",
+      "CSS cleanup and removal of duplicate styles",
+    ],
+  },
+  // ── September 2025 ──
+  {
+    date: "Sep 10, 2025",
+    title: "Sitemap, Grid Toggle & Lazy Loading",
+    changes: [
+      "Automated sitemap generation for SEO",
+      "New toggle between grid positions and live standings view",
+      "Lazy-loaded charts — Chart.js loaded only when needed",
+      "Mobile demo mode for showcasing the app",
+      "Build error and createContext fixes",
+    ],
+  },
+  // ── August 2025 ──
+  {
+    date: "Aug 2–3, 2025",
+    title: "Subscriptions, Email & Promo Codes",
+    changes: [
+      "Subscription system with Stripe payments for premium features",
+      "Email notifications service",
+      "Promo code support for subscription discounts",
+      "Subscriber portal to manage billing",
+      "Subscription management UI",
+    ],
+  },
+  // ── July 2025 ──
+  {
+    date: "Jul 29–31, 2025",
+    title: "Smart Input — AI-Powered Predictions",
+    changes: [
+      "Smart Input: type predictions in natural language (e.g. \"Verstappen wins, Norris P2\") and AI parses them into grid positions",
+      "Two-stage language model for accurate prediction understanding",
+      "Context-aware NLP that understands driver nicknames and shorthand",
+      "Redesigned natural language input UI to match app styling",
+      "Subscription paywall UI for Smart Input",
+      "Stripe payment integration for the premium feature",
+    ],
+  },
+  {
+    date: "Jul 14, 2025",
+    title: "API Integration & Major Refactor",
+    changes: [
+      "Backend API integration: user saves, version history, and prediction persistence",
+      "Database schema setup for predictions",
+      "Removed legacy points system and old race fetch code",
+      "Constants and code cleanup across the app",
+    ],
+  },
+  {
+    date: "Jul 10–13, 2025",
+    title: "Race Automation & Scrollbar",
+    changes: [
+      "Automated race data fetching — results load automatically as races finish",
+      "Horizontal top scrollbar for navigating the race grid",
+      "\"Scroll to race\" quick navigation",
+      "Reset button to clear all predictions",
+      "Race swap refactoring for cleaner code",
+    ],
+  },
+  {
+    date: "Jul 7, 2025",
+    title: "British Grand Prix",
+    changes: [
+      "Added UK GP results to the 2025 season",
+    ],
+  },
+  // ── June 2025 ──
+  {
+    date: "Jun 30, 2025",
+    title: "Austrian Grand Prix",
+    changes: [
+      "Added Austria GP results to the 2025 season",
+    ],
+  },
+  {
+    date: "Jun 15–16, 2025",
+    title: "Multiple Points Systems, Canada GP & Performance",
+    changes: [
+      "Multiple points systems: switch between Official F1, Classic, and alternative scoring methods",
+      "Canada GP results",
+      "Spain GP results",
+      "Performance optimizations with Terser code minification",
+      "SEO improvements and Open Graph image",
+    ],
+  },
+  {
+    date: "Jun 2, 2025",
+    title: "Monaco Grand Prix",
+    changes: [
+      "Added Monaco GP results to the 2025 season",
+    ],
+  },
+  {
+    date: "May 22, 2025",
+    title: "Emilia Romagna Grand Prix",
+    changes: [
+      "Added Imola GP results to the 2025 season",
+    ],
+  },
+  {
+    date: "May 6, 2025",
+    title: "Miami Grand Prix",
+    changes: [
+      "Added Miami GP results to the 2025 season",
+    ],
+  },
+  // ── April 2025 ──
+  {
+    date: "Apr 22, 2025",
+    title: "Saudi Arabian Grand Prix",
+    changes: [
+      "Added Saudi Arabia GP results to the 2025 season",
+    ],
+  },
+  {
+    date: "Apr 15, 2025",
+    title: "Bahrain Grand Prix",
+    changes: [
+      "Added Bahrain GP results to the 2025 season",
+    ],
+  },
+  {
+    date: "Apr 7–11, 2025",
+    title: "Japanese Grand Prix & Layout Updates",
+    changes: [
+      "Added Japan GP results to the 2025 season",
+      "Layout and TypeScript improvements",
+    ],
+  },
+  // ── March 2025 ──
+  {
+    date: "Mar 24, 2025",
+    title: "Chinese Grand Prix",
+    changes: [
+      "Added China GP results including sprint race to the 2025 season",
+    ],
+  },
+  {
+    date: "Mar 16–17, 2025",
+    title: "Australia GP, Official Results & Mobile Polish",
+    changes: [
+      "Added Australia 2025 GP results",
+      "Official results toggle — switch between your predictions and actual results",
+      "Prediction visual fix for locked results",
+      "Buy Me A Coffee support link in the menu",
+      "Mobile visual improvements and toggle fixes",
+    ],
+  },
+  {
+    date: "Mar 1–13, 2025",
+    title: "Community Consensus",
+    changes: [
+      "Community consensus feature — see aggregated predictions from all users",
+      "Consensus UI with bug fixes",
+      "Mobile scroll fix for the consensus view",
+    ],
+  },
+  // ── February 2025 ──
+  {
+    date: "Feb 26–27, 2025",
+    title: "Charts & Sharing",
+    changes: [
+      "Driver and team points progression charts (Chart.js)",
+      "Sharing functionality for predictions",
+      "User save feature for persisting predictions",
+      "Removed legacy htmx dependency",
+      "Mobile chart layout fixes",
+    ],
+  },
+  // ── December 2024 ──
+  {
+    date: "Dec 22–25, 2024",
+    title: "2025 Season Prep & Visual Overhaul",
+    changes: [
+      "Updated all data for the 2025 F1 season",
+      "Jack Doohan added to the driver roster",
+      "Completely new standings UI layout",
+      "Major visual overhaul — redesigned grid, buttons, footer, and overall styling",
+      "Grid refactoring: moved table logic from CSS to JavaScript for better control",
+      "Driver order and points updates",
+    ],
+  },
+  {
+    date: "Dec 23–24, 2024",
+    title: "Mobile & Onboarding",
+    changes: [
+      "Mobile UI updates and tooltip additions",
+      "\"How to Use\" onboarding section for new users",
+      "SEO and metadata improvements",
+      "Screenshot and readme updates",
+    ],
+  },
+  {
+    date: "Dec 9, 2024",
+    title: "End of 2024 Season",
+    changes: [
+      "Finalized all 2024 season data",
+    ],
+  },
+  {
+    date: "Dec 2–3, 2024",
+    title: "Qatar GP & Constructor Standings",
+    changes: [
+      "Added Qatar GP results",
+      "Constructor championship standings feature — track team points alongside drivers",
+    ],
+  },
+  // ── November 2024 ──
+  {
+    date: "Nov 3–4, 2024",
+    title: "Brazil Grand Prix & Driver Swap Fix",
+    changes: [
+      "Added Brazil GP results with sprint race and fastest lap",
+      "Fixed driver swapping for races that haven't happened yet",
+      "Sticky position headers on the grid",
+      "Mobile swap improvements",
+    ],
+  },
+  // ── October 2024 ──
+  {
+    date: "Oct 29, 2024",
+    title: "Mobile v1",
+    changes: [
+      "First dedicated mobile experience — fully responsive layout for phones",
+      "Mobile-specific footer and navigation",
+    ],
+  },
+  {
+    date: "Oct 28, 2024",
+    title: "Mexico Grand Prix",
+    changes: [
+      "Added Mexico GP results to the 2024 season",
+    ],
+  },
+  {
+    date: "Oct 21, 2024",
+    title: "USA Grand Prix & Lawson",
+    changes: [
+      "Added USA GP results to the 2024 season",
+      "Liam Lawson added as a new driver to the roster",
+    ],
+  },
+  // ── September 2024 ──
+  {
+    date: "Sep 23, 2024",
+    title: "Singapore Grand Prix",
+    changes: [
+      "Added Singapore GP results to the 2024 season",
+    ],
+  },
+  {
+    date: "Sep 21, 2024",
+    title: "Azerbaijan Grand Prix & Analytics",
+    changes: [
+      "Added Azerbaijan GP results to the 2024 season",
+      "Google Analytics integration for usage tracking",
+      "Photo fixes and SEO rename",
+    ],
+  },
+  {
+    date: "Sep 9–10, 2024",
+    title: "Sharing & Image Export",
+    changes: [
+      "Sharable links with shortened URLs for predictions",
+      "Image download feature — share predictions as screenshots",
+      "Mobile UI fixes",
+      "Fixed scores for Leclerc and Hamilton",
+      "Visual and SEO improvements",
+    ],
+  },
+  {
+    date: "Sep 7–8, 2024",
+    title: "Race Predictions, Sprint & Fastest Lap",
+    changes: [
+      "Future race prediction — drag drivers to predict upcoming results",
+      "Visually distinguish past races from future predictions",
+      "Sprint race points support",
+      "Fastest lap bonus point tracking for past and future races",
+      "Save prediction state for sharing",
+      "Reset future races button",
+      "Colapinto driver color fix",
+    ],
+  },
+  // ── August 2024 ──
+  {
+    date: "Aug 26–31, 2024",
+    title: "Launch",
+    changes: [
+      "Initial release of the F1 Points Calculator",
+      "Drag-and-drop interface for predicting race finishing positions",
+      "Real-time driver championship standings calculation",
+      "Past race results display",
+      "Basic UI with mobile-responsive design",
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Changelog - F1 Points Calculator"
+  description="See what's new in the F1 Points Calculator. Browse the full history of features, improvements, and updates."
+  keywords="F1 points calculator changelog, F1 calculator updates, new features, release history"
+  canonicalPath="/changelog"
+  ogTitle="Changelog - F1 Points Calculator"
+  ogDescription="See what's new in the F1 Points Calculator. Full history of features, improvements, and updates."
+>
+  <div class="min-h-screen bg-gray-100 py-6">
+    <div class="max-w-5xl mx-auto px-4">
+      <div class="mb-6">
+        <a
+          href="/"
+          class="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium"
+        >
+          <svg
+            class="w-5 h-5 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M10 19l-7-7m0 0l7-7m-7 7h18"
+            />
+          </svg>
+          Back to Calculator
+        </a>
+      </div>
+
+      <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6 flex items-center flex-wrap">
+        <span class="bg-red-600 text-white px-3 py-1 mr-3 rounded-md">F1</span>
+        <span class="mr-3">Points Calculator</span>
+        <span class="text-gray-600">- Changelog</span>
+      </h1>
+
+      <div class="relative">
+        {changelogEntries.map((entry, index) => (
+          <div class={`relative pl-8 ${index !== changelogEntries.length - 1 ? 'pb-6' : ''}`}>
+            {index !== changelogEntries.length - 1 && (
+              <div class="absolute left-[11px] top-8 bottom-0 w-0.5 bg-gray-300"></div>
+            )}
+            <div class={`absolute left-1.5 top-2 w-3 h-3 rounded-full ${index === 0 ? 'bg-red-600' : 'bg-gray-400'}`}></div>
+            <div class="p-4 bg-white rounded-lg shadow-sm">
+              <span class="text-sm font-medium text-gray-500">{entry.date}</span>
+              <h2 class="text-lg font-semibold text-gray-800 mt-1 mb-2">{entry.title}</h2>
+              <ul class="list-disc list-inside text-gray-600 space-y-1 text-sm">
+                {entry.changes.map((change) => (
+                  <li>{change}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</BaseLayout>
