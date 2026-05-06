@@ -9,6 +9,7 @@ import { toggleConsensus, selectDriver } from '../../store/slices/uiSlice';
 import { selectLockedPredictions } from '../../store/selectors/lockedPredictionsSelectors';
 import { selectTeamsByIdMap, getDriverLastName } from '../../store/selectors/dataSelectors';
 import { useAppDispatch } from '../../store';
+import { trackEvent, GA_EVENTS } from '../../utils/analytics';
 
 interface MobileRaceCardViewProps {
   onReset: () => void;
@@ -98,7 +99,10 @@ const MobileRaceCardView: React.FC<MobileRaceCardViewProps> = ({
           onOpenHistory={onOpenHistory}
           onOpenExport={onOpenExport}
           showOfficialResults={showOfficialResults}
-          onToggleConsensus={() => dispatch(toggleConsensus())}
+          onToggleConsensus={() => {
+            dispatch(toggleConsensus());
+            trackEvent(GA_EVENTS.GRID_ACTIONS.TOGGLE_CONSENSUS, 'Grid Actions', !showConsensus ? 'show' : 'hide');
+          }}
           showConsensus={showConsensus}
         />
       </div>

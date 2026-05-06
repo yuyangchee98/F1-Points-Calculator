@@ -6,7 +6,7 @@ import { type DriverDragItem, ItemTypes } from '../types/dragTypes';
 import { useGridContext } from '../contexts/GridContext';
 import { toastService } from '../components/common/ToastContainer';
 import { selectDriversByIdMap, selectTeamsByIdMap } from '../store/selectors/dataSelectors';
-import { trackDriverDrop, incrementPredictionCount, updateUserProperties } from '../utils/analytics';
+import { trackDriverDrop, incrementPredictionCount, updateUserProperties, trackEvent, GA_EVENTS } from '../utils/analytics';
 
 interface UseDriverDropParams {
   raceId: string;
@@ -119,12 +119,17 @@ export function useDriverDrop({ raceId, position }: UseDriverDropParams) {
     trackDriverDrop(driverId, raceId, position);
 
     const totalPredictions = incrementPredictionCount();
-    const completionRate = Math.round((positions.length / 480) * 100);
+    const filledPositions = positions.filter(p => p.driverId).length + 1; // +1 for the one just placed
+    const completionRate = Math.round((filledPositions / 480) * 100);
 
     updateUserProperties({
       total_predictions: totalPredictions,
       completion_rate: completionRate
     });
+
+    if (completionRate >= 100) {
+      trackEvent(GA_EVENTS.GRID_ACTIONS.GRID_COMPLETE, 'Grid Actions');
+    }
 
     return { driverId, raceId, position };
   }, [raceId, position, currentDriverId, moveDriver, races, driverById, teamById, recentDropRef, positions]);

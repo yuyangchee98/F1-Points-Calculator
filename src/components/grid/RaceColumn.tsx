@@ -14,7 +14,6 @@ import { useContextMenu, useLongPress } from '../../hooks/useContextMenu';
 import ContextMenu from '../common/ContextMenu';
 import type { ContextMenuItem } from '../../types/contextMenu';
 import { toastService } from '../common/ToastContainer';
-import { trackContextMenuAction } from '../../utils/analytics';
 import { getActiveSeason } from '../../utils/constants';
 import { hasFastestLapPoint } from '../../data/seasonRules';
 
@@ -91,7 +90,6 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position, style }) => {
         onClick: () => {
           dispatch(copyDriver(driverId));
           toastService.addToast(`Copied ${getDriverDisplayName(driver)}`, 'info');
-          trackContextMenuAction('ACTION', 'copy_driver');
         },
       });
 
@@ -111,7 +109,6 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position, style }) => {
                 `Set fastest lap for ${getDriverDisplayName(driver)}`,
                 'info'
               );
-              trackContextMenuAction('ACTION', 'set_fastest_lap');
             },
           });
         }
@@ -125,7 +122,6 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position, style }) => {
           onClick: () => {
             clearPosition({ raceId: race.id, position });
             toastService.addToast(`Removed ${getDriverDisplayName(driver)} from P${position}`, 'info');
-            trackContextMenuAction('ACTION', 'remove_driver');
           },
         });
 
@@ -147,7 +143,6 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position, style }) => {
               `Filled ${getDriverDisplayName(driver)} at P${position} for ${remainingCount} remaining races`,
               'success'
             );
-            trackContextMenuAction('ACTION', 'fill_rest_of_season', remainingCount);
           },
         });
       }
@@ -166,7 +161,6 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position, style }) => {
                 driverId: copiedDriverId,
               });
               toastService.addToast(`Pasted ${getDriverDisplayName(copiedDriver)} at P${position}`, 'success');
-              trackContextMenuAction('ACTION', 'paste_driver');
             },
           });
         }
@@ -201,7 +195,6 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position, style }) => {
               `Placed ${getDriverDisplayName(standingDriver)} at P${position}`,
               'success'
             );
-            trackContextMenuAction('ACTION', `place_standing_p${standing.position}`);
           },
         });
       });
@@ -234,7 +227,6 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position, style }) => {
             onClick: () => {
               resetGrid();
               toastService.addToast('Cleared all predictions', 'info');
-              trackContextMenuAction('ACTION', 'clear_predictions');
             },
           },
           {
@@ -243,7 +235,6 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position, style }) => {
             onClick: () => {
               clearEverything();
               toastService.addToast('Cleared everything', 'warning');
-              trackContextMenuAction('ACTION', 'clear_everything');
             },
           },
         ],

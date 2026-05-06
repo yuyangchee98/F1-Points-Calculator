@@ -4,7 +4,6 @@ import type { RootState } from '../../store';
 import { selectDriver } from '../../store/slices/uiSlice';
 import DriverCard from './DriverCard';
 import { useAppDispatch } from '../../store';
-import { GA_EVENTS, trackEvent } from '../../utils/analytics';
 import { getDriverLastName } from '../../store/selectors/dataSelectors';
 
 const DriverSelection: React.FC = () => {
@@ -35,11 +34,6 @@ const DriverSelection: React.FC = () => {
           className="text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1 transition-colors"
           onClick={() => {
             setIsExpanded(!isExpanded);
-            trackEvent(
-              GA_EVENTS.DRIVER_ACTIONS.TOGGLE_DRIVER_VISIBILITY,
-              'Driver Selection',
-              isExpanded ? 'hide' : 'show'
-            );
           }}
         >
           {isExpanded ? (
@@ -100,11 +94,6 @@ const DriverSelection: React.FC = () => {
                     flex items-center justify-center transition-all hover:bg-opacity-30"
             onClick={() => {
               dispatch(selectDriver(null));
-              trackEvent(
-                GA_EVENTS.DRIVER_ACTIONS.CANCEL_SELECTION,
-                'Driver Selection',
-                selectedDriverId || 'unknown'
-              );
             }}
             aria-label="Cancel selection"
           >

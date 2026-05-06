@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../store';
 import { getVersionHistory, deleteAllHistory, type VersionSummary, type UserIdentifier } from '../../api/predictions';
-import { trackVersionHistoryAction } from '../../utils/analytics';
+import { trackEvent, GA_EVENTS } from '../../utils/analytics';
 import { getActiveSeason } from '../../utils/constants';
 
 interface VersionHistoryProps {
@@ -90,7 +90,7 @@ const VersionHistory: React.FC<VersionHistoryProps> = ({ onClose, onLoadVersion 
   const handleLoadVersion = async (version: string) => {
     setSelectedVersion(version);
     onLoadVersion(version);
-    trackVersionHistoryAction('LOAD_VERSION', version);
+    trackEvent(GA_EVENTS.VERSION_HISTORY.LOAD_VERSION, 'Version History', version);
   };
 
   const handleDeleteAll = async () => {
@@ -104,7 +104,6 @@ const VersionHistory: React.FC<VersionHistoryProps> = ({ onClose, onLoadVersion 
       if (success) {
         setVersions([]);
         setShowDeleteConfirm(false);
-        trackVersionHistoryAction('DELETE_ALL_VERSIONS', 'success');
         onClose();
       }
     } catch (error) {
@@ -130,10 +129,7 @@ const VersionHistory: React.FC<VersionHistoryProps> = ({ onClose, onLoadVersion 
                 </button>
               )}
               <button
-                onClick={() => {
-                  trackVersionHistoryAction('CLOSE_HISTORY');
-                  onClose();
-                }}
+                onClick={onClose}
                 className="text-gray-400 hover:text-gray-600 transition-colors"
                 aria-label="Close"
               >

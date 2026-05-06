@@ -310,10 +310,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
                 </label>
                 <div className="flex gap-3">
                   <button
-                    onClick={() => {
-                      setFormat('grid');
-                      trackExportAction('CHANGE_FORMAT', 'grid');
-                    }}
+                    onClick={() => setFormat('grid')}
                     className={`flex-1 px-4 py-3 border-2 rounded-lg transition-all ${
                       format === 'grid'
                         ? 'border-red-500 bg-red-50 text-red-700'
@@ -324,10 +321,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
                     <div className="text-xs text-gray-500 mt-1">1080 × 1080</div>
                   </button>
                   <button
-                    onClick={() => {
-                      setFormat('mobile');
-                      trackExportAction('CHANGE_FORMAT', 'mobile');
-                    }}
+                    onClick={() => setFormat('mobile')}
                     className={`flex-1 px-4 py-3 border-2 rounded-lg transition-all ${
                       format === 'mobile'
                         ? 'border-red-500 bg-red-50 text-red-700'
