@@ -140,6 +140,7 @@ const StandingsSidebar: React.FC = () => {
           <p>Created by <a href="https://chyuang.com" className="hover:text-gray-600" target="_blank" rel="noopener noreferrer">Chyuang</a></p>
           <p><a href="https://github.com/yuyangchee98/F1-Points-Calculator" className="hover:text-gray-600" target="_blank" rel="noopener noreferrer">Open source on GitHub</a></p>
           <p><a href="mailto:f1pointscalculator@chyuang.com" className="hover:text-gray-600">Contact</a></p>
+          <p><a href="/changelog" className="hover:text-gray-600">Changelog</a></p>
           <div className="flex gap-3 pt-1">
             <a href="https://f1-dash.com/" className="hover:text-gray-600" target="_blank" rel="noopener noreferrer">F1 Dash</a>
             <a href="https://f1calendar.com/" className="hover:text-gray-600" target="_blank" rel="noopener noreferrer">F1 Calendar</a>
