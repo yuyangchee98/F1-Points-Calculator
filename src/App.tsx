@@ -27,7 +27,7 @@ import UserMenu from './components/auth/UserMenu';
 import { SandboxGridProvider } from './contexts/GridContext';
 import { useAppDispatch } from './store';
 import useWindowSize from './hooks/useWindowSize';
-import { GA_EVENTS, trackEvent, trackVersionHistoryAction, trackExportAction } from './utils/analytics';
+import { GA_EVENTS, trackEvent } from './utils/analytics';
 import { CURRENT_SEASON } from './utils/constants';
 
 
@@ -81,11 +81,6 @@ const App: React.FC<{ year?: string }> = ({ year }) => {
     const newValue = !showOfficialResults;
     dispatch(toggleOfficialResultsUI(newValue));
     dispatch(toggleOfficialResults({ show: newValue, pastResults }));
-    trackEvent(
-      GA_EVENTS.GRID_ACTIONS.TOGGLE_OFFICIAL,
-      'Grid Actions',
-      newValue ? 'show' : 'hide'
-    );
   };
 
   const handleLoadVersion = async (version: string) => {
@@ -183,14 +178,8 @@ const App: React.FC<{ year?: string }> = ({ year }) => {
                       <MobileRaceCardView
                         onReset={handleReset}
                         onToggleOfficialResults={handleToggleOfficialResults}
-                        onOpenHistory={() => {
-                          setShowHistory(true);
-                          trackVersionHistoryAction('OPEN_HISTORY');
-                        }}
-                        onOpenExport={() => {
-                          trackExportAction('OPEN_MODAL');
-                          setShowExport(true);
-                        }}
+                        onOpenHistory={() => setShowHistory(true)}
+                        onOpenExport={() => setShowExport(true)}
                         showOfficialResults={showOfficialResults}
                       />
                     </div>
@@ -202,14 +191,8 @@ const App: React.FC<{ year?: string }> = ({ year }) => {
                           scrollRef={raceGridScrollRef}
                           onReset={handleReset}
                           onToggleOfficialResults={handleToggleOfficialResults}
-                          onOpenHistory={() => {
-                            setShowHistory(true);
-                            trackVersionHistoryAction('OPEN_HISTORY');
-                          }}
-                          onOpenExport={() => {
-                            trackExportAction('OPEN_MODAL');
-                            setShowExport(true);
-                          }}
+                          onOpenHistory={() => setShowHistory(true)}
+                          onOpenExport={() => setShowExport(true)}
                           showOfficialResults={showOfficialResults}
                         />
                       </div>

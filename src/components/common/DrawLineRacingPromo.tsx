@@ -13,14 +13,6 @@ const DrawLineRacingPromo: React.FC<DrawLineRacingPromoProps> = ({ className = '
       className={`group inline-flex items-center gap-1.5 h-8 px-3 bg-red-50 text-red-700 border border-red-200 font-medium rounded-md hover:bg-red-100 transition-colors text-sm ${className}`}
       aria-label="Try Draw Line Racing"
       title="Try my new game: Draw Line Racing!"
-      onClick={() => {
-        if (window.gtag) {
-          window.gtag('event', 'click', {
-            event_category: 'Draw Line Racing Promo',
-            event_label: 'Header Banner Click',
-          });
-        }
-      }}
     >
       <span className="text-sm leading-none">🏎️</span>
       <span>Draw Line Racing</span>

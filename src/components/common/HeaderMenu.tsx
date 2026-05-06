@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { trackBuyCoffeeClick, trackFeedbackClick } from '../../utils/analytics';
 
 const HeaderMenu: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,12 +15,6 @@ const HeaderMenu: React.FC = () => {
   }, []);
 
   const handlePromoClick = () => {
-    if (window.gtag) {
-      window.gtag('event', 'click', {
-        event_category: 'Draw Line Racing Promo',
-        event_label: 'Header Menu Click',
-      });
-    }
     setIsOpen(false);
   };
 
@@ -66,7 +59,7 @@ const HeaderMenu: React.FC = () => {
             href="https://github.com/yuyangchee98/F1-Points-Calculator/issues"
             target="_blank"
             rel="noopener noreferrer"
-            onClick={() => { trackFeedbackClick(); setIsOpen(false); }}
+            onClick={() => setIsOpen(false)}
             className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
           >
             <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -79,7 +72,7 @@ const HeaderMenu: React.FC = () => {
             href="https://buymeacoffee.com/yaang"
             target="_blank"
             rel="noopener noreferrer"
-            onClick={() => { trackBuyCoffeeClick(); setIsOpen(false); }}
+            onClick={() => setIsOpen(false)}
             className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 font-medium hover:bg-red-50"
           >
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">

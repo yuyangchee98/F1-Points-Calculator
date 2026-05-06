@@ -11,6 +11,7 @@ import { selectDriverStandings } from '../../store/selectors/resultsSelectors';
 import { selectLockedPredictions } from '../../store/selectors/lockedPredictionsSelectors';
 import { useAppDispatch } from '../../store';
 import { getActiveSeason, getGridPositions } from '../../utils/constants';
+import { trackEvent, GA_EVENTS } from '../../utils/analytics';
 import type { Race } from '../../types';
 
 interface RaceGridProps {
@@ -99,7 +100,10 @@ const RaceGrid: React.FC<RaceGridProps> = ({
       onOpenHistory={onOpenHistory}
       onOpenExport={onOpenExport}
       showOfficialResults={showOfficialResults}
-      onToggleConsensus={() => dispatch(toggleConsensus())}
+      onToggleConsensus={() => {
+        dispatch(toggleConsensus());
+        trackEvent(GA_EVENTS.GRID_ACTIONS.TOGGLE_CONSENSUS, 'Grid Actions', !showConsensus ? 'show' : 'hide');
+      }}
       showConsensus={showConsensus}
     />
   );
