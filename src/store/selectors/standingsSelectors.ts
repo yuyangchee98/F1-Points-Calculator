@@ -5,6 +5,11 @@ import { getPointsForPositionWithSystem } from '../../data/pointsSystems';
 import { getSprintPoints, getFastestLapPoints } from '../../data/seasonRules';
 import { getActiveSeason } from '../../utils/constants';
 
+// Races where half points were awarded (race didn't reach 75% distance)
+const HALF_POINTS_RACES: Record<number, Set<string>> = {
+  2021: new Set(['belgian']),
+};
+
 const selectGridPositions = (state: RootState) => state.grid.positions;
 const selectRaces = (state: RootState) => state.seasonData.races;
 const selectDrivers = (state: RootState) => state.seasonData.drivers;
@@ -73,6 +78,10 @@ const selectCalculatedPoints = createSelector(
 
             if (!race.isSprint && position.hasFastestLap) {
               pointsForPosition += getFastestLapPoints(position.position, activeSeason);
+            }
+
+            if (HALF_POINTS_RACES[activeSeason]?.has(race.id)) {
+              pointsForPosition *= 0.5;
             }
 
             if (!driverPoints[position.driverId]) {
