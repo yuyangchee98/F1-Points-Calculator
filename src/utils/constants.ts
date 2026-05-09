@@ -11,6 +11,7 @@ const SEASON_DRIVER_COUNT: { [key: number]: number } = {
   2023: 20,
   2022: 20,
   2021: 20,
+  2020: 20,
 };
 
 export const getGridPositions = (season: number): number => {
@@ -59,4 +60,5 @@ export const COUNTRY_CODE_MAP: Record<string, string> = {
   'portugal': 'pt',
   'turkey': 'tr',
   'russia': 'ru',
+  'germany': 'de',
 } as const;
