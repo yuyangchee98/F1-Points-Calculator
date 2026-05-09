@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { getConsensus, type ConsensusData } from '../api/predictions';
-import { getActiveSeason } from '../utils/constants';
+import { getActiveSeason, CURRENT_SEASON } from '../utils/constants';
 
 // Global cache for consensus data per race
 const consensusCache: Record<string, ConsensusData> = {};
@@ -28,7 +28,7 @@ export function useConsensus(raceId: string, enabled: boolean) {
   }, []);
 
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled || season !== CURRENT_SEASON) return;
 
     // Already cached
     if (consensusCache[cacheKey]) {
