@@ -133,6 +133,7 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
                   </svg>
                   Version History
                 </button>
+                {isCurrentSeason && (
                 <button
                   onClick={() => { onOpenExport(); setShowMoreMenu(false); }}
                   className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
@@ -142,6 +143,7 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
                   </svg>
                   Export Image
                 </button>
+                )}
                 <button
                   onClick={toggleHowToUse}
                   className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
