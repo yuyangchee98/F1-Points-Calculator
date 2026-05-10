@@ -5,6 +5,7 @@ import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
   output: 'static',
+  trailingSlash: 'never',
   site: 'https://f1pointscalculator.chyuang.com',
   integrations: [
     react(),

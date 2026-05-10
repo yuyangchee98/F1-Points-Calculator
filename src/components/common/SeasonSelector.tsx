@@ -14,7 +14,8 @@ const SEASONS: Season[] = [
   { year: 2023, label: '2023 Season', isHistorical: true },
   { year: 2022, label: '2022 Season', isHistorical: true },
   { year: 2021, label: '2021 Season', isHistorical: true },
-  { year: 2020, label: '2020 Season', isHistorical: true }
+  { year: 2020, label: '2020 Season', isHistorical: true },
+  { year: 2019, label: '2019 Season', isHistorical: true }
 ];
 
 const SeasonSelector: React.FC<{ activeSeason: number }> = ({ activeSeason }) => {
