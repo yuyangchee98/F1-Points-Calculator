@@ -10,6 +10,13 @@ const HALF_POINTS_RACES: Record<number, Set<string>> = {
   2021: new Set(['belgian']),
 };
 
+// Constructor points resets (team excluded from constructor points before a given round)
+// Force India went into administration before round 13 (Belgian GP) in 2018;
+// FIA reset their constructor points to 0, but driver points were retained.
+const CONSTRUCTOR_POINTS_RESET: Record<number, { teamId: string; fromRound: number }[]> = {
+  2018: [{ teamId: 'force_india', fromRound: 13 }],
+};
+
 const selectGridPositions = (state: RootState) => state.grid.positions;
 const selectRaces = (state: RootState) => state.seasonData.races;
 const selectDrivers = (state: RootState) => state.seasonData.drivers;
@@ -64,6 +71,7 @@ const selectCalculatedPoints = createSelector(
         const raceDriverPoints: Record<string, number> = {};
         const raceTeamPoints: Record<string, number> = {};
         const raceResults = pastResults[race.id] || [];
+        const roundNum = race.round ? parseInt(race.round, 10) : 0;
 
         racePositions.forEach(position => {
           if (position.driverId) {
@@ -118,16 +126,25 @@ const selectCalculatedPoints = createSelector(
               if (!raceTeamPoints[teamId]) {
                 raceTeamPoints[teamId] = 0;
               }
-              teamPoints[teamId] += pointsForPosition;
-              raceTeamPoints[teamId] += pointsForPosition;
 
-              if (!race.isSprint && position.position >= 1) {
-                if (!teamFinishes[teamId]) {
-                  teamFinishes[teamId] = [];
+              // Check if this team's points are excluded before their reset round
+              const resetRules = CONSTRUCTOR_POINTS_RESET[activeSeason];
+              const isResetExcluded = resetRules?.some(
+                r => r.teamId === teamId && roundNum < r.fromRound
+              );
+
+              if (!isResetExcluded) {
+                teamPoints[teamId] += pointsForPosition;
+                raceTeamPoints[teamId] += pointsForPosition;
+
+                if (!race.isSprint && position.position >= 1) {
+                  if (!teamFinishes[teamId]) {
+                    teamFinishes[teamId] = [];
+                  }
+                  const finishIndex = position.position - 1;
+                  teamFinishes[teamId][finishIndex] =
+                    (teamFinishes[teamId][finishIndex] || 0) + 1;
                 }
-                const finishIndex = position.position - 1;
-                teamFinishes[teamId][finishIndex] =
-                  (teamFinishes[teamId][finishIndex] || 0) + 1;
               }
             }
           }
