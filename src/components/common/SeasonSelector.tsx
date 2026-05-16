@@ -21,6 +21,7 @@ const SEASONS: Season[] = [
   { year: 2016, label: '2016 Season', isHistorical: true },
   { year: 2015, label: '2015 Season', isHistorical: true },
   { year: 2014, label: '2014 Season', isHistorical: true },
+  { year: 2013, label: '2013 Season', isHistorical: true },
 ];
 
 const SeasonSelector: React.FC<{ activeSeason: number }> = ({ activeSeason }) => {
