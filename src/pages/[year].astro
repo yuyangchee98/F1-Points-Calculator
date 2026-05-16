@@ -3,7 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import AppIsland from '../components/AppIsland';
 
 export function getStaticPaths() {
-  // Generate paths for years that don't have dedicated pages (2015-2024 have their own)
+  // Generate paths for years that don't have dedicated pages (2014-2024 have their own)
   return [
     { params: { year: '2025' } },
     { params: { year: '2026' } },
@@ -60,6 +60,7 @@ const schemaData = {
       <li><a href="/2017">2017 F1 Season</a></li>
       <li><a href="/2016">2016 F1 Season</a></li>
       <li><a href="/2015">2015 F1 Season</a></li>
+      <li><a href="/2014">2014 F1 Season</a></li>
     </ul>
 
     <p><a href="/about">FAQ & Help Guide</a></p>

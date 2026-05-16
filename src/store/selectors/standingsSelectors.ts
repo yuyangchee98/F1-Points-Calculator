@@ -10,6 +10,11 @@ const HALF_POINTS_RACES: Record<number, Set<string>> = {
   2021: new Set(['belgian']),
 };
 
+// Races where double points were awarded (2014 Abu Dhabi finale)
+const DOUBLE_POINTS_RACES: Record<number, Set<string>> = {
+  2014: new Set(['abu-dhabi']),
+};
+
 // Constructor points resets (team excluded from constructor points before a given round)
 // Force India went into administration before round 13 (Belgian GP) in 2018;
 // FIA reset their constructor points to 0, but driver points were retained.
@@ -90,6 +95,10 @@ const selectCalculatedPoints = createSelector(
 
             if (HALF_POINTS_RACES[activeSeason]?.has(race.id)) {
               pointsForPosition *= 0.5;
+            }
+
+            if (DOUBLE_POINTS_RACES[activeSeason]?.has(race.id)) {
+              pointsForPosition *= 2;
             }
 
             if (!driverPoints[position.driverId]) {

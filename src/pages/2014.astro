@@ -4,8 +4,8 @@ import AppIsland from '../components/AppIsland';
 const schemaData = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  "name": "F1 Points Calculator 2018 - Championship Predictor",
-  "description": "F1 championship calculator and standings predictor. Simulate Formula 1 race results and calculate driver points for the 2018 season.",
+  "name": "F1 Points Calculator 2014 - Championship Predictor",
+  "description": "F1 championship calculator and standings predictor. Simulate Formula 1 race results and calculate driver points for the 2014 season.",
   "applicationCategory": "Sports Calculator",
   "operatingSystem": "Web Browser",
   "author": {
@@ -17,29 +17,31 @@ const schemaData = {
 ---
 
 <BaseLayout
-  title="F1 Points Calculator 2018 - Championship Predictor"
-  description="F1 points calculator for 2018. Explore Formula 1 race results, calculate driver points, and simulate championship standings with our interactive drag-and-drop tool."
-  keywords="F1, Formula 1, 2018 season, points calculator, championship predictor, race simulator, F1 standings, predictions"
-  canonicalPath="/2018"
-  ogTitle="F1 Points Calculator 2018 - Championship Predictor"
+  title="F1 Points Calculator 2014 - Championship Predictor"
+  description="F1 points calculator for 2014. Explore Formula 1 race results, calculate driver points, and simulate championship standings with our interactive drag-and-drop tool."
+  keywords="F1, Formula 1, 2014 season, points calculator, championship predictor, race simulator, F1 standings, predictions"
+  canonicalPath="/2014"
+  ogTitle="F1 Points Calculator 2014 - Championship Predictor"
   ogDescription="Predict F1 race results and championship standings with our interactive calculator"
   schemaData={schemaData}
-  initialYear={2018}
+  initialYear={2014}
 >
   <!-- SEO content — always in HTML, hidden once React mounts -->
   <div id="seo-content" style="padding: 20px; max-width: 900px; margin: 0 auto; font-family: system-ui, sans-serif; line-height: 1.6;">
-    <h1 style="color: #dc2626;">F1 Points Calculator - 2018 Season</h1>
+    <h1 style="color: #dc2626;">F1 Points Calculator - 2014 Season</h1>
 
-    <p>Explore the 2018 Formula 1 World Championship results and simulate alternative standings.
+    <p>Explore the 2014 Formula 1 World Championship results and simulate alternative standings.
     Use our drag-and-drop calculator to see how different race outcomes would have affected
     the championship.</p>
 
-    <h2>2018 F1 Season Highlights</h2>
+    <h2>2014 F1 Season Highlights</h2>
     <ul>
-      <li>21 races across 21 countries</li>
+      <li>19 races across 19 countries (first turbo-hybrid era season)</li>
+      <li>11 teams, 22 drivers</li>
+      <li>Double points awarded at Abu Dhabi finale</li>
       <li>No Sprint races</li>
       <li>No fastest lap bonus point</li>
-      <li>Lewis Hamilton - 5x World Champion</li>
+      <li>Lewis Hamilton - 2x World Champion</li>
     </ul>
 
     <h2>Other Seasons</h2>
@@ -52,10 +54,10 @@ const schemaData = {
       <li><a href="/2021">2021 F1 Season</a></li>
       <li><a href="/2020">2020 F1 Season</a></li>
       <li><a href="/2019">2019 F1 Season</a></li>
+      <li><a href="/2018">2018 F1 Season</a></li>
       <li><a href="/2017">2017 F1 Season</a></li>
       <li><a href="/2016">2016 F1 Season</a></li>
       <li><a href="/2015">2015 F1 Season</a></li>
-      <li><a href="/2014">2014 F1 Season</a></li>
     </ul>
 
     <p><a href="/about">FAQ & Help Guide</a></p>
@@ -66,6 +68,6 @@ const schemaData = {
     </p>
   </div>
 
-  <AppIsland year="2018" client:only="react" />
+  <AppIsland year="2014" client:only="react" />
   <script is:inline>document.getElementById('seo-content').style.display='none';</script>
 </BaseLayout>
