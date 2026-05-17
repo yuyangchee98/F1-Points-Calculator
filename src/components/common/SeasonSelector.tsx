@@ -247,9 +247,7 @@ const SeasonSelector: React.FC<Props> = ({ activeSeason }) => {
             aria-hidden="true"
           />
         )}
-        <span className="font-mono tabular-nums tracking-tight text-gray-900">
-          {activeSeason}
-        </span>
+        <span className="text-gray-900">{activeSeason}</span>
         <svg
           className={`h-3 w-3 text-gray-500 transition-transform ${
             isOpen ? 'rotate-180' : ''
@@ -416,7 +414,7 @@ const SheetContents: React.FC<SheetContentsProps> = ({
               </span>
             )}
             {totalRaces > 0 && (
-              <span className="font-mono tabular-nums text-xs text-gray-500">
+              <span className="text-xs text-gray-500">
                 {completedRaces} / {totalRaces}
               </span>
             )}
@@ -462,7 +460,7 @@ const SheetContents: React.FC<SheetContentsProps> = ({
                 onFocus={() => setFocusedYear(year)}
                 className={`relative ${
                   isMobile ? 'h-[52px] text-[17px]' : 'h-10 text-[15px]'
-                } flex items-center justify-center rounded font-mono tabular-nums font-semibold tracking-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 transition-colors ${
+                } flex items-center justify-center rounded font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 transition-colors ${
                   isSelected
                     ? 'bg-gray-900 text-white border border-gray-900'
                     : 'bg-white text-gray-900 border border-gray-200 hover:bg-gray-50 hover:border-gray-300'
@@ -485,7 +483,7 @@ const SheetContents: React.FC<SheetContentsProps> = ({
       <div
         className={`border-t border-gray-200 bg-gray-50 ${
           isMobile ? 'px-4 py-2 text-[12px]' : 'px-3.5 py-1.5 text-[11px]'
-        } font-mono tabular-nums text-gray-500 whitespace-nowrap overflow-hidden`}
+        } text-gray-500 whitespace-nowrap overflow-hidden`}
         aria-live="polite"
       >
         {statusText}
