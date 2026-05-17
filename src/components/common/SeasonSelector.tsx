@@ -52,10 +52,6 @@ const SeasonSelector: React.FC<Props> = ({ activeSeason }) => {
   const races = useSelector((s: RootState) => s.seasonData.races);
   const totalRaces = races.length;
   const completedRaces = races.filter((r) => r.completed).length;
-  const currentSeasonIsLive =
-    totalRaces === 0 || completedRaces < totalRaces;
-  const isOnLiveSeason = activeSeason === CURRENT_SEASON;
-  const showLiveDotInTrigger = isOnLiveSeason && currentSeasonIsLive;
 
   // Click-outside (desktop only)
   useEffect(() => {
@@ -216,7 +212,6 @@ const SeasonSelector: React.FC<Props> = ({ activeSeason }) => {
   const sheetContents = (
     <SheetContents
       activeSeason={activeSeason}
-      currentSeasonIsLive={currentSeasonIsLive}
       totalRaces={totalRaces}
       completedRaces={completedRaces}
       focusedYear={focusedYear}
@@ -241,12 +236,6 @@ const SeasonSelector: React.FC<Props> = ({ activeSeason }) => {
         aria-expanded={isOpen}
         aria-label={`Choose season, currently ${activeSeason}`}
       >
-        {showLiveDotInTrigger && (
-          <span
-            className="inline-block w-1.5 h-1.5 rounded-full bg-red-600 motion-safe:animate-pulse"
-            aria-hidden="true"
-          />
-        )}
         <span className="text-gray-900">{activeSeason}</span>
         <svg
           className={`h-3 w-3 text-gray-500 transition-transform ${
@@ -352,7 +341,6 @@ const SeasonSelector: React.FC<Props> = ({ activeSeason }) => {
 
 interface SheetContentsProps {
   activeSeason: number;
-  currentSeasonIsLive: boolean;
   totalRaces: number;
   completedRaces: number;
   focusedYear: number;
@@ -366,7 +354,6 @@ interface SheetContentsProps {
 
 const SheetContents: React.FC<SheetContentsProps> = ({
   activeSeason,
-  currentSeasonIsLive,
   totalRaces,
   completedRaces,
   focusedYear,
@@ -378,11 +365,11 @@ const SheetContents: React.FC<SheetContentsProps> = ({
   isMobile,
 }) => {
   const statusText = formatStatusStrip(focusedYear);
-  const isLiveSelected = activeSeason === CURRENT_SEASON;
+  const isCurrentSelected = activeSeason === CURRENT_SEASON;
 
   return (
     <>
-      {/* LIVE / current-season card */}
+      {/* Current-season card */}
       <div className="relative">
         <span
           className="absolute left-0 top-0 bottom-0 w-[3px] bg-red-600"
@@ -394,25 +381,15 @@ const SheetContents: React.FC<SheetContentsProps> = ({
           onMouseEnter={() => setFocusedYear(CURRENT_SEASON)}
           onFocus={() => setFocusedYear(CURRENT_SEASON)}
           onKeyDown={handleLiveKeyDown}
-          aria-current={isLiveSelected ? 'page' : undefined}
+          aria-current={isCurrentSelected ? 'page' : undefined}
           className={`block pl-[14px] pr-3.5 py-3 hover:bg-gray-50 focus-visible:outline-none focus-visible:bg-gray-50 transition-colors ${
-            isLiveSelected ? 'bg-gray-50' : ''
+            isCurrentSelected ? 'bg-gray-50' : ''
           }`}
         >
           <div className="flex items-center justify-between">
-            {currentSeasonIsLive ? (
-              <span className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-red-600">
-                <span
-                  className="w-1.5 h-1.5 rounded-full bg-red-600 motion-safe:animate-pulse"
-                  aria-hidden="true"
-                />
-                LIVE
-              </span>
-            ) : (
-              <span className="text-[10px] font-semibold uppercase tracking-[0.1em] text-gray-500">
-                Current
-              </span>
-            )}
+            <span className="text-[10px] font-semibold uppercase tracking-[0.1em] text-gray-500">
+              Current
+            </span>
             {totalRaces > 0 && (
               <span className="text-xs text-gray-500">
                 {completedRaces} / {totalRaces}

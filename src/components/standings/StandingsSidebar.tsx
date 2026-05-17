@@ -38,10 +38,6 @@ const StandingsSidebar: React.FC = () => {
 
       <div className="hidden sm:flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-white">
         <h2 className="text-2xl font-bold text-gray-800">Championship Standings</h2>
-        <div className="flex items-center text-sm text-gray-500">
-          <span className="mr-2">Updated</span>
-          <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Live</span>
-        </div>
       </div>
 
       <div className="flex mx-4 mt-4 bg-white rounded-lg p-1 sticky top-0 z-10 shadow-sm border border-gray-200">
