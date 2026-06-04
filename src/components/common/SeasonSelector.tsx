@@ -1,14 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../store';
-import { CURRENT_SEASON, getGridPositions } from '../../utils/constants';
+import { CURRENT_SEASON, getGridPositions, isPaidSeason } from '../../utils/constants';
 import { getSeasonRules } from '../../data/seasonRules';
 import useWindowSize from '../../hooks/useWindowSize';
 
 const COMPLETED_YEARS = [
   2025, 2024, 2023, 2022, 2021,
   2020, 2019, 2018, 2017, 2016,
-  2015, 2014, 2013, 2012,
+  2015, 2014, 2013, 2012, 2011,
 ];
 
 const getSeasonUrl = (year: number): string =>
@@ -424,6 +424,7 @@ const SheetContents: React.FC<SheetContentsProps> = ({
           {COMPLETED_YEARS.map((year, idx) => {
             const isSelected = year === activeSeason;
             const isFocusedTile = year === focusedYear;
+            const isPaid = isPaidSeason(year);
             return (
               <a
                 key={year}
@@ -433,11 +434,12 @@ const SheetContents: React.FC<SheetContentsProps> = ({
                 href={getSeasonUrl(year)}
                 tabIndex={isFocusedTile ? 0 : -1}
                 aria-current={isSelected ? 'page' : undefined}
+                aria-label={isPaid ? `${year} (premium)` : String(year)}
                 onMouseEnter={() => setFocusedYear(year)}
                 onFocus={() => setFocusedYear(year)}
                 className={`relative ${
                   isMobile ? 'h-[52px] text-[17px]' : 'h-10 text-[15px]'
-                } flex items-center justify-center rounded font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 transition-colors ${
+                } flex items-center justify-center gap-1 rounded font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 transition-colors ${
                   isSelected
                     ? 'bg-gray-900 text-white border border-gray-900'
                     : 'bg-white text-gray-900 border border-gray-200 hover:bg-gray-50 hover:border-gray-300'
@@ -449,7 +451,20 @@ const SheetContents: React.FC<SheetContentsProps> = ({
                     aria-hidden="true"
                   />
                 )}
-                {year}
+                <span>{year}</span>
+                {isPaid && (
+                  <svg
+                    className={`w-3 h-3 ${isSelected ? 'text-white' : 'text-gray-400'}`}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    aria-hidden="true"
+                  >
+                    <rect x="5" y="11" width="14" height="9" rx="2" />
+                    <path strokeLinecap="round" d="M8 11V8a4 4 0 1 1 8 0v3" />
+                  </svg>
+                )}
               </a>
             );
           })}
