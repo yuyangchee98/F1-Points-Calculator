@@ -11,6 +11,7 @@ export interface SeasonRules {
 }
 
 export const SEASON_RULES: Record<number, SeasonRules> = {
+  2010: { sprintFormat: 'none' },
   2011: { sprintFormat: 'none' },
   2012: { sprintFormat: 'none' },
   2013: { sprintFormat: 'none' },
