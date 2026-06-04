@@ -2,6 +2,11 @@ export const CURRENT_SEASON = 2026;
 
 export const getActiveSeason = () => window.INITIAL_YEAR || CURRENT_SEASON;
 
+// Keep in sync with PAID_SEASON_THRESHOLD in the API.
+// Real enforcement is server-side; this is for UI prelock only.
+export const PAID_SEASON_THRESHOLD = 2012;
+export const isPaidSeason = (year: number): boolean => year < PAID_SEASON_THRESHOLD;
+
 export const API_BASE_URL = import.meta.env.PUBLIC_API_BASE_URL;
 
 const SEASON_DRIVER_COUNT: { [key: number]: number } = {
@@ -20,6 +25,7 @@ const SEASON_DRIVER_COUNT: { [key: number]: number } = {
   2014: 22,
   2013: 22,
   2012: 24,
+  2011: 24,
 };
 
 export const getGridPositions = (season: number): number => {

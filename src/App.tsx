@@ -21,6 +21,7 @@ import HeaderMenu from './components/common/HeaderMenu';
 import CalculatorDropdown from './components/common/CalculatorDropdown';
 import GridSkeleton from './components/common/GridSkeleton';
 import DriverSelectionSkeleton from './components/common/DriverSelectionSkeleton';
+import PaywallOverlay from './components/common/PaywallOverlay';
 import DriverSelection from './components/drivers/DriverSelection';
 import SeasonSelector from './components/common/SeasonSelector';
 import UserMenu from './components/auth/UserMenu';
@@ -49,6 +50,7 @@ const App: React.FC<{ year?: string }> = ({ year }) => {
   const showOfficialResults = useSelector((state: RootState) => state.ui.showOfficialResults);
   const pastResults = useSelector((state: RootState) => state.seasonData.pastResults);
   const isLoading = useSelector((state: RootState) => state.seasonData.isLoading);
+  const requiresSubscription = useSelector((state: RootState) => state.seasonData.requiresSubscription);
   const { fingerprint } = useSelector((state: RootState) => state.predictions);
   const { user } = useSelector((state: RootState) => state.auth);
   const { isMobile } = useWindowSize();
@@ -156,7 +158,11 @@ const App: React.FC<{ year?: string }> = ({ year }) => {
 
 
               <div className={`flex-1 min-h-0 flex flex-col ${(mobileView === 'grid' || !isMobile) ? '' : 'hidden'}`}>
-                {isLoading ? (
+                {requiresSubscription ? (
+                  <div className="flex-1 min-h-0 overflow-hidden">
+                    <PaywallOverlay year={activeSeason} />
+                  </div>
+                ) : isLoading ? (
                   <>
                     <div className="shrink-0"><DriverSelectionSkeleton /></div>
                     <div className="shrink-0 w-full py-2 px-4 hidden sm:block">

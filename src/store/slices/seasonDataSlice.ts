@@ -9,6 +9,7 @@ export interface SeasonDataState {
   pastResults: Record<string, RaceResult[]>;
   isLoading: boolean;
   isLoaded: boolean;
+  requiresSubscription: boolean;
 }
 
 const initialState: SeasonDataState = {
@@ -17,15 +18,25 @@ const initialState: SeasonDataState = {
   races: [],
   pastResults: {},
   isLoading: false,
-  isLoaded: false
+  isLoaded: false,
+  requiresSubscription: false,
 };
 
-export const fetchSeasonData = createAsyncThunk(
+export const fetchSeasonData = createAsyncThunk<
+  { schedule: any; results: any; teams: any; drivers: any },
+  number,
+  { rejectValue: { status: number; reason: 'subscription_required' | 'unknown' } }
+>(
   'seasonData/fetchSeasonData',
-  async (year: number) => {
-    const response = await fetch(`${API_BASE_URL}/api/init?year=${year}`);
+  async (year, { rejectWithValue }) => {
+    const response = await fetch(`${API_BASE_URL}/api/init?year=${year}`, {
+      credentials: 'include',
+    });
     if (!response.ok) {
-      throw new Error('Failed to fetch season data');
+      if (response.status === 402) {
+        return rejectWithValue({ status: 402, reason: 'subscription_required' });
+      }
+      return rejectWithValue({ status: response.status, reason: 'unknown' });
     }
 
     const { schedule, teams, drivers, raceResults } = await response.json();
@@ -42,6 +53,7 @@ export const seasonDataSlice = createSlice({
       .addCase(fetchSeasonData.pending, (state) => {
         state.isLoading = true;
         state.isLoaded = false;
+        state.requiresSubscription = false;
       })
       .addCase(fetchSeasonData.fulfilled, (state, action) => {
         const { schedule, results, teams, drivers } = action.payload;
@@ -81,9 +93,16 @@ export const seasonDataSlice = createSlice({
         state.isLoading = false;
         state.isLoaded = true;
       })
-      .addCase(fetchSeasonData.rejected, (state) => {
+      .addCase(fetchSeasonData.rejected, (state, action) => {
         state.isLoading = false;
         state.isLoaded = true;
+        if (action.payload?.reason === 'subscription_required') {
+          state.requiresSubscription = true;
+          state.drivers = [];
+          state.teams = [];
+          state.races = [];
+          state.pastResults = {};
+        }
       });
   }
 });

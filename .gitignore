@@ -2,6 +2,8 @@
 .DS_Store
 .aider*
 .env
+.env.local
+.env.*.local
 automatic-updates/*
 .vite
 dist/*
