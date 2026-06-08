@@ -1,0 +1,82 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import AppIsland from '../components/AppIsland';
+const schemaData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "F1 Points Calculator 2008 - Championship Predictor",
+  "description": "F1 championship calculator and standings predictor. Simulate Formula 1 race results and calculate driver points for the 2008 season.",
+  "applicationCategory": "Sports Calculator",
+  "operatingSystem": "Web Browser",
+  "author": {
+    "@type": "Person",
+    "name": "Chyuang",
+    "url": "https://chyuang.com"
+  }
+};
+---
+
+<BaseLayout
+  title="F1 Points Calculator 2008 - Championship Predictor"
+  description="F1 points calculator for 2008. Replay Hamilton's last-corner title fight against Massa, calculate driver points using the original 10-8-6 system, and simulate alternative standings."
+  keywords="F1, Formula 1, 2008 season, Hamilton, Massa, points calculator, championship predictor, race simulator, F1 standings, predictions"
+  canonicalPath="/2008"
+  ogTitle="F1 Points Calculator 2008 - Championship Predictor"
+  ogDescription="Replay Hamilton's first World Championship with our interactive 2008 F1 calculator"
+  schemaData={schemaData}
+  initialYear={2008}
+>
+  <!-- SEO content — always in HTML, hidden once React mounts -->
+  <div id="seo-content" style="padding: 20px; max-width: 900px; margin: 0 auto; font-family: system-ui, sans-serif; line-height: 1.6;">
+    <h1 style="color: #dc2626;">F1 Points Calculator - 2008 Season</h1>
+
+    <p>Explore the 2008 Formula 1 World Championship results and simulate alternative
+    standings. Use our drag-and-drop calculator to see how the closest title finish
+    in F1 history could have gone differently.</p>
+
+    <h2>2008 F1 Season Highlights</h2>
+    <ul>
+      <li>18 races, opening in Australia and ending in Brazil — one more race than 2009 (France and Canada were still on the calendar)</li>
+      <li>11 teams, 22 drivers — <strong>Super Aguri folded after Round 4 (Spain)</strong>, reducing the grid for the remainder of the season</li>
+      <li><strong>Lewis Hamilton wins his first World Championship by 1 point over Felipe Massa</strong>, decided at the final corner of the final race in Brazil — Massa won the race but Hamilton passed Glock for P5 on the last lap to take the title</li>
+      <li><strong>Sebastian Vettel's first F1 win at Monza for Toro Rosso</strong>, becoming the youngest race winner in F1 history at the time</li>
+      <li>Inaugural Singapore Grand Prix — the first ever F1 night race</li>
+      <li>Ferrari wins the Constructors' Championship (Massa + Räikkönen)</li>
+      <li>Last year of Honda F1 — the team withdrew at end of season and was bought by Ross Brawn, becoming Brawn GP for 2009</li>
+      <li>Same 10-8-6-5-4-3-2-1 top-8 points system as 2009 — the penultimate year before F1's modern 25-18-15 overhaul</li>
+      <li>No Sprint races, no fastest lap bonus point</li>
+    </ul>
+
+    <h2>Other Seasons</h2>
+    <ul>
+      <li><a href="/">Current Season Calculator</a></li>
+      <li><a href="/2025">2025 F1 Season</a></li>
+      <li><a href="/2024">2024 F1 Season</a></li>
+      <li><a href="/2023">2023 F1 Season</a></li>
+      <li><a href="/2022">2022 F1 Season</a></li>
+      <li><a href="/2021">2021 F1 Season</a></li>
+      <li><a href="/2020">2020 F1 Season</a></li>
+      <li><a href="/2019">2019 F1 Season</a></li>
+      <li><a href="/2018">2018 F1 Season</a></li>
+      <li><a href="/2017">2017 F1 Season</a></li>
+      <li><a href="/2016">2016 F1 Season</a></li>
+      <li><a href="/2015">2015 F1 Season</a></li>
+      <li><a href="/2014">2014 F1 Season</a></li>
+      <li><a href="/2013">2013 F1 Season</a></li>
+      <li><a href="/2012">2012 F1 Season</a></li>
+      <li><a href="/2011">2011 F1 Season</a></li>
+      <li><a href="/2010">2010 F1 Season</a></li>
+      <li><a href="/2009">2009 F1 Season</a></li>
+    </ul>
+
+    <p><a href="/about">FAQ & Help Guide</a></p>
+
+    <p style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666;">
+      Created by <a href="https://chyuang.com">Chyuang</a> |
+      <a href="https://github.com/yuyangchee98/F1-Points-Calculator">View on GitHub</a>
+    </p>
+  </div>
+
+  <AppIsland year="2008" client:only="react" />
+  <script is:inline>document.getElementById('seo-content').style.display='none';</script>
+</BaseLayout>
