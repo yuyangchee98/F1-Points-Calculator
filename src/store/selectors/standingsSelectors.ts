@@ -5,8 +5,11 @@ import { getPointsForPositionWithSystem } from '../../data/pointsSystems';
 import { getSprintPoints, getFastestLapPoints } from '../../data/seasonRules';
 import { getActiveSeason } from '../../utils/constants';
 
-// Races where half points were awarded (race didn't reach 75% distance)
+// Races where half points were awarded (race didn't reach 75% distance).
+// Note: 1975 Spanish, 1975 Austrian, 1984 Monaco, 1991 Australian also qualify
+// and need to be added if/when those seasons are added to the archive.
 const HALF_POINTS_RACES: Record<number, Set<string>> = {
+  2009: new Set(['malaysian']),
   2021: new Set(['belgian']),
 };
 

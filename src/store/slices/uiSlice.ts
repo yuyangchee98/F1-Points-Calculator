@@ -1,6 +1,7 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { UiState, StandingsTab, MobileView } from '../../types';
 import { DEFAULT_POINTS_SYSTEM } from '../../data/pointsSystems';
+import { getDefaultPointsSystem } from '../../data/seasonRules';
 
 const initialState: UiState = {
   activeTab: 'tables',
@@ -43,9 +44,15 @@ export const uiSlice = createSlice({
       state.copiedDriver = action.payload;
     },
 
+    // Session-local override. Not persisted — year change or reload
+    // reverts to the year's default points system.
     selectPointsSystem: (state, action: PayloadAction<string>) => {
       state.selectedPointsSystem = action.payload;
-      localStorage.setItem('selected-points-system', action.payload);
+    },
+
+    // Apply the active year's default points system.
+    syncPointsSystemForYear: (state, action: PayloadAction<number>) => {
+      state.selectedPointsSystem = getDefaultPointsSystem(action.payload);
     },
 
     togglePositionColumnMode: (state) => {
@@ -69,10 +76,7 @@ export const uiSlice = createSlice({
         state.mobileView = savedMobileView;
       }
 
-      const savedPointsSystem = localStorage.getItem('selected-points-system');
-      if (savedPointsSystem) {
-        state.selectedPointsSystem = savedPointsSystem;
-      }
+      // points system is handled by syncPointsSystemForYear (year-aware)
 
       const savedPositionMode = localStorage.getItem('position-column-mode');
       if (savedPositionMode === 'position' || savedPositionMode === 'standings') {
@@ -94,6 +98,7 @@ export const {
   selectDriver,
   copyDriver,
   selectPointsSystem,
+  syncPointsSystemForYear,
   togglePositionColumnMode,
   toggleConsensus,
   initializeUiState
