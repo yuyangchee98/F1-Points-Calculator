@@ -1,3 +1,5 @@
+import { DEFAULT_POINTS_SYSTEM } from './pointsSystems';
+
 export interface FastestLapRule {
   points: number;
   maxEligiblePosition: number;
@@ -8,9 +10,13 @@ export type SprintFormat = 'none' | '2021' | '2022+';
 export interface SeasonRules {
   fastestLap?: FastestLapRule;
   sprintFormat: SprintFormat;
+  // ID into POINTS_SYSTEMS (data/pointsSystems.ts). When set, used as the default
+  // points system for this year unless the user has explicitly chosen one.
+  defaultPointsSystem?: string;
 }
 
 export const SEASON_RULES: Record<number, SeasonRules> = {
+  2009: { sprintFormat: 'none', defaultPointsSystem: '2003-2009' },
   2010: { sprintFormat: 'none' },
   2011: { sprintFormat: 'none' },
   2012: { sprintFormat: 'none' },
@@ -81,4 +87,9 @@ export const getFastestLapPoints = (position: number, year: number): number => {
 export const hasFastestLapPoint = (year: number): boolean => {
   const rules = getSeasonRules(year);
   return !!rules.fastestLap;
+};
+
+export const getDefaultPointsSystem = (year: number): string => {
+  const rules = getSeasonRules(year);
+  return rules.defaultPointsSystem || DEFAULT_POINTS_SYSTEM;
 };

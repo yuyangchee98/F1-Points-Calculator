@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import LazyDndProvider from './components/common/LazyDndProvider';
-import { initializeUiState, setMobileView, toggleOfficialResults as toggleOfficialResultsUI } from './store/slices/uiSlice';
+import { initializeUiState, setMobileView, syncPointsSystemForYear, toggleOfficialResults as toggleOfficialResultsUI } from './store/slices/uiSlice';
 import type { RootState } from './store';
 import { moveDriver, resetGrid, toggleOfficialResults } from './store/slices/gridSlice';
 import { fetchLockedPredictions } from './store/slices/lockedPredictionsSlice';
@@ -114,6 +114,12 @@ const App: React.FC<{ year?: string }> = ({ year }) => {
   useEffect(() => {
     dispatch(initializeUiState());
   }, [dispatch]);
+
+  // Year-aware default points system: applies the season's native system
+  // (e.g. 2003-2009 for 2009) unless the user has explicitly chosen one.
+  useEffect(() => {
+    dispatch(syncPointsSystemForYear(activeSeason));
+  }, [dispatch, activeSeason]);
 
   useEffect(() => {
     if (!isMobile) {
