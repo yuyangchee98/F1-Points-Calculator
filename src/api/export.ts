@@ -7,7 +7,6 @@ interface ExportData {
     raceId: string;
     name: string;
     completed: boolean;
-    flag: string;
   }>;
   grids: Record<string, Array<{
     position: number;

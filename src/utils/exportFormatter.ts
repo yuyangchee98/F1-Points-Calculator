@@ -11,17 +11,6 @@ interface ExportStateInput {
   };
 }
 
-function countryCodeToFlag(countryCode: string): string {
-  if (!countryCode || countryCode.length !== 2) return '🏁';
-
-  const codePoints = countryCode
-    .toUpperCase()
-    .split('')
-    .map(char => 127397 + char.charCodeAt(0));
-
-  return String.fromCodePoint(...codePoints);
-}
-
 export interface ExportData {
   title: string;
   subtitle?: string;
@@ -30,7 +19,6 @@ export interface ExportData {
     raceId: string;
     name: string;
     completed: boolean;
-    flag: string;
   }>;
   grids: Record<string, Array<{
     position: number;
@@ -82,7 +70,6 @@ export function formatExportData(
       raceId: race.id,
       name: race.name,
       completed: race.completed,
-      flag: countryCodeToFlag(race.countryCode)
     }));
 
   const grids: Record<string, Array<{
