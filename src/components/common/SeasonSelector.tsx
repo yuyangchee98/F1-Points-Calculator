@@ -439,8 +439,8 @@ const SheetContents: React.FC<SheetContentsProps> = ({
                 onMouseEnter={() => setFocusedYear(year)}
                 onFocus={() => setFocusedYear(year)}
                 className={`relative ${
-                  isMobile ? 'h-[52px] text-[17px]' : 'h-10 text-[15px]'
-                } flex items-center justify-center gap-1 rounded font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 transition-colors ${
+                  isMobile ? 'h-[52px] text-[17px] gap-1' : 'h-10 text-[15px]'
+                } flex items-center justify-center rounded font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 transition-colors ${
                   isSelected
                     ? 'bg-gray-900 text-white border border-gray-900'
                     : 'bg-white text-gray-900 border border-gray-200 hover:bg-gray-50 hover:border-gray-300'
@@ -455,7 +455,11 @@ const SheetContents: React.FC<SheetContentsProps> = ({
                 <span>{year}</span>
                 {isPaid && (
                   <svg
-                    className={`w-3 h-3 ${isSelected ? 'text-white' : 'text-gray-400'}`}
+                    className={`${
+                      isMobile
+                        ? 'relative w-3 h-3'
+                        : 'absolute top-0.5 right-0.5 w-2.5 h-2.5'
+                    } ${isSelected ? 'text-white' : 'text-gray-400'}`}
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
