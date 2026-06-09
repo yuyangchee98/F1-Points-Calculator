@@ -227,7 +227,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                           fontSize: isCompleted ? '11px' : '12px',
                         }}
                       >
-                        {race.flag && <span style={{ fontSize: isCompleted ? '14px' : '16px' }}>{race.flag}</span>}
                         {race.name}
                       </div>
                       {!isCompleted && (
@@ -877,7 +876,6 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                               fontSize: isCompleted ? '13px' : '15px',
                             }}
                           >
-                            {race.flag && <span style={{ fontSize: isCompleted ? '18px' : '20px' }}>{race.flag}</span>}
                             {race.name}
                           </div>
                           {!isCompleted && (
