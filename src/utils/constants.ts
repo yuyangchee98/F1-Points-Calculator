@@ -30,6 +30,7 @@ const SEASON_DRIVER_COUNT: { [key: number]: number } = {
   2009: 20,
   2008: 22,
   2007: 22,
+  2006: 22,
 };
 
 export const getGridPositions = (season: number): number => {
@@ -80,4 +81,5 @@ export const COUNTRY_CODE_MAP: Record<string, string> = {
   'russia': 'ru',
   'germany': 'de',
   'malaysia': 'my',
+  'san marino': 'sm',
 } as const;

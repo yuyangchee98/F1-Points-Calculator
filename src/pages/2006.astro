@@ -1,0 +1,84 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import AppIsland from '../components/AppIsland';
+const schemaData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "F1 Points Calculator 2006 - Championship Predictor",
+  "description": "F1 championship calculator and standings predictor. Simulate Formula 1 race results and calculate driver points for the 2006 season.",
+  "applicationCategory": "Sports Calculator",
+  "operatingSystem": "Web Browser",
+  "author": {
+    "@type": "Person",
+    "name": "Chyuang",
+    "url": "https://chyuang.com"
+  }
+};
+---
+
+<BaseLayout
+  title="F1 Points Calculator 2006 - Championship Predictor"
+  description="F1 points calculator for 2006. Replay Alonso's second title over Schumacher's retirement-year charge, calculate driver points using the 10-8-6 system, and simulate alternative standings."
+  keywords="F1, Formula 1, 2006 season, Alonso, Schumacher, points calculator, championship predictor, race simulator, F1 standings, predictions"
+  canonicalPath="/2006"
+  ogTitle="F1 Points Calculator 2006 - Championship Predictor"
+  ogDescription="Replay Alonso's back-to-back title and Schumacher's retirement race with our interactive 2006 F1 calculator"
+  schemaData={schemaData}
+  initialYear={2006}
+>
+  <!-- SEO content — always in HTML, hidden once React mounts -->
+  <div id="seo-content" style="padding: 20px; max-width: 900px; margin: 0 auto; font-family: system-ui, sans-serif; line-height: 1.6;">
+    <h1 style="color: #dc2626;">F1 Points Calculator - 2006 Season</h1>
+
+    <p>Explore the 2006 Formula 1 World Championship results and simulate alternative
+    standings. Use our drag-and-drop calculator to replay Alonso's back-to-back title
+    fight against Michael Schumacher's retirement-year charge.</p>
+
+    <h2>2006 F1 Season Highlights</h2>
+    <ul>
+      <li>18 races, including the <strong>final San Marino Grand Prix at Imola</strong> (the venue returned in 2020 as the "Emilia Romagna GP")</li>
+      <li>11 teams, 22 drivers — <strong>Toro Rosso, Super Aguri, and BMW Sauber all debut</strong>; Midland renamed to Spyker MF1 from the Italian GP onwards</li>
+      <li><strong>Fernando Alonso wins his second consecutive Drivers' Championship</strong> (134 pts) over Michael Schumacher (121) — Renault completes back-to-back Constructors' titles</li>
+      <li><strong>Michael Schumacher's "retirement" race at Brazil</strong> — he returned with Mercedes for 2010</li>
+      <li><strong>Robert Kubica's F1 debut</strong> at Hungary (replacing Jacques Villeneuve at BMW Sauber); first F1 podium finish for a Polish driver</li>
+      <li>Last year of the <strong>Bridgestone/Michelin dual tyre supplier era</strong> — Bridgestone becomes sole supplier from 2007</li>
+      <li>First year of the new <strong>2.4L V8 engine regulations</strong> (replacing the 3.0L V10s)</li>
+      <li>Same 10-8-6-5-4-3-2-1 top-8 points system as 2007/2008/2009</li>
+      <li>No Sprint races, no fastest lap bonus point</li>
+    </ul>
+
+    <h2>Other Seasons</h2>
+    <ul>
+      <li><a href="/">Current Season Calculator</a></li>
+      <li><a href="/2025">2025 F1 Season</a></li>
+      <li><a href="/2024">2024 F1 Season</a></li>
+      <li><a href="/2023">2023 F1 Season</a></li>
+      <li><a href="/2022">2022 F1 Season</a></li>
+      <li><a href="/2021">2021 F1 Season</a></li>
+      <li><a href="/2020">2020 F1 Season</a></li>
+      <li><a href="/2019">2019 F1 Season</a></li>
+      <li><a href="/2018">2018 F1 Season</a></li>
+      <li><a href="/2017">2017 F1 Season</a></li>
+      <li><a href="/2016">2016 F1 Season</a></li>
+      <li><a href="/2015">2015 F1 Season</a></li>
+      <li><a href="/2014">2014 F1 Season</a></li>
+      <li><a href="/2013">2013 F1 Season</a></li>
+      <li><a href="/2012">2012 F1 Season</a></li>
+      <li><a href="/2011">2011 F1 Season</a></li>
+      <li><a href="/2010">2010 F1 Season</a></li>
+      <li><a href="/2009">2009 F1 Season</a></li>
+      <li><a href="/2008">2008 F1 Season</a></li>
+      <li><a href="/2007">2007 F1 Season</a></li>
+    </ul>
+
+    <p><a href="/about">FAQ & Help Guide</a></p>
+
+    <p style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666;">
+      Created by <a href="https://chyuang.com">Chyuang</a> |
+      <a href="https://github.com/yuyangchee98/F1-Points-Calculator">View on GitHub</a>
+    </p>
+  </div>
+
+  <AppIsland year="2006" client:only="react" />
+  <script is:inline>document.getElementById('seo-content').style.display='none';</script>
+</BaseLayout>
