@@ -29,6 +29,7 @@ const SEASON_DRIVER_COUNT: { [key: number]: number } = {
   2010: 24,
   2009: 20,
   2008: 22,
+  2007: 22,
 };
 
 export const getGridPositions = (season: number): number => {
