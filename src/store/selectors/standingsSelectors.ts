@@ -25,6 +25,13 @@ const CONSTRUCTOR_POINTS_RESET: Record<number, { teamId: string; fromRound: numb
   2018: [{ teamId: 'force_india', fromRound: 13 }],
 };
 
+// Full-season constructor exclusions (team scores zero constructor points all year).
+// McLaren stripped of all 2007 constructor points after "Spygate" (use of confidential
+// Ferrari technical data); driver points were retained.
+const CONSTRUCTOR_EXCLUSIONS: Record<number, Set<string>> = {
+  2007: new Set(['mclaren']),
+};
+
 const selectGridPositions = (state: RootState) => state.grid.positions;
 const selectRaces = (state: RootState) => state.seasonData.races;
 const selectDrivers = (state: RootState) => state.seasonData.drivers;
@@ -144,8 +151,10 @@ const selectCalculatedPoints = createSelector(
               const isResetExcluded = resetRules?.some(
                 r => r.teamId === teamId && roundNum < r.fromRound
               );
+              const isFullSeasonExcluded =
+                CONSTRUCTOR_EXCLUSIONS[activeSeason]?.has(teamId);
 
-              if (!isResetExcluded) {
+              if (!isResetExcluded && !isFullSeasonExcluded) {
                 teamPoints[teamId] += pointsForPosition;
                 raceTeamPoints[teamId] += pointsForPosition;
 
