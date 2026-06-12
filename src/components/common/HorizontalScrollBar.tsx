@@ -145,13 +145,12 @@ const HorizontalScrollBar: React.FC<HorizontalScrollBarProps> = ({ scrollContain
   const thumbOffsetPx = (thumbPosition / 100) * scrollBarWidth;
 
   return (
-    <div className={`w-full py-2 px-4 hidden sm:block transition-opacity duration-200 ${!isVisible ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-      <div className="bg-surface rounded-md p-2 shadow-xs border">
-        <div
-          ref={scrollBarRef}
-          className="relative w-full h-2.5 bg-carbon-100 rounded-full cursor-pointer"
-          onClick={handleScrollBarClick}
-        >
+    <div className={`w-full py-1 hidden sm:block transition-opacity duration-200 ${!isVisible ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+      <div
+        ref={scrollBarRef}
+        className="relative w-full h-2 bg-carbon-200/70 rounded-full cursor-pointer"
+        onClick={handleScrollBarClick}
+      >
           <div
             ref={thumbRef}
             className={`absolute top-0 left-0 h-full bg-carbon-400 hover:bg-carbon-500 rounded-full transition-transform ${isDragging ? '' : 'duration-200'} cursor-grab active:cursor-grabbing hover:shadow-md will-change-transform`}
@@ -161,7 +160,6 @@ const HorizontalScrollBar: React.FC<HorizontalScrollBarProps> = ({ scrollContain
             }}
             onMouseDown={handleMouseDown}
           />
-        </div>
       </div>
     </div>
   );

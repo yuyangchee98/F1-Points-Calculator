@@ -62,7 +62,7 @@ const DriverCard: React.FC<DriverCardProps> = ({
         cursor: 'grab'
       }}
     >
-      <div className="flex flex-col ml-2 flex-grow">
+      <div className="flex flex-col ml-1 flex-grow min-w-0">
         <span className="text-xs font-bold flex items-center gap-1">
           {getDriverDisplayName(driver)}
         </span>

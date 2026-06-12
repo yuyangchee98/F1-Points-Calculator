@@ -19,7 +19,7 @@ interface MobileRaceCardViewProps {
   showOfficialResults: boolean;
 }
 
-const ROW_HEIGHT = 56;
+const ROW_HEIGHT = 48;
 
 const formatName = (name: string) =>
   name.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
@@ -212,7 +212,7 @@ const MobileRaceCardView: React.FC<MobileRaceCardViewProps> = ({
                   key={driver.id}
                   ref={isSelected ? selectedDriverRef : undefined}
                   onClick={() => handleDriverTap(driver.id)}
-                  className={`flex items-center gap-1 px-2.5 py-2 rounded-md text-sm font-medium transition-all duration-150 ${
+                  className={`flex items-center gap-1 px-2 py-1.5 rounded-md text-sm font-medium transition-all duration-150 ${
                     isSelected
                       ? 'bg-blue-50 ring-2 ring-interactive text-interactive shadow-xs'
                       : 'bg-carbon-100 text-ink-secondary active:bg-carbon-200'
@@ -230,10 +230,10 @@ const MobileRaceCardView: React.FC<MobileRaceCardViewProps> = ({
       {/* Swipeable card body */}
       <div
         {...swipeHandlers}
-        className="flex-1 min-h-0 overflow-y-auto p-3"
+        className="flex-1 min-h-0 overflow-y-auto p-2"
         key={race.id}
       >
-        <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
+        <div className="grid grid-cols-2 gap-x-2 gap-y-1">
           {Array.from({ length: posCount }, (_, i) => i + 1).map(position => (
             <div key={position} className="flex items-center gap-1.5">
               <div

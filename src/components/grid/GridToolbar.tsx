@@ -63,7 +63,7 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
 
   return (
     <div className="bg-surface border-b rounded-t-lg">
-      <div className="p-2 md:p-4">
+      <div className="p-2">
         <div className="flex flex-nowrap gap-1 md:gap-2 items-center">
           {/* View Settings */}
           <div className="flex items-center gap-2 shrink-0">

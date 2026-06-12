@@ -33,7 +33,7 @@ function SegmentedControl<T extends string>({
             key={option.value}
             role="tab"
             aria-selected={selected}
-            className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-md transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-interactive ${
+            className={`flex-1 px-3 py-1 text-sm font-medium rounded-md transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-interactive ${
               selected
                 ? 'bg-surface text-ink shadow-xs'
                 : 'text-ink-secondary hover:text-ink'

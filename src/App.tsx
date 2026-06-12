@@ -137,8 +137,8 @@ const App: React.FC<{ year?: string }> = ({ year }) => {
         <Layout
           sidebar={<StandingsSidebar />}
           content={
-            <div className="flex-1 min-h-0 flex flex-col px-2 sm:px-3 lg:px-4 pt-2 sm:pt-3 lg:pt-4 pb-16 sm:pb-0 max-w-5xl mx-auto w-full">
-              <div className="mb-2 shrink-0">
+            <div className="flex-1 min-h-0 flex flex-col px-2 sm:px-3 pt-2 pb-16 sm:pb-0 w-full">
+              <div className="mb-1.5 shrink-0">
                 {/* Single header row — unified sizing */}
                 <div className="flex items-center gap-1.5 sm:gap-2 flex-nowrap">
                   <h1 className="text-sm sm:text-base lg:text-lg font-display font-bold text-ink flex items-center min-w-0 shrink">
@@ -171,11 +171,9 @@ const App: React.FC<{ year?: string }> = ({ year }) => {
                 ) : isLoading ? (
                   <>
                     <div className="shrink-0"><DriverSelectionSkeleton /></div>
-                    <div className="shrink-0 w-full py-2 px-4 hidden sm:block">
-                      <div className="bg-surface rounded-md p-2 shadow-xs border">
-                        <div className="relative w-full h-2.5 bg-carbon-100 rounded-full">
-                          <div className="absolute top-0 h-full w-1/4 bg-carbon-300 rounded-full" style={{ left: '0%' }} />
-                        </div>
+                    <div className="shrink-0 w-full py-1 hidden sm:block">
+                      <div className="relative w-full h-2 bg-carbon-200/70 rounded-full">
+                        <div className="absolute top-0 h-full w-1/4 bg-carbon-300 rounded-full" style={{ left: '0%' }} />
                       </div>
                     </div>
                     <div className="flex-1 min-h-0 overflow-hidden"><GridSkeleton /></div>

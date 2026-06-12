@@ -10,7 +10,6 @@ import { DriverPointsChart, TeamPointsChart } from '../charts/LazyCharts';
 import { useAppDispatch } from '../../store';
 import CompetitionCard from './CompetitionCard';
 import SegmentedControl from '../ui/SegmentedControl';
-import Card from '../ui/Card';
 
 const StandingsSidebar: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -31,90 +30,94 @@ const StandingsSidebar: React.FC = () => {
   }, [uiActiveTab]);
 
   return (
-    <div className="h-full overflow-hidden flex flex-col bg-surface-sunken pb-4">
-      <div className="px-4 py-3 border-b bg-surface">
-        <h2 className="text-xl font-semibold font-display text-ink text-center sm:text-left">
-          Championship Standings
-          <span className="block h-0.5 w-10 bg-brand mt-1 mx-auto sm:mx-0" aria-hidden="true"></span>
+    <div className="h-full overflow-hidden flex flex-col bg-surface pb-3">
+      <div className="px-3 py-2 border-b flex items-center justify-between gap-2">
+        <h2 className="text-base font-semibold font-display text-ink truncate">
+          <span className="hidden lg:inline">Championship </span>Standings
         </h2>
+        <SegmentedControl
+          className="shrink-0"
+          aria-label="Standings view"
+          options={[
+            { value: 'tables', label: 'Tables' },
+            { value: 'charts', label: 'Charts' },
+          ]}
+          value={activeTab}
+          onChange={handleTabChange}
+        />
       </div>
 
-      <SegmentedControl
-        className="mx-4 mt-4 sticky top-0 z-sticky"
-        aria-label="Standings view"
-        options={[
-          { value: 'tables', label: 'Tables' },
-          { value: 'charts', label: 'Charts' },
-        ]}
-        value={activeTab}
-        onChange={handleTabChange}
-      />
-
-      <div className="overflow-auto flex-1 px-4 pt-4">
+      <div className="overflow-auto flex-1">
         {activeTab === 'tables' ? (
-          <div className="space-y-6">
-            <Card title="Driver Standings">
-              <div className="overflow-x-auto">
-                {isLoading || driverStandings.length === 0 ? (
-                  <TableSkeleton rows={20} type="driver" />
-                ) : (
-                  <DriverStandingsTable standings={driverStandings} />
-                )}
-              </div>
-            </Card>
+          <>
+            <h3 className="sticky top-0 z-sticky bg-surface px-3 pt-2 pb-1 text-2xs font-semibold uppercase tracking-wider text-ink-muted">
+              Drivers
+            </h3>
+            <div className="overflow-x-auto px-1">
+              {isLoading || driverStandings.length === 0 ? (
+                <TableSkeleton rows={20} type="driver" />
+              ) : (
+                <DriverStandingsTable standings={driverStandings} />
+              )}
+            </div>
 
-            <Card title="Constructor Standings">
-              <div className="overflow-x-auto">
-                {isLoading || teamStandings.length === 0 ? (
-                  <TableSkeleton rows={10} type="team" />
-                ) : (
-                  <TeamStandingsTable standings={teamStandings} />
-                )}
-              </div>
-            </Card>
+            <h3 className="sticky top-0 z-sticky bg-surface px-3 pt-3 pb-1 mt-1 border-t text-2xs font-semibold uppercase tracking-wider text-ink-muted">
+              Constructors
+            </h3>
+            <div className="overflow-x-auto px-1">
+              {isLoading || teamStandings.length === 0 ? (
+                <TableSkeleton rows={10} type="team" />
+              ) : (
+                <TeamStandingsTable standings={teamStandings} />
+              )}
+            </div>
 
-            <CompetitionCard />
-          </div>
+            <div className="px-3 pt-3">
+              <CompetitionCard />
+            </div>
+          </>
         ) : (
-          <div className="space-y-6">
-            <Card title="Driver Championship">
-              <div className="p-3">
-                <Suspense fallback={
-                  <div className="h-[250px] flex items-center justify-center">
-                    <div className="text-ink-muted">Loading chart...</div>
-                  </div>
-                }>
-                  <DriverPointsChart />
-                </Suspense>
-              </div>
-            </Card>
+          <>
+            <h3 className="sticky top-0 z-sticky bg-surface px-3 pt-2 pb-1 text-2xs font-semibold uppercase tracking-wider text-ink-muted">
+              Drivers
+            </h3>
+            <div className="px-2">
+              <Suspense fallback={
+                <div className="h-[250px] flex items-center justify-center">
+                  <div className="text-ink-muted">Loading chart...</div>
+                </div>
+              }>
+                <DriverPointsChart />
+              </Suspense>
+            </div>
 
-            <Card title="Constructor Championship">
-              <div className="p-3">
-                <Suspense fallback={
-                  <div className="h-[250px] flex items-center justify-center">
-                    <div className="text-ink-muted">Loading chart...</div>
-                  </div>
-                }>
-                  <TeamPointsChart />
-                </Suspense>
-              </div>
-            </Card>
+            <h3 className="sticky top-0 z-sticky bg-surface px-3 pt-3 pb-1 mt-2 border-t text-2xs font-semibold uppercase tracking-wider text-ink-muted">
+              Constructors
+            </h3>
+            <div className="px-2">
+              <Suspense fallback={
+                <div className="h-[250px] flex items-center justify-center">
+                  <div className="text-ink-muted">Loading chart...</div>
+                </div>
+              }>
+                <TeamPointsChart />
+              </Suspense>
+            </div>
 
-            <CompetitionCard />
-          </div>
+            <div className="px-3 pt-3">
+              <CompetitionCard />
+            </div>
+          </>
         )}
 
-        <div className="mt-6 pt-4 border-t text-xs text-ink-muted space-y-1.5">
-          <p>Created by <a href="https://chyuang.com" className="hover:text-ink" target="_blank" rel="noopener noreferrer">Chyuang</a></p>
-          <p><a href="https://github.com/yuyangchee98/F1-Points-Calculator" className="hover:text-ink" target="_blank" rel="noopener noreferrer">Open source on GitHub</a></p>
-          <p><a href="mailto:f1pointscalculator@chyuang.com" className="hover:text-ink">Contact</a></p>
-          <p><a href="/changelog" className="hover:text-ink">Changelog</a></p>
-          <div className="flex gap-3 pt-1">
-            <a href="https://f1-dash.com/" className="hover:text-ink" target="_blank" rel="noopener noreferrer">F1 Dash</a>
-            <a href="https://f1calendar.com/" className="hover:text-ink" target="_blank" rel="noopener noreferrer">F1 Calendar</a>
-            <a href="https://drawlineracing.chyuang.com/" className="hover:text-ink" target="_blank" rel="noopener noreferrer">Draw Line Racing</a>
-          </div>
+        <div className="mx-3 mt-3 pt-3 border-t text-xs text-ink-muted flex flex-wrap gap-x-3 gap-y-1">
+          <a href="https://chyuang.com" className="hover:text-ink" target="_blank" rel="noopener noreferrer">By Chyuang</a>
+          <a href="https://github.com/yuyangchee98/F1-Points-Calculator" className="hover:text-ink" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a href="mailto:f1pointscalculator@chyuang.com" className="hover:text-ink">Contact</a>
+          <a href="/changelog" className="hover:text-ink">Changelog</a>
+          <a href="https://f1-dash.com/" className="hover:text-ink" target="_blank" rel="noopener noreferrer">F1 Dash</a>
+          <a href="https://f1calendar.com/" className="hover:text-ink" target="_blank" rel="noopener noreferrer">F1 Calendar</a>
+          <a href="https://drawlineracing.chyuang.com/" className="hover:text-ink" target="_blank" rel="noopener noreferrer">Draw Line Racing</a>
         </div>
       </div>
     </div>

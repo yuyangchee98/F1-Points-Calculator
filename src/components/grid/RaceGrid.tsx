@@ -26,10 +26,10 @@ interface RaceGridProps {
   gridPositionCount?: number;
 }
 
-const POSITION_COLUMN_WIDTH = 80;
-const HEADER_HEIGHT = 64;
-const ROW_HEIGHT = 72;
-const GAP = 8;
+const POSITION_COLUMN_WIDTH = 64;
+const HEADER_HEIGHT = 56;
+const ROW_HEIGHT = 60;
+const GAP = 6;
 const OVERSCAN = 2;
 
 const RaceGrid: React.FC<RaceGridProps> = ({
@@ -116,7 +116,7 @@ const RaceGrid: React.FC<RaceGridProps> = ({
       <div
         ref={actualScrollRef}
         id="race-grid"
-        className="flex-1 min-h-0 overflow-auto p-4"
+        className="flex-1 min-h-0 overflow-auto p-2"
       >
         <div
           style={{
@@ -165,18 +165,20 @@ const RaceGrid: React.FC<RaceGridProps> = ({
 
                 const headerContent = (
                   <>
-                    {race.countryCode && (
-                      <img
-                        src={`/flags/${race.countryCode}.webp`}
-                        alt={race.country}
-                        className="flag"
-                      />
-                    )}
-                    <span className={`${isMobile ? 'text-xs' : 'text-sm'}`}>
-                      {race.name
-                        .split('-')
-                        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                        .join(' ')}
+                    <span className={`${isMobile ? 'text-xs' : 'text-sm'} flex items-center justify-center gap-1 min-w-0 max-w-full`}>
+                      {race.countryCode && (
+                        <img
+                          src={`/flags/${race.countryCode}.webp`}
+                          alt={race.country}
+                          className="flag !mr-0 shrink-0"
+                        />
+                      )}
+                      <span className="line-clamp-2 leading-tight">
+                        {race.name
+                          .split('-')
+                          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                          .join(' ')}
+                      </span>
                     </span>
                     {/* Lock/Score badges */}
                     {hasScore ? (
