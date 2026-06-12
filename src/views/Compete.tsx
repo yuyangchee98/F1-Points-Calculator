@@ -225,19 +225,19 @@ const Compete: React.FC = () => {
 
   return (
     <LazyDndProvider>
-      <div className="min-h-screen bg-gray-100">
+      <div className="min-h-screen bg-surface-sunken">
         <ToastContainer />
 
         {/* Header */}
-        <header className="bg-white border-b border-gray-200">
+        <header className="bg-surface border-b">
           <div className="mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
             <a href="/" className="flex items-center gap-2">
-              <span className="bg-red-600 text-white text-sm font-bold px-2 py-1 rounded">F1</span>
-              <span className="text-lg font-semibold text-gray-900">Compete</span>
+              <span className="bg-brand text-white text-sm font-bold px-2 py-1 rounded-sm">F1</span>
+              <span className="text-lg font-display font-semibold text-ink">Compete</span>
             </a>
             <a
               href="/"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-ink-secondary hover:text-ink transition-colors"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -250,10 +250,10 @@ const Compete: React.FC = () => {
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
           {/* How it works */}
-          <div className="max-w-3xl mx-auto mb-6 bg-white rounded-lg border border-gray-200 p-4 flex gap-5 items-center">
+          <div className="max-w-3xl mx-auto mb-6 bg-surface rounded-lg border shadow-xs p-4 flex gap-5 items-center">
             {/* Explanation */}
-            <div className="text-sm text-gray-600 min-w-0">
-              <div className="font-semibold text-gray-900 mb-1">Predict. Lock. Score.</div>
+            <div className="text-sm text-ink-secondary min-w-0">
+              <div className="font-semibold text-ink mb-1">Predict. Lock. Score.</div>
               <p>
                 Drag drivers into your predicted finishing order and lock your prediction before the race starts. After the race, you score a point for every position you got exactly right. Lock every race to climb the season leaderboard.
               </p>
@@ -261,7 +261,7 @@ const Compete: React.FC = () => {
 
             {/* Mini prediction vs actual visual */}
             <div className="flex-shrink-0 hidden sm:block">
-              <div className="flex gap-2 text-[10px] text-gray-400 font-medium mb-1.5 pl-7">
+              <div className="flex gap-2 text-[10px] text-ink-muted font-medium mb-1.5 pl-7">
                 <span className="w-16 text-center">Your pick</span>
                 <span className="w-16 text-center">Actual</span>
               </div>
@@ -272,23 +272,23 @@ const Compete: React.FC = () => {
                 { pos: 4, pick: 'SAI', actual: 'HAM', color: '#E80020', actualColor: '#27F4D2', exact: false },
               ].map(row => (
                 <div key={row.pos} className={`flex items-center gap-2 mb-1 rounded px-1 py-0.5 ${row.exact ? 'bg-green-50' : ''}`}>
-                  <span className={`w-5 text-[10px] font-bold text-center rounded py-px ${row.pos <= 3 ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-500'}`}>
+                  <span className={`w-5 text-[10px] font-bold text-center rounded py-px ${row.pos <= 3 ? 'bg-carbon-800 text-white' : 'bg-carbon-100 text-ink-muted'}`}>
                     {row.pos}
                   </span>
-                  <div className="w-16 flex items-center gap-1 bg-white rounded border border-gray-200 px-1.5 py-1 shadow-sm">
+                  <div className="w-16 flex items-center gap-1 bg-white rounded border px-1.5 py-1 shadow-sm">
                     <div className="w-1 h-3 rounded-sm" style={{ backgroundColor: row.color }} />
-                    <span className="text-[10px] font-bold text-gray-700">{row.pick}</span>
+                    <span className="text-[10px] font-bold text-ink-secondary">{row.pick}</span>
                   </div>
-                  <div className="w-16 flex items-center gap-1 bg-white rounded border border-gray-200 px-1.5 py-1 shadow-sm">
+                  <div className="w-16 flex items-center gap-1 bg-white rounded border px-1.5 py-1 shadow-sm">
                     <div className="w-1 h-3 rounded-sm" style={{ backgroundColor: row.exact ? row.color : row.actualColor }} />
-                    <span className="text-[10px] font-bold text-gray-700">{row.actual}</span>
+                    <span className="text-[10px] font-bold text-ink-secondary">{row.actual}</span>
                   </div>
                   {row.exact ? (
-                    <svg className="w-3 h-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-3 h-3 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                     </svg>
                   ) : (
-                    <svg className="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-3 h-3 text-carbon-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   )}
@@ -299,17 +299,17 @@ const Compete: React.FC = () => {
 
           {/* Sign-in banner */}
           {!isAuthenticated && (
-            <div className="max-w-3xl mx-auto bg-red-600 rounded-lg p-5 mb-6 text-white">
+            <div className="max-w-3xl mx-auto bg-brand rounded-lg p-5 mb-6 text-white">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-lg font-bold">Join the Competition</h2>
-                  <p className="text-red-100 text-sm mt-1">
+                  <h2 className="text-lg font-display font-bold">Join the Competition</h2>
+                  <p className="text-white/85 text-sm mt-1">
                     Lock predictions before races, get scored on accuracy, climb the leaderboard.
                   </p>
                 </div>
                 <button
                   onClick={() => dispatch(openAuthModal('signup'))}
-                  className="flex-shrink-0 bg-white text-red-600 font-semibold py-2 px-5 rounded-md hover:bg-red-50 transition-colors"
+                  className="flex-shrink-0 bg-white text-brand font-semibold py-2 px-5 rounded-md hover:bg-red-50 transition-colors"
                 >
                   Sign In
                 </button>
@@ -319,7 +319,7 @@ const Compete: React.FC = () => {
 
           {/* Hero Card — show for the active race in the weekend */}
           {activeRace && !allWeekendLocked && (
-            <div className="max-w-3xl mx-auto bg-white rounded-lg border border-gray-200 shadow-sm p-5 mb-6">
+            <div className="max-w-3xl mx-auto bg-surface rounded-lg border shadow-xs shadow-sm p-5 mb-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   {activeRace.countryCode && (
@@ -330,11 +330,11 @@ const Compete: React.FC = () => {
                     />
                   )}
                   <div>
-                    <h2 className="text-lg font-bold text-gray-900">{formatName(activeRace.name)}</h2>
-                    <div className="flex items-center gap-2 text-sm text-gray-500 mt-0.5">
+                    <h2 className="text-lg font-display font-bold text-ink">{formatName(activeRace.name)}</h2>
+                    <div className="flex items-center gap-2 text-sm text-ink-muted mt-0.5">
                       {activeRace.date && !isActiveRaceLocked && <Countdown date={activeRace.date} prefix="Locks in" />}
                       {isActiveRaceLocked ? (
-                        <span className="inline-flex items-center gap-1 text-green-600 font-medium">
+                        <span className="inline-flex items-center gap-1 text-success font-medium">
                           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                           </svg>
@@ -345,7 +345,7 @@ const Compete: React.FC = () => {
                           {filledCount}/{gridPositionCount} filled
                         </span>
                       ) : (
-                        <span className="text-gray-400">No predictions yet</span>
+                        <span className="text-ink-muted">No predictions yet</span>
                       )}
                     </div>
                   </div>
@@ -355,7 +355,7 @@ const Compete: React.FC = () => {
                   <button
                     onClick={handleLockRace}
                     disabled={filledCount === 0}
-                    className="flex-shrink-0 bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-2 px-5 rounded-md transition-colors flex items-center gap-2"
+                    className="flex-shrink-0 bg-brand hover:bg-brand-strong disabled:bg-carbon-300 disabled:cursor-not-allowed text-white font-semibold py-2 px-5 rounded-md transition-colors flex items-center gap-2"
                   >
                     Lock Prediction
                   </button>
@@ -365,21 +365,21 @@ const Compete: React.FC = () => {
           )}
 
           {nextWeekendRaces.length === 0 && awaitingResults.length === 0 && (
-            <div className="max-w-3xl mx-auto bg-white rounded-lg border border-gray-200 p-5 mb-6 text-center">
-              <p className="text-gray-500">No upcoming races. Season complete!</p>
+            <div className="max-w-3xl mx-auto bg-surface rounded-lg border shadow-xs p-5 mb-6 text-center">
+              <p className="text-ink-muted">No upcoming races. Season complete!</p>
             </div>
           )}
 
           {/* Tab Bar */}
-          <div className="flex border-b border-gray-200 mb-6 max-w-3xl mx-auto">
+          <div className="flex border-b mb-6 max-w-3xl mx-auto">
             {tabs.map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
                   activeTab === tab.id
-                    ? 'border-red-600 text-red-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-brand text-brand'
+                    : 'border-transparent text-ink-muted hover:text-ink-secondary hover:border-strong'
                 }`}
               >
                 {tab.icon}
@@ -393,10 +393,10 @@ const Compete: React.FC = () => {
             <>
               {!isAuthenticated ? (
                 <div className="text-center py-12">
-                  <p className="text-gray-500 mb-4">Sign in to set your predictions.</p>
+                  <p className="text-ink-muted mb-4">Sign in to set your predictions.</p>
                   <button
                     onClick={() => dispatch(openAuthModal('signup'))}
-                    className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-6 rounded-md transition-colors"
+                    className="bg-brand hover:bg-brand-strong text-white font-medium py-2 px-6 rounded-md transition-colors"
                   >
                     Sign In
                   </button>
@@ -404,7 +404,7 @@ const Compete: React.FC = () => {
               ) : nextWeekendRaces.length === 0 && awaitingResults.length > 0 ? (
                 <div className="max-w-3xl mx-auto">
                   {awaitingResults.map(({ race, lockedPrediction }) => (
-                    <div key={race.id} className="bg-white rounded-lg border border-gray-200 p-5 mb-4">
+                    <div key={race.id} className="bg-surface rounded-lg border shadow-xs p-5 mb-4">
                       <div className="flex items-center gap-3 mb-3">
                         {race.countryCode && (
                           <img
@@ -413,15 +413,15 @@ const Compete: React.FC = () => {
                             className="w-6 h-4 object-cover rounded shadow-sm"
                           />
                         )}
-                        <span className="font-semibold text-gray-900">{formatName(race.name)}</span>
-                        <span className="inline-flex items-center gap-1 text-green-600 text-sm font-medium">
+                        <span className="font-semibold text-ink">{formatName(race.name)}</span>
+                        <span className="inline-flex items-center gap-1 text-success text-sm font-medium">
                           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                           </svg>
                           Locked
                         </span>
                       </div>
-                      <p className="text-sm text-gray-500 mb-3">
+                      <p className="text-sm text-ink-muted mb-3">
                         Your prediction is locked. Results will be scored after the race finishes. Next predictions open once results are in.
                       </p>
                       <div className="flex flex-wrap gap-1.5">
@@ -431,13 +431,13 @@ const Compete: React.FC = () => {
                           .map(pos => {
                             const driver = driverById[pos.driverId];
                             return (
-                              <span key={pos.position} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md font-medium">
+                              <span key={pos.position} className="text-xs bg-carbon-100 text-ink-secondary px-2 py-1 rounded-md font-medium">
                                 P{pos.position} {getDriverCode(driver)}
                               </span>
                             );
                           })}
                         {lockedPrediction.positions.length > 5 && (
-                          <span className="text-xs text-gray-400 px-2 py-1">
+                          <span className="text-xs text-ink-muted px-2 py-1">
                             +{lockedPrediction.positions.length - 5} more
                           </span>
                         )}
@@ -447,7 +447,7 @@ const Compete: React.FC = () => {
                 </div>
               ) : nextWeekendRaces.length === 0 ? (
                 <div className="text-center py-12">
-                  <p className="text-gray-500">No upcoming races to predict.</p>
+                  <p className="text-ink-muted">No upcoming races to predict.</p>
                 </div>
               ) : allWeekendLocked ? (
                 <div className="max-w-3xl mx-auto">
@@ -455,7 +455,7 @@ const Compete: React.FC = () => {
                     const lp = lockedPredictions[race.id];
                     if (!lp) return null;
                     return (
-                      <div key={race.id} className="bg-white rounded-lg border border-gray-200 p-5 mb-4">
+                      <div key={race.id} className="bg-surface rounded-lg border shadow-xs p-5 mb-4">
                         <div className="flex items-center gap-3 mb-3">
                           {race.countryCode && (
                             <img
@@ -464,15 +464,15 @@ const Compete: React.FC = () => {
                               className="w-6 h-4 object-cover rounded shadow-sm"
                             />
                           )}
-                          <span className="font-semibold text-gray-900">{formatName(race.name)}</span>
-                          <span className="inline-flex items-center gap-1 text-green-600 text-sm font-medium">
+                          <span className="font-semibold text-ink">{formatName(race.name)}</span>
+                          <span className="inline-flex items-center gap-1 text-success text-sm font-medium">
                             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                             </svg>
                             Locked
                           </span>
                         </div>
-                        <p className="text-sm text-gray-500 mb-3">
+                        <p className="text-sm text-ink-muted mb-3">
                           Your prediction is locked. Results will be scored after the race finishes.
                         </p>
                         <div className="flex flex-wrap gap-1.5">
@@ -482,13 +482,13 @@ const Compete: React.FC = () => {
                             .map(pos => {
                               const driver = driverById[pos.driverId];
                               return (
-                                <span key={pos.position} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md font-medium">
+                                <span key={pos.position} className="text-xs bg-carbon-100 text-ink-secondary px-2 py-1 rounded-md font-medium">
                                   P{pos.position} {getDriverCode(driver)}
                                 </span>
                               );
                             })}
                           {lp.positions.length > 5 && (
-                            <span className="text-xs text-gray-400 px-2 py-1">
+                            <span className="text-xs text-ink-muted px-2 py-1">
                               +{lp.positions.length - 5} more
                             </span>
                           )}
@@ -502,17 +502,17 @@ const Compete: React.FC = () => {
                   {/* Active race is locked — show compact summary */}
                   {isActiveRaceLocked && activeRace && lockedPredictions[activeRace.id] && (
                     <div className="max-w-3xl mx-auto">
-                      <div className="bg-white rounded-lg border border-gray-200 p-5 mb-4">
+                      <div className="bg-surface rounded-lg border shadow-xs p-5 mb-4">
                         <div className="flex items-center gap-3 mb-3">
-                          <span className="font-semibold text-gray-900">{formatName(activeRace.name)}</span>
-                          <span className="inline-flex items-center gap-1 text-green-600 text-sm font-medium">
+                          <span className="font-semibold text-ink">{formatName(activeRace.name)}</span>
+                          <span className="inline-flex items-center gap-1 text-success text-sm font-medium">
                             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                             </svg>
                             Locked
                           </span>
                         </div>
-                        <p className="text-sm text-gray-500 mb-3">
+                        <p className="text-sm text-ink-muted mb-3">
                           Your prediction is locked. Results will be scored after the race finishes.
                         </p>
                         <div className="flex flex-wrap gap-1.5">
@@ -522,13 +522,13 @@ const Compete: React.FC = () => {
                             .map(pos => {
                               const driver = driverById[pos.driverId];
                               return (
-                                <span key={pos.position} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md font-medium">
+                                <span key={pos.position} className="text-xs bg-carbon-100 text-ink-secondary px-2 py-1 rounded-md font-medium">
                                   P{pos.position} {getDriverCode(driver)}
                                 </span>
                               );
                             })}
                           {lockedPredictions[activeRace.id].positions.length > 5 && (
-                            <span className="text-xs text-gray-400 px-2 py-1">
+                            <span className="text-xs text-ink-muted px-2 py-1">
                               +{lockedPredictions[activeRace.id].positions.length - 5} more
                             </span>
                           )}
@@ -553,7 +553,7 @@ const Compete: React.FC = () => {
                                   onClick={() => handleDriverClick(driver.id)}
                                   className={`flex-shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-bold transition-all ${
                                     isSelected
-                                      ? 'ring-2 ring-blue-500 shadow-md scale-105'
+                                      ? 'ring-2 ring-interactive shadow-md scale-105'
                                       : 'hover:scale-105'
                                   }`}
                                   style={{
@@ -588,7 +588,7 @@ const Compete: React.FC = () => {
                       {!isMobile ? (
                         <div className="flex gap-4">
                           <div className="flex-1 min-w-0">
-                            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Drivers</h3>
+                            <h3 className="text-sm font-semibold text-ink-muted uppercase tracking-wide mb-2">Drivers</h3>
                             <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 max-h-[calc(100vh-240px)] overflow-y-auto pr-1 pb-2">
                               {allDrivers.map(driver => (
                                 <DriverCard
@@ -637,10 +637,10 @@ const Compete: React.FC = () => {
             <div className="max-w-3xl mx-auto">
               {!isAuthenticated ? (
                 <div className="text-center py-12">
-                  <p className="text-gray-500 mb-4">Sign in to see your results.</p>
+                  <p className="text-ink-muted mb-4">Sign in to see your results.</p>
                   <button
                     onClick={() => dispatch(openAuthModal('signup'))}
-                    className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-6 rounded-md transition-colors"
+                    className="bg-brand hover:bg-brand-strong text-white font-medium py-2 px-6 rounded-md transition-colors"
                   >
                     Sign In
                   </button>
@@ -649,35 +649,35 @@ const Compete: React.FC = () => {
                 <>
                   {/* Stats */}
                   <div className="grid grid-cols-3 gap-3 mb-6">
-                    <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
-                      <div className="text-2xl font-bold text-gray-900">
+                    <div className="bg-surface rounded-lg border shadow-xs p-4 text-center">
+                      <div className="text-2xl font-display font-bold text-ink tnum">
                         {scoredCount > 0 ? `${overallAccuracy.percentage}%` : '--'}
                       </div>
-                      <div className="text-xs text-gray-500 mt-1">Accuracy</div>
+                      <div className="text-xs text-ink-muted mt-1">Accuracy</div>
                     </div>
-                    <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
-                      <div className="text-2xl font-bold text-gray-900">{lockedCount}</div>
-                      <div className="text-xs text-gray-500 mt-1">Locked</div>
+                    <div className="bg-surface rounded-lg border shadow-xs p-4 text-center">
+                      <div className="text-2xl font-display font-bold text-ink tnum">{lockedCount}</div>
+                      <div className="text-xs text-ink-muted mt-1">Locked</div>
                     </div>
-                    <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
-                      <div className="text-2xl font-bold text-gray-900">{scoredCount}</div>
-                      <div className="text-xs text-gray-500 mt-1">Scored</div>
+                    <div className="bg-surface rounded-lg border shadow-xs p-4 text-center">
+                      <div className="text-2xl font-display font-bold text-ink tnum">{scoredCount}</div>
+                      <div className="text-xs text-ink-muted mt-1">Scored</div>
                     </div>
                   </div>
 
                   {/* Scored Races */}
                   {scoredRaces.length > 0 && (
                     <div className="mb-6">
-                      <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Scored Races</h3>
+                      <h3 className="text-sm font-semibold text-ink-muted uppercase tracking-wide mb-3">Scored Races</h3>
                       <div className="space-y-3">
                         {scoredRaces.map(({ race, lockedPrediction }) => {
                           const isExpanded = expandedRaceId === race.id;
                           const score = lockedPrediction.score;
                           return (
-                            <div key={race.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                            <div key={race.id} className="bg-surface rounded-lg border shadow-xs overflow-hidden">
                               <button
                                 onClick={() => setExpandedRaceId(isExpanded ? null : race.id)}
-                                className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 transition-colors"
+                                className="w-full flex items-center justify-between p-4 text-left hover:bg-carbon-50 transition-colors"
                               >
                                 <div className="flex items-center gap-3">
                                   {race.countryCode && (
@@ -687,34 +687,34 @@ const Compete: React.FC = () => {
                                       className="w-6 h-4 object-cover rounded shadow-sm"
                                     />
                                   )}
-                                  <span className="font-medium text-gray-900">{formatName(race.name)}</span>
+                                  <span className="font-medium text-ink">{formatName(race.name)}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                   <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
                                     (score?.percentage ?? 0) >= 40 ? 'bg-green-100 text-green-700' :
                                     (score?.percentage ?? 0) >= 25 ? 'bg-amber-100 text-amber-700' :
-                                    'bg-gray-100 text-gray-600'
+                                    'bg-carbon-100 text-ink-secondary'
                                   }`}>
                                     {score?.exact}/{score?.total} exact ({score?.percentage}%)
                                   </span>
-                                  <svg className={`w-4 h-4 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <svg className={`w-4 h-4 text-ink-muted transition-transform ${isExpanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                   </svg>
                                 </div>
                               </button>
 
                               {isExpanded && lockedPrediction.breakdown && (
-                                <div className="border-t border-gray-100">
+                                <div className="border-t border-carbon-100">
                                   <table className="w-full text-sm">
                                     <thead>
-                                      <tr className="bg-gray-50 text-xs text-gray-500 uppercase">
+                                      <tr className="bg-carbon-50 text-xs text-ink-muted uppercase">
                                         <th className="px-4 py-2 text-left w-14">Pos</th>
                                         <th className="px-4 py-2 text-left">Your Pick</th>
                                         <th className="px-4 py-2 text-left">Actual</th>
                                         <th className="px-4 py-2 text-center w-12"></th>
                                       </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-gray-50">
+                                    <tbody className="divide-y divide-carbon-50">
                                       {lockedPrediction.breakdown.map(item => {
                                         const predicted = driverById[item.predictedDriverId];
                                         const actual = item.actualDriverId ? driverById[item.actualDriverId] : null;
@@ -723,20 +723,20 @@ const Compete: React.FC = () => {
                                             key={item.position}
                                             className={item.isExact ? 'bg-green-50' : ''}
                                           >
-                                            <td className="px-4 py-2 font-medium text-gray-500">P{item.position}</td>
-                                            <td className="px-4 py-2 font-medium text-gray-900">
+                                            <td className="px-4 py-2 font-medium text-ink-muted">P{item.position}</td>
+                                            <td className="px-4 py-2 font-medium text-ink">
                                               {getDriverCode(predicted)}
                                             </td>
-                                            <td className="px-4 py-2 text-gray-600">
+                                            <td className="px-4 py-2 text-ink-secondary">
                                               {actual ? getDriverCode(actual) : '--'}
                                             </td>
                                             <td className="px-4 py-2 text-center">
                                               {item.isExact ? (
-                                                <svg className="w-4 h-4 text-green-600 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg className="w-4 h-4 text-success mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                                 </svg>
                                               ) : (
-                                                <svg className="w-4 h-4 text-gray-300 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg className="w-4 h-4 text-carbon-300 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                                 </svg>
                                               )}
@@ -758,10 +758,10 @@ const Compete: React.FC = () => {
                   {/* Awaiting Results */}
                   {awaitingResults.length > 0 && (
                     <div className="mb-6">
-                      <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Awaiting Results</h3>
+                      <h3 className="text-sm font-semibold text-ink-muted uppercase tracking-wide mb-3">Awaiting Results</h3>
                       <div className="space-y-3">
                         {awaitingResults.map(({ race, lockedPrediction }) => (
-                          <div key={race.id} className="bg-white rounded-lg border border-gray-200 p-4">
+                          <div key={race.id} className="bg-surface rounded-lg border shadow-xs p-4">
                             <div className="flex items-center justify-between mb-2">
                               <div className="flex items-center gap-3">
                                 {race.countryCode && (
@@ -771,10 +771,10 @@ const Compete: React.FC = () => {
                                     className="w-6 h-4 object-cover rounded shadow-sm"
                                   />
                                 )}
-                                <span className="font-medium text-gray-900">{formatName(race.name)}</span>
+                                <span className="font-medium text-ink">{formatName(race.name)}</span>
                               </div>
                               {race.date && (
-                                <span className="text-sm text-gray-500"><Countdown date={race.date} /></span>
+                                <span className="text-sm text-ink-muted"><Countdown date={race.date} /></span>
                               )}
                             </div>
                             <div className="flex flex-wrap gap-1">
@@ -784,13 +784,13 @@ const Compete: React.FC = () => {
                                 .map(pos => {
                                   const driver = driverById[pos.driverId];
                                   return (
-                                    <span key={pos.position} className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded font-medium">
+                                    <span key={pos.position} className="text-xs bg-carbon-100 text-ink-secondary px-2 py-0.5 rounded font-medium">
                                       P{pos.position} {getDriverCode(driver)}
                                     </span>
                                   );
                                 })}
                               {lockedPrediction.positions.length > 10 && (
-                                <span className="text-xs text-gray-400 px-2 py-0.5">
+                                <span className="text-xs text-ink-muted px-2 py-0.5">
                                   +{lockedPrediction.positions.length - 10} more
                                 </span>
                               )}
@@ -803,8 +803,8 @@ const Compete: React.FC = () => {
 
                   {scoredRaces.length === 0 && awaitingResults.length === 0 && (
                     <div className="text-center py-12">
-                      <p className="text-gray-500 mb-2">No results yet.</p>
-                      <p className="text-sm text-gray-400">Lock a prediction and wait for the race to finish.</p>
+                      <p className="text-ink-muted mb-2">No results yet.</p>
+                      <p className="text-sm text-ink-muted">Lock a prediction and wait for the race to finish.</p>
                     </div>
                   )}
                 </>
@@ -821,8 +821,8 @@ const Compete: React.FC = () => {
                   <div className="flex items-center gap-3">
                     <span className="text-2xl">{getRankBadge(userRank.rank || 0)}</span>
                     <div>
-                      <div className="font-bold text-gray-900">Your Rank</div>
-                      <div className="text-sm text-gray-600">
+                      <div className="font-bold text-ink">Your Rank</div>
+                      <div className="text-sm text-ink-secondary">
                         {userRank.accuracy}% accuracy · {userRank.exactMatches}/{userRank.totalPositions} exact
                       </div>
                     </div>
@@ -830,42 +830,42 @@ const Compete: React.FC = () => {
                 </div>
               )}
 
-              <div className="text-sm text-gray-500 mb-3">
+              <div className="text-sm text-ink-muted mb-3">
                 {leaderboardTotalUsers} predictor{leaderboardTotalUsers !== 1 ? 's' : ''} this season
               </div>
 
               {leaderboardLoading ? (
-                <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
-                  <p className="text-gray-500 mt-3 text-sm">Loading leaderboard...</p>
+                <div className="bg-surface rounded-lg border shadow-xs p-8 text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand mx-auto"></div>
+                  <p className="text-ink-muted mt-3 text-sm">Loading leaderboard...</p>
                 </div>
               ) : leaderboardEntries.length === 0 && leaderboardPending.length === 0 ? (
-                <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
-                  <p className="text-gray-500">No predictions yet. Be the first!</p>
+                <div className="bg-surface rounded-lg border shadow-xs p-8 text-center">
+                  <p className="text-ink-muted">No predictions yet. Be the first!</p>
                 </div>
               ) : leaderboardEntries.length === 0 ? (
-                <div className="bg-white rounded-lg border border-gray-200 p-6 text-center mb-6">
-                  <p className="text-gray-500">No races scored yet. Check back after the first race!</p>
+                <div className="bg-surface rounded-lg border shadow-xs p-6 text-center mb-6">
+                  <p className="text-ink-muted">No races scored yet. Check back after the first race!</p>
                 </div>
               ) : (
-                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                <div className="bg-surface rounded-lg border shadow-xs overflow-hidden">
                   <table className="w-full">
-                    <thead className="bg-gray-50 border-b border-gray-200">
+                    <thead className="bg-carbon-50 border-b">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide w-14">Rank</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Predictor</th>
-                        <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wide w-16">Races</th>
-                        <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wide w-24">Accuracy</th>
-                        <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wide w-20">Exact</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wide w-14">Rank</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wide">Predictor</th>
+                        <th className="px-4 py-3 text-right text-xs font-medium text-ink-muted uppercase tracking-wide w-16">Races</th>
+                        <th className="px-4 py-3 text-right text-xs font-medium text-ink-muted uppercase tracking-wide w-24">Accuracy</th>
+                        <th className="px-4 py-3 text-right text-xs font-medium text-ink-muted uppercase tracking-wide w-20">Exact</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100">
+                    <tbody className="divide-y divide-carbon-100">
                       {leaderboardEntries.map(entry => {
                         const isCurrentUser = user?.id === entry.userId;
                         return (
                           <tr
                             key={entry.userId}
-                            className={`transition-colors ${isCurrentUser ? 'bg-amber-50' : 'hover:bg-gray-50'}`}
+                            className={`transition-colors ${isCurrentUser ? 'bg-amber-50' : 'hover:bg-carbon-50'}`}
                           >
                             <td className="px-4 py-3">
                               <span className="text-lg">{getRankBadge(entry.rank || 0)}</span>
@@ -875,26 +875,26 @@ const Compete: React.FC = () => {
                                 {entry.image ? (
                                   <img src={entry.image} alt={entry.name} className="w-7 h-7 rounded-full object-cover" />
                                 ) : (
-                                  <div className="w-7 h-7 rounded-full bg-red-600 text-white flex items-center justify-center text-xs font-bold">
+                                  <div className="w-7 h-7 rounded-full bg-brand text-white flex items-center justify-center text-xs font-bold">
                                     {getInitials(entry.name)}
                                   </div>
                                 )}
-                                <span className={`font-medium ${isCurrentUser ? 'text-amber-700' : 'text-gray-900'}`}>
+                                <span className={`font-medium ${isCurrentUser ? 'text-amber-700' : 'text-ink'}`}>
                                   {entry.name} {isCurrentUser && <span className="text-xs text-amber-500">(you)</span>}
                                 </span>
                               </div>
                             </td>
-                            <td className="px-4 py-3 text-right text-sm text-gray-600">{entry.racesScored}</td>
+                            <td className="px-4 py-3 text-right text-sm text-ink-secondary">{entry.racesScored}</td>
                             <td className="px-4 py-3 text-right">
                               <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${
                                 entry.accuracy >= 40 ? 'bg-green-100 text-green-700' :
                                 entry.accuracy >= 25 ? 'bg-amber-100 text-amber-700' :
-                                'bg-gray-100 text-gray-600'
+                                'bg-carbon-100 text-ink-secondary'
                               }`}>
                                 {entry.accuracy}%
                               </span>
                             </td>
-                            <td className="px-4 py-3 text-right text-sm text-gray-600">
+                            <td className="px-4 py-3 text-right text-sm text-ink-secondary">
                               {entry.exactMatches}/{entry.totalPositions}
                             </td>
                           </tr>
@@ -904,21 +904,21 @@ const Compete: React.FC = () => {
                   </table>
 
                   {leaderboardTotalPages > 1 && (
-                    <div className="flex items-center justify-center gap-2 p-4 border-t border-gray-200">
+                    <div className="flex items-center justify-center gap-2 p-4 border-t">
                       <button
                         onClick={() => setLeaderboardPage(p => Math.max(1, p - 1))}
                         disabled={leaderboardPage <= 1}
-                        className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-3 py-1.5 text-sm font-medium text-ink-secondary bg-white border border-strong rounded-md hover:bg-carbon-50 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         Prev
                       </button>
-                      <span className="px-3 py-1.5 text-sm text-gray-500">
+                      <span className="px-3 py-1.5 text-sm text-ink-muted">
                         {leaderboardPage} / {leaderboardTotalPages}
                       </span>
                       <button
                         onClick={() => setLeaderboardPage(p => Math.min(leaderboardTotalPages, p + 1))}
                         disabled={leaderboardPage >= leaderboardTotalPages}
-                        className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-3 py-1.5 text-sm font-medium text-ink-secondary bg-white border border-strong rounded-md hover:bg-carbon-50 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         Next
                       </button>
@@ -930,11 +930,11 @@ const Compete: React.FC = () => {
               {/* Pending predictions */}
               {leaderboardPending.length > 0 && (
                 <div className="mt-6">
-                  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Upcoming Predictions</h3>
+                  <h3 className="text-sm font-semibold text-ink-muted uppercase tracking-wide mb-3">Upcoming Predictions</h3>
                   <div className="space-y-3">
                     {leaderboardPending.map(entry => (
-                      <div key={entry.userId} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                        <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-3">
+                      <div key={entry.userId} className="bg-surface rounded-lg border shadow-xs overflow-hidden">
+                        <div className="px-4 py-3 border-b border-carbon-100 flex items-center gap-3">
                           {entry.image ? (
                             <img src={entry.image} alt={entry.name} className="w-7 h-7 rounded-full object-cover" />
                           ) : (
@@ -942,28 +942,28 @@ const Compete: React.FC = () => {
                               {getInitials(entry.name)}
                             </div>
                           )}
-                          <span className="font-medium text-gray-900">{entry.name}</span>
+                          <span className="font-medium text-ink">{entry.name}</span>
                         </div>
                         <div className="px-4 py-3 space-y-2">
                           {entry.predictions.map(pred => (
                             <div key={pred.raceName} className="flex items-center gap-3">
-                              <span className="text-sm font-medium text-gray-600 w-32 flex-shrink-0">{pred.raceName}</span>
+                              <span className="text-sm font-medium text-ink-secondary w-32 flex-shrink-0">{pred.raceName}</span>
                               <div className="flex gap-1 flex-wrap">
                                 {pred.drivers.slice(0, 5).map((driver, i) => (
                                   <span
                                     key={i}
                                     className={`text-xs px-2 py-0.5 rounded font-medium ${
                                       i === 0 ? 'bg-yellow-100 text-yellow-800' :
-                                      i === 1 ? 'bg-gray-200 text-gray-700' :
+                                      i === 1 ? 'bg-carbon-200 text-ink-secondary' :
                                       i === 2 ? 'bg-amber-100 text-amber-800' :
-                                      'bg-gray-100 text-gray-600'
+                                      'bg-carbon-100 text-ink-secondary'
                                     }`}
                                   >
                                     {i === 0 ? 'P1' : i === 1 ? 'P2' : i === 2 ? 'P3' : `P${i + 1}`} {driver}
                                   </span>
                                 ))}
                                 {pred.drivers.length > 5 && (
-                                  <span className="text-xs text-gray-400 px-2 py-0.5">+{pred.drivers.length - 5} more</span>
+                                  <span className="text-xs text-ink-muted px-2 py-0.5">+{pred.drivers.length - 5} more</span>
                                 )}
                               </div>
                             </div>

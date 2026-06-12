@@ -146,15 +146,15 @@ const HorizontalScrollBar: React.FC<HorizontalScrollBarProps> = ({ scrollContain
 
   return (
     <div className={`w-full py-2 px-4 hidden sm:block transition-opacity duration-200 ${!isVisible ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-      <div className="bg-white rounded-md p-2 shadow-sm border border-gray-200">
+      <div className="bg-surface rounded-md p-2 shadow-xs border">
         <div
           ref={scrollBarRef}
-          className="relative w-full h-2.5 bg-gray-200 rounded-full cursor-pointer"
+          className="relative w-full h-2.5 bg-carbon-100 rounded-full cursor-pointer"
           onClick={handleScrollBarClick}
         >
           <div
             ref={thumbRef}
-            className={`absolute top-0 left-0 h-full bg-gradient-to-r from-red-500 to-red-600 rounded-full shadow transition-transform ${isDragging ? '' : 'duration-200'} cursor-grab active:cursor-grabbing hover:shadow-md will-change-transform`}
+            className={`absolute top-0 left-0 h-full bg-carbon-400 hover:bg-carbon-500 rounded-full transition-transform ${isDragging ? '' : 'duration-200'} cursor-grab active:cursor-grabbing hover:shadow-md will-change-transform`}
             style={{
               width: `${thumbWidthPercentage}%`,
               transform: `translateX(${thumbOffsetPx}px)`

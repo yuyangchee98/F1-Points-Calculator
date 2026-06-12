@@ -323,7 +323,7 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position, style }) => {
             <span className="text-xs font-medium">
               {getDriverLastName(topConsensus.driverId)}
             </span>
-            <span className="text-[10px] ml-1">
+            <span className="text-2xs ml-1 tnum">
               {topConsensus.percentage}%
             </span>
           </div>

@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import type { Driver } from '../../types';
 import { selectTeamsByIdMap, getDriverLastName, getDriverDisplayName } from '../../store/selectors/dataSelectors';
 import { useDriverDrag } from '../../hooks/useDriverDragDrop';
+import { getContrastText } from '../../utils/color';
 
 interface DriverCardProps {
   driver: Driver;
@@ -45,33 +46,37 @@ const DriverCard: React.FC<DriverCardProps> = ({
       data-driver-name={`${driver.givenName} ${driver.familyName}`}
       data-team={driver.team}
       onClick={onClick}
+      {...(onClick && {
+        role: 'button',
+        tabIndex: 0,
+        'aria-pressed': isSelected,
+        onKeyDown: (e: React.KeyboardEvent) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onClick();
+          }
+        },
+      })}
       style={{
         borderLeft: `4px solid ${team?.color || '#ccc'}`,
         cursor: 'grab'
       }}
     >
-      <div
-        className="absolute left-0 top-0 bottom-0 w-1/3 opacity-10"
-        style={{
-          background: `linear-gradient(to right, ${team?.color || '#ccc'} 0%, transparent 100%)`,
-          zIndex: 0
-        }}
-      />
-
-      <div className="flex flex-col ml-2 flex-grow relative" style={{ zIndex: 1 }}>
+      <div className="flex flex-col ml-2 flex-grow">
         <span className="text-xs font-bold flex items-center gap-1">
           {getDriverDisplayName(driver)}
         </span>
-        <span className="text-xs text-gray-600 leading-tight" style={{ color: team?.color || '#555' }}>
+        <span className="text-2xs text-ink-muted leading-tight">
           {team?.name || driver.team}
         </span>
       </div>
 
       {!hideCode && (
-        <div 
-          className="flex-shrink-0 bg-gray-800 text-white text-xs font-bold py-1 px-2 rounded mr-2"
-          style={{ 
+        <div
+          className="flex-shrink-0 text-xs font-bold py-1 px-2 rounded-sm mr-2"
+          style={{
             backgroundColor: team?.color || '#555',
+            color: getContrastText(team?.color || '#555'),
             minWidth: '40px',
             textAlign: 'center'
           }}

@@ -90,7 +90,7 @@ const MobileRaceCardView: React.FC<MobileRaceCardViewProps> = ({
   const hasScore = lockedPrediction?.score !== undefined;
 
   return (
-    <div className="flex flex-col h-full shadow-md rounded-lg border border-gray-200 overflow-hidden">
+    <div className="flex flex-col h-full bg-surface shadow-xs rounded-lg border overflow-hidden">
       {/* Toolbar */}
       <div className="shrink-0">
         <GridToolbar
@@ -108,11 +108,11 @@ const MobileRaceCardView: React.FC<MobileRaceCardViewProps> = ({
       </div>
 
       {/* Compact race navigation: single row */}
-      <div className="shrink-0 flex items-center px-1 bg-gray-50 border-b border-gray-200">
+      <div className="shrink-0 flex items-center px-1 bg-surface-sunken border-b">
         <button
           onClick={goToPrev}
           disabled={currentIndex === 0}
-          className="w-8 h-8 flex items-center justify-center rounded-full text-gray-600 disabled:text-gray-300 active:bg-gray-200 transition-colors shrink-0"
+          className="w-8 h-8 flex items-center justify-center rounded-full text-ink-secondary disabled:text-carbon-300 active:bg-carbon-200 transition-colors shrink-0"
           aria-label="Previous race"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -128,29 +128,32 @@ const MobileRaceCardView: React.FC<MobileRaceCardViewProps> = ({
               className="flag !mr-0 shrink-0"
             />
           )}
-          <span className="font-bold text-sm text-gray-800 truncate min-w-0">
+          <span className="font-display font-bold text-sm text-ink truncate min-w-0">
             {formatName(race.name)}
           </span>
           {race.isSprint && (
-            <span className="text-[9px] bg-gray-600 text-white px-1 py-px rounded font-medium shrink-0">
+            <span className="text-2xs bg-carbon-700 text-white px-1 py-px rounded-sm font-semibold tracking-wide shrink-0">
               SPRINT
             </span>
           )}
           {hasScore ? (
-            <span className="text-[9px] bg-amber-100 text-amber-700 px-1 py-px rounded font-medium shrink-0">
+            <span className="text-2xs bg-carbon-100 text-ink-secondary px-1 py-px rounded-sm font-semibold tnum shrink-0">
               {lockedPrediction.score?.percentage}%
             </span>
           ) : isLocked ? (
-            <span className="text-xs shrink-0" title="Prediction locked">🔒</span>
+            <svg className="w-3 h-3 text-ink-muted shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Prediction locked">
+              <title>Prediction locked</title>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
           ) : race.completed ? (
-            <span className="text-[9px] bg-green-100 text-green-700 px-1 py-px rounded font-medium shrink-0">✓</span>
+            <span className="text-2xs bg-green-50 text-success px-1 py-px rounded-sm font-semibold shrink-0">✓</span>
           ) : null}
         </div>
 
         <button
           onClick={goToNext}
           disabled={currentIndex === races.length - 1}
-          className="w-8 h-8 flex items-center justify-center rounded-full text-gray-600 disabled:text-gray-300 active:bg-gray-200 transition-colors shrink-0"
+          className="w-8 h-8 flex items-center justify-center rounded-full text-ink-secondary disabled:text-carbon-300 active:bg-carbon-200 transition-colors shrink-0"
           aria-label="Next race"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -160,16 +163,16 @@ const MobileRaceCardView: React.FC<MobileRaceCardViewProps> = ({
       </div>
 
       {/* Driver grid — expandable, default open, wraps so all drivers are visible at once */}
-      <div className="shrink-0 border-b border-gray-200 bg-white">
+      <div className="shrink-0 border-b bg-surface">
         <button
           onClick={() => setDriverStripExpanded(!driverStripExpanded)}
-          className="w-full flex items-center justify-between px-2.5 py-1 text-[11px] font-semibold text-gray-600 active:bg-gray-50"
+          className="w-full flex items-center justify-between px-2.5 py-1 text-2xs font-semibold text-ink-secondary active:bg-carbon-50"
         >
           <span className="flex items-center gap-1.5 min-w-0">
             {selectedDriverId ? (
               <>
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse shrink-0" />
-                <span className="text-blue-700 truncate">
+                <span className="w-1.5 h-1.5 rounded-full bg-interactive animate-pulse shrink-0" />
+                <span className="text-interactive truncate">
                   {getDriverLastName(selectedDriverId)} — tap a slot
                 </span>
                 <button
@@ -177,17 +180,18 @@ const MobileRaceCardView: React.FC<MobileRaceCardViewProps> = ({
                     e.stopPropagation();
                     dispatch(selectDriver(null));
                   }}
-                  className="ml-1 text-gray-400 hover:text-gray-600 bg-gray-100 rounded-full w-4 h-4 flex items-center justify-center text-[10px] leading-none shrink-0"
+                  className="ml-1 text-ink-muted hover:text-ink bg-carbon-100 rounded-full w-4 h-4 flex items-center justify-center text-2xs leading-none shrink-0"
+                  aria-label="Cancel selection"
                 >
                   x
                 </button>
               </>
             ) : (
-              <span>SELECT DRIVER</span>
+              <span className="tracking-wider">SELECT DRIVER</span>
             )}
           </span>
           <svg
-            className={`w-3 h-3 text-gray-400 transition-transform duration-200 shrink-0 ${driverStripExpanded ? 'rotate-180' : ''}`}
+            className={`w-3 h-3 text-ink-muted transition-transform duration-200 shrink-0 ${driverStripExpanded ? 'rotate-180' : ''}`}
             fill="none" stroke="currentColor" viewBox="0 0 24 24"
           >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -210,8 +214,8 @@ const MobileRaceCardView: React.FC<MobileRaceCardViewProps> = ({
                   onClick={() => handleDriverTap(driver.id)}
                   className={`flex items-center gap-1 px-2.5 py-2 rounded-md text-sm font-medium transition-all duration-150 ${
                     isSelected
-                      ? 'bg-blue-100 ring-2 ring-blue-500 text-blue-800 shadow-sm'
-                      : 'bg-gray-100 text-gray-700 active:bg-gray-200'
+                      ? 'bg-blue-50 ring-2 ring-interactive text-interactive shadow-xs'
+                      : 'bg-carbon-100 text-ink-secondary active:bg-carbon-200'
                   }`}
                   style={{ borderLeft: `3px solid ${team?.color || '#ccc'}` }}
                 >
@@ -233,12 +237,12 @@ const MobileRaceCardView: React.FC<MobileRaceCardViewProps> = ({
           {Array.from({ length: posCount }, (_, i) => i + 1).map(position => (
             <div key={position} className="flex items-center gap-1.5">
               <div
-                className={`w-8 shrink-0 text-center text-xs font-bold rounded py-0.5 ${
+                className={`w-8 shrink-0 text-center text-xs font-display font-bold rounded-sm py-0.5 tnum ${
                   position <= 3
-                    ? 'bg-gray-800 text-white'
+                    ? 'bg-carbon-900 text-white'
                     : position <= 10
-                    ? 'bg-gray-200 text-gray-700'
-                    : 'bg-gray-100 text-gray-500'
+                    ? 'bg-carbon-200 text-carbon-700'
+                    : 'bg-carbon-100 text-ink-muted'
                 }`}
               >
                 P{position}

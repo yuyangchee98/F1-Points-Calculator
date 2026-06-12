@@ -73,10 +73,11 @@ const RaceGrid: React.FC<RaceGridProps> = ({
     const firstUpcomingRaceIndex = races.findIndex(race => !race.completed);
     if (firstUpcomingRaceIndex === -1) return;
 
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const scrollTimeout = setTimeout(() => {
       columnVirtualizer.scrollToIndex(
         Math.max(0, firstUpcomingRaceIndex - 1),
-        { behavior: 'smooth', align: 'start' }
+        { behavior: prefersReducedMotion ? 'auto' : 'smooth', align: 'start' }
       );
     }, 100);
 
@@ -109,7 +110,7 @@ const RaceGrid: React.FC<RaceGridProps> = ({
   );
 
   return (
-    <div className="shadow-md rounded-lg border border-gray-200 flex flex-col h-full overflow-hidden">
+    <div className="bg-surface shadow-xs rounded-lg border flex flex-col h-full overflow-hidden">
       <div className="shrink-0">{toolbarContent}</div>
 
       <div
@@ -125,8 +126,11 @@ const RaceGrid: React.FC<RaceGridProps> = ({
         >
           <div style={{ display: 'flex', marginBottom: GAP, height: HEADER_HEIGHT }}>
             <div
-              className="position-header cursor-pointer hover:bg-gray-800 transition-all duration-200 flex flex-col items-center justify-center gap-0.5 group sticky left-0 z-20"
+              className="position-header cursor-pointer flex flex-col items-center justify-center gap-0.5 group sticky left-0 z-header"
               onClick={() => dispatch(togglePositionColumnMode())}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); dispatch(togglePositionColumnMode()); } }}
               title={`Click to switch to ${positionColumnMode === 'position' ? 'championship standings' : 'grid positions'} view`}
               style={{
                 width: POSITION_COLUMN_WIDTH,
@@ -134,10 +138,10 @@ const RaceGrid: React.FC<RaceGridProps> = ({
                 flexShrink: 0,
               }}
             >
-              <span className="text-[11px] font-bold">
+              <span className="text-2xs font-bold uppercase tracking-wide">
                 {positionColumnMode === 'position' ? 'Grid' : 'Driver'}
               </span>
-              <span className="text-[9px] opacity-80">
+              <span className="text-2xs opacity-70">
                 {positionColumnMode === 'position' ? 'Position' : 'Standings'}
               </span>
               <svg
@@ -177,18 +181,22 @@ const RaceGrid: React.FC<RaceGridProps> = ({
                     {/* Lock/Score badges */}
                     {hasScore ? (
                       <span
-                        className="text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-medium"
+                        className="text-2xs bg-carbon-100 text-ink-secondary px-1.5 py-0.5 rounded-sm font-semibold tnum"
                         title={`You scored ${lockedPrediction.score?.percentage}%`}
                       >
                         {lockedPrediction.score?.percentage}%
                       </span>
                     ) : isLocked ? (
-                      <span
-                        className="text-sm"
-                        title="Prediction locked"
+                      <svg
+                        className="w-3.5 h-3.5 text-ink-muted"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        aria-label="Prediction locked"
                       >
-                        🔒
-                      </span>
+                        <title>Prediction locked</title>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
                     ) : race.completed ? (
                       <span className="completed-indicator" title="Completed Race">✓</span>
                     ) : null}

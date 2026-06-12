@@ -26,10 +26,10 @@ const TeamStandingsTable: React.FC<TeamStandingsTableProps> = ({ standings }) =>
       ) : (
         <table className="w-full min-w-full table-auto">
           <thead>
-            <tr className="text-gray-300 border-gray-600">
-              <th className="w-12 text-left py-2 font-normal text-sm">Pos</th>
-              <th className="text-left py-2 font-normal text-sm">Constructor</th>
-              <th className="text-right py-2 pr-2 font-normal text-sm">Points</th>
+            <tr className="text-ink-muted">
+              <th className="w-12 text-left py-2 px-2 font-medium text-2xs uppercase tracking-wider">Pos</th>
+              <th className="text-left py-2 font-medium text-2xs uppercase tracking-wider">Constructor</th>
+              <th className="text-right py-2 pr-2 font-medium text-2xs uppercase tracking-wider">Points</th>
             </tr>
           </thead>
           <tbody>
@@ -46,25 +46,25 @@ const TeamStandingsTable: React.FC<TeamStandingsTableProps> = ({ standings }) =>
                     ${animatedTeams[standing.teamId] === 'down' ? 'animate-position-down' : ''}
                   `}
                 >
-                  <td className="py-3 px-2 text-center font-bold text-gray-700 w-12">
+                  <td className="py-3 px-2 text-center font-bold text-ink-secondary w-12 tnum font-display">
                     {standing.position}
                   </td>
                   <td className="py-3">
                     <div className="flex items-center">
-                      <div 
-                        className="h-5 w-4 mr-2 rounded-sm"
+                      <div
+                        className="h-4 w-1 mr-2 rounded-full shrink-0"
                         style={{ backgroundColor: team.color }}
                       />
-                      <div className="font-medium text-gray-800">{team.name}</div>
+                      <div className="font-medium text-ink">{team.name}</div>
                     </div>
                   </td>
                   <td
-                    className={`py-3 px-2 font-bold text-right text-gray-800 ${animatedTeams[standing.teamId] ? 'animate-points-update' : ''}`}
+                    className={`py-3 px-2 font-bold text-right text-ink tnum font-display ${animatedTeams[standing.teamId] ? 'animate-points-update' : ''}`}
                   >
                     <div className="flex items-center justify-end gap-2">
                       <span>{standing.points} pts</span>
                       {standing.predictionPointsGained > 0 && (
-                        <span className="text-xs font-semibold text-green-600 bg-green-100 px-2 py-1 rounded">
+                        <span className="text-2xs font-semibold text-success bg-green-50 px-1.5 py-0.5 rounded-sm tnum">
                           +{standing.predictionPointsGained}
                         </span>
                       )}
