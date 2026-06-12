@@ -18,18 +18,18 @@ const TeamStandingsTable: React.FC<TeamStandingsTableProps> = ({ standings }) =>
   const animatedTeams = useStandingsAnimation(standings, animationOptions);
 
   return (
-    <div className="overflow-hidden rounded-lg">
+    <div>
       {standings.length === 0 ? (
-        <div className="text-center p-4 rounded text-gray-300">
+        <div className="text-center p-4 text-ink-muted text-sm">
           No constructor standings available yet. Try placing drivers in race positions.
         </div>
       ) : (
         <table className="w-full min-w-full table-auto">
           <thead>
             <tr className="text-ink-muted">
-              <th className="w-12 text-left py-2 px-2 font-medium text-2xs uppercase tracking-wider">Pos</th>
-              <th className="text-left py-2 font-medium text-2xs uppercase tracking-wider">Constructor</th>
-              <th className="text-right py-2 pr-2 font-medium text-2xs uppercase tracking-wider">Points</th>
+              <th className="w-10 text-left py-1 px-2 font-medium text-2xs uppercase tracking-wider">Pos</th>
+              <th className="text-left py-1 font-medium text-2xs uppercase tracking-wider">Constructor</th>
+              <th className="text-right py-1 pr-2 font-medium text-2xs uppercase tracking-wider">Points</th>
             </tr>
           </thead>
           <tbody>
@@ -41,25 +41,25 @@ const TeamStandingsTable: React.FC<TeamStandingsTableProps> = ({ standings }) =>
                 <tr 
                   key={standing.teamId} 
                   className={`
-                    hover:bg-gray-50
+                    hover:bg-carbon-50
                     ${animatedTeams[standing.teamId] === 'up' ? 'animate-position-up' : ''}
                     ${animatedTeams[standing.teamId] === 'down' ? 'animate-position-down' : ''}
                   `}
                 >
-                  <td className="py-3 px-2 text-center font-bold text-ink-secondary w-12 tnum font-display">
+                  <td className="py-1.5 px-2 text-center font-bold text-ink-secondary text-sm w-10 tnum font-display">
                     {standing.position}
                   </td>
-                  <td className="py-3">
+                  <td className="py-1.5">
                     <div className="flex items-center">
                       <div
-                        className="h-4 w-1 mr-2 rounded-full shrink-0"
+                        className="h-3.5 w-1 mr-2 rounded-full shrink-0"
                         style={{ backgroundColor: team.color }}
                       />
-                      <div className="font-medium text-ink">{team.name}</div>
+                      <div className="font-medium text-sm text-ink">{team.name}</div>
                     </div>
                   </td>
                   <td
-                    className={`py-3 px-2 font-bold text-right text-ink tnum font-display ${animatedTeams[standing.teamId] ? 'animate-points-update' : ''}`}
+                    className={`py-1.5 px-2 font-bold text-sm text-right text-ink tnum font-display ${animatedTeams[standing.teamId] ? 'animate-points-update' : ''}`}
                   >
                     <div className="flex items-center justify-end gap-2">
                       <span>{standing.points} pts</span>

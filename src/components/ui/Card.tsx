@@ -22,9 +22,9 @@ const Card: React.FC<CardProps> = ({
   <div className={`bg-surface rounded-lg shadow-xs border overflow-hidden ${className}`}>
     {title !== undefined && (
       <h2
-        className={`text-lg font-semibold font-display p-3 border-b sticky top-0 bg-surface flex items-center ${headerClassName}`}
+        className={`text-base font-semibold font-display px-3 py-2 border-b sticky top-0 bg-surface flex items-center ${headerClassName}`}
       >
-        {accent && <span className="w-1 h-5 bg-brand mr-3 inline-block rounded-r-md" aria-hidden="true"></span>}
+        {accent && <span className="w-1 h-4 bg-brand mr-2 inline-block rounded-r-md" aria-hidden="true"></span>}
         {title}
       </h2>
     )}

@@ -57,12 +57,12 @@ const DriverSelection: React.FC = () => {
       <div 
         id="driver-selection"
         className={`
-          grid gap-1.5
+          grid gap-1
           ${isExpanded ? 'max-h-[25vh] lg:max-h-[35vh] opacity-100 overflow-y-auto' : 'max-h-0 opacity-0'}
           overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out
-          p-2 bg-surface-sunken rounded-lg border
+          p-1.5 bg-surface-sunken rounded-lg border
         `}
-        style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))' }}
+        style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(96px, 1fr))' }}
       >
         {drivers.map(driver => (
           <DriverCard

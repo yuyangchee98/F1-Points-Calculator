@@ -22,18 +22,18 @@ const DriverStandingsTable: React.FC<DriverStandingsTableProps> = ({ standings }
   const animatedDrivers = useStandingsAnimation(standings, animationOptions);
   
   return (
-    <div className="overflow-hidden rounded-lg">
+    <div>
       {standings.length === 0 ? (
-        <div className="text-center p-4 rounded text-gray-300">
+        <div className="text-center p-4 text-ink-muted text-sm">
           No driver standings available yet. Try placing drivers in race positions.
         </div>
       ) : (
         <table className="w-full min-w-full table-auto">
           <thead>
             <tr className="text-ink-muted">
-              <th className="w-12 text-left py-2 px-2 font-medium text-2xs uppercase tracking-wider">Pos</th>
-              <th className="text-left py-2 font-medium text-2xs uppercase tracking-wider">Driver</th>
-              <th className="text-right py-2 pr-2 font-medium text-2xs uppercase tracking-wider">Points</th>
+              <th className="w-10 text-left py-1 px-2 font-medium text-2xs uppercase tracking-wider">Pos</th>
+              <th className="text-left py-1 font-medium text-2xs uppercase tracking-wider">Driver</th>
+              <th className="text-right py-1 pr-2 font-medium text-2xs uppercase tracking-wider">Points</th>
             </tr>
           </thead>
           <tbody>
@@ -47,18 +47,18 @@ const DriverStandingsTable: React.FC<DriverStandingsTableProps> = ({ standings }
                 <tr 
                   key={standing.driverId} 
                   className={`
-                    hover:bg-gray-50
+                    hover:bg-carbon-50
                     ${animatedDrivers[standing.driverId] === 'up' ? 'animate-position-up' : ''}
                     ${animatedDrivers[standing.driverId] === 'down' ? 'animate-position-down' : ''}
                   `}
                 >
-                  <td className="py-3 px-2 text-center font-bold text-ink-secondary w-12 tnum font-display">
-                    <div className="flex flex-col items-center">
+                  <td className="py-1.5 px-2 text-center font-bold text-ink-secondary text-sm w-10 tnum font-display">
+                    <div className="flex items-baseline justify-center gap-0.5">
                       <span>{standing.position}</span>
                       {standing.positionChange !== 0 && (
                         <span
-                          className={`text-xs font-bold ${
-                            standing.positionChange > 0 ? 'text-green-600' : 'text-red-600'
+                          className={`text-2xs font-bold ${
+                            standing.positionChange > 0 ? 'text-success' : 'text-danger'
                           }`}
                         >
                           {standing.positionChange > 0 ? '↑' : '↓'}{Math.abs(standing.positionChange)}
@@ -66,19 +66,19 @@ const DriverStandingsTable: React.FC<DriverStandingsTableProps> = ({ standings }
                       )}
                     </div>
                   </td>
-                  <td className="py-3">
+                  <td className="py-1.5">
                     <div className="flex items-center">
                       <div
-                        className="h-4 w-1 mr-2 rounded-full shrink-0"
+                        className="h-3.5 w-1 mr-2 rounded-full shrink-0"
                         style={{ backgroundColor: teamColor }}
                       />
                       <div>
-                        <div className="font-medium text-ink">{getDriverLastName(driver.id)}</div>
+                        <div className="font-medium text-sm text-ink">{getDriverLastName(driver.id)}</div>
                       </div>
                     </div>
                   </td>
                   <td
-                    className={`py-3 px-2 font-bold text-right text-ink tnum font-display ${animatedDrivers[standing.driverId] ? 'animate-points-update' : ''}`}
+                    className={`py-1.5 px-2 font-bold text-sm text-right text-ink tnum font-display ${animatedDrivers[standing.driverId] ? 'animate-points-update' : ''}`}
                   >
                     <div className="flex items-center justify-end gap-2">
                       <span>{standing.points} pts</span>
