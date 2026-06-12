@@ -241,7 +241,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
           <h2 className="text-2xl font-bold">Export to Image</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition"
+            className="text-ink-muted hover:text-ink transition"
             disabled={isLoading}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -293,7 +293,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Subtitle <span className="text-gray-400">(optional)</span>
+                  Subtitle <span className="text-ink-muted">(optional)</span>
                 </label>
                 <input
                   type="text"
@@ -781,7 +781,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
               <ExportPreview data={previewData} />
             ) : (
               <div className="flex items-center justify-center h-full">
-                <p className="text-gray-400">Select at least one race to see preview</p>
+                <p className="text-ink-muted">Select at least one race to see preview</p>
               </div>
             )}
           </div>

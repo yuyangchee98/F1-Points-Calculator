@@ -585,12 +585,12 @@ const changelogEntries = [
   ogTitle="Changelog - F1 Points Calculator"
   ogDescription="See what's new in the F1 Points Calculator. Full history of features, improvements, and updates."
 >
-  <div class="min-h-screen bg-gray-100 py-6">
-    <div class="max-w-5xl mx-auto px-4">
+  <div class="min-h-screen bg-surface-sunken py-6">
+    <div class="max-w-3xl mx-auto px-4">
       <div class="mb-6">
         <a
           href="/"
-          class="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium"
+          class="inline-flex items-center text-interactive hover:underline font-medium text-sm"
         >
           <svg
             class="w-5 h-5 mr-2"
@@ -609,23 +609,23 @@ const changelogEntries = [
         </a>
       </div>
 
-      <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6 flex items-center flex-wrap">
-        <span class="bg-red-600 text-white px-3 py-1 mr-3 rounded-md">F1</span>
-        <span class="mr-3">Points Calculator</span>
-        <span class="text-gray-600">- Changelog</span>
+      <h1 class="text-2xl font-display font-bold text-ink mb-6 flex items-center flex-wrap gap-x-3">
+        <span class="bg-brand text-white text-lg px-2.5 py-1 rounded-md font-display font-bold">F1</span>
+        <span>Points Calculator</span>
+        <span class="text-ink-muted font-semibold">Changelog</span>
       </h1>
 
       <div class="relative">
         {changelogEntries.map((entry, index) => (
           <div class={`relative pl-8 ${index !== changelogEntries.length - 1 ? 'pb-6' : ''}`}>
             {index !== changelogEntries.length - 1 && (
-              <div class="absolute left-[11px] top-8 bottom-0 w-0.5 bg-gray-300"></div>
+              <div class="absolute left-[11px] top-8 bottom-0 w-0.5 bg-carbon-200"></div>
             )}
-            <div class={`absolute left-1.5 top-2 w-3 h-3 rounded-full ${index === 0 ? 'bg-red-600' : 'bg-gray-400'}`}></div>
-            <div class="p-4 bg-white rounded-lg shadow-sm">
-              <span class="text-sm font-medium text-gray-500">{entry.date}</span>
-              <h2 class="text-lg font-semibold text-gray-800 mt-1 mb-2">{entry.title}</h2>
-              <ul class="list-disc list-inside text-gray-600 space-y-1 text-sm">
+            <div class={`absolute left-1.5 top-2 w-3 h-3 rounded-full ${index === 0 ? 'bg-brand' : 'bg-carbon-300'}`}></div>
+            <div class="p-4 bg-surface rounded-lg shadow-xs border">
+              <span class="text-sm font-medium text-ink-muted">{entry.date}</span>
+              <h2 class="text-lg font-display font-semibold text-ink mt-1 mb-2">{entry.title}</h2>
+              <ul class="list-disc list-inside text-ink-secondary space-y-1 text-sm">
                 {entry.changes.map((change) => (
                   <li>{change}</li>
                 ))}

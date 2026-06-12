@@ -3,6 +3,68 @@
 @tailwind utilities;
 /* cache bust */
 
+/* ================================================================
+   Design tokens — single source of truth for the UI palette.
+   Channels-only values (R G B) so Tailwind opacity modifiers work:
+   rgb(var(--x) / <alpha-value>). Mapped to utilities in
+   tailwind.config.js. Team colors come from the API at runtime and
+   are applied inline — they are intentionally NOT tokens.
+   A future dark theme overrides these under [data-theme='dark'].
+   ================================================================ */
+:root {
+  /* Brand — F1 red anchor */
+  --brand: 225 6 0;          /* #E10600 */
+  --brand-strong: 184 5 0;   /* #B80500 hover/active */
+  --brand-subtle: 253 233 232;
+
+  /* Carbon neutral scale (cool gray) */
+  --carbon-50: 247 248 249;
+  --carbon-100: 238 240 242;
+  --carbon-200: 223 227 230;
+  --carbon-300: 201 206 212;
+  --carbon-400: 154 163 172;
+  --carbon-500: 110 119 128;
+  --carbon-600: 79 87 96;
+  --carbon-700: 55 62 70;
+  --carbon-800: 35 40 46;
+  --carbon-900: 21 24 28;
+
+  /* Semantic */
+  --surface: 255 255 255;
+  --surface-sunken: var(--carbon-50);
+  --surface-inverse: var(--carbon-900);
+  --border: var(--carbon-200);
+  --border-strong: var(--carbon-300);
+  --text-primary: var(--carbon-900);
+  --text-secondary: var(--carbon-600);
+  --text-muted: var(--carbon-500);
+  --interactive: 37 99 235;  /* blue = selection/placement; red = brand only */
+  --success: 14 138 77;
+  --warning: 180 83 9;
+  --danger: 185 28 28;
+}
+
+/* Display face for headings, race headers, and numerals only.
+   Body text stays on the system stack. */
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/archivo-var-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Metric-compatible fallback to minimise CLS while Archivo loads */
+@font-face {
+  font-family: 'Archivo-fallback';
+  src: local('Arial');
+  size-adjust: 98%;
+  ascent-override: 89%;
+  descent-override: 22%;
+  line-gap-override: 0%;
+}
+
 /* Hide scrollbar but keep scroll functionality */
 .scrollbar-hide {
   -ms-overflow-style: none;
@@ -72,12 +134,12 @@
 /* Drag and Drop Styles */
 /* Drop target styles */
 .race-slot.can-drop {
-  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.1);
+  box-shadow: inset 0 0 0 2px rgb(0 0 0 / 0.08);
 }
 
 .race-slot.drag-over {
-  background-color: rgba(52, 152, 219, 0.1);
-  box-shadow: inset 0 0 0 2px rgba(52, 152, 219, 0.5);
+  background-color: rgb(var(--interactive) / 0.08);
+  box-shadow: inset 0 0 0 2px rgb(var(--interactive) / 0.5);
 }
 
 /* App shell — viewport lock for app-like feel (scoped to .app pages only) */
@@ -87,10 +149,27 @@ body:has(.app) { overflow: hidden; }
 
 /* Base styles */
 body {
-  @apply text-gray-900;
+  @apply text-ink bg-surface-sunken;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
-  background-attachment: fixed;
+}
+
+/* Visible keyboard focus everywhere; the blue interactive token, never brand red */
+:focus-visible {
+  outline: 2px solid rgb(var(--interactive));
+  outline-offset: 2px;
+}
+
+/* Respect users who opt out of motion: kill decorative animations and
+   transitions, keep state changes instant */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Custom component classes */
@@ -141,12 +220,18 @@ body {
     animation: moveDown 0.5s ease-out;
   }
 
-  /* Pulse glow using pseudo-element for GPU acceleration */
-  .animate-pulse {
+  /* Tabular numerals for points/positions so values don't jitter */
+  .tnum {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Pulse glow using pseudo-element for GPU acceleration.
+     (Named -ring to avoid shadowing Tailwind's animate-pulse.) */
+  .animate-pulse-ring {
     position: relative;
     overflow: visible;
   }
-  .animate-pulse::after {
+  .animate-pulse-ring::after {
     content: '';
     position: absolute;
     inset: 0;
@@ -203,18 +288,18 @@ body {
     height: 1px;
   }
   
-  /* Driver Card Styling */
+  /* Driver Card Styling — flat at rest; the board is hundreds of these,
+     so elevation is reserved for interaction states */
   .driver-card {
-    @apply flex items-center p-2 rounded-md bg-white relative w-full shadow-md transition-transform duration-200;
+    @apply flex items-center p-2 rounded-md bg-surface border relative w-full transition-[border-color,box-shadow] duration-200;
   }
 
   .driver-card:hover {
-    transform: translateY(-2px);
+    @apply border-strong shadow-xs;
   }
-  
+
   .driver-card.selected {
-    @apply ring-2 ring-blue-500 shadow-lg shadow-blue-500/20;
-    transform: translateY(-2px);
+    @apply ring-2 ring-interactive border-transparent shadow-sm;
   }
   
   /* Single overlay shimmer - replaces 500+ individual animations with 1 */
@@ -240,30 +325,43 @@ body {
 
   /* Race Grid Components */
   .race-grid {
-    @apply p-6 rounded-lg min-w-full gap-2 shadow-xl;
+    @apply p-6 rounded-lg min-w-full gap-2;
   }
 
+  /* Empty slot = quiet dashed drop target; a filled slot hands its surface
+     over to the card inside it */
   .race-slot {
-    @apply p-2 rounded-md border border-gray-200 flex items-center justify-center transition-transform duration-200 shadow-md;
+    @apply p-2 rounded-md border border-dashed bg-surface-sunken flex items-center justify-center transition-colors duration-200;
     box-sizing: border-box;
     width: 100%;
     height: 100%;
   }
 
   .race-slot:hover {
-    @apply border-blue-300;
+    @apply border-strong;
   }
-  
+
+  .race-slot.sprint {
+    @apply bg-carbon-100;
+  }
+
+  .race-slot:has(.grid-card-wrapper) {
+    @apply border-solid border-transparent bg-transparent;
+  }
+
   .race-slot.highlight-slot {
-    @apply bg-blue-50 border-blue-400 ring-1 ring-blue-500/30;
+    @apply ring-1 ring-interactive/30;
+    background-color: rgb(var(--interactive) / 0.06);
+    border-color: rgb(var(--interactive) / 0.5);
   }
-  
+
   /* Enhanced slot highlighting for mobile tap-to-place */
   .race-slot.highlight-slot:active {
-    @apply bg-green-100 border-green-500 transition-transform duration-100;
+    @apply transition-transform duration-100;
+    background-color: rgb(var(--interactive) / 0.15);
     transform: scale(0.97);
   }
-  
+
   /* Enhanced visual cue for tappable slots on mobile */
   @media (max-width: theme('screens.sm')) {
     .race-slot.highlight-slot {
@@ -273,10 +371,10 @@ body {
     .race-slot.highlight-slot::after {
       content: '';
       @apply absolute inset-0 w-full h-full rounded-md pointer-events-none z-0;
-      background-color: rgba(59, 130, 246, 0.08);
+      background-color: rgb(var(--interactive) / 0.08);
       animation: pulseHighlight 1.5s infinite;
     }
-    
+
     @keyframes pulseHighlight {
       0% { opacity: 0.2; }
       50% { opacity: 0.5; }
@@ -284,84 +382,65 @@ body {
     }
   }
   
-  .race-slot.sprint {
-    @apply bg-gray-50 border-gray-300;
-  }
-
   .race-header.sprint {
-    @apply bg-gray-600 text-white italic;
+    @apply text-ink-secondary;
   }
 
-  /* Consensus hint for empty slots */
+  /* Consensus hint for empty slots — clearly a suggestion, never a card */
   .consensus-hint {
-    @apply flex items-center justify-center text-gray-400 pointer-events-none select-none;
-    opacity: 0.5;
+    @apply flex items-center justify-center text-ink-muted pointer-events-none select-none;
   }
-  
-  /* Apply styling for official results that indicates they're official but doesn't restrict functionality */
+
+  /* Official results carry a small success corner tick on the card */
   .official-result-styling {
-    @apply border-green-300 relative;
+    @apply relative;
   }
-  
-  /* Add a subtle indicator for official results on mobile, but no lock icon since we allow modifications */
-  @media (max-width: theme('screens.sm')) {
-    .official-result-styling::after {
-      content: '\2713'; /* Unicode checkmark symbol */
-      @apply absolute top-0 right-0 text-[10px] p-0.5 text-green-600 pointer-events-none;
-      background-color: rgba(5, 150, 105, 0.1);
-      border-radius: 0 0.25rem 0 0.25rem;
-    }
+
+  .driver-card.official-result-styling::after {
+    content: '';
+    @apply absolute top-0 right-0 pointer-events-none;
+    border-top: 9px solid rgb(var(--success) / 0.75);
+    border-left: 9px solid transparent;
+    border-radius: 0 4px 0 0;
   }
-  
-  /* Completed Race Styling */
+
+  /* Completed Race Styling — signalled in the header check + card ticks,
+     not by tinting the whole column */
   .completed-race {
     @apply relative;
   }
-  
-  .completed-race::after {
-    content: '';
-    @apply absolute inset-0 pointer-events-none rounded-md z-0;
-    background: repeating-linear-gradient(
-      -45deg,
-      rgba(0, 150, 136, 0.03),
-      rgba(0, 150, 136, 0.03) 10px,
-      rgba(0, 150, 136, 0.06) 10px,
-      rgba(0, 150, 136, 0.06) 20px
-    );
-  }
-  
+
   .completed-race-header {
-    @apply bg-green-600 text-white relative;
+    @apply relative;
   }
-  
+
   .completed-indicator {
-    @apply absolute top-1 right-1 text-xs text-green-600 w-4 h-4 flex items-center justify-center rounded-full font-bold;
-    background-color: rgba(255, 255, 255, 0.9);
+    @apply absolute top-1 right-1 text-2xs text-success w-4 h-4 flex items-center justify-center rounded-full font-bold bg-green-50;
   }
-  
+
+  /* The one dark anchor of the board — reads as the timing-tower mast */
   .position-header {
-    @apply text-white font-bold text-center p-3 rounded-md shadow-md transition-transform duration-200 bg-gray-600 border border-gray-800 select-none;
+    @apply text-white font-display font-semibold text-center p-3 rounded-md transition-colors duration-200 bg-carbon-900 select-none;
   }
 
   .position-header:hover {
-    @apply bg-gray-800;
-    transform: translateY(-1px);
+    @apply bg-carbon-800;
   }
-  
-  .position-header:active {
-    transform: translateY(0);
-  }
-  
+
   .race-header {
-    @apply bg-gray-700 text-white font-bold text-center p-2 rounded-md shadow-md transition-transform duration-200 flex flex-col items-center justify-center;
+    @apply bg-surface text-ink border font-display font-semibold text-center p-2 rounded-md flex flex-col items-center justify-center;
     box-sizing: border-box;
   }
 
   .position {
-    @apply flex items-center justify-center font-bold rounded-md border border-slate-300;
-    background: #f0f4f8;
-    box-shadow: 2px 0 6px -2px rgba(0, 0, 0, 0.1);
+    @apply flex items-center justify-center font-display font-bold rounded-md bg-carbon-100 text-carbon-700;
+    font-variant-numeric: tabular-nums;
     box-sizing: border-box;
+  }
+
+  /* Podium positions anchor the eye like the mobile card view's pills */
+  .position.position-podium {
+    @apply bg-carbon-900 text-white;
   }
 
   /* Grid Card Wrapper */

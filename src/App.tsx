@@ -141,7 +141,7 @@ const App: React.FC<{ year?: string }> = ({ year }) => {
               <div className="mb-2 shrink-0">
                 {/* Single header row — unified sizing */}
                 <div className="flex items-center gap-1.5 sm:gap-2 flex-nowrap">
-                  <h1 className="text-sm sm:text-base lg:text-lg font-bold text-gray-800 flex items-center min-w-0 shrink">
+                  <h1 className="text-sm sm:text-base lg:text-lg font-display font-bold text-ink flex items-center min-w-0 shrink">
                     <CalculatorDropdown />
                     <span className="truncate">Points Calculator</span>
                   </h1>
@@ -172,9 +172,9 @@ const App: React.FC<{ year?: string }> = ({ year }) => {
                   <>
                     <div className="shrink-0"><DriverSelectionSkeleton /></div>
                     <div className="shrink-0 w-full py-2 px-4 hidden sm:block">
-                      <div className="bg-white rounded-md p-2 shadow-sm border border-gray-200">
-                        <div className="relative w-full h-2.5 bg-gray-200 rounded-full">
-                          <div className="absolute top-0 h-full w-1/4 bg-gray-300 rounded-full" style={{ left: '0%' }} />
+                      <div className="bg-surface rounded-md p-2 shadow-xs border">
+                        <div className="relative w-full h-2.5 bg-carbon-100 rounded-full">
+                          <div className="absolute top-0 h-full w-1/4 bg-carbon-300 rounded-full" style={{ left: '0%' }} />
                         </div>
                       </div>
                     </div>

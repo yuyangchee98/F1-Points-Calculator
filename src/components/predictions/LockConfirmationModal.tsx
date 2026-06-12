@@ -110,7 +110,7 @@ const LockConfirmationModal: React.FC<LockConfirmationModalProps> = ({
                     {driver?.givenName} {driver?.familyName}
                   </span>
                   {driver?.team && teamById[driver.team] && (
-                    <span className="text-xs text-gray-400">{teamById[driver.team].name}</span>
+                    <span className="text-xs text-ink-muted">{teamById[driver.team].name}</span>
                   )}
                 </div>
               );

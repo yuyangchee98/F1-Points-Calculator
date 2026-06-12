@@ -88,7 +88,7 @@ const SearchableSubmenu: React.FC<{
         {/* Driver list */}
         <div className="overflow-y-auto overscroll-contain max-h-[min(320px,50vh)]">
           {filtered.length === 0 ? (
-            <div className="px-4 py-6 text-center text-sm text-gray-400">
+            <div className="px-4 py-6 text-center text-sm text-ink-muted">
               No drivers found
             </div>
           ) : (

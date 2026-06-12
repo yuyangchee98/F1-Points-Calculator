@@ -28,10 +28,10 @@ const DriverSelection: React.FC = () => {
   return (
     <div className="mb-1.5">
       <div className="flex justify-between items-center mb-1">
-        <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Drivers</h2>
+        <h2 className="text-2xs font-semibold text-ink-muted uppercase tracking-wider">Drivers</h2>
         <button
           id="driver-toggle-button"
-          className="text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1 transition-colors"
+          className="text-xs text-ink-muted hover:text-ink flex items-center gap-1 transition-colors"
           onClick={() => {
             setIsExpanded(!isExpanded);
           }}
@@ -60,7 +60,7 @@ const DriverSelection: React.FC = () => {
           grid gap-1.5
           ${isExpanded ? 'max-h-[25vh] lg:max-h-[35vh] opacity-100 overflow-y-auto' : 'max-h-0 opacity-0'}
           overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out
-          p-2 bg-gray-50 rounded-lg shadow-sm border border-gray-200
+          p-2 bg-surface-sunken rounded-lg border
         `}
         style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))' }}
       >
@@ -76,19 +76,17 @@ const DriverSelection: React.FC = () => {
       </div>
 
       {selectedDriverId && (
-        <div 
+        <div
           id="mobile-selection-indicator"
-          className="fixed bottom-24 left-1/2 transform -translate-x-1/2 
-                    bg-red-600 text-white px-5 py-3 rounded-lg shadow-xl 
-                    flex items-center space-x-3 z-50 sm:hidden"
+          className="fixed bottom-24 left-1/2 transform -translate-x-1/2
+                    bg-carbon-900 text-white px-5 py-3 rounded-lg shadow-lg
+                    flex items-center space-x-3 z-modal sm:hidden"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-            <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6z" />
-          </svg>
+          <span className="w-2 h-2 rounded-full bg-brand shrink-0" aria-hidden="true" />
           <span className="selected-driver-name font-medium">
             {selectedDriverId ? getDriverLastName(selectedDriverId) : ''}
           </span>
-          <span className="text-sm ml-2 text-gray-100">Tap blue grid slots to place</span>
+          <span className="text-sm ml-2 text-carbon-300">Tap highlighted slots to place</span>
           <button 
             className="cancel-selection ml-2 bg-white bg-opacity-20 rounded-full w-7 h-7 
                     flex items-center justify-center transition-all hover:bg-opacity-30"

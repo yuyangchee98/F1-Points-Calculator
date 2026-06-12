@@ -130,7 +130,7 @@ const VersionHistory: React.FC<VersionHistoryProps> = ({ onClose, onLoadVersion 
               )}
               <button
                 onClick={onClose}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
+                className="text-ink-muted hover:text-ink transition-colors"
                 aria-label="Close"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

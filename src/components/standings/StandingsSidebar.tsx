@@ -9,6 +9,8 @@ import TableSkeleton from '../common/TableSkeleton';
 import { DriverPointsChart, TeamPointsChart } from '../charts/LazyCharts';
 import { useAppDispatch } from '../../store';
 import CompetitionCard from './CompetitionCard';
+import SegmentedControl from '../ui/SegmentedControl';
+import Card from '../ui/Card';
 
 const StandingsSidebar: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -29,46 +31,29 @@ const StandingsSidebar: React.FC = () => {
   }, [uiActiveTab]);
 
   return (
-    <div className="h-full overflow-hidden flex flex-col bg-gray-50 pb-4">
-      <div className="sm:hidden py-4 bg-red-600 text-white border-b border-red-700">
-        <h2 className="text-xl font-bold text-center">Championship Standings</h2>
+    <div className="h-full overflow-hidden flex flex-col bg-surface-sunken pb-4">
+      <div className="px-4 py-3 border-b bg-surface">
+        <h2 className="text-xl font-semibold font-display text-ink text-center sm:text-left">
+          Championship Standings
+          <span className="block h-0.5 w-10 bg-brand mt-1 mx-auto sm:mx-0" aria-hidden="true"></span>
+        </h2>
       </div>
 
-      <div className="hidden sm:block h-2 w-full bg-red-600"></div>
-
-      <div className="hidden sm:flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-white">
-        <h2 className="text-2xl font-bold text-gray-800">Championship Standings</h2>
-      </div>
-
-      <div className="flex mx-4 mt-4 bg-white rounded-lg p-1 sticky top-0 z-10 shadow-sm border border-gray-200">
-        <button
-          className={`flex-1 px-4 py-2 font-medium text-sm rounded-md transition-all 
-            ${activeTab === 'tables' 
-              ? 'bg-red-600 text-white shadow-sm' 
-              : 'text-gray-700 hover:bg-gray-100'}`}
-          onClick={() => handleTabChange('tables')}
-        >
-          TABLES
-        </button>
-        <button
-          className={`flex-1 px-4 py-2 font-medium text-sm rounded-md transition-all 
-            ${activeTab === 'charts' 
-              ? 'bg-red-600 text-white shadow-sm' 
-              : 'text-gray-700 hover:bg-gray-100'}`}
-          onClick={() => handleTabChange('charts')}
-        >
-          CHARTS
-        </button>
-      </div>
+      <SegmentedControl
+        className="mx-4 mt-4 sticky top-0 z-sticky"
+        aria-label="Standings view"
+        options={[
+          { value: 'tables', label: 'Tables' },
+          { value: 'charts', label: 'Charts' },
+        ]}
+        value={activeTab}
+        onChange={handleTabChange}
+      />
 
       <div className="overflow-auto flex-1 px-4 pt-4">
         {activeTab === 'tables' ? (
           <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
-              <h2 className="text-lg font-medium p-3 border-b border-gray-200 sticky top-0 bg-white flex items-center">
-                <span className="w-1 h-6 bg-red-600 mr-3 inline-block rounded-r-md"></span>
-                Driver Standings
-              </h2>
+            <Card title="Driver Standings">
               <div className="overflow-x-auto">
                 {isLoading || driverStandings.length === 0 ? (
                   <TableSkeleton rows={20} type="driver" />
@@ -76,13 +61,9 @@ const StandingsSidebar: React.FC = () => {
                   <DriverStandingsTable standings={driverStandings} />
                 )}
               </div>
-            </div>
+            </Card>
 
-            <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
-              <h2 className="text-lg font-medium p-3 border-b border-gray-200 sticky top-0 bg-white flex items-center">
-                <span className="w-1 h-6 bg-red-600 mr-3 inline-block rounded-r-md"></span>
-                Constructor Standings
-              </h2>
+            <Card title="Constructor Standings">
               <div className="overflow-x-auto">
                 {isLoading || teamStandings.length === 0 ? (
                   <TableSkeleton rows={10} type="team" />
@@ -90,57 +71,49 @@ const StandingsSidebar: React.FC = () => {
                   <TeamStandingsTable standings={teamStandings} />
                 )}
               </div>
-            </div>
+            </Card>
 
             <CompetitionCard />
           </div>
         ) : (
           <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
-              <h3 className="text-lg font-medium p-3 border-b border-gray-200 sticky top-0 bg-white flex items-center">
-                <span className="w-1 h-6 bg-red-600 mr-3 inline-block rounded-r-md"></span>
-                Driver Championship
-              </h3>
+            <Card title="Driver Championship">
               <div className="p-3">
                 <Suspense fallback={
                   <div className="h-[250px] flex items-center justify-center">
-                    <div className="text-gray-500">Loading chart...</div>
+                    <div className="text-ink-muted">Loading chart...</div>
                   </div>
                 }>
                   <DriverPointsChart />
                 </Suspense>
               </div>
-            </div>
+            </Card>
 
-            <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
-              <h3 className="text-lg font-medium p-3 border-b border-gray-200 sticky top-0 bg-white flex items-center">
-                <span className="w-1 h-6 bg-red-600 mr-3 inline-block rounded-r-md"></span>
-                Constructor Championship
-              </h3>
+            <Card title="Constructor Championship">
               <div className="p-3">
                 <Suspense fallback={
                   <div className="h-[250px] flex items-center justify-center">
-                    <div className="text-gray-500">Loading chart...</div>
+                    <div className="text-ink-muted">Loading chart...</div>
                   </div>
                 }>
                   <TeamPointsChart />
                 </Suspense>
               </div>
-            </div>
+            </Card>
 
             <CompetitionCard />
           </div>
         )}
 
-        <div className="mt-6 pt-4 border-t border-gray-200 text-xs text-gray-400 space-y-1.5">
-          <p>Created by <a href="https://chyuang.com" className="hover:text-gray-600" target="_blank" rel="noopener noreferrer">Chyuang</a></p>
-          <p><a href="https://github.com/yuyangchee98/F1-Points-Calculator" className="hover:text-gray-600" target="_blank" rel="noopener noreferrer">Open source on GitHub</a></p>
-          <p><a href="mailto:f1pointscalculator@chyuang.com" className="hover:text-gray-600">Contact</a></p>
-          <p><a href="/changelog" className="hover:text-gray-600">Changelog</a></p>
+        <div className="mt-6 pt-4 border-t text-xs text-ink-muted space-y-1.5">
+          <p>Created by <a href="https://chyuang.com" className="hover:text-ink" target="_blank" rel="noopener noreferrer">Chyuang</a></p>
+          <p><a href="https://github.com/yuyangchee98/F1-Points-Calculator" className="hover:text-ink" target="_blank" rel="noopener noreferrer">Open source on GitHub</a></p>
+          <p><a href="mailto:f1pointscalculator@chyuang.com" className="hover:text-ink">Contact</a></p>
+          <p><a href="/changelog" className="hover:text-ink">Changelog</a></p>
           <div className="flex gap-3 pt-1">
-            <a href="https://f1-dash.com/" className="hover:text-gray-600" target="_blank" rel="noopener noreferrer">F1 Dash</a>
-            <a href="https://f1calendar.com/" className="hover:text-gray-600" target="_blank" rel="noopener noreferrer">F1 Calendar</a>
-            <a href="https://drawlineracing.chyuang.com/" className="hover:text-gray-600" target="_blank" rel="noopener noreferrer">Draw Line Racing</a>
+            <a href="https://f1-dash.com/" className="hover:text-ink" target="_blank" rel="noopener noreferrer">F1 Dash</a>
+            <a href="https://f1calendar.com/" className="hover:text-ink" target="_blank" rel="noopener noreferrer">F1 Calendar</a>
+            <a href="https://drawlineracing.chyuang.com/" className="hover:text-ink" target="_blank" rel="noopener noreferrer">Draw Line Racing</a>
           </div>
         </div>
       </div>

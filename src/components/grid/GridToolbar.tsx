@@ -5,6 +5,7 @@ import useWindowSize from '../../hooks/useWindowSize';
 import { useAuth } from '../../hooks/useAuth';
 import { selectNextRaceToLock } from '../../store/selectors/lockedPredictionsSelectors';
 import { getActiveSeason, CURRENT_SEASON } from '../../utils/constants';
+import Button, { ButtonLink } from '../ui/Button';
 
 interface GridToolbarProps {
   onReset: () => void;
@@ -61,22 +62,22 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
   };
 
   return (
-    <div className="bg-white border-b border-gray-200 rounded-t-lg">
+    <div className="bg-surface border-b rounded-t-lg">
       <div className="p-2 md:p-4">
         <div className="flex flex-nowrap gap-1 md:gap-2 items-center">
           {/* View Settings */}
           <div className="flex items-center gap-2 shrink-0">
-            {!isCompact && <span className="text-sm text-gray-500 font-medium">Points:</span>}
+            {!isCompact && <span className="text-sm text-ink-muted font-medium">Points:</span>}
             <PointsSystemSelector />
           </div>
 
-          <button
+          <Button
             onClick={onToggleOfficialResults}
-            className={`${
-              showOfficialResults
-                ? 'bg-green-50 border-green-300 text-green-700'
-                : 'bg-gray-50 border-gray-300 text-gray-700'
-            } shrink-0 border p-2 md:px-3 md:py-2 rounded-md hover:bg-opacity-80 transition-colors duration-200 flex items-center gap-2 font-medium text-sm`}
+            variant="ghost"
+            pressed={showOfficialResults}
+            iconOnly={isCompact}
+            className="shrink-0"
+            aria-label={showOfficialResults ? 'Hide Official Results' : 'Show Official Results'}
             title={showOfficialResults ? 'Hide Official Results' : 'Show Official Results'}
           >
             {showOfficialResults ? (
@@ -90,43 +91,46 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
               </svg>
             )}
             {!isCompact && <span>Results</span>}
-          </button>
+          </Button>
 
           {isCurrentSeason && (
-            <button
+            <Button
               onClick={onToggleConsensus}
-              className={`${
-                showConsensus
-                  ? 'bg-purple-50 border-purple-300 text-purple-700'
-                  : 'bg-gray-50 border-gray-300 text-gray-700'
-              } shrink-0 border p-2 md:px-3 md:py-2 rounded-md hover:bg-opacity-80 transition-colors duration-200 flex items-center gap-2 font-medium text-sm`}
+              variant="ghost"
+              pressed={showConsensus}
+              iconOnly={isCompact}
+              className="shrink-0"
+              aria-label={showConsensus ? 'Hide Consensus' : 'Show what other players predicted'}
               title={showConsensus ? 'Hide Consensus' : 'Show what other players predicted'}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
               {!isCompact && <span>Consensus</span>}
-            </button>
+            </Button>
           )}
 
           {/* More Menu */}
           <div className="relative shrink-0" ref={moreMenuRef}>
-            <button
+            <Button
               onClick={() => setShowMoreMenu(!showMoreMenu)}
-              className="bg-gray-50 border border-gray-300 text-gray-700 hover:bg-gray-100 p-2 md:px-3 md:py-2 rounded-md transition-colors duration-200 flex items-center gap-2 font-medium text-sm"
+              variant="ghost"
+              iconOnly={isCompact}
+              aria-label="More options"
+              aria-expanded={showMoreMenu}
               title="More options"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
               </svg>
               {!isCompact && <span>More</span>}
-            </button>
+            </Button>
 
             {showMoreMenu && (
-              <div className="absolute left-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+              <div className="absolute left-0 mt-1 w-48 bg-surface rounded-lg shadow-md border py-1 z-overlay">
                 <button
                   onClick={() => { onOpenHistory(); setShowMoreMenu(false); }}
-                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                  className="w-full text-left px-4 py-2 text-sm text-ink-secondary hover:bg-carbon-50 hover:text-ink flex items-center gap-2"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -136,7 +140,7 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
                 {isCurrentSeason && (
                 <button
                   onClick={() => { onOpenExport(); setShowMoreMenu(false); }}
-                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                  className="w-full text-left px-4 py-2 text-sm text-ink-secondary hover:bg-carbon-50 hover:text-ink flex items-center gap-2"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -146,7 +150,7 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
                 )}
                 <button
                   onClick={toggleHowToUse}
-                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                  className="w-full text-left px-4 py-2 text-sm text-ink-secondary hover:bg-carbon-50 hover:text-ink flex items-center gap-2"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -162,49 +166,59 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
 
           {/* Compete Button - only show for current season */}
           {isCurrentSeason && (
-            <a
+            <ButtonLink
               href="/compete"
-              className="relative shrink-0 bg-amber-50 border border-amber-300 text-amber-700 hover:bg-amber-100 p-2 md:px-3 md:py-2 rounded-md transition-colors duration-200 flex items-center gap-2 font-medium text-sm"
+              variant="primary"
+              iconOnly={isCompact}
+              className="relative shrink-0"
+              aria-label="Compete"
               title="Compete"
             >
               {showNotification && (
-                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse" />
+                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-carbon-900 ring-2 ring-white rounded-full animate-pulse" />
               )}
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
               </svg>
               {!isCompact && <span>Compete</span>}
-            </a>
+            </ButtonLink>
           )}
 
-          <button
+          <Button
             onClick={onReset}
-            className="shrink-0 bg-gray-50 border border-gray-300 text-red-600 hover:bg-red-50 hover:border-red-300 p-2 md:px-3 md:py-2 rounded-md transition-colors duration-200 flex items-center gap-2 font-medium text-sm"
+            variant="danger"
+            iconOnly={isCompact}
+            className="shrink-0"
+            aria-label="Reset Predictions"
             title="Reset Predictions"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
             {!isCompact && <span>Reset</span>}
-          </button>
+          </Button>
         </div>
       </div>
 
       {isCurrentSeason && showConsensus && (
-        <div className="px-3 md:px-4 py-2 border-t border-purple-200 bg-purple-50">
-          <p className="text-purple-700 text-sm">
-            <strong>Consensus</strong> shows the most popular pick by other players for each position. The percentage indicates how many players chose that driver.
+        <div className="px-3 md:px-4 py-2 border-t bg-surface-sunken">
+          <p className="text-ink-secondary text-sm flex items-start gap-2">
+            <svg className="w-4 h-4 mt-0.5 shrink-0 text-ink-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span><strong className="text-ink">Consensus</strong> shows the most popular pick by other players for each position. The percentage indicates how many players chose that driver.</span>
           </p>
         </div>
       )}
 
       {showHowToUse && (
-        <div className="px-3 md:px-4 pb-3 md:pb-4 border-t border-gray-200 bg-blue-50">
-          <div className="pt-3">
-            <p className="text-gray-700 text-sm">
-              Drag drivers from the list to place them in their predicted finishing positions and get live points calculation.
-            </p>
-          </div>
+        <div className="px-3 md:px-4 py-2 border-t bg-surface-sunken">
+          <p className="text-ink-secondary text-sm flex items-start gap-2">
+            <svg className="w-4 h-4 mt-0.5 shrink-0 text-ink-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Drag drivers from the list to place them in their predicted finishing positions and get live points calculation.</span>
+          </p>
         </div>
       )}
     </div>
