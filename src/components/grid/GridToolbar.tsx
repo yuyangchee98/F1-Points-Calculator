@@ -64,7 +64,7 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
   return (
     <div className="bg-surface border-b rounded-t-lg">
       <div className="p-2">
-        <div className="flex flex-nowrap gap-1 md:gap-2 items-center">
+        <div className="flex flex-wrap gap-1 md:gap-2 items-center">
           {/* View Settings */}
           <div className="flex items-center gap-2 shrink-0">
             {!isCompact && <span className="text-sm text-ink-muted font-medium">Points:</span>}
@@ -75,7 +75,7 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
             onClick={onToggleOfficialResults}
             variant="ghost"
             pressed={showOfficialResults}
-            iconOnly={isCompact}
+            iconOnly={isMobile}
             className="shrink-0"
             aria-label={showOfficialResults ? 'Hide Official Results' : 'Show Official Results'}
             title={showOfficialResults ? 'Hide Official Results' : 'Show Official Results'}
@@ -90,7 +90,7 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
               </svg>
             )}
-            {!isCompact && <span>Results</span>}
+            {!isMobile && <span>Results</span>}
           </Button>
 
           {isCurrentSeason && (
@@ -98,7 +98,7 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
               onClick={onToggleConsensus}
               variant="ghost"
               pressed={showConsensus}
-              iconOnly={isCompact}
+              iconOnly={isMobile}
               className="shrink-0"
               aria-label={showConsensus ? 'Hide Consensus' : 'Show what other players predicted'}
               title={showConsensus ? 'Hide Consensus' : 'Show what other players predicted'}
@@ -106,7 +106,7 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
-              {!isCompact && <span>Consensus</span>}
+              {!isMobile && <span>Consensus</span>}
             </Button>
           )}
 
@@ -115,7 +115,7 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
             <Button
               onClick={() => setShowMoreMenu(!showMoreMenu)}
               variant="ghost"
-              iconOnly={isCompact}
+              iconOnly={isMobile}
               aria-label="More options"
               aria-expanded={showMoreMenu}
               title="More options"
@@ -123,7 +123,7 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
               </svg>
-              {!isCompact && <span>More</span>}
+              {!isMobile && <span>More</span>}
             </Button>
 
             {showMoreMenu && (
@@ -169,7 +169,7 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
             <ButtonLink
               href="/compete"
               variant="primary"
-              iconOnly={isCompact}
+              iconOnly={isMobile}
               className="relative shrink-0"
               aria-label="Compete"
               title="Compete"
@@ -180,14 +180,14 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
               </svg>
-              {!isCompact && <span>Compete</span>}
+              {!isMobile && <span>Compete</span>}
             </ButtonLink>
           )}
 
           <Button
             onClick={onReset}
             variant="danger"
-            iconOnly={isCompact}
+            iconOnly={isMobile}
             className="shrink-0"
             aria-label="Reset Predictions"
             title="Reset Predictions"
@@ -195,7 +195,7 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
-            {!isCompact && <span>Reset</span>}
+            {!isMobile && <span>Reset</span>}
           </Button>
         </div>
       </div>
