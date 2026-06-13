@@ -23,7 +23,6 @@ const TeamPointsChart: React.FC = () => {
       data: series[standing.teamId] ?? [],
       borderColor: team.color,
       backgroundColor: team.color,
-      tension: 0.1,
       pointRadius: 3,
       spanGaps: false,
     };

@@ -18,6 +18,9 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
+  // Cumulative points are monotonic; straight segments avoid Bézier overshoot
+  // drawing totals that never occurred between rounds.
+  elements: { line: { tension: 0 } },
   plugins: {
     legend: {
       position: 'top' as const,

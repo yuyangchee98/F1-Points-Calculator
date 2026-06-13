@@ -27,7 +27,6 @@ const DriverPointsChart: React.FC = () => {
       data: series[standing.driverId] ?? [],
       borderColor: color,
       backgroundColor: color,
-      tension: 0.1,
       pointRadius: 3,
       spanGaps: false,
     };
