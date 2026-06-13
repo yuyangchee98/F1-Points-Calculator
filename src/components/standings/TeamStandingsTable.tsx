@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import type { TeamStanding } from '../../types';
+import type { RootState } from '../../store';
 import { selectTeamsByIdMap } from '../../store/selectors/dataSelectors';
 import { useStandingsAnimation } from '../../hooks/useStandingsAnimation';
 
@@ -10,6 +11,7 @@ interface TeamStandingsTableProps {
 
 const TeamStandingsTable: React.FC<TeamStandingsTableProps> = ({ standings }) => {
   const teamById = useSelector(selectTeamsByIdMap);
+  const showDelta = useSelector((state: RootState) => state.ui.teamShowDelta);
 
   const animationOptions = useMemo(() => ({
     getItemId: (standing: TeamStanding) => standing.teamId
@@ -63,7 +65,7 @@ const TeamStandingsTable: React.FC<TeamStandingsTableProps> = ({ standings }) =>
                   >
                     <div className="flex items-center justify-end gap-2">
                       <span>{standing.points} pts</span>
-                      {standing.predictionPointsGained > 0 && (
+                      {showDelta && standing.predictionPointsGained > 0 && (
                         <span className="text-2xs font-semibold text-success bg-green-50 px-1.5 py-0.5 rounded-sm tnum">
                           +{standing.predictionPointsGained}
                         </span>

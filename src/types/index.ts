@@ -85,6 +85,18 @@ export interface GridState {
 export type StandingsTab = 'tables' | 'charts';
 export type MobileView = 'grid' | 'standings';
 
+// What quantity the points charts plot on the y-axis. Extensible: future
+// metrics (e.g. 'bump' position chart, 'perRace' bars) are added as new members
+// without changing consumer signatures.
+// NOTE: an official-vs-predicted line split is NOT a metric — it doubles each
+// series rather than transforming the y-value, so it belongs in a separate flag.
+export type ChartMetric = 'cumulative' | 'gap';
+
+// Standings settings are per-section: the drivers and constructors boards each
+// carry their own chart line selection / metric and their own prediction-delta
+// toggle.
+export type StandingsSection = 'drivers' | 'teams';
+
 export interface UiState {
   activeTab: StandingsTab;
   mobileView: MobileView;
@@ -94,5 +106,14 @@ export interface UiState {
   positionColumnMode: 'position' | 'standings';
   copiedDriver: string | null;
   showConsensus: boolean;
+  // Explicit driver/team IDs to plot. Empty = use the default (top 5). IDs are
+  // season-specific; stale ones are ignored at render time.
+  driverChartSelection: string[];
+  teamChartSelection: string[];
+  driverChartMetric: ChartMetric;
+  teamChartMetric: ChartMetric;
+  driverShowDelta: boolean;
+  teamShowDelta: boolean;
+  sidebarWidth: number; // px; desktop only; ignored on mobile (full-width)
 }
 

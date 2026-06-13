@@ -3,28 +3,33 @@ import { useSelector } from 'react-redux';
 import { type ChartDataset } from 'chart.js';
 import type { RootState } from '../../store';
 
-import { selectDriverPointsForCharts, selectTopDrivers } from '../../store/selectors/resultsSelectors';
+import { selectDriverPointsForCharts, selectDriverStandings } from '../../store/selectors/resultsSelectors';
 import { selectDriversByIdMap, getDriverLastName, selectTeamsByIdMap } from '../../store/selectors/dataSelectors';
-import { buildRaceLabels } from './chartHelpers';
+import { buildRaceLabels, toMetricData, resolveChartSelection } from './chartHelpers';
 import PointsLineChart from './PointsLineChart';
 
 const DriverPointsChart: React.FC = () => {
   const driverById = useSelector(selectDriversByIdMap);
   const teamById = useSelector(selectTeamsByIdMap);
 
-  const topDrivers = useSelector((state: RootState) => selectTopDrivers(state, 5));
-  const { axis, series } = useSelector((state: RootState) => selectDriverPointsForCharts(state, 5));
+  const selection = useSelector((state: RootState) => state.ui.driverChartSelection);
+  const chartMetric = useSelector((state: RootState) => state.ui.driverChartMetric);
+  const standings = useSelector(selectDriverStandings);
+  const { axis, series, leader } = useSelector(selectDriverPointsForCharts);
 
-  const datasets = topDrivers.map(standing => {
-    const driver = driverById[standing.driverId];
+  // Which drivers to plot: explicit selection (or default top 5), ordered by
+  // standings so the legend reads top-down.
+  const plottedIds = resolveChartSelection(selection, standings.map(s => s.driverId));
+
+  const datasets = plottedIds.map(driverId => {
+    const driver = driverById[driverId];
     if (!driver) return null;
 
-    const team = teamById[driver.team];
-    const color = team?.color || '#ccc';
+    const color = teamById[driver.team]?.color || '#ccc';
 
     return {
       label: getDriverLastName(driver.id),
-      data: series[standing.driverId] ?? [],
+      data: toMetricData(series[driverId] ?? [], leader, chartMetric),
       borderColor: color,
       backgroundColor: color,
       pointRadius: 3,
@@ -32,7 +37,7 @@ const DriverPointsChart: React.FC = () => {
     };
   }).filter(Boolean) as ChartDataset<'line', (number | null)[]>[];
 
-  return <PointsLineChart labels={buildRaceLabels(axis)} datasets={datasets} />;
+  return <PointsLineChart labels={buildRaceLabels(axis)} datasets={datasets} metric={chartMetric} />;
 };
 
 export default DriverPointsChart;

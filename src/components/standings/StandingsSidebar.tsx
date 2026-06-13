@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense, type ReactNode } from 'react';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../store';
 import { selectDriverStandings, selectTeamStandings } from '../../store/selectors/resultsSelectors';
@@ -10,6 +10,31 @@ import { DriverPointsChart, TeamPointsChart } from '../charts/LazyCharts';
 import { useAppDispatch } from '../../store';
 import CompetitionCard from './CompetitionCard';
 import SegmentedControl from '../ui/SegmentedControl';
+import ChartSettingsButton from './ChartSettingsButton';
+import TableSettingsButton from './TableSettingsButton';
+
+// Sticky section heading with its own settings gear on the right. The gear is
+// scoped to what sits directly below it (a table in the Tables tab, a chart in
+// the Charts tab), so there's no panel-wide "settings" button.
+const SectionHeading: React.FC<{ title: string; gear: ReactNode; stackLevel: number; className?: string }> = ({
+  title,
+  gear,
+  stackLevel,
+  className = ''
+}) => (
+  // `position: sticky` always creates a stacking context, so an open settings
+  // popover is confined to its heading's context. A popover only ever overlaps
+  // the section *below* it, so we give earlier headings a higher stack level —
+  // the Drivers popover then paints above the Constructors heading, while the
+  // (last) Constructors popover opens over non-positioned cards and is fine.
+  <div
+    style={{ zIndex: stackLevel }}
+    className={`sticky top-0 bg-surface px-3 pb-1 flex items-center justify-between gap-2 ${className}`}
+  >
+    <h3 className="text-2xs font-semibold uppercase tracking-wider text-ink-muted">{title}</h3>
+    {gear}
+  </div>
+);
 
 const StandingsSidebar: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -50,9 +75,12 @@ const StandingsSidebar: React.FC = () => {
       <div className="overflow-auto flex-1">
         {activeTab === 'tables' ? (
           <>
-            <h3 className="sticky top-0 z-sticky bg-surface px-3 pt-2 pb-1 text-2xs font-semibold uppercase tracking-wider text-ink-muted">
-              Drivers
-            </h3>
+            <SectionHeading
+              title="Drivers"
+              stackLevel={12}
+              className="pt-2"
+              gear={<TableSettingsButton section="drivers" />}
+            />
             <div className="overflow-x-auto px-1">
               {isLoading || driverStandings.length === 0 ? (
                 <TableSkeleton rows={20} type="driver" />
@@ -61,9 +89,12 @@ const StandingsSidebar: React.FC = () => {
               )}
             </div>
 
-            <h3 className="sticky top-0 z-sticky bg-surface px-3 pt-3 pb-1 mt-1 border-t text-2xs font-semibold uppercase tracking-wider text-ink-muted">
-              Constructors
-            </h3>
+            <SectionHeading
+              title="Constructors"
+              stackLevel={11}
+              className="pt-3 mt-1 border-t"
+              gear={<TableSettingsButton section="teams" />}
+            />
             <div className="overflow-x-auto px-1">
               {isLoading || teamStandings.length === 0 ? (
                 <TableSkeleton rows={10} type="team" />
@@ -78,9 +109,12 @@ const StandingsSidebar: React.FC = () => {
           </>
         ) : (
           <>
-            <h3 className="sticky top-0 z-sticky bg-surface px-3 pt-2 pb-1 text-2xs font-semibold uppercase tracking-wider text-ink-muted">
-              Drivers
-            </h3>
+            <SectionHeading
+              title="Drivers"
+              stackLevel={12}
+              className="pt-2"
+              gear={<ChartSettingsButton section="drivers" />}
+            />
             <div className="px-2">
               <Suspense fallback={
                 <div className="h-[250px] flex items-center justify-center">
@@ -91,9 +125,12 @@ const StandingsSidebar: React.FC = () => {
               </Suspense>
             </div>
 
-            <h3 className="sticky top-0 z-sticky bg-surface px-3 pt-3 pb-1 mt-2 border-t text-2xs font-semibold uppercase tracking-wider text-ink-muted">
-              Constructors
-            </h3>
+            <SectionHeading
+              title="Constructors"
+              stackLevel={11}
+              className="pt-3 mt-2 border-t"
+              gear={<ChartSettingsButton section="teams" />}
+            />
             <div className="px-2">
               <Suspense fallback={
                 <div className="h-[250px] flex items-center justify-center">
