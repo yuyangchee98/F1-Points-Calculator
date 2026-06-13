@@ -39,10 +39,16 @@ export const selectTopTeams = createSelector(
  * `null` for races before the entity first appears. Because producer and
  * consumer share the same `axis` index, there is no index-space mismatch:
  * index `i` always means "the i-th race on the axis" on both ends.
+ *
+ * `leader[i]` is the championship leader's cumulative total at `axis[i]` —
+ * the max across ALL entities (not just the displayed top-N), so the
+ * gap-to-leader metric stays correct even when the leader is outside the
+ * shown set.
  */
 export interface PointsChartData {
   axis: Race[];
   series: Record<string, (number | null)[]>;
+  leader: (number | null)[];
 }
 
 // Races that have at least one history row, sorted by race order. This is the
@@ -66,52 +72,61 @@ const alignToAxis = (cumulativeByRace: Map<string, number>, axis: Race[]): (numb
   });
 };
 
-export const selectDriverPointsForCharts = createSelector(
-  [selectPointsHistory, selectDriverStandings, selectRaces, (_: RootState, count: number) => count],
-  (history, standings, races, count): PointsChartData => {
-    const axis = buildAxis(new Set(history.map(h => h.raceId)), races);
-    const topDriverIds = standings.slice(0, count).map(d => d.driverId);
-
-    const cumulativeByDriver = new Map<string, Map<string, number>>();
-    history.forEach(h => {
-      let raceMap = cumulativeByDriver.get(h.driverId);
-      if (!raceMap) {
-        raceMap = new Map<string, number>();
-        cumulativeByDriver.set(h.driverId, raceMap);
+// The championship leader's cumulative total at each axis race — the max across
+// every entity (computed from the full field, before any top-N slice).
+const computeLeader = (alignedSeries: (number | null)[][], axisLength: number): (number | null)[] => {
+  const leader: (number | null)[] = [];
+  for (let i = 0; i < axisLength; i++) {
+    let max: number | null = null;
+    for (const aligned of alignedSeries) {
+      const value = aligned[i];
+      if (value != null && (max == null || value > max)) {
+        max = value;
       }
-      raceMap.set(h.raceId, h.cumulativePoints);
-    });
-
-    const series: Record<string, (number | null)[]> = {};
-    topDriverIds.forEach(driverId => {
-      series[driverId] = alignToAxis(cumulativeByDriver.get(driverId) ?? new Map(), axis);
-    });
-
-    return { axis, series };
+    }
+    leader.push(max);
   }
+  return leader;
+};
+
+// Build aligned series for EVERY entity in the history (plus the leader line).
+// The chart component then plots whichever subset the user has selected — the
+// selector no longer slices to a count.
+const buildChartData = <T extends { raceId: string; cumulativePoints: number }>(
+  history: T[],
+  entityIdOf: (h: T) => string,
+  races: Race[]
+): PointsChartData => {
+  const axis = buildAxis(new Set(history.map(h => h.raceId)), races);
+
+  const cumulativeByEntity = new Map<string, Map<string, number>>();
+  history.forEach(h => {
+    const id = entityIdOf(h);
+    let raceMap = cumulativeByEntity.get(id);
+    if (!raceMap) {
+      raceMap = new Map<string, number>();
+      cumulativeByEntity.set(id, raceMap);
+    }
+    raceMap.set(h.raceId, h.cumulativePoints);
+  });
+
+  const series: Record<string, (number | null)[]> = {};
+  const aligned: (number | null)[][] = [];
+  cumulativeByEntity.forEach((raceMap, id) => {
+    const a = alignToAxis(raceMap, axis);
+    series[id] = a;
+    aligned.push(a);
+  });
+
+  return { axis, series, leader: computeLeader(aligned, axis.length) };
+};
+
+export const selectDriverPointsForCharts = createSelector(
+  [selectPointsHistory, selectRaces],
+  (history, races): PointsChartData => buildChartData(history, h => h.driverId, races)
 );
 
 export const selectTeamPointsForCharts = createSelector(
-  [selectTeamPointsHistory, selectTeamStandings, selectRaces, (_: RootState, count: number) => count],
-  (history, standings, races, count): PointsChartData => {
-    const axis = buildAxis(new Set(history.map(h => h.raceId)), races);
-    const topTeamIds = standings.slice(0, count).map(t => t.teamId);
-
-    const cumulativeByTeam = new Map<string, Map<string, number>>();
-    history.forEach(h => {
-      let raceMap = cumulativeByTeam.get(h.teamId);
-      if (!raceMap) {
-        raceMap = new Map<string, number>();
-        cumulativeByTeam.set(h.teamId, raceMap);
-      }
-      raceMap.set(h.raceId, h.cumulativePoints);
-    });
-
-    const series: Record<string, (number | null)[]> = {};
-    topTeamIds.forEach(teamId => {
-      series[teamId] = alignToAxis(cumulativeByTeam.get(teamId) ?? new Map(), axis);
-    });
-
-    return { axis, series };
-  }
+  [selectTeamPointsHistory, selectRaces],
+  (history, races): PointsChartData => buildChartData(history, h => h.teamId, races)
 );

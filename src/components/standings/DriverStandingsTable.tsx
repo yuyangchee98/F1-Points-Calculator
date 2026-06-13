@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import type { DriverStanding } from '../../types';
+import type { RootState } from '../../store';
 import { selectDriversByIdMap, getDriverLastName, selectTeamsByIdMap } from '../../store/selectors/dataSelectors';
 import { useStandingsAnimation } from '../../hooks/useStandingsAnimation';
 
@@ -11,6 +12,7 @@ interface DriverStandingsTableProps {
 const DriverStandingsTable: React.FC<DriverStandingsTableProps> = ({ standings }) => {
   const driverById = useSelector(selectDriversByIdMap);
   const teamById = useSelector(selectTeamsByIdMap);
+  const showDelta = useSelector((state: RootState) => state.ui.driverShowDelta);
 
   const animationOptions = useMemo(() => ({
     getItemId: (standing: DriverStanding) => standing.driverId,
@@ -55,7 +57,7 @@ const DriverStandingsTable: React.FC<DriverStandingsTableProps> = ({ standings }
                   <td className="py-1.5 px-2 text-center font-bold text-ink-secondary text-sm w-10 tnum font-display">
                     <div className="flex items-baseline justify-center gap-0.5">
                       <span>{standing.position}</span>
-                      {standing.positionChange !== 0 && (
+                      {showDelta && standing.positionChange !== 0 && (
                         <span
                           className={`text-2xs font-bold ${
                             standing.positionChange > 0 ? 'text-success' : 'text-danger'
@@ -82,7 +84,7 @@ const DriverStandingsTable: React.FC<DriverStandingsTableProps> = ({ standings }
                   >
                     <div className="flex items-center justify-end gap-2">
                       <span>{standing.points} pts</span>
-                      {standing.predictionPointsGained > 0 && (
+                      {showDelta && standing.predictionPointsGained > 0 && (
                         <span className="text-2xs font-semibold text-success bg-green-50 px-1.5 py-0.5 rounded-sm tnum">
                           +{standing.predictionPointsGained}
                         </span>

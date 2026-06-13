@@ -1,7 +1,16 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { UiState, StandingsTab, MobileView } from '../../types';
+import type { UiState, StandingsTab, MobileView, ChartMetric, StandingsSection } from '../../types';
 import { DEFAULT_POINTS_SYSTEM } from '../../data/pointsSystems';
 import { getDefaultPointsSystem } from '../../data/seasonRules';
+
+// Resizable-sidebar bounds (desktop only). DEFAULT ~= lg:w-1/4 on a 1440px
+// screen and is used for the double-click reset.
+export const SIDEBAR_MIN = 280;
+export const SIDEBAR_MAX = 640;
+export const SIDEBAR_DEFAULT = 360;
+
+const clampSidebarWidth = (px: number): number =>
+  Math.max(SIDEBAR_MIN, Math.min(SIDEBAR_MAX, px));
 
 const initialState: UiState = {
   activeTab: 'tables',
@@ -11,7 +20,14 @@ const initialState: UiState = {
   selectedPointsSystem: DEFAULT_POINTS_SYSTEM,
   positionColumnMode: 'position',
   copiedDriver: null,
-  showConsensus: false
+  showConsensus: false,
+  driverChartSelection: [],
+  teamChartSelection: [],
+  driverChartMetric: 'cumulative',
+  teamChartMetric: 'cumulative',
+  driverShowDelta: true,
+  teamShowDelta: true,
+  sidebarWidth: SIDEBAR_DEFAULT
 };
 
 export const uiSlice = createSlice({
@@ -65,6 +81,40 @@ export const uiSlice = createSlice({
       localStorage.setItem('show-consensus', state.showConsensus.toString());
     },
 
+    // Chart settings are per section (drivers vs constructors), so each chart
+    // carries its own explicit line selection and metric.
+    setChartSelection: (state, action: PayloadAction<{ section: StandingsSection; ids: string[] }>) => {
+      const { section, ids } = action.payload;
+      if (section === 'drivers') state.driverChartSelection = ids;
+      else state.teamChartSelection = ids;
+      localStorage.setItem(`${section}-chart-selection`, JSON.stringify(ids));
+    },
+
+    setChartMetric: (state, action: PayloadAction<{ section: StandingsSection; value: ChartMetric }>) => {
+      const { section, value } = action.payload;
+      if (section === 'drivers') state.driverChartMetric = value;
+      else state.teamChartMetric = value;
+      localStorage.setItem(`${section}-chart-metric`, value);
+    },
+
+    toggleShowDelta: (state, action: PayloadAction<StandingsSection>) => {
+      const section = action.payload;
+      if (section === 'drivers') {
+        state.driverShowDelta = !state.driverShowDelta;
+        localStorage.setItem('drivers-show-delta', state.driverShowDelta.toString());
+      } else {
+        state.teamShowDelta = !state.teamShowDelta;
+        localStorage.setItem('teams-show-delta', state.teamShowDelta.toString());
+      }
+    },
+
+    // Committed once on drag-release (the drag itself mutates the DOM directly
+    // to avoid dispatching 60×/sec). Clamps defensively.
+    setSidebarWidth: (state, action: PayloadAction<number>) => {
+      state.sidebarWidth = clampSidebarWidth(action.payload);
+      localStorage.setItem('sidebar-width', String(state.sidebarWidth));
+    },
+
     initializeUiState: (state) => {
       const hideOfficialResults = localStorage.getItem('hide-official-results');
       if (hideOfficialResults !== null) {
@@ -87,6 +137,37 @@ export const uiSlice = createSlice({
       if (savedShowConsensus !== null) {
         state.showConsensus = savedShowConsensus === 'true';
       }
+
+      const parseSelection = (raw: string | null): string[] | null => {
+        if (raw === null) return null;
+        try {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.every(id => typeof id === 'string')) return parsed;
+        } catch { /* ignore malformed */ }
+        return null;
+      };
+      const driverSelection = parseSelection(localStorage.getItem('drivers-chart-selection'));
+      if (driverSelection !== null) state.driverChartSelection = driverSelection;
+      const teamSelection = parseSelection(localStorage.getItem('teams-chart-selection'));
+      if (teamSelection !== null) state.teamChartSelection = teamSelection;
+
+      const driverMetric = localStorage.getItem('drivers-chart-metric');
+      if (driverMetric === 'cumulative' || driverMetric === 'gap') state.driverChartMetric = driverMetric;
+      const teamMetric = localStorage.getItem('teams-chart-metric');
+      if (teamMetric === 'cumulative' || teamMetric === 'gap') state.teamChartMetric = teamMetric;
+
+      const driverDelta = localStorage.getItem('drivers-show-delta');
+      if (driverDelta !== null) state.driverShowDelta = driverDelta === 'true';
+      const teamDelta = localStorage.getItem('teams-show-delta');
+      if (teamDelta !== null) state.teamShowDelta = teamDelta === 'true';
+
+      const savedWidth = localStorage.getItem('sidebar-width');
+      if (savedWidth !== null) {
+        const n = Number(savedWidth);
+        if (Number.isFinite(n)) {
+          state.sidebarWidth = clampSidebarWidth(n);
+        }
+      }
     }
   }
 });
@@ -101,6 +182,10 @@ export const {
   syncPointsSystemForYear,
   togglePositionColumnMode,
   toggleConsensus,
+  setChartSelection,
+  setChartMetric,
+  toggleShowDelta,
+  setSidebarWidth,
   initializeUiState
 } = uiSlice.actions;
 

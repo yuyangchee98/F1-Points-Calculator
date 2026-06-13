@@ -1,4 +1,4 @@
-import React, { type ReactNode, useEffect } from 'react';
+import React, { type ReactNode, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../store';
 import MobileNavigation from '../navigation/MobileNavigation';
@@ -6,6 +6,7 @@ import useWindowSize from '../../hooks/useWindowSize';
 import { setMobileView } from '../../store/slices/uiSlice';
 import { useAppDispatch } from '../../store';
 import AuthModal from '../auth/AuthModal';
+import SidebarResizeHandle from './SidebarResizeHandle';
 
 interface LayoutProps {
   sidebar: ReactNode;
@@ -15,7 +16,9 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ sidebar, content }) => {
   const dispatch = useAppDispatch();
   const mobileView = useSelector((state: RootState) => state.ui.mobileView);
+  const sidebarWidth = useSelector((state: RootState) => state.ui.sidebarWidth);
   const { isMobile } = useWindowSize();
+  const asideRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     if (!isMobile) {
@@ -29,16 +32,21 @@ const Layout: React.FC<LayoutProps> = ({ sidebar, content }) => {
     <div className="h-full bg-gray-100">
       <div className="flex flex-col sm:flex-row h-full">
         <aside
+          ref={asideRef}
+          // Inline width drives the desktop resize; on mobile the aside is
+          // full-width (class-driven) so we omit the style entirely.
+          style={!isMobile ? { width: sidebarWidth } : undefined}
           className={`
             ${mobileView === 'standings' ? 'block w-full h-[calc(100dvh-64px)] z-30' : 'hidden'}
             sm:block bg-white border-r border-gray-200 overflow-hidden shadow-md
-            sm:w-72 lg:w-1/4 min-w-[280px] max-w-[450px]
-            sm:h-full sm:z-20
+            sm:w-72 min-w-[280px]
+            sm:h-full sm:z-20 relative
           `}
         >
           <div className="h-full overflow-auto">
             {sidebar}
           </div>
+          <SidebarResizeHandle asideRef={asideRef} />
         </aside>
 
         <main
