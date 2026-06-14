@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import AppIsland from '../components/AppIsland';
+import SeasonNotesSection from '../components/seo/SeasonNotesSection.astro';
 const schemaData = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
@@ -44,6 +45,8 @@ const schemaData = {
       <li>The final year of the original 10-8-6-5-4-3-2-1 top-8 points system before F1's 25-18-15 overhaul</li>
       <li>No Sprint races, no fastest lap bonus point</li>
     </ul>
+
+    <SeasonNotesSection year={2009} />
 
     <h2>Other Seasons</h2>
     <ul>

@@ -2,7 +2,7 @@ import { createSelector } from '@reduxjs/toolkit';
 import type { RootState } from '../index';
 import type { DriverStanding, TeamStanding, PointsHistory, TeamPointsHistory } from '../../types';
 import { getPointsForPositionWithSystem } from '../../data/pointsSystems';
-import { getSprintPoints, getFastestLapPoints } from '../../data/seasonRules';
+import { getSprintPoints, getFastestLapPoints, getCanonicalTeamId } from '../../data/seasonRules';
 import { getActiveSeason } from '../../utils/constants';
 
 // Races where half points were awarded (race didn't reach 75% distance).
@@ -136,6 +136,12 @@ const selectCalculatedPoints = createSelector(
             } else {
               const driver = drivers.find(d => d.id === position.driverId);
               teamId = driver?.team;
+            }
+
+            // Normalize mid-season renames (e.g. 2006 mf1 → spyker_mf1)
+            // so both eras of the same team aggregate to one constructor.
+            if (teamId) {
+              teamId = getCanonicalTeamId(activeSeason, teamId);
             }
 
             if (teamId) {
