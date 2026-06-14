@@ -21,23 +21,6 @@ export interface SeasonNote {
 }
 
 export const SEASON_NOTES: Record<number, SeasonNote[]> = {
-  2005: [
-    {
-      scope: 'race',
-      raceId: 'united-states',
-      title: 'Indianapolis 6-car race',
-      detail:
-        '14 Michelin runners withdrew on the formation lap. Jolpica lists them at P7–P20; we drop "Withdrew" results so they score 0 (not 2pts for P7, 1pt for P8).',
-    },
-    {
-      scope: 'team',
-      teamId: 'bar',
-      title: 'BAR 2-race ban',
-      detail:
-        'Excluded at Imola, banned from Spain and Monaco. Their drivers don\'t appear in those races\' results, so they score 0 — no override needed.',
-    },
-  ],
-
   2006: [
     {
       scope: 'season',
@@ -53,7 +36,7 @@ export const SEASON_NOTES: Record<number, SeasonNote[]> = {
       teamId: 'mclaren',
       title: 'McLaren stripped (Spygate)',
       detail:
-        'Full-season Constructors\' exclusion → McLaren shows 0 in the team table. Driver points kept: Hamilton 109, Alonso 109.',
+        'Full-season Constructors\' exclusion → McLaren shows 0 in the team table. Driver points kept.',
     },
   ],
 
@@ -63,7 +46,7 @@ export const SEASON_NOTES: Record<number, SeasonNote[]> = {
       raceId: 'malaysian',
       title: 'Half points',
       detail:
-        'Red-flagged at lap 31/56 (rain). All positions get half points — winner Button scores 5, not 10.',
+        'Red-flagged at lap 31/56 (rain). All positions get half points.',
     },
   ],
 
@@ -73,7 +56,7 @@ export const SEASON_NOTES: Record<number, SeasonNote[]> = {
       raceId: 'abu-dhabi',
       title: 'Double points finale',
       detail:
-        'One-off 2014 rule: every position pays 2× at the season-ender. Winner 50, P2 36, P10 2.',
+        'One-off 2014 rule: every position pays 2× at the season-ender.',
     },
   ],
 
@@ -81,9 +64,9 @@ export const SEASON_NOTES: Record<number, SeasonNote[]> = {
     {
       scope: 'team',
       teamId: 'force_india',
-      title: 'Constructor points wiped at round 13',
+      title: 'Force India team points wiped before Belgium',
       detail:
-        'Administration → FIA zeroed Force India\'s Constructors\' total before Belgium. Rounds 13+ count under "Racing Point Force India". Drivers kept all their points.',
+        'Administration → FIA zeroed Force India\'s Constructors\' total before Belgium. Only Belgium onwards counts towards their team total. Driver points are kept for the whole season.',
     },
   ],
 
@@ -103,7 +86,7 @@ export const SEASON_NOTES: Record<number, SeasonNote[]> = {
       raceId: 'belgian',
       title: 'Half points (2 laps under SC)',
       detail:
-        'Race halted after two safety-car laps (rain). All positions get half points — Verstappen wins with 12.5.',
+        'Race halted after two safety-car laps (rain). All positions get half points.',
     },
   ],
 };
