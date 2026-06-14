@@ -135,7 +135,7 @@ const App: React.FC<{ year?: string }> = ({ year }) => {
         <ToastContainer />
 
         <Layout
-          sidebar={<StandingsSidebar />}
+          sidebar={<StandingsSidebar activeSeason={activeSeason} />}
           content={
             <div className="flex-1 min-h-0 flex flex-col px-2 sm:px-3 pt-2 pb-16 sm:pb-0 w-full">
               <div className="mb-1.5 shrink-0">

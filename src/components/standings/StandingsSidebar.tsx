@@ -12,6 +12,7 @@ import CompetitionCard from './CompetitionCard';
 import SegmentedControl from '../ui/SegmentedControl';
 import ChartSettingsButton from './ChartSettingsButton';
 import TableSettingsButton from './TableSettingsButton';
+import SeasonNotes from '../common/SeasonNotes';
 
 // Sticky section heading with its own settings gear on the right. The gear is
 // scoped to what sits directly below it (a table in the Tables tab, a chart in
@@ -36,7 +37,11 @@ const SectionHeading: React.FC<{ title: string; gear: ReactNode; stackLevel: num
   </div>
 );
 
-const StandingsSidebar: React.FC = () => {
+interface Props {
+  activeSeason: number;
+}
+
+const StandingsSidebar: React.FC<Props> = ({ activeSeason }) => {
   const dispatch = useAppDispatch();
   const driverStandings = useSelector(selectDriverStandings);
   const teamStandings = useSelector(selectTeamStandings);
@@ -73,6 +78,7 @@ const StandingsSidebar: React.FC = () => {
       </div>
 
       <div className="overflow-auto flex-1">
+        <SeasonNotes activeSeason={activeSeason} />
         {activeTab === 'tables' ? (
           <>
             <SectionHeading

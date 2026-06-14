@@ -1,0 +1,35 @@
+---
+// Static SEO rendering of per-season notes. Reads the same data file as the
+// in-app SeasonNotes React component (src/data/seasonNotes.ts), so the prose
+// has a single source of truth.
+import { getSeasonNotes } from '../../data/seasonNotes';
+
+interface Props {
+  year: number;
+}
+
+const { year } = Astro.props;
+const notes = getSeasonNotes(year);
+---
+
+{notes.length > 0 && (
+  <section>
+    <h2>Scoring Notes for {year}</h2>
+    <p>One-off rulings, race-day anomalies, and data quirks that affect how points are awarded this season.</p>
+    <ul>
+      {notes.map((note) => (
+        <li>
+          <strong>
+            [{note.scope === 'race'
+              ? 'Race'
+              : note.scope === 'team'
+              ? 'Team'
+              : 'Season'}]
+            {' '}{note.title}:
+          </strong>{' '}
+          {note.detail}
+        </li>
+      ))}
+    </ul>
+  </section>
+)}

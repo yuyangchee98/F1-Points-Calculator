@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import AppIsland from '../components/AppIsland';
+import SeasonNotesSection from '../components/seo/SeasonNotesSection.astro';
 const schemaData = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
@@ -40,6 +41,8 @@ const schemaData = {
       <li>3 Sprint Qualifying weekends (Silverstone, Monza, Interlagos)</li>
       <li>Max Verstappen - World Champion</li>
     </ul>
+
+    <SeasonNotesSection year={2021} />
 
     <h2>Other Seasons</h2>
     <ul>

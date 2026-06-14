@@ -97,3 +97,18 @@ export const getDefaultPointsSystem = (year: number): string => {
   const rules = getSeasonRules(year);
   return rules.defaultPointsSystem || DEFAULT_POINTS_SYSTEM;
 };
+
+// Mid-season constructor renames where the upstream data splits the team across
+// two IDs but championship totals should treat them as one. Maps {old → canonical}.
+// The canonical ID gets all the points; the old ID is hidden from the team list.
+const CONSTRUCTOR_ALIASES: Record<number, Record<string, string>> = {
+  2006: { 'mf1': 'spyker_mf1' }, // Midland → Spyker MF1 from round 15 (Italy)
+};
+
+export const getCanonicalTeamId = (year: number, teamId: string): string => {
+  return CONSTRUCTOR_ALIASES[year]?.[teamId] || teamId;
+};
+
+export const isAliasedTeamId = (year: number, teamId: string): boolean => {
+  return CONSTRUCTOR_ALIASES[year]?.[teamId] !== undefined;
+};

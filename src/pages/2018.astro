@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import AppIsland from '../components/AppIsland';
+import SeasonNotesSection from '../components/seo/SeasonNotesSection.astro';
 const schemaData = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
@@ -41,6 +42,8 @@ const schemaData = {
       <li>No fastest lap bonus point</li>
       <li>Lewis Hamilton - 5x World Champion</li>
     </ul>
+
+    <SeasonNotesSection year={2018} />
 
     <h2>Other Seasons</h2>
     <ul>
