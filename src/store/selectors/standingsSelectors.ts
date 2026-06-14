@@ -32,6 +32,14 @@ const CONSTRUCTOR_EXCLUSIONS: Record<number, Set<string>> = {
   2007: new Set(['mclaren']),
 };
 
+// Flat constructor points deductions (post-event sanctions). Subtracted from the
+// team's season total once all races are summed — race-by-race history is not
+// modified, so cumulative charts still match the raw race-by-race data.
+// Racing Point 2020: docked 15 points for copying Mercedes brake ducts.
+const CONSTRUCTOR_POINTS_DEDUCTION: Record<number, Record<string, number>> = {
+  2020: { racing_point: 15 },
+};
+
 const selectGridPositions = (state: RootState) => state.grid.positions;
 const selectRaces = (state: RootState) => state.seasonData.races;
 const selectDrivers = (state: RootState) => state.seasonData.drivers;
@@ -195,6 +203,15 @@ const selectCalculatedPoints = createSelector(
           });
         });
       });
+
+      const deductions = CONSTRUCTOR_POINTS_DEDUCTION[getActiveSeason()];
+      if (deductions) {
+        Object.entries(deductions).forEach(([teamId, deduction]) => {
+          if (teamPoints[teamId] !== undefined) {
+            teamPoints[teamId] = Math.max(0, teamPoints[teamId] - deduction);
+          }
+        });
+      }
 
       return { driverPoints, teamPoints, driverHistories, teamHistories, driverFinishes, teamFinishes };
     };
