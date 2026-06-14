@@ -1,8 +1,6 @@
 import { createSelector } from '@reduxjs/toolkit';
 import type { RootState } from '../index';
 import type { Driver, Team } from '../../types';
-import { isAliasedTeamId } from '../../data/seasonRules';
-import { getActiveSeason } from '../../utils/constants';
 
 const selectDrivers = (state: RootState): Driver[] => state.seasonData.drivers;
 
@@ -36,12 +34,8 @@ const selectTeams = (state: RootState): Team[] => state.seasonData.teams;
 export const selectTeamsByIdMap = createSelector(
   [selectTeams],
   (teams) => {
-    const year = getActiveSeason();
     const map: Record<string, Team> = {};
     teams.forEach(team => {
-      // Drop teams that are merged into another (mid-season rename). Their
-      // points are already attributed to the canonical team in standings calc.
-      if (isAliasedTeamId(year, team.id)) return;
       map[team.id] = {
         ...team,
         name: getDisplayName(team.name)
