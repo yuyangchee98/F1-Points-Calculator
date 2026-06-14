@@ -87,6 +87,16 @@ export const SEASON_NOTES: Record<number, SeasonNote[]> = {
     },
   ],
 
+  2020: [
+    {
+      scope: 'team',
+      teamId: 'racing_point',
+      title: 'Racing Point −15 (brake ducts)',
+      detail:
+        'Flat −15 applied to Racing Point\'s Constructors\' total (copied Mercedes brake ducts). Drivers unaffected.',
+    },
+  ],
+
   2021: [
     {
       scope: 'race',
