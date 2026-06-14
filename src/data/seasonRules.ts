@@ -108,7 +108,3 @@ const CONSTRUCTOR_ALIASES: Record<number, Record<string, string>> = {
 export const getCanonicalTeamId = (year: number, teamId: string): string => {
   return CONSTRUCTOR_ALIASES[year]?.[teamId] || teamId;
 };
-
-export const isAliasedTeamId = (year: number, teamId: string): boolean => {
-  return CONSTRUCTOR_ALIASES[year]?.[teamId] !== undefined;
-};

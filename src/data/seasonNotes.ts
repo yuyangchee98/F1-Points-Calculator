@@ -41,9 +41,9 @@ export const SEASON_NOTES: Record<number, SeasonNote[]> = {
   2006: [
     {
       scope: 'season',
-      title: 'Midland → Spyker MF1 mid-season',
+      title: 'MF1 → Spyker MF1 mid-season',
       detail:
-        'Spyker bought Midland and renamed the team from round 15 (Italy). The two names are merged into a single team total in the standings — no points reset.',
+        'Spyker bought the team and renamed it from round 15 (Italy). MF1 and Spyker MF1 are merged into a single team total in the standings.',
     },
   ],
 
