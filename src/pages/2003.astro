@@ -1,0 +1,96 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import AppIsland from '../components/AppIsland';
+import SeasonNotesSection from '../components/seo/SeasonNotesSection.astro';
+const schemaData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "F1 Points Calculator 2003 - Championship Predictor",
+  "description": "F1 championship calculator and standings predictor. Simulate Formula 1 race results and calculate driver points for the 2003 season.",
+  "applicationCategory": "Sports Calculator",
+  "operatingSystem": "Web Browser",
+  "author": {
+    "@type": "Person",
+    "name": "Chyuang",
+    "url": "https://chyuang.com"
+  }
+};
+---
+
+<BaseLayout
+  title="F1 Points Calculator 2003 - Championship Predictor"
+  description="F1 points calculator for 2003. Replay Schumacher's record-breaking sixth title in a three-way fight with Räikkönen and Montoya, the debut of one-lap qualifying, and the new 10-8-6-5-4-3-2-1 points system with our drag-and-drop simulator."
+  keywords="F1, Formula 1, 2003 season, Schumacher, Räikkönen, Montoya, Ferrari, McLaren, Williams, points calculator, championship predictor, race simulator, F1 standings"
+  canonicalPath="/2003"
+  ogTitle="F1 Points Calculator 2003 - Championship Predictor"
+  ogDescription="Replay the 2003 three-way title fight — Schumacher vs Räikkönen vs Montoya — with our interactive F1 calculator"
+  schemaData={schemaData}
+  initialYear={2003}
+>
+  <!-- SEO content — always in HTML, hidden once React mounts -->
+  <div id="seo-content" style="padding: 20px; max-width: 900px; margin: 0 auto; font-family: system-ui, sans-serif; line-height: 1.6;">
+    <h1 style="color: #dc2626;">F1 Points Calculator - 2003 Season</h1>
+
+    <p>Explore the 2003 Formula 1 World Championship results and simulate alternative
+    standings. Use our drag-and-drop calculator to replay the closest three-way title
+    fight in years — Michael Schumacher edging Kimi Räikkönen by two points after a
+    season of new rules, new winners, and a points system rewrite designed to keep the
+    championship alive longer.</p>
+
+    <h2>2003 F1 Season Highlights</h2>
+    <ul>
+      <li>16 races — opening at <strong>Australia</strong> and closing at <strong>Suzuka</strong>, with the championship still mathematically open at the final round</li>
+      <li>10 teams, 20 drivers — Ferrari, McLaren, Williams (BMW), Renault, BAR-Honda, Sauber-Petronas, Jaguar (Ford), Jordan-Ford, Minardi-Cosworth and Toyota</li>
+      <li><strong>Michael Schumacher wins his sixth Drivers' Championship</strong> with Ferrari (93 pts) — surpassing Juan Manuel Fangio's 46-year-old record of five titles</li>
+      <li><strong>Kimi Räikkönen P2 by just two points</strong> (91 pts) in his second McLaren season — the closest a non-Ferrari driver had come since 2000</li>
+      <li><strong>Juan Pablo Montoya P3</strong> (82 pts) for Williams-BMW — three drivers separated by 11 points heading into Japan</li>
+      <li><strong>Ferrari's fifth consecutive Constructors' Championship</strong> (158 pts) — but only 14 ahead of Williams (144) and 16 ahead of McLaren (142)</li>
+      <li><strong>New 10-8-6-5-4-3-2-1 points system debuts</strong> — replaces the old 10-6-4-3-2-1 (top-6 only) used 1991–2002, rewarding lower finishers and stretching out championships. This is the system used through 2009</li>
+      <li><strong>Fernando Alonso's first F1 win</strong> at the Hungarian Grand Prix for Renault — at 22 years and 26 days, then the youngest race winner in F1 history</li>
+      <li><strong>Kimi Räikkönen's first F1 win</strong> at the Malaysian Grand Prix — McLaren's first victory of the year</li>
+      <li><strong>One-lap qualifying introduced</strong> — single flying lap per car on Saturday, in reverse championship order, with cars going out in race fuel</li>
+      <li><strong>Parc fermé rules introduced</strong> — cars locked between qualifying and the race, ending the old high-fuel-low-fuel qualifying game</li>
+      <li>Eight different race winners across the season — the most varied top step since 1985</li>
+      <li>No Sprint races, no fastest lap bonus point</li>
+    </ul>
+
+    <SeasonNotesSection year={2003} />
+
+    <h2>Other Seasons</h2>
+    <ul>
+      <li><a href="/">Current Season Calculator</a></li>
+      <li><a href="/2025">2025 F1 Season</a></li>
+      <li><a href="/2024">2024 F1 Season</a></li>
+      <li><a href="/2023">2023 F1 Season</a></li>
+      <li><a href="/2022">2022 F1 Season</a></li>
+      <li><a href="/2021">2021 F1 Season</a></li>
+      <li><a href="/2020">2020 F1 Season</a></li>
+      <li><a href="/2019">2019 F1 Season</a></li>
+      <li><a href="/2018">2018 F1 Season</a></li>
+      <li><a href="/2017">2017 F1 Season</a></li>
+      <li><a href="/2016">2016 F1 Season</a></li>
+      <li><a href="/2015">2015 F1 Season</a></li>
+      <li><a href="/2014">2014 F1 Season</a></li>
+      <li><a href="/2013">2013 F1 Season</a></li>
+      <li><a href="/2012">2012 F1 Season</a></li>
+      <li><a href="/2011">2011 F1 Season</a></li>
+      <li><a href="/2010">2010 F1 Season</a></li>
+      <li><a href="/2009">2009 F1 Season</a></li>
+      <li><a href="/2008">2008 F1 Season</a></li>
+      <li><a href="/2007">2007 F1 Season</a></li>
+      <li><a href="/2006">2006 F1 Season</a></li>
+      <li><a href="/2005">2005 F1 Season</a></li>
+      <li><a href="/2004">2004 F1 Season</a></li>
+    </ul>
+
+    <p><a href="/about">FAQ & Help Guide</a></p>
+
+    <p style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666;">
+      Created by <a href="https://chyuang.com">Chyuang</a> |
+      <a href="https://github.com/yuyangchee98/F1-Points-Calculator">View on GitHub</a>
+    </p>
+  </div>
+
+  <AppIsland year="2003" client:only="react" />
+  <script is:inline>document.getElementById('seo-content').style.display='none';</script>
+</BaseLayout>
