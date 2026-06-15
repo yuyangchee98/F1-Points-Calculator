@@ -3,7 +3,8 @@ import { useSelector } from 'react-redux';
 import type { Driver } from '../../types';
 import { selectTeamsByIdMap, getDriverLastName, getDriverDisplayName } from '../../store/selectors/dataSelectors';
 import { useDriverDrag } from '../../hooks/useDriverDragDrop';
-import { getContrastText, teamFillStyle, teamLeftBorderStyle } from '../../utils/color';
+import { getContrastText, teamFillStyle } from '../../utils/color';
+import TeamColorStripe from '../common/TeamColorStripe';
 
 interface DriverCardProps {
   driver: Driver;
@@ -58,10 +59,13 @@ const DriverCard: React.FC<DriverCardProps> = ({
         },
       })}
       style={{
-        ...teamLeftBorderStyle(team, 4),
+        // 6px base padding (px-1.5) + 4px to clear the stripe, matching the
+        // old 4px left border's layout offset.
+        paddingLeft: '10px',
         cursor: 'grab'
       }}
     >
+      <TeamColorStripe team={team} widthPx={4} />
       <div className="flex flex-col ml-1 flex-grow min-w-0">
         <span className="text-xs font-bold flex items-center gap-1">
           {getDriverDisplayName(driver)}

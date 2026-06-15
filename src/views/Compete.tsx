@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { type RootState, useAppDispatch } from '../store';
-import { teamLeftBorderStyle } from '../utils/color';
+import TeamColorStripe from '../components/common/TeamColorStripe';
 import { CompeteGridProvider } from '../contexts/GridContext';
 import { openAuthModal } from '../store/slices/authSlice';
 import { fetchLockedPredictions } from '../store/slices/lockedPredictionsSlice';
@@ -552,16 +552,17 @@ const Compete: React.FC = () => {
                                 <button
                                   key={driver.id}
                                   onClick={() => handleDriverClick(driver.id)}
-                                  className={`flex-shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-bold transition-all ${
+                                  className={`relative overflow-hidden flex-shrink-0 flex items-center gap-1.5 py-1.5 pr-2.5 rounded-md text-xs font-bold transition-all ${
                                     isSelected
                                       ? 'ring-2 ring-interactive shadow-md scale-105'
                                       : 'hover:scale-105'
                                   }`}
                                   style={{
-                                    ...teamLeftBorderStyle(team, 3),
+                                    paddingLeft: '13px',
                                     backgroundColor: isSelected ? `${team?.color}15` : 'white',
                                   }}
                                 >
+                                  <TeamColorStripe team={team} widthPx={3} />
                                   <span style={{ color: team?.color || '#555' }}>
                                     {getDriverLastName(driver.id).slice(0, 3).toUpperCase()}
                                   </span>

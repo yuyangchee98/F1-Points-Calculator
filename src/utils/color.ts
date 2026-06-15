@@ -1,5 +1,3 @@
-import type { CSSProperties } from 'react';
-
 /**
  * Pick black or white text for a given background color using YIQ
  * perceived luminance. Team colors arrive from the API at runtime, so
@@ -46,23 +44,6 @@ export function teamFillStyle(team: TeamColorFields | undefined | null): { backg
   return { background: team.color };
 }
 
-// Left-edge stripe via border-image so a 3-4px borderLeft can show two-tone
-// without restructuring the parent into a flex/absolute layout. Falls back to
-// solid borderLeft when no secondary color.
-//
-// Note: border-image applies to all four borders by default. The
-// `/ 0 0 0 Npx` constrains border-image-width so only the left edge draws —
-// otherwise the gradient bleeds across top/right/bottom as visible stripes.
-export function teamLeftBorderStyle(
-  team: TeamColorFields | undefined | null,
-  widthPx: number
-): CSSProperties {
-  const color = team?.color || '#ccc';
-  if (team?.secondaryColor) {
-    return {
-      borderLeft: `${widthPx}px solid transparent`,
-      borderImage: `linear-gradient(to bottom, ${color} 50%, ${team.secondaryColor} 50%) 1 / 0 0 0 ${widthPx}px`,
-    };
-  }
-  return { borderLeft: `${widthPx}px solid ${color}` };
-}
+// The left-edge team color stripe lives in <TeamColorStripe>, rendered as a
+// clipped child element — a border/background stripe on the card itself can't
+// be both two-tone and follow the card's rounded corners.

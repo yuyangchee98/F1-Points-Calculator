@@ -8,7 +8,7 @@ import { getActiveSeason, getGridPositions } from '../../utils/constants';
 import { toggleConsensus, selectDriver } from '../../store/slices/uiSlice';
 import { selectLockedPredictions } from '../../store/selectors/lockedPredictionsSelectors';
 import { selectTeamsByIdMap, getDriverLastName } from '../../store/selectors/dataSelectors';
-import { teamLeftBorderStyle } from '../../utils/color';
+import TeamColorStripe from '../common/TeamColorStripe';
 import { useAppDispatch } from '../../store';
 import { trackEvent, GA_EVENTS } from '../../utils/analytics';
 
@@ -213,13 +213,14 @@ const MobileRaceCardView: React.FC<MobileRaceCardViewProps> = ({
                   key={driver.id}
                   ref={isSelected ? selectedDriverRef : undefined}
                   onClick={() => handleDriverTap(driver.id)}
-                  className={`flex items-center gap-1 px-2 py-1.5 rounded-md text-sm font-medium transition-all duration-150 ${
+                  className={`relative overflow-hidden flex items-center gap-1 py-1.5 pr-2 rounded-md text-sm font-medium transition-all duration-150 ${
                     isSelected
                       ? 'bg-blue-50 ring-2 ring-interactive text-interactive shadow-xs'
                       : 'bg-carbon-100 text-ink-secondary active:bg-carbon-200'
                   }`}
-                  style={teamLeftBorderStyle(team, 3)}
+                  style={{ paddingLeft: '11px' }}
                 >
+                  <TeamColorStripe team={team} widthPx={3} />
                   {getDriverLastName(driver.id)}
                 </button>
               );
