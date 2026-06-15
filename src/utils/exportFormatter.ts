@@ -133,11 +133,12 @@ export function formatExportData(
     };
   });
 
-  const teams: Record<string, { name: string; color: string }> = {};
+  const teams: Record<string, { name: string; color: string; secondaryColor?: string }> = {};
   seasonData.teams.forEach(team => {
     teams[team.id] = {
       name: team.name,
-      color: team.color
+      color: team.color,
+      ...(team.secondaryColor ? { secondaryColor: team.secondaryColor } : {}),
     };
   });
 

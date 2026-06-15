@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import type { ExportData } from '../../utils/exportFormatter';
+import { teamFillStyle } from '../../utils/color';
 
 interface ExportPreviewProps {
   data: ExportData;
@@ -308,7 +309,7 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                                   top: 0,
                                   bottom: 0,
                                   width: '4px',
-                                  background: teamColor,
+                                  ...teamFillStyle(team),
                                   display: 'flex',
                                 }}
                               />
@@ -501,7 +502,7 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                             )}
                           </div>
                           <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <div style={{ width: '4px', height: '32px', background: teamColor, borderRadius: '2px', display: 'flex' }} />
+                            <div style={{ width: '4px', height: '32px', ...teamFillStyle(team), borderRadius: '2px', display: 'flex' }} />
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                               <span style={{ fontSize: '13px', fontWeight: '700', color: '#1f2937' }}>{driver?.name || standing.driverId}</span>
                               <span style={{ fontSize: '10px', fontWeight: '400', color: teamColor }}>{team?.name || ''}</span>
@@ -561,7 +562,7 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                             )}
                           </div>
                           <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <div style={{ width: '4px', height: '32px', background: teamColor, borderRadius: '2px', display: 'flex' }} />
+                            <div style={{ width: '4px', height: '32px', ...teamFillStyle(team), borderRadius: '2px', display: 'flex' }} />
                             <span style={{ fontSize: '13px', fontWeight: '700', color: '#1f2937' }}>{team?.name || standing.teamId}</span>
                           </div>
                           <div style={{ width: '100px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px' }}>
@@ -611,7 +612,7 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                                 )}
                               </div>
                               <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <div style={{ width: '3px', height: '28px', background: teamColor, borderRadius: '2px', display: 'flex' }} />
+                                <div style={{ width: '3px', height: '28px', ...teamFillStyle(team), borderRadius: '2px', display: 'flex' }} />
                                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                                   <span style={{ fontSize: '12px', fontWeight: '700', color: '#1f2937' }}>{driver?.name || standing.driverId}</span>
                                   <span style={{ fontSize: '9px', fontWeight: '400', color: teamColor }}>{team?.name || ''}</span>
@@ -648,7 +649,7 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                                 )}
                               </div>
                               <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <div style={{ width: '3px', height: '28px', background: teamColor, borderRadius: '2px', display: 'flex' }} />
+                                <div style={{ width: '3px', height: '28px', ...teamFillStyle(team), borderRadius: '2px', display: 'flex' }} />
                                 <span style={{ fontSize: '12px', fontWeight: '700', color: '#1f2937' }}>{team?.name || standing.teamId}</span>
                               </div>
                               <div style={{ width: '80px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '6px' }}>
@@ -957,7 +958,7 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                                       top: 0,
                                       bottom: 0,
                                       width: '4px',
-                                      background: teamColor,
+                                      ...teamFillStyle(team),
                                       display: 'flex',
                                     }}
                                   />
@@ -1137,7 +1138,7 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                                     )}
                                   </div>
                                   <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '14px' }}>
-                                    <div style={{ width: '5px', height: '42px', background: teamColor, borderRadius: '2px', display: 'flex' }} />
+                                    <div style={{ width: '5px', height: '42px', ...teamFillStyle(team), borderRadius: '2px', display: 'flex' }} />
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                                       <span style={{ fontSize: '18px', fontWeight: '700', color: '#1f2937' }}>{driver?.name || standing.driverId}</span>
                                       <span style={{ fontSize: '14px', fontWeight: '400', color: teamColor }}>{team?.name || ''}</span>
@@ -1179,7 +1180,7 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                                     )}
                                   </div>
                                   <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '14px' }}>
-                                    <div style={{ width: '5px', height: '42px', background: teamColor, borderRadius: '2px', display: 'flex' }} />
+                                    <div style={{ width: '5px', height: '42px', ...teamFillStyle(team), borderRadius: '2px', display: 'flex' }} />
                                     <span style={{ fontSize: '18px', fontWeight: '700', color: '#1f2937' }}>{team?.name || standing.teamId}</span>
                                   </div>
                                   <div style={{ width: '110px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '10px' }}>
@@ -1237,7 +1238,7 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                               )}
                             </div>
                             <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px' }}>
-                              <div style={{ width: '4px', height: '32px', background: teamColor, borderRadius: '2px', display: 'flex' }} />
+                              <div style={{ width: '4px', height: '32px', ...teamFillStyle(team), borderRadius: '2px', display: 'flex' }} />
                               <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                                 <span style={{ fontSize: '13px', fontWeight: '700', color: '#1f2937' }}>{driver?.name || standing.driverId}</span>
                                 <span style={{ fontSize: '10px', fontWeight: '400', color: teamColor }}>{team?.name || ''}</span>
@@ -1297,7 +1298,7 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ data }) => {
                               )}
                             </div>
                             <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px' }}>
-                              <div style={{ width: '4px', height: '32px', background: teamColor, borderRadius: '2px', display: 'flex' }} />
+                              <div style={{ width: '4px', height: '32px', ...teamFillStyle(team), borderRadius: '2px', display: 'flex' }} />
                               <span style={{ fontSize: '13px', fontWeight: '700', color: '#1f2937' }}>{team?.name || standing.teamId}</span>
                             </div>
                             <div style={{ width: '100px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px' }}>

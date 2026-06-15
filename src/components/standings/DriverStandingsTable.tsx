@@ -4,6 +4,7 @@ import type { DriverStanding } from '../../types';
 import type { RootState } from '../../store';
 import { selectDriversByIdMap, getDriverLastName, selectTeamsByIdMap } from '../../store/selectors/dataSelectors';
 import { useStandingsAnimation } from '../../hooks/useStandingsAnimation';
+import { teamFillStyle } from '../../utils/color';
 
 interface DriverStandingsTableProps {
   standings: DriverStanding[];
@@ -43,7 +44,7 @@ const DriverStandingsTable: React.FC<DriverStandingsTableProps> = ({ standings }
               const driver = driverById[standing.driverId];
               if (!driver) return null;
 
-              const teamColor = teamById[driver.team]?.color || '#ccc';
+              const team = teamById[driver.team];
               
               return (
                 <tr 
@@ -72,7 +73,7 @@ const DriverStandingsTable: React.FC<DriverStandingsTableProps> = ({ standings }
                     <div className="flex items-center">
                       <div
                         className="h-3.5 w-1 mr-2 rounded-full shrink-0"
-                        style={{ backgroundColor: teamColor }}
+                        style={teamFillStyle(team)}
                       />
                       <div>
                         <div className="font-medium text-sm text-ink">{getDriverLastName(driver.id)}</div>

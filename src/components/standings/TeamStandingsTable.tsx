@@ -4,6 +4,7 @@ import type { TeamStanding } from '../../types';
 import type { RootState } from '../../store';
 import { selectTeamsByIdMap } from '../../store/selectors/dataSelectors';
 import { useStandingsAnimation } from '../../hooks/useStandingsAnimation';
+import { teamFillStyle } from '../../utils/color';
 
 interface TeamStandingsTableProps {
   standings: TeamStanding[];
@@ -55,7 +56,7 @@ const TeamStandingsTable: React.FC<TeamStandingsTableProps> = ({ standings }) =>
                     <div className="flex items-center">
                       <div
                         className="h-3.5 w-1 mr-2 rounded-full shrink-0"
-                        style={{ backgroundColor: team.color }}
+                        style={teamFillStyle(team)}
                       />
                       <div className="font-medium text-sm text-ink">{team.name}</div>
                     </div>

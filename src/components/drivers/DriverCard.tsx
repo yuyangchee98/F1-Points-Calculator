@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import type { Driver } from '../../types';
 import { selectTeamsByIdMap, getDriverLastName, getDriverDisplayName } from '../../store/selectors/dataSelectors';
 import { useDriverDrag } from '../../hooks/useDriverDragDrop';
-import { getContrastText } from '../../utils/color';
+import { getContrastText, teamFillStyle } from '../../utils/color';
 
 interface DriverCardProps {
   driver: Driver;
@@ -75,7 +75,7 @@ const DriverCard: React.FC<DriverCardProps> = ({
         <div
           className="flex-shrink-0 text-xs font-bold py-1 px-2 rounded-sm mr-2"
           style={{
-            backgroundColor: team?.color || '#555',
+            ...teamFillStyle(team),
             color: getContrastText(team?.color || '#555'),
             minWidth: '40px',
             textAlign: 'center'

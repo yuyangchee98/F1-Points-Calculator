@@ -12,6 +12,7 @@ export interface Team {
   name: string;
   nationality: string;
   color: string;
+  secondaryColor?: string;
 }
 
 export interface Race {

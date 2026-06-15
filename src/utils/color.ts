@@ -24,3 +24,22 @@ export function getContrastText(hexcolor: string | undefined | null): string {
   const yiq = (r * 299 + g * 587 + b * 114) / 1000;
   return yiq >= 128 ? '#000000' : '#ffffff';
 }
+
+interface TeamColorFields {
+  color?: string;
+  secondaryColor?: string;
+}
+
+// Render a team's color as a solid fill or — when a secondary color is set — a
+// 50/50 vertical split via linear-gradient. Use on surfaces wide enough to read
+// two halves (~16px+); keep thin borders, dots, and chart lines on the primary
+// color alone.
+export function teamFillStyle(team: TeamColorFields | undefined | null): { background: string } {
+  if (!team || !team.color) return { background: '#ccc' };
+  if (team.secondaryColor) {
+    return {
+      background: `linear-gradient(to right, ${team.color} 50%, ${team.secondaryColor} 50%)`,
+    };
+  }
+  return { background: team.color };
+}
