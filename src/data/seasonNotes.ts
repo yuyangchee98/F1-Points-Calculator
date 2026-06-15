@@ -84,9 +84,9 @@ export const SEASON_NOTES: Record<number, SeasonNote[]> = {
     {
       scope: 'race',
       raceId: 'belgian',
-      title: 'Half points (2 laps under SC)',
+      title: 'Belgian GP — half points (2 laps under SC)',
       detail:
-        'Race halted after two safety-car laps (rain). All positions get half points.',
+        'Belgian GP halted after two safety-car laps (rain). All positions get half points.',
     },
   ],
 };
