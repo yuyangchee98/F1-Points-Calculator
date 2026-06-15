@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { type RootState, useAppDispatch } from '../store';
+import { teamLeftBorderStyle } from '../utils/color';
 import { CompeteGridProvider } from '../contexts/GridContext';
 import { openAuthModal } from '../store/slices/authSlice';
 import { fetchLockedPredictions } from '../store/slices/lockedPredictionsSlice';
@@ -557,7 +558,7 @@ const Compete: React.FC = () => {
                                       : 'hover:scale-105'
                                   }`}
                                   style={{
-                                    borderLeft: `3px solid ${team?.color || '#ccc'}`,
+                                    ...teamLeftBorderStyle(team, 3),
                                     backgroundColor: isSelected ? `${team?.color}15` : 'white',
                                   }}
                                 >

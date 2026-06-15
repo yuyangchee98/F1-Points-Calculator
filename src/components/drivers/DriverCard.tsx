@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import type { Driver } from '../../types';
 import { selectTeamsByIdMap, getDriverLastName, getDriverDisplayName } from '../../store/selectors/dataSelectors';
 import { useDriverDrag } from '../../hooks/useDriverDragDrop';
-import { getContrastText, teamFillStyle } from '../../utils/color';
+import { getContrastText, teamFillStyle, teamLeftBorderStyle } from '../../utils/color';
 
 interface DriverCardProps {
   driver: Driver;
@@ -58,7 +58,7 @@ const DriverCard: React.FC<DriverCardProps> = ({
         },
       })}
       style={{
-        borderLeft: `4px solid ${team?.color || '#ccc'}`,
+        ...teamLeftBorderStyle(team, 4),
         cursor: 'grab'
       }}
     >

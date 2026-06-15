@@ -1,3 +1,5 @@
+import type { CSSProperties } from 'react';
+
 /**
  * Pick black or white text for a given background color using YIQ
  * perceived luminance. Team colors arrive from the API at runtime, so
@@ -31,15 +33,32 @@ interface TeamColorFields {
 }
 
 // Render a team's color as a solid fill or — when a secondary color is set — a
-// 50/50 vertical split via linear-gradient. Use on surfaces wide enough to read
-// two halves (~16px+); keep thin borders, dots, and chart lines on the primary
-// color alone.
+// 50/50 top/bottom split via linear-gradient. Horizontal works at both wide
+// chips (avatars) and thin tall stripes (standings bars) without losing either
+// half. Keep chart lines and small dots on the primary color alone.
 export function teamFillStyle(team: TeamColorFields | undefined | null): { background: string } {
   if (!team || !team.color) return { background: '#ccc' };
   if (team.secondaryColor) {
     return {
-      background: `linear-gradient(to right, ${team.color} 50%, ${team.secondaryColor} 50%)`,
+      background: `linear-gradient(to bottom, ${team.color} 50%, ${team.secondaryColor} 50%)`,
     };
   }
   return { background: team.color };
+}
+
+// Left-edge stripe via border-image so a 3-4px borderLeft can show two-tone
+// without restructuring the parent into a flex/absolute layout. Falls back to
+// solid borderLeft when no secondary color.
+export function teamLeftBorderStyle(
+  team: TeamColorFields | undefined | null,
+  widthPx: number
+): CSSProperties {
+  const color = team?.color || '#ccc';
+  if (team?.secondaryColor) {
+    return {
+      borderLeft: `${widthPx}px solid transparent`,
+      borderImage: `linear-gradient(to bottom, ${color} 50%, ${team.secondaryColor} 50%) 1`,
+    };
+  }
+  return { borderLeft: `${widthPx}px solid ${color}` };
 }

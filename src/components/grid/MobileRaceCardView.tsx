@@ -8,6 +8,7 @@ import { getActiveSeason, getGridPositions } from '../../utils/constants';
 import { toggleConsensus, selectDriver } from '../../store/slices/uiSlice';
 import { selectLockedPredictions } from '../../store/selectors/lockedPredictionsSelectors';
 import { selectTeamsByIdMap, getDriverLastName } from '../../store/selectors/dataSelectors';
+import { teamLeftBorderStyle } from '../../utils/color';
 import { useAppDispatch } from '../../store';
 import { trackEvent, GA_EVENTS } from '../../utils/analytics';
 
@@ -217,7 +218,7 @@ const MobileRaceCardView: React.FC<MobileRaceCardViewProps> = ({
                       ? 'bg-blue-50 ring-2 ring-interactive text-interactive shadow-xs'
                       : 'bg-carbon-100 text-ink-secondary active:bg-carbon-200'
                   }`}
-                  style={{ borderLeft: `3px solid ${team?.color || '#ccc'}` }}
+                  style={teamLeftBorderStyle(team, 3)}
                 >
                   {getDriverLastName(driver.id)}
                 </button>
