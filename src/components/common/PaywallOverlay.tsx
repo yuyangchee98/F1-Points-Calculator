@@ -6,7 +6,6 @@ import { API_BASE_URL } from '../../utils/constants';
 import GridSkeleton from './GridSkeleton';
 
 interface Props {
-  year: number;
   priceLabel?: string;
 }
 
@@ -15,7 +14,7 @@ const CHEAP_LINES = [
   '14× cheaper than F1 25.',
 ];
 
-const PaywallOverlay: React.FC<Props> = ({ year, priceLabel = '$4.99' }) => {
+const PaywallOverlay: React.FC<Props> = ({ priceLabel = '$4.99' }) => {
   const dispatch = useDispatch();
   const { isAuthenticated, user } = useSelector((s: RootState) => s.auth);
   const [submitting, setSubmitting] = useState(false);
@@ -92,7 +91,7 @@ const PaywallOverlay: React.FC<Props> = ({ year, priceLabel = '$4.99' }) => {
             Unlock the F1 Archive
           </h2>
           <p className="mt-2 text-sm text-gray-600 leading-relaxed">
-            {year} and every season before it lives in the Archive &mdash; one payment, kept forever.
+            Every historical season lives in the Archive &mdash; one payment, kept forever.
           </p>
           <p className="mt-1.5 text-sm font-medium text-gray-900">{cheapLine}</p>
 
