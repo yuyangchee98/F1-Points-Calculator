@@ -49,6 +49,10 @@ export function teamFillStyle(team: TeamColorFields | undefined | null): { backg
 // Left-edge stripe via border-image so a 3-4px borderLeft can show two-tone
 // without restructuring the parent into a flex/absolute layout. Falls back to
 // solid borderLeft when no secondary color.
+//
+// Note: border-image applies to all four borders by default. The
+// `/ 0 0 0 Npx` constrains border-image-width so only the left edge draws —
+// otherwise the gradient bleeds across top/right/bottom as visible stripes.
 export function teamLeftBorderStyle(
   team: TeamColorFields | undefined | null,
   widthPx: number
@@ -57,7 +61,7 @@ export function teamLeftBorderStyle(
   if (team?.secondaryColor) {
     return {
       borderLeft: `${widthPx}px solid transparent`,
-      borderImage: `linear-gradient(to bottom, ${color} 50%, ${team.secondaryColor} 50%) 1`,
+      borderImage: `linear-gradient(to bottom, ${color} 50%, ${team.secondaryColor} 50%) 1 / 0 0 0 ${widthPx}px`,
     };
   }
   return { borderLeft: `${widthPx}px solid ${color}` };
