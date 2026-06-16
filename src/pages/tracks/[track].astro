@@ -140,6 +140,13 @@ const podiumAt = (e: typeof editions[number], pos: number) => e.results?.find((p
                   <div class="text-xs text-ink-muted">{stats.mostPodiumsDriver.count}</div>
                 </div>
               )}
+              {stats?.mostTopTensDriver && (
+                <div class="rounded-lg border bg-surface-sunken p-3">
+                  <div class="text-2xs uppercase tracking-wide text-ink-muted">Most top 10s</div>
+                  <div class="text-sm font-semibold leading-tight">{stats.mostTopTensDriver.name}</div>
+                  <div class="text-xs text-ink-muted">{stats.mostTopTensDriver.count}</div>
+                </div>
+              )}
               {stats?.mostWinsTeam && (
                 <div class="rounded-lg border bg-surface-sunken p-3">
                   <div class="text-2xs uppercase tracking-wide text-ink-muted">Top team</div>
@@ -147,10 +154,22 @@ const podiumAt = (e: typeof editions[number], pos: number) => e.results?.find((p
                   <div class="text-xs text-ink-muted">{stats.mostWinsTeam.count} wins</div>
                 </div>
               )}
+              {stats?.mostOneTwoTeam && (
+                <div class="rounded-lg border bg-surface-sunken p-3">
+                  <div class="text-2xs uppercase tracking-wide text-ink-muted">Most 1–2 finishes</div>
+                  <div class="text-sm font-semibold leading-tight">{stats.mostOneTwoTeam.name}</div>
+                  <div class="text-xs text-ink-muted">{stats.mostOneTwoTeam.count}</div>
+                </div>
+              )}
             </div>
             {stats && (
-              <div class="flex gap-2 text-xs text-ink-secondary">
-                <span class="rounded-md bg-surface-sunken border px-2 py-1"><strong class="text-ink">{stats.uniqueWinners}</strong> different winners</span>
+              <div class="flex flex-wrap gap-2 text-xs text-ink-secondary">
+                {stats.longestWinStreak && (
+                  <span class="rounded-md bg-surface-sunken border px-2 py-1">
+                    Win streak: <strong class="text-ink">{stats.longestWinStreak.name}</strong> ×{stats.longestWinStreak.count}
+                  </span>
+                )}
+                <span class="rounded-md bg-surface-sunken border px-2 py-1"><strong class="text-ink">{stats.uniqueWinners}</strong> first-time winners</span>
                 <span class="rounded-md bg-surface-sunken border px-2 py-1"><strong class="text-ink">{stats.totalEditions}</strong> races</span>
               </div>
             )}
@@ -174,7 +193,7 @@ const podiumAt = (e: typeof editions[number], pos: number) => e.results?.find((p
     </aside>
 
     {/* Main — the results grid, calculator styling, full width */}
-    <main class="flex-1 min-h-0 flex flex-col p-2 sm:p-3 bg-surface-sunken">
+    <main class="flex-1 min-w-0 min-h-0 flex flex-col p-2 sm:p-3 bg-surface-sunken">
       {/* Static table — server-rendered for SEO / no-JS. The island replaces it. */}
       <div id="track-results-static" class="flex-1 min-h-0 overflow-auto bg-surface rounded-lg border p-2">
         {editions.length === 0 ? (

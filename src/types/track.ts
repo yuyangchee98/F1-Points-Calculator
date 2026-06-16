@@ -28,6 +28,9 @@ export interface CircuitStats {
   mostWinsDriver?: StatLeader;
   mostWinsTeam?: StatLeader;
   mostPodiumsDriver?: StatLeader;
+  mostTopTensDriver?: StatLeader;
+  mostOneTwoTeam?: StatLeader;
+  longestWinStreak?: StatLeader;
   uniqueWinners: number;
   totalEditions: number;
 }
