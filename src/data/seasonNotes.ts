@@ -21,6 +21,16 @@ export interface SeasonNote {
 }
 
 export const SEASON_NOTES: Record<number, SeasonNote[]> = {
+  2002: [
+    {
+      scope: 'team',
+      teamId: 'arrows',
+      title: 'Arrows withdrew mid-season',
+      detail:
+        'Arrows last raced at the German GP (round 11) before folding due to financial collapse. Later 2002 races ran with only 20 cars, so the grid shows empty slots.',
+    },
+  ],
+
   2006: [
     {
       scope: 'season',
