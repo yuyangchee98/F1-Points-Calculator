@@ -8,6 +8,7 @@ export interface PodiumEntry {
   teamId: string;
   teamName: string;
   teamColor?: string;
+  teamSecondaryColor?: string;
 }
 
 export interface CircuitEdition {

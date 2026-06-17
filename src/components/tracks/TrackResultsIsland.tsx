@@ -27,7 +27,7 @@ const GAP = 6;
 // left team stripe, UPPERCASE last name + team beneath — exactly the grid cards.
 const TrackDriverCard: React.FC<{ entry?: PodiumEntry }> = ({ entry }) => {
   if (!entry) return <div className="race-slot h-full w-full" aria-hidden="true" />;
-  const team = { color: entry.teamColor, secondaryColor: undefined };
+  const team = { color: entry.teamColor, secondaryColor: entry.teamSecondaryColor };
   return (
     <div className="grid-card-wrapper">
       <div className="driver-card h-full" style={{ paddingLeft: '10px', cursor: 'default' }}>
@@ -174,7 +174,7 @@ const TrackResultsEnhancer: React.FC<Props> = ({ circuitId, initialEditions, sta
               type="button"
               aria-label="Close"
               onClick={() => setShowPaywall(false)}
-              className="absolute top-2 right-2 z-10 w-8 h-8 rounded-full bg-white/80 hover:bg-white text-gray-700 flex items-center justify-center"
+              className="absolute top-2 right-2 z-10 w-8 h-8 rounded-full bg-surface/80 hover:bg-surface text-ink-secondary flex items-center justify-center"
             >
               ✕
             </button>
