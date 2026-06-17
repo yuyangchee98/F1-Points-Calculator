@@ -86,4 +86,6 @@ export const COUNTRY_CODE_MAP: Record<string, string> = {
   'germany': 'de',
   'malaysia': 'my',
   'san marino': 'sm',
+  'korea': 'kr',
+  'india': 'in',
 } as const;

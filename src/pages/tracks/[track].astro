@@ -58,6 +58,10 @@ const seasons = editions.map((e) => e.season);
 const latestSeason = seasons.length ? Math.max(...seasons) : null;
 const earliestSeason = seasons.length ? Math.min(...seasons) : null;
 const countryCode = COUNTRY_CODE_MAP[country.toLowerCase()] ?? '';
+// flagcdn keys by ISO 3166-1 alpha-2 — the UK is 'gb' there, not 'uk'. The
+// calculator grid uses a local /flags/uk.webp, so the shared map keeps 'uk';
+// translate only for the flagcdn URL below.
+const flagCode = countryCode === 'uk' ? 'gb' : countryCode;
 
 // Aggregate trivia computed server-side over the full history (incl. premium years).
 const stats = history?.stats;
@@ -106,7 +110,7 @@ const schemaData = {
           <div class="flex items-center gap-2 mb-1.5">
             {countryCode && (
               <img
-                src={`https://flagcdn.com/w40/${countryCode}.png`}
+                src={`https://flagcdn.com/w40/${flagCode}.png`}
                 width="28"
                 height="21"
                 alt={`${country} flag`}
