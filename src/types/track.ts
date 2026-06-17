@@ -30,6 +30,7 @@ export interface CircuitStats {
   mostPodiumsDriver?: StatLeader;
   mostTopTensDriver?: StatLeader;
   mostOneTwoTeam?: StatLeader;
+  mostAppearances?: StatLeader;
   longestWinStreak?: StatLeader;
   uniqueWinners: number;
   totalEditions: number;

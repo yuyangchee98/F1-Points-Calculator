@@ -76,9 +76,6 @@ const schemaData = {
     },
   },
 };
-
-const driverLabel = (p?: { driverName: string }) => p?.driverName ?? '—';
-const podiumAt = (e: typeof editions[number], pos: number) => e.results?.find((p) => p.position === pos);
 ---
 
 <BaseLayout
@@ -164,6 +161,11 @@ const podiumAt = (e: typeof editions[number], pos: number) => e.results?.find((p
             </div>
             {stats && (
               <div class="flex flex-wrap gap-2 text-xs text-ink-secondary">
+                {stats.mostAppearances && (
+                  <span class="rounded-md bg-surface-sunken border px-2 py-1">
+                    Most starts: <strong class="text-ink">{stats.mostAppearances.name}</strong> ({stats.mostAppearances.count})
+                  </span>
+                )}
                 {stats.longestWinStreak && (
                   <span class="rounded-md bg-surface-sunken border px-2 py-1">
                     Win streak: <strong class="text-ink">{stats.longestWinStreak.name}</strong> ×{stats.longestWinStreak.count}
@@ -178,64 +180,46 @@ const podiumAt = (e: typeof editions[number], pos: number) => e.results?.find((p
 
         <p class="text-xs text-ink-secondary leading-relaxed">
           Every {fullName} at {circuitName}, with the full classification year by year.
-          Premium seasons are part of the Archive.
         </p>
 
         <a
           href="/"
-          class="inline-flex items-center justify-center h-10 rounded-md bg-brand text-white font-semibold text-sm hover:opacity-90 transition-opacity"
+          class="inline-flex items-center justify-center h-10 rounded-md bg-brand text-white font-semibold text-sm hover:opacity-90 transition-opacity mt-auto"
         >
           Open the Points Calculator
         </a>
-
-        <p class="text-2xs text-ink-muted mt-auto pt-2">Data via the Jolpica/Ergast F1 API.</p>
       </div>
     </aside>
 
     {/* Main — the results grid, calculator styling, full width */}
     <main class="flex-1 min-w-0 min-h-0 flex flex-col p-2 sm:p-3 bg-surface-sunken">
-      {/* Static table — server-rendered for SEO / no-JS. The island replaces it. */}
-      <div id="track-results-static" class="flex-1 min-h-0 overflow-auto bg-surface rounded-lg border p-2">
+      {/* Static, crawlable results — full classification per free year (premium
+          excluded). Server-rendered for SEO / no-JS; the island replaces it. */}
+      <div id="track-results-static" class="flex-1 min-h-0 overflow-auto bg-surface rounded-lg border p-3">
         {editions.length === 0 ? (
           <div class="p-4 text-ink-secondary">Results are temporarily unavailable. Please check back soon.</div>
         ) : (
-          <table class="w-full text-sm">
-            <thead>
-              <tr class="bg-surface-sunken text-left text-ink-muted">
-                <th class="px-3 py-2 font-medium">Year</th>
-                <th class="px-3 py-2 font-medium">🥇 Winner</th>
-                <th class="px-3 py-2 font-medium">🥈 2nd</th>
-                <th class="px-3 py-2 font-medium">🥉 3rd</th>
-              </tr>
-            </thead>
-            <tbody>
-              {editions.map((e) => (
-                <tr class="border-t">
-                  <td class="px-3 py-2 font-semibold whitespace-nowrap align-top">{e.season}</td>
-                  {e.locked ? (
-                    <td class="px-3 py-2 text-ink-muted" colspan="3">
-                      🔒 Archive — <a href="/" class="text-brand hover:underline">unlock historical seasons</a>
-                    </td>
-                  ) : (
-                    <>
-                      <td class="px-3 py-2 align-top">
-                        <div class="font-medium">{driverLabel(podiumAt(e, 1))}</div>
-                        <div class="text-xs text-ink-muted">{podiumAt(e, 1)?.teamName}</div>
-                      </td>
-                      <td class="px-3 py-2 align-top">
-                        <div>{driverLabel(podiumAt(e, 2))}</div>
-                        <div class="text-xs text-ink-muted">{podiumAt(e, 2)?.teamName}</div>
-                      </td>
-                      <td class="px-3 py-2 align-top">
-                        <div>{driverLabel(podiumAt(e, 3))}</div>
-                        <div class="text-xs text-ink-muted">{podiumAt(e, 3)?.teamName}</div>
-                      </td>
-                    </>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div class="flex flex-col gap-4">
+            {[...editions].sort((a, b) => b.season - a.season).map((e) => (
+              <section>
+                <h2 class="text-sm font-semibold mb-1">{circuitName} {e.season} — result</h2>
+                {e.locked || !e.results ? (
+                  <p class="text-xs text-ink-muted">
+                    🔒 Archive season — <a href="/" class="text-brand hover:underline">unlock to view the full classification</a>.
+                  </p>
+                ) : (
+                  <ol class="text-xs text-ink-secondary list-decimal pl-5 space-y-0.5">
+                    {e.results.map((p) => (
+                      <li>
+                        <span class="text-ink font-medium">{p.driverName}</span>
+                        <span class="text-ink-muted"> — {p.teamName}</span>
+                      </li>
+                    ))}
+                  </ol>
+                )}
+              </section>
+            ))}
+          </div>
         )}
       </div>
 
