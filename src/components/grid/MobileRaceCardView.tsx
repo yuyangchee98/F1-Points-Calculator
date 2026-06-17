@@ -129,9 +129,19 @@ const MobileRaceCardView: React.FC<MobileRaceCardViewProps> = ({
               className="flag !mr-0 shrink-0"
             />
           )}
-          <span className="font-display font-bold text-sm text-ink truncate min-w-0">
-            {formatName(race.name)}
-          </span>
+          {race.trackSlug ? (
+            <a
+              href={`/tracks/${race.trackSlug}`}
+              className="font-display font-bold text-sm text-ink truncate min-w-0 hover:underline"
+              onClick={e => e.stopPropagation()}
+            >
+              {formatName(race.name)}
+            </a>
+          ) : (
+            <span className="font-display font-bold text-sm text-ink truncate min-w-0">
+              {formatName(race.name)}
+            </span>
+          )}
           {race.isSprint && (
             <span className="text-2xs bg-carbon-700 text-white px-1 py-px rounded-sm font-semibold tracking-wide shrink-0">
               SPRINT

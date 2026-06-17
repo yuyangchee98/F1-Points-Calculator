@@ -173,12 +173,24 @@ const RaceGrid: React.FC<RaceGridProps> = ({
                           className="flag !mr-0 shrink-0"
                         />
                       )}
-                      <span className="line-clamp-2 leading-tight">
-                        {race.name
+                      {(() => {
+                        const label = race.name
                           .split('-')
                           .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                          .join(' ')}
-                      </span>
+                          .join(' ');
+                        return race.trackSlug ? (
+                          <a
+                            href={`/tracks/${race.trackSlug}`}
+                            className="line-clamp-2 leading-tight hover:underline"
+                            onClick={e => e.stopPropagation()}
+                            title={`${label} — results by year`}
+                          >
+                            {label}
+                          </a>
+                        ) : (
+                          <span className="line-clamp-2 leading-tight">{label}</span>
+                        );
+                      })()}
                     </span>
                     {/* Lock/Score badges */}
                     {hasScore ? (

@@ -25,6 +25,8 @@ export interface Race {
   completed: boolean;
   date?: string;
   round?: string;
+  circuitId?: string;
+  trackSlug?: string;
 }
 
 export interface GridPosition {

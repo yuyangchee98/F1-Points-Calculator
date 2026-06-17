@@ -7,29 +7,36 @@ import type { CircuitHistory, CircuitListItem } from '../../types/track';
 const API_BASE_URL = import.meta.env.PUBLIC_API_BASE_URL;
 
 // ---------------------------------------------------------------------------
-// Which track pages to generate. The system is generic: getStaticPaths pulls the
-// full circuit list from the Worker. For this first rollout we render ONLY
-// Australia — delete the `.filter(...)` line below to turn on every circuit.
+// Which track pages to generate. getStaticPaths pulls the full circuit list from
+// the Worker and renders a page per circuit. If the Worker is unreachable or
+// returns no circuits at build time, we FAIL THE BUILD rather than silently
+// shipping a near-empty set of pages — a partial build would 404 every track
+// link in the calculator. Re-run the deploy once the Worker is healthy.
 // ---------------------------------------------------------------------------
 export async function getStaticPaths() {
-  const fallback: CircuitListItem[] = [
-    { circuitId: 'albert_park', slug: 'australian-grand-prix', fullName: 'Australian Grand Prix', country: 'Australia' },
-  ];
-
-  let circuits: CircuitListItem[] = fallback;
+  let circuits: CircuitListItem[];
   try {
     const res = await fetch(`${import.meta.env.PUBLIC_API_BASE_URL}/api/circuits`);
-    if (res.ok) {
-      const data = (await res.json()) as { circuits: CircuitListItem[] };
-      if (data.circuits?.length) circuits = data.circuits;
+    if (!res.ok) {
+      throw new Error(`/api/circuits returned HTTP ${res.status}`);
     }
-  } catch {
-    // Worker unreachable at build — fall back to the Australia entry below.
+    const data = (await res.json()) as { circuits?: CircuitListItem[] };
+    circuits = data.circuits ?? [];
+  } catch (err) {
+    throw new Error(
+      `[tracks] Cannot build track pages: failed to load the circuit list from the Worker ` +
+      `(${API_BASE_URL}/api/circuits). ${err instanceof Error ? err.message : String(err)}`
+    );
   }
 
-  return circuits
-    .filter((c) => c.circuitId === 'albert_park') // ← remove to enable all tracks
-    .map((c) => ({ params: { track: c.slug }, props: c }));
+  if (circuits.length === 0) {
+    throw new Error(
+      `[tracks] Cannot build track pages: /api/circuits returned an empty list. ` +
+      `Refusing to ship a track-page-less build.`
+    );
+  }
+
+  return circuits.map((c) => ({ params: { track: c.slug }, props: c }));
 }
 
 const { circuitId, fullName, country } = Astro.props as CircuitListItem;
