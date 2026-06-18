@@ -68,9 +68,34 @@ const stats = history?.stats;
 const latestEdition = editions.find((e) => e.season === latestSeason);
 const latestWinner = latestEdition?.results?.find((p) => p.position === 1);
 
+// Names this circuit previously raced under (e.g. Imola: the "San Marino Grand
+// Prix" before today's "Emilia Romagna"). Derived from each edition's historical
+// name; the Worker now names the page after the most recent RACED edition, so
+// anything else here is genuinely a FORMER name (no provisional future round
+// leaks in). Empty for circuits that never renamed.
+const canonicalName = fullName.replace(/\s+Grand Prix$/i, '');
+const formerRanges = new Map<string, { min: number; max: number }>();
+for (const e of editions) {
+  if (!e.name || e.name === canonicalName) continue;
+  const r = formerRanges.get(e.name);
+  if (!r) formerRanges.set(e.name, { min: e.season, max: e.season });
+  else {
+    r.min = Math.min(r.min, e.season);
+    r.max = Math.max(r.max, e.season);
+  }
+}
+const formerNames = [...formerRanges.entries()]
+  .sort((a, b) => b[1].max - a[1].max)
+  .map(([name, r]) => ({
+    label: `${name} Grand Prix`,
+    range: r.min === r.max ? `${r.min}` : `${r.min}–${r.max}`,
+  }));
+// "the San Marino Grand Prix (2002–2006) and the European Grand Prix (2016)"
+const formerlyPhrase = formerNames.map((f) => `the ${f.label} (${f.range})`).join(' and ');
+
 const title = `${fullName} Winners & Results by Year | F1 Points Calculator`;
 const yearRange = earliestSeason && latestSeason ? `${earliestSeason}–${latestSeason}` : '';
-const description = `Every ${fullName} winner and podium at ${circuitName}${locality ? `, ${locality}` : ''}. Full Formula 1 results year by year${yearRange ? ` (${yearRange})` : ''}.`;
+const description = `Every ${fullName} winner and podium at ${circuitName}${locality ? `, ${locality}` : ''}. Full Formula 1 results year by year${yearRange ? ` (${yearRange})` : ''}.${formerNames.length ? ` Previously ${formerlyPhrase}.` : ''}`;
 
 const schemaData = {
   '@context': 'https://schema.org',
@@ -92,7 +117,7 @@ const schemaData = {
 <BaseLayout
   title={title}
   description={description}
-  keywords={`${fullName}, ${circuitName}, ${fullName} winners, ${country} grand prix results, F1 podium history, Formula 1 results by year`}
+  keywords={`${fullName}, ${circuitName}, ${fullName} winners, ${country} grand prix results, F1 podium history, Formula 1 results by year${formerNames.length ? `, ${formerNames.map((f) => f.label).join(', ')}` : ''}`}
   canonicalPath={`/tracks/${slug}`}
   schemaData={schemaData}
 >
@@ -122,6 +147,9 @@ const schemaData = {
           </div>
           <p class="text-xs text-ink-secondary">{[circuitName, locality, country].filter(Boolean).join(' · ')}</p>
           <p class="text-xs text-ink-muted mt-0.5">Results by year{yearRange ? ` · ${yearRange}` : ''}</p>
+          {formerNames.length > 0 && (
+            <p class="text-2xs text-ink-muted mt-1 italic">Formerly {formerlyPhrase}.</p>
+          )}
         </header>
 
         {editions.length > 0 && (
@@ -213,7 +241,11 @@ const schemaData = {
           <div class="flex flex-col gap-4">
             {[...editions].sort((a, b) => b.season - a.season).map((e) => (
               <section>
-                <h2 class="text-sm font-semibold mb-1">{circuitName} {e.season} — result</h2>
+                {/* Use the season's HISTORICAL race name (e.name), not the
+                    circuit's current canonical name — Imola 2005 was the "San
+                    Marino Grand Prix", not "Emilia Romagna". Keeps the crawlable
+                    headings factually correct and SEO-relevant per year. */}
+                <h2 class="text-sm font-semibold mb-1">{e.name} Grand Prix {e.season} — result</h2>
                 {e.locked || !e.results ? (
                   <p class="text-xs text-ink-muted">
                     🔒 Archive season — <a href="/" class="text-brand hover:underline">unlock to view the full classification</a>.
