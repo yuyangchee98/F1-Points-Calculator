@@ -74,8 +74,10 @@ const TrackResultsEnhancer: React.FC<Props> = ({ circuitId, initialEditions, sta
 
   const resultAt = (e: CircuitEdition, pos: number) => e.results?.find((p) => p.position === pos);
 
-  // Columns chronological (oldest left). Rows = finishing positions 1..maxPos.
-  const cols = [...editions].sort((a, b) => a.season - b.season);
+  // Columns newest-first (most recent year on the LEFT). Rows = finishing
+  // positions 1..maxPos. (Track pages only — the landing-page calculator grid is
+  // a separate component and keeps its own ordering.)
+  const cols = [...editions].sort((a, b) => b.season - a.season);
   const maxPos = Math.max(1, ...cols.flatMap((e) => (e.results ?? []).map((p) => p.position)));
   const positions = Array.from({ length: maxPos }, (_, i) => i + 1);
 
