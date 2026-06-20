@@ -1,0 +1,98 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import AppIsland from '../components/AppIsland';
+import SeasonNotesSection from '../components/seo/SeasonNotesSection.astro';
+const schemaData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "F1 Points Calculator 2001 - Championship Predictor",
+  "description": "F1 championship calculator and standings predictor. Simulate Formula 1 race results and calculate driver points for the 2001 season.",
+  "applicationCategory": "Sports Calculator",
+  "operatingSystem": "Web Browser",
+  "author": {
+    "@type": "Person",
+    "name": "Chyuang",
+    "url": "https://chyuang.com"
+  }
+};
+---
+
+<BaseLayout
+  title="F1 Points Calculator 2001 - Championship Predictor"
+  description="F1 points calculator for 2001. Replay Schumacher's fourth title and record-breaking 52nd win, the F1 debuts of Alonso, Räikkönen and Montoya, and the classic 10-6-4-3-2-1 points system — with our drag-and-drop simulator."
+  keywords="F1, Formula 1, 2001 season, Schumacher, Coulthard, Barrichello, Häkkinen, Montoya, Alonso, Räikkönen, Ferrari, McLaren, Williams, points calculator, championship predictor, race simulator, F1 standings"
+  canonicalPath="/2001"
+  ogTitle="F1 Points Calculator 2001 - Championship Predictor"
+  ogDescription="Replay Schumacher's fourth title and the debuts of Alonso, Räikkönen and Montoya with our interactive F1 calculator"
+  schemaData={schemaData}
+  initialYear={2001}
+>
+  <!-- SEO content — always in HTML, hidden once React mounts -->
+  <div id="seo-content" style="padding: 20px; max-width: 900px; margin: 0 auto; font-family: system-ui, sans-serif; line-height: 1.6;">
+    <h1 style="color: #dc2626;">F1 Points Calculator - 2001 Season</h1>
+
+    <p>Explore the 2001 Formula 1 World Championship results and simulate alternative
+    standings. Use our drag-and-drop calculator to replay Michael Schumacher's fourth
+    title with Ferrari, the season three future stars — Fernando Alonso, Kimi Räikkönen
+    and Juan Pablo Montoya — all made their F1 debuts, and the classic 10-6-4-3-2-1 points
+    system.</p>
+
+    <h2>2001 F1 Season Highlights</h2>
+    <ul>
+      <li>17 races — opening at <strong>Australia</strong> and closing at <strong>Suzuka</strong></li>
+      <li>11 teams, 22 drivers — Ferrari, McLaren-Mercedes, Williams-BMW, Sauber-Petronas, Benetton-Renault, BAR-Honda, Jordan-Honda, Arrows-Asiatech, Jaguar, Prost-Acer and Minardi</li>
+      <li><strong>Michael Schumacher wins his fourth Drivers' Championship</strong> with Ferrari (123 pts) — nine wins, clinched at the Hungarian Grand Prix (round 13) with four races to spare</li>
+      <li><strong>Schumacher breaks Alain Prost's all-time wins record</strong> — his victory at Spa was a then-record 52nd career win, passing Prost's 51</li>
+      <li><strong>David Coulthard P2</strong> (65 pts) for McLaren-Mercedes and <strong>Rubens Barrichello P3</strong> (56 pts) for Ferrari</li>
+      <li><strong>Ferrari take the Constructors' Championship</strong> (179 pts), comfortably clear of McLaren and Williams</li>
+      <li><strong>Ralf Schumacher's first F1 wins</strong> — three victories for Williams-BMW (San Marino, Canada and Germany)</li>
+      <li><strong>Mika Häkkinen's final F1 season</strong> — the two-time champion won at Silverstone and Indianapolis before stepping away at year's end</li>
+      <li><strong>F1 debuts of Fernando Alonso (Minardi), Kimi Räikkönen (Sauber) and Juan Pablo Montoya (Williams)</strong> — Montoya took his maiden win at Monza</li>
+      <li><strong>Classic 10-6-4-3-2-1 points system</strong> — top six only, used since 1991 and kept through 2002</li>
+      <li>The Italian Grand Prix ran days after the September 11 attacks — drivers agreed not to overtake at the first two chicanes on the opening lap, and there were no podium celebrations</li>
+      <li>Final season for the Benetton name (became Renault in 2002) and for Prost Grand Prix, which folded before 2002</li>
+      <li>No Sprint races, no fastest lap bonus point</li>
+    </ul>
+
+    <SeasonNotesSection year={2001} />
+
+    <h2>Other Seasons</h2>
+    <ul>
+      <li><a href="/">Current Season Calculator</a></li>
+      <li><a href="/2025">2025 F1 Season</a></li>
+      <li><a href="/2024">2024 F1 Season</a></li>
+      <li><a href="/2023">2023 F1 Season</a></li>
+      <li><a href="/2022">2022 F1 Season</a></li>
+      <li><a href="/2021">2021 F1 Season</a></li>
+      <li><a href="/2020">2020 F1 Season</a></li>
+      <li><a href="/2019">2019 F1 Season</a></li>
+      <li><a href="/2018">2018 F1 Season</a></li>
+      <li><a href="/2017">2017 F1 Season</a></li>
+      <li><a href="/2016">2016 F1 Season</a></li>
+      <li><a href="/2015">2015 F1 Season</a></li>
+      <li><a href="/2014">2014 F1 Season</a></li>
+      <li><a href="/2013">2013 F1 Season</a></li>
+      <li><a href="/2012">2012 F1 Season</a></li>
+      <li><a href="/2011">2011 F1 Season</a></li>
+      <li><a href="/2010">2010 F1 Season</a></li>
+      <li><a href="/2009">2009 F1 Season</a></li>
+      <li><a href="/2008">2008 F1 Season</a></li>
+      <li><a href="/2007">2007 F1 Season</a></li>
+      <li><a href="/2006">2006 F1 Season</a></li>
+      <li><a href="/2005">2005 F1 Season</a></li>
+      <li><a href="/2004">2004 F1 Season</a></li>
+      <li><a href="/2003">2003 F1 Season</a></li>
+      <li><a href="/2002">2002 F1 Season</a></li>
+    </ul>
+
+    <p><a href="/about">FAQ & Help Guide</a></p>
+
+    <p style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666;">
+      Created by <a href="https://chyuang.com">Chyuang</a> |
+      <a href="https://github.com/yuyangchee98/F1-Points-Calculator">View on GitHub</a>
+    </p>
+  </div>
+
+  <AppIsland year="2001" client:only="react" />
+  <script is:inline>document.getElementById('seo-content').style.display='none';</script>
+</BaseLayout>
