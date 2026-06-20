@@ -132,7 +132,7 @@ const MobileRaceCardView: React.FC<MobileRaceCardViewProps> = ({
           {race.trackSlug ? (
             <a
               href={`/tracks/${race.trackSlug}`}
-              className="font-display font-bold text-sm text-ink truncate min-w-0 hover:underline"
+              className="font-display font-bold text-sm text-ink truncate min-w-0 underline decoration-dotted decoration-2 decoration-ink/70 underline-offset-2 hover:decoration-solid hover:decoration-ink"
               onClick={e => e.stopPropagation()}
             >
               {formatName(race.name)}

@@ -181,7 +181,7 @@ const RaceGrid: React.FC<RaceGridProps> = ({
                         return race.trackSlug ? (
                           <a
                             href={`/tracks/${race.trackSlug}`}
-                            className="line-clamp-2 leading-tight hover:underline"
+                            className="line-clamp-2 leading-tight underline decoration-dotted decoration-2 decoration-ink/70 underline-offset-2 hover:decoration-solid hover:decoration-ink"
                             onClick={e => e.stopPropagation()}
                             title={`${label} — results by year`}
                           >
