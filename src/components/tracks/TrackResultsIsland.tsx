@@ -2,18 +2,23 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Provider } from 'react-redux';
 import { store } from '../../store';
 import { useAuth } from '../../hooks/useAuth';
+import useWindowSize from '../../hooks/useWindowSize';
 import AuthModal from '../auth/AuthModal';
 import PaywallOverlay from '../common/PaywallOverlay';
-import TeamColorStripe from '../common/TeamColorStripe';
 import HorizontalScrollBar from '../common/HorizontalScrollBar';
+import TrackDriverCard from './TrackDriverCard';
+import MobileTrackResults from './MobileTrackResults';
 import { API_BASE_URL } from '../../utils/constants';
-import type { CircuitEdition, CircuitHistory, PodiumEntry } from '../../types/track';
+import type { CircuitEdition, CircuitHistory } from '../../types/track';
 
 interface Props {
   circuitId: string;
   initialEditions: CircuitEdition[];
   /** id of the server-rendered static table to hide once this island mounts. */
   staticContainerId: string;
+  country: string;
+  /** ISO 3166-1 alpha-2 code already translated for flagcdn (uk -> gb). */
+  flagCode: string;
 }
 
 // Match the calculator grid's dimensions exactly.
@@ -23,60 +28,16 @@ const HEADER_HEIGHT = 56;
 const ROW_HEIGHT = 60;
 const GAP = 6;
 
-// Read-only twin of <DriverCard> (which is Redux/DnD-coupled): same flat card,
-// left team stripe, UPPERCASE last name + team beneath — exactly the grid cards.
-const TrackDriverCard: React.FC<{ entry?: PodiumEntry }> = ({ entry }) => {
-  if (!entry) return <div className="race-slot h-full w-full" aria-hidden="true" />;
-  const team = { color: entry.teamColor, secondaryColor: entry.teamSecondaryColor };
-  return (
-    <div className="grid-card-wrapper">
-      <div className="driver-card h-full" style={{ paddingLeft: '10px', cursor: 'default' }}>
-        <TeamColorStripe team={team} widthPx={4} />
-        <div className="flex flex-col ml-1 flex-grow min-w-0">
-          <span className="text-xs font-bold truncate">{entry.driverLast.toUpperCase()}</span>
-          <span className="text-2xs text-ink-muted leading-tight truncate">{entry.teamName}</span>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const TrackResultsEnhancer: React.FC<Props> = ({ circuitId, initialEditions, staticContainerId }) => {
-  useAuth(); // bootstraps the Better-Auth session into Redux for the paywall
-  const [editions, setEditions] = useState<CircuitEdition[]>(initialEditions);
-  const [showPaywall, setShowPaywall] = useState(false);
+// Desktop year-matrix: columns = seasons (newest left), rows = finishing
+// positions, cells = read-only driver cards. Scrolls horizontally via the
+// drag bar. Mobile gets <MobileTrackResults> instead (one season at a time).
+const DesktopTrackGrid: React.FC<{ editions: CircuitEdition[]; onUnlock: () => void }> = ({
+  editions,
+  onUnlock,
+}) => {
   const scrollRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const staticEl = document.getElementById(staticContainerId);
-    if (staticEl) staticEl.style.display = 'none';
-
-    let cancelled = false;
-    // no-store: this refetch exists to get fresh data (unlock premium for
-    // subscribers + newest race), so it should bypass the browser HTTP cache.
-    (async () => {
-      try {
-        const res = await fetch(`${API_BASE_URL}/api/circuit?circuitId=${circuitId}`, {
-          credentials: 'include',
-          cache: 'no-store',
-        });
-        if (!res.ok || cancelled) return;
-        const data = (await res.json()) as CircuitHistory;
-        if (data.editions?.length) setEditions(data.editions);
-      } catch {
-        /* keep build-time editions */
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [circuitId, staticContainerId]);
-
   const resultAt = (e: CircuitEdition, pos: number) => e.results?.find((p) => p.position === pos);
 
-  // Columns newest-first (most recent year on the LEFT). Rows = finishing
-  // positions 1..maxPos. (Track pages only — the landing-page calculator grid is
-  // a separate component and keeps its own ordering.)
   const cols = [...editions].sort((a, b) => b.season - a.season);
   const maxPos = Math.max(1, ...cols.flatMap((e) => (e.results ?? []).map((p) => p.position)));
   const positions = Array.from({ length: maxPos }, (_, i) => i + 1);
@@ -138,7 +99,7 @@ const TrackResultsEnhancer: React.FC<Props> = ({ circuitId, initialEditions, sta
               <button
                 key={`lock-${e.season}-${e.raceId}`}
                 type="button"
-                onClick={() => setShowPaywall(true)}
+                onClick={onUnlock}
                 className="race-slot !border-solid !border-strong bg-surface-sunken text-ink-muted hover:text-ink hover:bg-carbon-100 transition-colors !items-start !justify-start"
                 style={{ gridColumn: ci + 2, gridRow: `2 / span ${maxPos}` }}
                 aria-label={`Unlock the ${e.season} archive season`}
@@ -162,6 +123,61 @@ const TrackResultsEnhancer: React.FC<Props> = ({ circuitId, initialEditions, sta
           )}
         </div>
       </div>
+    </div>
+  );
+};
+
+const TrackResultsEnhancer: React.FC<Props> = ({
+  circuitId,
+  initialEditions,
+  staticContainerId,
+  country,
+  flagCode,
+}) => {
+  useAuth(); // bootstraps the Better-Auth session into Redux for the paywall
+  const { isMobile } = useWindowSize();
+  const [editions, setEditions] = useState<CircuitEdition[]>(initialEditions);
+  const [showPaywall, setShowPaywall] = useState(false);
+
+  useEffect(() => {
+    const staticEl = document.getElementById(staticContainerId);
+    if (staticEl) staticEl.style.display = 'none';
+
+    let cancelled = false;
+    // no-store: this refetch exists to get fresh data (unlock premium for
+    // subscribers + newest race), so it should bypass the browser HTTP cache.
+    (async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/circuit?circuitId=${circuitId}`, {
+          credentials: 'include',
+          cache: 'no-store',
+        });
+        if (!res.ok || cancelled) return;
+        const data = (await res.json()) as CircuitHistory;
+        if (data.editions?.length) setEditions(data.editions);
+      } catch {
+        /* keep build-time editions */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [circuitId, staticContainerId]);
+
+  const openPaywall = () => setShowPaywall(true);
+
+  return (
+    <>
+      {isMobile ? (
+        <MobileTrackResults
+          editions={editions}
+          country={country}
+          flagCode={flagCode}
+          onUnlock={openPaywall}
+        />
+      ) : (
+        <DesktopTrackGrid editions={editions} onUnlock={openPaywall} />
+      )}
 
       {showPaywall && (
         <div
@@ -186,7 +202,7 @@ const TrackResultsEnhancer: React.FC<Props> = ({ circuitId, initialEditions, sta
       )}
 
       <AuthModal />
-    </div>
+    </>
   );
 };
 

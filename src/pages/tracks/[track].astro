@@ -121,37 +121,102 @@ const schemaData = {
   canonicalPath={`/tracks/${slug}`}
   schemaData={schemaData}
 >
-  <div class="flex flex-col sm:flex-row h-[100dvh] overflow-hidden text-ink">
-    {/* Left sidebar — same shape as the calculator's standings sidebar */}
-    <aside class="sm:w-80 sm:min-w-[300px] shrink-0 bg-surface border-r overflow-y-auto">
-      <div class="p-4 flex flex-col gap-5">
-        <nav class="text-xs text-ink-muted" aria-label="Breadcrumb">
-          <a href="/" class="hover:text-ink">Calculator</a>
-          <span class="mx-1">/</span>
-          <span class="text-ink-secondary">Tracks</span>
-        </nav>
+  {/* Responsive shell. Mobile (single column): identity → results → records,
+      stacked in source order with natural page scroll. Desktop (sm+): a CSS
+      grid reassembles the left rail (identity pinned over scrolling records) and
+      a full-height results pane on the right — the locked, calculator-style
+      viewport split. Earlier this was one h-[100dvh]+overflow-hidden flex row,
+      which on phones let the sidebar eat the viewport and starved the grid. */}
+  <div
+    class="grid grid-cols-1 min-h-[100dvh] text-ink
+           sm:grid-cols-[20rem_minmax(0,1fr)] sm:grid-rows-[auto_minmax(0,1fr)]
+           sm:h-[100dvh] sm:min-h-0 sm:overflow-hidden"
+  >
+    {/* Identity — circuit name + at-a-glance facts. Top of the left rail on
+        desktop; first thing on mobile. */}
+    <header class="bg-surface border-b sm:border-b-0 sm:border-r p-4 flex flex-col gap-3 sm:col-start-1 sm:row-start-1">
+      <nav class="text-xs text-ink-muted" aria-label="Breadcrumb">
+        <a href="/" class="hover:text-ink">Calculator</a>
+        <span class="mx-1">/</span>
+        <span class="text-ink-secondary">Tracks</span>
+      </nav>
 
-        <header>
-          <div class="flex items-center gap-2 mb-1.5">
-            {countryCode && (
-              <img
-                src={`https://flagcdn.com/w40/${flagCode}.png`}
-                width="28"
-                height="21"
-                alt={`${country} flag`}
-                class="rounded shadow-sm"
-                loading="eager"
-              />
-            )}
-            <h1 class="text-xl font-bold font-display tracking-tight leading-tight">{fullName}</h1>
-          </div>
-          <p class="text-xs text-ink-secondary">{[circuitName, locality, country].filter(Boolean).join(' · ')}</p>
-          <p class="text-xs text-ink-muted mt-0.5">Results by year{yearRange ? ` · ${yearRange}` : ''}</p>
-          {formerNames.length > 0 && (
-            <p class="text-2xs text-ink-muted mt-1 italic">Formerly {formerlyPhrase}.</p>
+      <div>
+        <div class="flex items-center gap-2 mb-1.5">
+          {countryCode && (
+            <img
+              src={`https://flagcdn.com/w40/${flagCode}.png`}
+              width="28"
+              height="21"
+              alt={`${country} flag`}
+              class="rounded shadow-sm"
+              loading="eager"
+            />
           )}
-        </header>
+          <h1 class="text-xl font-bold font-display tracking-tight leading-tight">{fullName}</h1>
+        </div>
+        <p class="text-xs text-ink-secondary">{[circuitName, locality, country].filter(Boolean).join(' · ')}</p>
+        <p class="text-xs text-ink-muted mt-0.5">Results by year{yearRange ? ` · ${yearRange}` : ''}</p>
+        {formerNames.length > 0 && (
+          <p class="text-2xs text-ink-muted mt-1 italic">Formerly {formerlyPhrase}.</p>
+        )}
+      </div>
+    </header>
 
+    {/* Main — the results. Right pane (full height) on desktop; the hero, right
+        after the identity, on mobile. */}
+    <main class="min-w-0 flex flex-col p-2 sm:p-3 bg-surface-sunken min-h-[80dvh] sm:min-h-0 sm:col-start-2 sm:row-start-1 sm:row-span-2 sm:overflow-hidden">
+      {/* Static, crawlable results — full classification per free year (premium
+          excluded). Server-rendered for SEO / no-JS; the island replaces it. */}
+      <div id="track-results-static" class="flex-1 min-h-0 overflow-auto bg-surface rounded-lg border p-3">
+        {editions.length === 0 ? (
+          <div class="p-4 text-ink-secondary">Results are temporarily unavailable. Please check back soon.</div>
+        ) : (
+          <div class="flex flex-col gap-4">
+            {[...editions].sort((a, b) => b.season - a.season).map((e) => (
+              <section>
+                {/* Use the season's HISTORICAL race name (e.name), not the
+                    circuit's current canonical name — Imola 2005 was the "San
+                    Marino Grand Prix", not "Emilia Romagna". Keeps the crawlable
+                    headings factually correct and SEO-relevant per year. */}
+                <h2 class="text-sm font-semibold mb-1">{e.name} Grand Prix {e.season} — result</h2>
+                {e.locked || !e.results ? (
+                  <p class="text-xs text-ink-muted">
+                    🔒 Archive season — <a href="/" class="text-brand hover:underline">unlock to view the full classification</a>.
+                  </p>
+                ) : (
+                  <ol class="text-xs text-ink-secondary list-decimal pl-5 space-y-0.5">
+                    {e.results.map((p) => (
+                      <li>
+                        <span class="text-ink font-medium">{p.driverName}</span>
+                        <span class="text-ink-muted"> — {p.teamName}</span>
+                      </li>
+                    ))}
+                  </ol>
+                )}
+              </section>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {editions.length > 0 && (
+        <div class="flex-1 min-h-0">
+          <TrackResultsIsland
+            client:only="react"
+            circuitId={circuitId}
+            initialEditions={editions}
+            staticContainerId="track-results-static"
+            country={country}
+            flagCode={flagCode}
+          />
+        </div>
+      )}
+    </main>
+
+    {/* Records — track trivia + CTA. Below the identity in the left rail on
+        desktop (scrolls); below the results on mobile. */}
+    <aside class="bg-surface border-t sm:border-t-0 sm:border-r p-4 flex flex-col gap-5 sm:col-start-1 sm:row-start-2 sm:overflow-y-auto">
         {editions.length > 0 && (
           <div class="flex flex-col gap-2">
             {latestWinner && (
@@ -227,55 +292,6 @@ const schemaData = {
         >
           Open the Points Calculator
         </a>
-      </div>
     </aside>
-
-    {/* Main — the results grid, calculator styling, full width */}
-    <main class="flex-1 min-w-0 min-h-0 flex flex-col p-2 sm:p-3 bg-surface-sunken">
-      {/* Static, crawlable results — full classification per free year (premium
-          excluded). Server-rendered for SEO / no-JS; the island replaces it. */}
-      <div id="track-results-static" class="flex-1 min-h-0 overflow-auto bg-surface rounded-lg border p-3">
-        {editions.length === 0 ? (
-          <div class="p-4 text-ink-secondary">Results are temporarily unavailable. Please check back soon.</div>
-        ) : (
-          <div class="flex flex-col gap-4">
-            {[...editions].sort((a, b) => b.season - a.season).map((e) => (
-              <section>
-                {/* Use the season's HISTORICAL race name (e.name), not the
-                    circuit's current canonical name — Imola 2005 was the "San
-                    Marino Grand Prix", not "Emilia Romagna". Keeps the crawlable
-                    headings factually correct and SEO-relevant per year. */}
-                <h2 class="text-sm font-semibold mb-1">{e.name} Grand Prix {e.season} — result</h2>
-                {e.locked || !e.results ? (
-                  <p class="text-xs text-ink-muted">
-                    🔒 Archive season — <a href="/" class="text-brand hover:underline">unlock to view the full classification</a>.
-                  </p>
-                ) : (
-                  <ol class="text-xs text-ink-secondary list-decimal pl-5 space-y-0.5">
-                    {e.results.map((p) => (
-                      <li>
-                        <span class="text-ink font-medium">{p.driverName}</span>
-                        <span class="text-ink-muted"> — {p.teamName}</span>
-                      </li>
-                    ))}
-                  </ol>
-                )}
-              </section>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {editions.length > 0 && (
-        <div class="flex-1 min-h-0">
-          <TrackResultsIsland
-            client:only="react"
-            circuitId={circuitId}
-            initialEditions={editions}
-            staticContainerId="track-results-static"
-          />
-        </div>
-      )}
-    </main>
   </div>
 </BaseLayout>
