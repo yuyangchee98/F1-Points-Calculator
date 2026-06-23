@@ -1,0 +1,98 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import AppIsland from '../components/AppIsland';
+import SeasonNotesSection from '../components/seo/SeasonNotesSection.astro';
+const schemaData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "F1 Points Calculator 1998 - Championship Predictor",
+  "description": "F1 championship calculator and standings predictor. Simulate Formula 1 race results and calculate driver points for the 1998 season.",
+  "applicationCategory": "Sports Calculator",
+  "operatingSystem": "Web Browser",
+  "author": {
+    "@type": "Person",
+    "name": "Chyuang",
+    "url": "https://chyuang.com"
+  }
+};
+---
+
+<BaseLayout
+  title="F1 Points Calculator 1998 - Championship Predictor"
+  description="F1 points calculator for 1998. Replay Mika Häkkinen's first title in the new grooved-tyre, narrow-car era, his Suzuka decider with Schumacher and Damon Hill's maiden Jordan win at Spa, with our drag-and-drop simulator."
+  keywords="F1, Formula 1, 1998 season, Häkkinen, Schumacher, Coulthard, Hill, McLaren, Ferrari, Jordan, Williams, Tyrrell, grooved tyres, points calculator, championship predictor, race simulator, F1 standings"
+  canonicalPath="/1998"
+  ogTitle="F1 Points Calculator 1998 - Championship Predictor"
+  ogDescription="Replay Häkkinen's first title in the new grooved-tyre era and his Suzuka decider with Schumacher with our interactive F1 calculator"
+  schemaData={schemaData}
+  initialYear={1998}
+>
+  <!-- SEO content — always in HTML, hidden once React mounts -->
+  <div id="seo-content" style="padding: 20px; max-width: 900px; margin: 0 auto; font-family: system-ui, sans-serif; line-height: 1.6;">
+    <h1 style="color: #dc2626;">F1 Points Calculator - 1998 Season</h1>
+
+    <p>Explore the 1998 Formula 1 World Championship results and simulate alternative
+    standings. Use our drag-and-drop calculator to replay the first season of narrower cars
+    and grooved tyres, in which Mika Häkkinen took his maiden title for McLaren-Mercedes
+    after a season-long fight with Michael Schumacher, in the classic 10-6-4-3-2-1 points era.</p>
+
+    <h2>1998 F1 Season Highlights</h2>
+    <ul>
+      <li>16 races — opening at <strong>Australia</strong> and closing at <strong>Suzuka, Japan</strong></li>
+      <li>11 teams, 22 drivers — McLaren-Mercedes, Ferrari, Williams-Mecachrome, Jordan-Mugen-Honda, Benetton-Playlife, Sauber-Petronas, Arrows, Stewart-Ford, Prost-Peugeot, Minardi-Ford and Tyrrell-Ford</li>
+      <li><strong>New technical rules</strong> — narrower 1,800mm cars and grooved (treaded) tyres introduced to cut cornering speeds, reshaping car design for the era</li>
+      <li><strong>Mika Häkkinen wins his first Drivers' Championship</strong> (100 pts) for McLaren-Mercedes, whose dominant MP4-13 set the pace all year</li>
+      <li><strong>Title decided at the final round in Japan</strong> — <strong>Michael Schumacher P2</strong> (86 pts) stalled on the Suzuka grid, started from the back and later retired with a tyre failure, handing Häkkinen the crown</li>
+      <li><strong>David Coulthard P3</strong> (56 pts) completed McLaren-Mercedes' front-running season</li>
+      <li><strong>McLaren-Mercedes take the Constructors' Championship</strong> (156 pts to Ferrari's 133)</li>
+      <li><strong>Damon Hill wins Jordan's first Grand Prix</strong> — a rain-hit Belgian GP at Spa, headed by a 13-car first-lap pileup, ending in a Jordan 1-2 with Ralf Schumacher</li>
+      <li><strong>Tyrrell's final season</strong> — one of F1's great names bowed out after 1998, its entry becoming BAR for 1999</li>
+      <li><strong>Classic 10-6-4-3-2-1 points system</strong> — top six only, used since 1991 and kept through 2002</li>
+      <li>No Sprint races, no fastest lap bonus point</li>
+    </ul>
+
+    <SeasonNotesSection year={1998} />
+
+    <h2>Other Seasons</h2>
+    <ul>
+      <li><a href="/">Current Season Calculator</a></li>
+      <li><a href="/2025">2025 F1 Season</a></li>
+      <li><a href="/2024">2024 F1 Season</a></li>
+      <li><a href="/2023">2023 F1 Season</a></li>
+      <li><a href="/2022">2022 F1 Season</a></li>
+      <li><a href="/2021">2021 F1 Season</a></li>
+      <li><a href="/2020">2020 F1 Season</a></li>
+      <li><a href="/2019">2019 F1 Season</a></li>
+      <li><a href="/2018">2018 F1 Season</a></li>
+      <li><a href="/2017">2017 F1 Season</a></li>
+      <li><a href="/2016">2016 F1 Season</a></li>
+      <li><a href="/2015">2015 F1 Season</a></li>
+      <li><a href="/2014">2014 F1 Season</a></li>
+      <li><a href="/2013">2013 F1 Season</a></li>
+      <li><a href="/2012">2012 F1 Season</a></li>
+      <li><a href="/2011">2011 F1 Season</a></li>
+      <li><a href="/2010">2010 F1 Season</a></li>
+      <li><a href="/2009">2009 F1 Season</a></li>
+      <li><a href="/2008">2008 F1 Season</a></li>
+      <li><a href="/2007">2007 F1 Season</a></li>
+      <li><a href="/2006">2006 F1 Season</a></li>
+      <li><a href="/2005">2005 F1 Season</a></li>
+      <li><a href="/2004">2004 F1 Season</a></li>
+      <li><a href="/2003">2003 F1 Season</a></li>
+      <li><a href="/2002">2002 F1 Season</a></li>
+      <li><a href="/2001">2001 F1 Season</a></li>
+      <li><a href="/2000">2000 F1 Season</a></li>
+      <li><a href="/1999">1999 F1 Season</a></li>
+    </ul>
+
+    <p><a href="/about">FAQ & Help Guide</a></p>
+
+    <p style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666;">
+      Created by <a href="https://chyuang.com">Chyuang</a> |
+      <a href="https://github.com/yuyangchee98/F1-Points-Calculator">View on GitHub</a>
+    </p>
+  </div>
+
+  <AppIsland year="1998" client:only="react" />
+  <script is:inline>document.getElementById('seo-content').style.display='none';</script>
+</BaseLayout>

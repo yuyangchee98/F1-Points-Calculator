@@ -16,6 +16,8 @@ export interface SeasonRules {
 }
 
 export const SEASON_RULES: Record<number, SeasonRules> = {
+  1998: { sprintFormat: 'none', defaultPointsSystem: '1991-2002' },
+  1999: { sprintFormat: 'none', defaultPointsSystem: '1991-2002' },
   2000: { sprintFormat: 'none', defaultPointsSystem: '1991-2002' },
   2001: { sprintFormat: 'none', defaultPointsSystem: '1991-2002' },
   2002: { sprintFormat: 'none', defaultPointsSystem: '1991-2002' },
