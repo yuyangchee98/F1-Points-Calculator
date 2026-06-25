@@ -5,8 +5,8 @@ import SeasonNotesSection from '../components/seo/SeasonNotesSection.astro';
 const schemaData = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  "name": "F1 Points Calculator 2021 - Championship Predictor",
-  "description": "F1 championship calculator and standings predictor. Simulate Formula 1 race results and calculate driver points for the 2021 season.",
+  "name": "F1 Points Calculator 1992 - Championship Predictor",
+  "description": "F1 championship calculator and standings predictor. Simulate Formula 1 race results and calculate driver points for the 1992 season.",
   "applicationCategory": "Sports Calculator",
   "operatingSystem": "Web Browser",
   "author": {
@@ -18,31 +18,39 @@ const schemaData = {
 ---
 
 <BaseLayout
-  title="F1 Points Calculator 2021 - Championship Predictor"
-  description="F1 points calculator for 2021. Explore Formula 1 race results, calculate driver points, and simulate championship standings with our interactive drag-and-drop tool."
-  keywords="F1, Formula 1, 2021 season, points calculator, championship predictor, race simulator, F1 standings, predictions"
-  canonicalPath="/2021"
-  ogTitle="F1 Points Calculator 2021 - Championship Predictor"
-  ogDescription="Predict F1 race results and championship standings with our interactive calculator"
+  title="F1 Points Calculator 1992 - Championship Predictor"
+  description="F1 points calculator for 1992. Replay Nigel Mansell's record-breaking title in the active-suspension Williams FW14B, with our drag-and-drop championship simulator."
+  keywords="F1, Formula 1, 1992 season, Mansell, Patrese, Schumacher, Senna, Williams, Renault, active suspension, points calculator, championship predictor, race simulator, F1 standings"
+  canonicalPath="/1992"
+  ogTitle="F1 Points Calculator 1992 - Championship Predictor"
+  ogDescription="Replay Mansell's dominant Williams title and Schumacher's first win with our interactive F1 calculator"
   schemaData={schemaData}
-  initialYear={2021}
+  initialYear={1992}
 >
   <!-- SEO content — always in HTML, hidden once React mounts -->
   <div id="seo-content" style="padding: 20px; max-width: 900px; margin: 0 auto; font-family: system-ui, sans-serif; line-height: 1.6;">
-    <h1 style="color: #dc2626;">F1 Points Calculator - 2021 Season</h1>
+    <h1 style="color: #dc2626;">F1 Points Calculator - 1992 Season</h1>
 
-    <p>Explore the 2021 Formula 1 World Championship results and simulate alternative standings.
-    Use our drag-and-drop calculator to see how different race outcomes would have affected
-    the championship.</p>
+    <p>Explore the 1992 Formula 1 World Championship results and simulate alternative
+    standings. Use our drag-and-drop calculator to replay Nigel Mansell's long-awaited,
+    record-breaking title at the wheel of the technologically dominant active-suspension
+    Williams-Renault FW14B, in the classic 10-6-4-3-2-1 points era.</p>
 
-    <h2>2021 F1 Season Highlights</h2>
+    <h2>1992 F1 Season Highlights</h2>
     <ul>
-      <li>22 races across 20 countries</li>
-      <li>3 Sprint Qualifying weekends (Silverstone, Monza, Interlagos)</li>
-      <li>Max Verstappen - World Champion</li>
+      <li>16 races — opening at <strong>Kyalami, South Africa</strong> and closing at <strong>Adelaide, Australia</strong></li>
+      <li><strong>Nigel Mansell wins his only World Championship</strong> (108 pts) for Williams-Renault, a then-record 9 wins including the first 5 races in a row</li>
+      <li><strong>Title clinched in Hungary</strong> — the earliest a championship had ever been wrapped up at that point in the calendar</li>
+      <li><strong>Riccardo Patrese P2</strong> (56 pts) gave Williams a dominant 1-2 in the standings</li>
+      <li><strong>Michael Schumacher P3</strong> (53 pts) for Benetton-Ford, taking his maiden Grand Prix win at a rain-hit Belgian GP at Spa</li>
+      <li><strong>Ayrton Senna P4</strong> (50 pts) — McLaren-Honda outgunned by the active-suspension Williams</li>
+      <li><strong>Williams-Renault take a crushing Constructors' Championship</strong> (164 pts to McLaren's 99)</li>
+      <li><strong>Last of the Brabham name</strong> — the once-great team folded mid-season</li>
+      <li><strong>Classic 10-6-4-3-2-1 points system</strong> — only the top six score</li>
+      <li>No Sprint races, no fastest lap bonus point</li>
     </ul>
 
-    <SeasonNotesSection year={2021} />
+    <SeasonNotesSection year={1992} />
 
     <h2>Other Seasons</h2>
     <ul>
@@ -51,6 +59,7 @@ const schemaData = {
       <li><a href="/2024">2024 F1 Season</a></li>
       <li><a href="/2023">2023 F1 Season</a></li>
       <li><a href="/2022">2022 F1 Season</a></li>
+      <li><a href="/2021">2021 F1 Season</a></li>
       <li><a href="/2020">2020 F1 Season</a></li>
       <li><a href="/2019">2019 F1 Season</a></li>
       <li><a href="/2018">2018 F1 Season</a></li>
@@ -79,7 +88,6 @@ const schemaData = {
       <li><a href="/1995">1995 F1 Season</a></li>
       <li><a href="/1994">1994 F1 Season</a></li>
       <li><a href="/1993">1993 F1 Season</a></li>
-      <li><a href="/1992">1992 F1 Season</a></li>
       <li><a href="/1991">1991 F1 Season</a></li>
     </ul>
 
@@ -91,6 +99,6 @@ const schemaData = {
     </p>
   </div>
 
-  <AppIsland year="2021" client:only="react" />
+  <AppIsland year="1992" client:only="react" />
   <script is:inline>document.getElementById('seo-content').style.display='none';</script>
 </BaseLayout>

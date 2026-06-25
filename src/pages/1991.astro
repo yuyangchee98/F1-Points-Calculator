@@ -5,8 +5,8 @@ import SeasonNotesSection from '../components/seo/SeasonNotesSection.astro';
 const schemaData = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  "name": "F1 Points Calculator 2021 - Championship Predictor",
-  "description": "F1 championship calculator and standings predictor. Simulate Formula 1 race results and calculate driver points for the 2021 season.",
+  "name": "F1 Points Calculator 1991 - Championship Predictor",
+  "description": "F1 championship calculator and standings predictor. Simulate Formula 1 race results and calculate driver points for the 1991 season.",
   "applicationCategory": "Sports Calculator",
   "operatingSystem": "Web Browser",
   "author": {
@@ -18,31 +18,39 @@ const schemaData = {
 ---
 
 <BaseLayout
-  title="F1 Points Calculator 2021 - Championship Predictor"
-  description="F1 points calculator for 2021. Explore Formula 1 race results, calculate driver points, and simulate championship standings with our interactive drag-and-drop tool."
-  keywords="F1, Formula 1, 2021 season, points calculator, championship predictor, race simulator, F1 standings, predictions"
-  canonicalPath="/2021"
-  ogTitle="F1 Points Calculator 2021 - Championship Predictor"
-  ogDescription="Predict F1 race results and championship standings with our interactive calculator"
+  title="F1 Points Calculator 1991 - Championship Predictor"
+  description="F1 points calculator for 1991. Replay Ayrton Senna's third and final title for McLaren-Honda and the rise of the Williams FW14, with our drag-and-drop championship simulator."
+  keywords="F1, Formula 1, 1991 season, Senna, Mansell, Patrese, McLaren, Honda, Williams, Renault, Schumacher debut, points calculator, championship predictor, race simulator, F1 standings"
+  canonicalPath="/1991"
+  ogTitle="F1 Points Calculator 1991 - Championship Predictor"
+  ogDescription="Replay Senna's third title and the rise of Williams-Renault with our interactive F1 calculator"
   schemaData={schemaData}
-  initialYear={2021}
+  initialYear={1991}
 >
   <!-- SEO content — always in HTML, hidden once React mounts -->
   <div id="seo-content" style="padding: 20px; max-width: 900px; margin: 0 auto; font-family: system-ui, sans-serif; line-height: 1.6;">
-    <h1 style="color: #dc2626;">F1 Points Calculator - 2021 Season</h1>
+    <h1 style="color: #dc2626;">F1 Points Calculator - 1991 Season</h1>
 
-    <p>Explore the 2021 Formula 1 World Championship results and simulate alternative standings.
-    Use our drag-and-drop calculator to see how different race outcomes would have affected
-    the championship.</p>
+    <p>Explore the 1991 Formula 1 World Championship results and simulate alternative
+    standings. Use our drag-and-drop calculator to replay Ayrton Senna's third and final
+    title for McLaren-Honda — and the emergence of the Williams-Renault FW14 that would
+    dominate the years to come — in the classic 10-6-4-3-2-1 points era.</p>
 
-    <h2>2021 F1 Season Highlights</h2>
+    <h2>1991 F1 Season Highlights</h2>
     <ul>
-      <li>22 races across 20 countries</li>
-      <li>3 Sprint Qualifying weekends (Silverstone, Monza, Interlagos)</li>
-      <li>Max Verstappen - World Champion</li>
+      <li>16 races — opening at <strong>Phoenix, USA</strong> and closing at <strong>Adelaide, Australia</strong></li>
+      <li><strong>Ayrton Senna wins his third and final World Championship</strong> (96 pts) for McLaren-Honda, winning the first four races of the year</li>
+      <li><strong>Nigel Mansell P2</strong> (72 pts) for Williams-Renault, whose FW14 grew into the fastest car as the season went on</li>
+      <li><strong>Riccardo Patrese P3</strong> (53 pts) made it two Williams drivers in the top three</li>
+      <li><strong>McLaren-Honda take the Constructors' Championship</strong> (139 pts to Williams' 125)</li>
+      <li><strong>Michael Schumacher's F1 debut</strong> — a stunning qualifying run for Jordan at the Belgian GP, after which Benetton poached him for the very next race</li>
+      <li><strong>Mansell's Silverstone lift</strong> — he gave the stranded Senna a ride back to the pits on his sidepod after the British GP</li>
+      <li><strong>Half-points Adelaide finale</strong> — the rain-soaked Australian GP was stopped after 14 laps, the shortest race in F1 history</li>
+      <li><strong>Classic 10-6-4-3-2-1 points system</strong> — only the top six score, every point precious</li>
+      <li>No Sprint races, no fastest lap bonus point</li>
     </ul>
 
-    <SeasonNotesSection year={2021} />
+    <SeasonNotesSection year={1991} />
 
     <h2>Other Seasons</h2>
     <ul>
@@ -51,6 +59,7 @@ const schemaData = {
       <li><a href="/2024">2024 F1 Season</a></li>
       <li><a href="/2023">2023 F1 Season</a></li>
       <li><a href="/2022">2022 F1 Season</a></li>
+      <li><a href="/2021">2021 F1 Season</a></li>
       <li><a href="/2020">2020 F1 Season</a></li>
       <li><a href="/2019">2019 F1 Season</a></li>
       <li><a href="/2018">2018 F1 Season</a></li>
@@ -80,7 +89,6 @@ const schemaData = {
       <li><a href="/1994">1994 F1 Season</a></li>
       <li><a href="/1993">1993 F1 Season</a></li>
       <li><a href="/1992">1992 F1 Season</a></li>
-      <li><a href="/1991">1991 F1 Season</a></li>
     </ul>
 
     <p><a href="/about">FAQ & Help Guide</a></p>
@@ -91,6 +99,6 @@ const schemaData = {
     </p>
   </div>
 
-  <AppIsland year="2021" client:only="react" />
+  <AppIsland year="1991" client:only="react" />
   <script is:inline>document.getElementById('seo-content').style.display='none';</script>
 </BaseLayout>

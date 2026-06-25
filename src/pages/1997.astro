@@ -5,8 +5,8 @@ import SeasonNotesSection from '../components/seo/SeasonNotesSection.astro';
 const schemaData = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  "name": "F1 Points Calculator 2006 - Championship Predictor",
-  "description": "F1 championship calculator and standings predictor. Simulate Formula 1 race results and calculate driver points for the 2006 season.",
+  "name": "F1 Points Calculator 1997 - Championship Predictor",
+  "description": "F1 championship calculator and standings predictor. Simulate Formula 1 race results and calculate driver points for the 1997 season.",
   "applicationCategory": "Sports Calculator",
   "operatingSystem": "Web Browser",
   "author": {
@@ -18,37 +18,39 @@ const schemaData = {
 ---
 
 <BaseLayout
-  title="F1 Points Calculator 2006 - Championship Predictor"
-  description="F1 points calculator for 2006. Replay Alonso's second title over Schumacher's retirement-year charge, calculate driver points using the 10-8-6 system, and simulate alternative standings."
-  keywords="F1, Formula 1, 2006 season, Alonso, Schumacher, points calculator, championship predictor, race simulator, F1 standings, predictions"
-  canonicalPath="/2006"
-  ogTitle="F1 Points Calculator 2006 - Championship Predictor"
-  ogDescription="Replay Alonso's back-to-back title and Schumacher's retirement race with our interactive 2006 F1 calculator"
+  title="F1 Points Calculator 1997 - Championship Predictor"
+  description="F1 points calculator for 1997. Replay Jacques Villeneuve's title and the Jerez finale where Michael Schumacher was disqualified from the championship, with our drag-and-drop simulator."
+  keywords="F1, Formula 1, 1997 season, Villeneuve, Schumacher, Frentzen, Williams, Ferrari, Jerez, disqualified, points calculator, championship predictor, race simulator, F1 standings"
+  canonicalPath="/1997"
+  ogTitle="F1 Points Calculator 1997 - Championship Predictor"
+  ogDescription="Replay Villeneuve's title and the Jerez decider where Schumacher was excluded, with our interactive F1 calculator"
   schemaData={schemaData}
-  initialYear={2006}
+  initialYear={1997}
 >
   <!-- SEO content — always in HTML, hidden once React mounts -->
   <div id="seo-content" style="padding: 20px; max-width: 900px; margin: 0 auto; font-family: system-ui, sans-serif; line-height: 1.6;">
-    <h1 style="color: #dc2626;">F1 Points Calculator - 2006 Season</h1>
+    <h1 style="color: #dc2626;">F1 Points Calculator - 1997 Season</h1>
 
-    <p>Explore the 2006 Formula 1 World Championship results and simulate alternative
-    standings. Use our drag-and-drop calculator to replay Alonso's back-to-back title
-    fight against Michael Schumacher's retirement-year charge.</p>
+    <p>Explore the 1997 Formula 1 World Championship results and simulate alternative
+    standings. Use our drag-and-drop calculator to replay Jacques Villeneuve's title for
+    Williams-Renault and the explosive Jerez finale — where Michael Schumacher was
+    disqualified from the entire championship — in the classic 10-6-4-3-2-1 points era.</p>
 
-    <h2>2006 F1 Season Highlights</h2>
+    <h2>1997 F1 Season Highlights</h2>
     <ul>
-      <li>18 races, including the <strong>final San Marino Grand Prix at Imola</strong> (the venue returned in 2020 as the "Emilia Romagna GP")</li>
-      <li>11 teams, 22 drivers — <strong>Toro Rosso, Super Aguri, and BMW Sauber all debut</strong>; Midland renamed to Spyker MF1 from the Italian GP onwards</li>
-      <li><strong>Fernando Alonso wins his second consecutive Drivers' Championship</strong> (134 pts) over Michael Schumacher (121) — Renault completes back-to-back Constructors' titles</li>
-      <li><strong>Michael Schumacher's "retirement" race at Brazil</strong> — he returned with Mercedes for 2010</li>
-      <li><strong>Robert Kubica's F1 debut</strong> at Hungary (replacing Jacques Villeneuve at BMW Sauber); first F1 podium finish for a Polish driver</li>
-      <li>Last year of the <strong>Bridgestone/Michelin dual tyre supplier era</strong> — Bridgestone becomes sole supplier from 2007</li>
-      <li>First year of the new <strong>2.4L V8 engine regulations</strong> (replacing the 3.0L V10s)</li>
-      <li>Same 10-8-6-5-4-3-2-1 top-8 points system as 2007/2008/2009</li>
+      <li>17 races — opening at <strong>Melbourne, Australia</strong> and closing at <strong>Jerez, Spain</strong> (the European GP)</li>
+      <li><strong>Jacques Villeneuve wins the World Championship</strong> (81 pts, 7 wins) for Williams-Renault in his second season</li>
+      <li><strong>Michael Schumacher disqualified from the championship</strong> — after deliberately turning into Villeneuve at the Jerez decider, he was excluded from the standings despite scoring 78 points on track (he keeps his race results, so Ferrari retain their Constructors' points)</li>
+      <li><strong>Heinz-Harald Frentzen P2</strong> (42 pts) in his first year replacing Damon Hill at Williams, winning at Imola</li>
+      <li><strong>David Coulthard P3</strong> (36 pts) helped the new silver West McLaren-Mercedes back to winning ways</li>
+      <li><strong>Williams-Renault take the Constructors' Championship</strong> (123 pts to Ferrari's 102)</li>
+      <li><strong>Stewart Grand Prix debut</strong> — Rubens Barrichello took a shock P2 in the wet at Monaco in only the team's fifth race; the failed MasterCard Lola folded after a single weekend</li>
+      <li><strong>Tyre war returns</strong> — Bridgestone entered to challenge Goodyear, and McLaren's Mika Häkkinen took his maiden win at the Jerez finale</li>
+      <li><strong>Classic 10-6-4-3-2-1 points system</strong> — only the top six score</li>
       <li>No Sprint races, no fastest lap bonus point</li>
     </ul>
 
-    <SeasonNotesSection year={2006} />
+    <SeasonNotesSection year={1997} />
 
     <h2>Other Seasons</h2>
     <ul>
@@ -72,6 +74,7 @@ const schemaData = {
       <li><a href="/2009">2009 F1 Season</a></li>
       <li><a href="/2008">2008 F1 Season</a></li>
       <li><a href="/2007">2007 F1 Season</a></li>
+      <li><a href="/2006">2006 F1 Season</a></li>
       <li><a href="/2005">2005 F1 Season</a></li>
       <li><a href="/2004">2004 F1 Season</a></li>
       <li><a href="/2003">2003 F1 Season</a></li>
@@ -80,7 +83,6 @@ const schemaData = {
       <li><a href="/2000">2000 F1 Season</a></li>
       <li><a href="/1999">1999 F1 Season</a></li>
       <li><a href="/1998">1998 F1 Season</a></li>
-      <li><a href="/1997">1997 F1 Season</a></li>
       <li><a href="/1996">1996 F1 Season</a></li>
       <li><a href="/1995">1995 F1 Season</a></li>
       <li><a href="/1994">1994 F1 Season</a></li>
@@ -97,6 +99,6 @@ const schemaData = {
     </p>
   </div>
 
-  <AppIsland year="2006" client:only="react" />
+  <AppIsland year="1997" client:only="react" />
   <script is:inline>document.getElementById('seo-content').style.display='none';</script>
 </BaseLayout>

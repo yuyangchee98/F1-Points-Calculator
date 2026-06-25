@@ -5,8 +5,8 @@ import SeasonNotesSection from '../components/seo/SeasonNotesSection.astro';
 const schemaData = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  "name": "F1 Points Calculator 2021 - Championship Predictor",
-  "description": "F1 championship calculator and standings predictor. Simulate Formula 1 race results and calculate driver points for the 2021 season.",
+  "name": "F1 Points Calculator 1994 - Championship Predictor",
+  "description": "F1 championship calculator and standings predictor. Simulate Formula 1 race results and calculate driver points for the 1994 season.",
   "applicationCategory": "Sports Calculator",
   "operatingSystem": "Web Browser",
   "author": {
@@ -18,31 +18,39 @@ const schemaData = {
 ---
 
 <BaseLayout
-  title="F1 Points Calculator 2021 - Championship Predictor"
-  description="F1 points calculator for 2021. Explore Formula 1 race results, calculate driver points, and simulate championship standings with our interactive drag-and-drop tool."
-  keywords="F1, Formula 1, 2021 season, points calculator, championship predictor, race simulator, F1 standings, predictions"
-  canonicalPath="/2021"
-  ogTitle="F1 Points Calculator 2021 - Championship Predictor"
-  ogDescription="Predict F1 race results and championship standings with our interactive calculator"
+  title="F1 Points Calculator 1994 - Championship Predictor"
+  description="F1 points calculator for 1994. Replay Michael Schumacher's first title and his Adelaide showdown with Damon Hill, in the season forever marked by the loss of Ayrton Senna, with our drag-and-drop simulator."
+  keywords="F1, Formula 1, 1994 season, Schumacher, Damon Hill, Senna, Imola, Benetton, Williams, Adelaide, points calculator, championship predictor, race simulator, F1 standings"
+  canonicalPath="/1994"
+  ogTitle="F1 Points Calculator 1994 - Championship Predictor"
+  ogDescription="Replay Schumacher's first title and the Adelaide decider with Damon Hill with our interactive F1 calculator"
   schemaData={schemaData}
-  initialYear={2021}
+  initialYear={1994}
 >
   <!-- SEO content — always in HTML, hidden once React mounts -->
   <div id="seo-content" style="padding: 20px; max-width: 900px; margin: 0 auto; font-family: system-ui, sans-serif; line-height: 1.6;">
-    <h1 style="color: #dc2626;">F1 Points Calculator - 2021 Season</h1>
+    <h1 style="color: #dc2626;">F1 Points Calculator - 1994 Season</h1>
 
-    <p>Explore the 2021 Formula 1 World Championship results and simulate alternative standings.
-    Use our drag-and-drop calculator to see how different race outcomes would have affected
-    the championship.</p>
+    <p>Explore the 1994 Formula 1 World Championship results and simulate alternative
+    standings. Use our drag-and-drop calculator to replay Michael Schumacher's controversial
+    first title and his title-deciding clash with Damon Hill — in a season forever defined by
+    the tragic loss of Ayrton Senna — in the classic 10-6-4-3-2-1 points era.</p>
 
-    <h2>2021 F1 Season Highlights</h2>
+    <h2>1994 F1 Season Highlights</h2>
     <ul>
-      <li>22 races across 20 countries</li>
-      <li>3 Sprint Qualifying weekends (Silverstone, Monza, Interlagos)</li>
-      <li>Max Verstappen - World Champion</li>
+      <li>16 races — opening at <strong>Interlagos, Brazil</strong> and closing at <strong>Adelaide, Australia</strong></li>
+      <li><strong>Michael Schumacher wins his first World Championship</strong> (92 pts, 8 wins) for Benetton-Ford</li>
+      <li><strong>Damon Hill P2</strong> (91 pts) for Williams-Renault — the title decided by just one point at the Adelaide finale, where Schumacher and Hill collided</li>
+      <li><strong>Imola tragedy</strong> — the San Marino GP weekend claimed both <strong>Ayrton Senna</strong> and <strong>Roland Ratzenberger</strong>, the sport's darkest weekend and the catalyst for sweeping safety reform</li>
+      <li><strong>Gerhard Berger P3</strong> (41 pts) led Ferrari's recovery</li>
+      <li><strong>Williams-Renault take the Constructors' Championship</strong> (118 pts to Benetton's 103)</li>
+      <li><strong>Schumacher's bans and disqualifications</strong> — he missed two races and was disqualified from others amid controversy, keeping Hill's title hopes alive</li>
+      <li><strong>Electronic driver aids banned</strong> — active suspension and traction control outlawed, returning the cars to the drivers</li>
+      <li><strong>Classic 10-6-4-3-2-1 points system</strong> — only the top six score</li>
+      <li>No Sprint races, no fastest lap bonus point</li>
     </ul>
 
-    <SeasonNotesSection year={2021} />
+    <SeasonNotesSection year={1994} />
 
     <h2>Other Seasons</h2>
     <ul>
@@ -51,6 +59,7 @@ const schemaData = {
       <li><a href="/2024">2024 F1 Season</a></li>
       <li><a href="/2023">2023 F1 Season</a></li>
       <li><a href="/2022">2022 F1 Season</a></li>
+      <li><a href="/2021">2021 F1 Season</a></li>
       <li><a href="/2020">2020 F1 Season</a></li>
       <li><a href="/2019">2019 F1 Season</a></li>
       <li><a href="/2018">2018 F1 Season</a></li>
@@ -77,7 +86,6 @@ const schemaData = {
       <li><a href="/1997">1997 F1 Season</a></li>
       <li><a href="/1996">1996 F1 Season</a></li>
       <li><a href="/1995">1995 F1 Season</a></li>
-      <li><a href="/1994">1994 F1 Season</a></li>
       <li><a href="/1993">1993 F1 Season</a></li>
       <li><a href="/1992">1992 F1 Season</a></li>
       <li><a href="/1991">1991 F1 Season</a></li>
@@ -91,6 +99,6 @@ const schemaData = {
     </p>
   </div>
 
-  <AppIsland year="2021" client:only="react" />
+  <AppIsland year="1994" client:only="react" />
   <script is:inline>document.getElementById('seo-content').style.display='none';</script>
 </BaseLayout>

@@ -1,44 +1,9 @@
 import { createSelector } from '@reduxjs/toolkit';
 import type { RootState } from '../index';
 import type { DriverStanding, TeamStanding, PointsHistory, TeamPointsHistory } from '../../types';
-import { getPointsForPositionWithSystem } from '../../data/pointsSystems';
-import { getSprintPoints, getFastestLapPoints, getCanonicalTeamId } from '../../data/seasonRules';
 import { getActiveSeason } from '../../utils/constants';
-
-// Races where half points were awarded (race didn't reach 75% distance).
-// Note: 1975 Spanish, 1975 Austrian, 1984 Monaco, 1991 Australian also qualify
-// and need to be added if/when those seasons are added to the archive.
-const HALF_POINTS_RACES: Record<number, Set<string>> = {
-  2009: new Set(['malaysian']),
-  2021: new Set(['belgian']),
-};
-
-// Races where double points were awarded (2014 Abu Dhabi finale)
-const DOUBLE_POINTS_RACES: Record<number, Set<string>> = {
-  2014: new Set(['abu-dhabi']),
-};
-
-// Constructor points resets (team excluded from constructor points before a given round)
-// Force India went into administration before round 13 (Belgian GP) in 2018;
-// FIA reset their constructor points to 0, but driver points were retained.
-const CONSTRUCTOR_POINTS_RESET: Record<number, { teamId: string; fromRound: number }[]> = {
-  2018: [{ teamId: 'force_india', fromRound: 13 }],
-};
-
-// Full-season constructor exclusions (team scores zero constructor points all year).
-// McLaren stripped of all 2007 constructor points after "Spygate" (use of confidential
-// Ferrari technical data); driver points were retained.
-const CONSTRUCTOR_EXCLUSIONS: Record<number, Set<string>> = {
-  2007: new Set(['mclaren']),
-};
-
-// Flat constructor points deductions (post-event sanctions). Subtracted from the
-// team's season total once all races are summed — race-by-race history is not
-// modified, so cumulative charts still match the raw race-by-race data.
-// Racing Point 2020: docked 15 points for copying Mercedes brake ducts.
-const CONSTRUCTOR_POINTS_DEDUCTION: Record<number, Record<string, number>> = {
-  2020: { racing_point: 15 },
-};
+import { computeRawPoints } from './computeStandings';
+import type { CalculatedResults } from './computeStandings';
 
 const selectGridPositions = (state: RootState) => state.grid.positions;
 const selectRaces = (state: RootState) => state.seasonData.races;
@@ -58,167 +23,14 @@ const compareByCountback = (finishesA: number[], finishesB: number[]): number =>
   return 0;
 };
 
-interface CalculatedResults {
-  driverPoints: Record<string, number>;
-  teamPoints: Record<string, number>;
-  driverHistories: PointsHistory[];
-  teamHistories: TeamPointsHistory[];
-  driverFinishes: Record<string, number[]>;
-  teamFinishes: Record<string, number[]>;
-}
-
 const selectCalculatedPoints = createSelector(
   [selectGridPositions, selectRaces, selectDrivers, selectPastResults, selectPointsSystem],
   (positions, races, drivers, pastResults, pointsSystem): { official: CalculatedResults; total: CalculatedResults } => {
-
-    const calculatePoints = (filterOfficialOnly: boolean): CalculatedResults => {
-      const driverPoints: Record<string, number> = {};
-      const teamPoints: Record<string, number> = {};
-      const driverHistories: PointsHistory[] = [];
-      const teamHistories: TeamPointsHistory[] = [];
-      const driverFinishes: Record<string, number[]> = {};
-      const teamFinishes: Record<string, number[]> = {};
-
-      drivers.forEach(driver => {
-        driverPoints[driver.id] = 0;
-        if (!teamPoints[driver.team]) {
-          teamPoints[driver.team] = 0;
-        }
-      });
-
-      races.forEach(race => {
-        const racePositions = positions.filter(p =>
-          p.raceId === race.id && (!filterOfficialOnly || p.isOfficialResult)
-        );
-
-        const raceDriverPoints: Record<string, number> = {};
-        const raceTeamPoints: Record<string, number> = {};
-        const raceResults = pastResults[race.id] || [];
-        const roundNum = race.round ? parseInt(race.round, 10) : 0;
-
-        racePositions.forEach(position => {
-          if (position.driverId) {
-            const activeSeason = getActiveSeason();
-
-            let pointsForPosition: number;
-            if (race.isSprint) {
-              pointsForPosition = getSprintPoints(position.position, activeSeason);
-            } else {
-              pointsForPosition = getPointsForPositionWithSystem(position.position, pointsSystem);
-            }
-
-            if (!race.isSprint && position.hasFastestLap) {
-              pointsForPosition += getFastestLapPoints(position.position, activeSeason);
-            }
-
-            if (HALF_POINTS_RACES[activeSeason]?.has(race.id)) {
-              pointsForPosition *= 0.5;
-            }
-
-            if (DOUBLE_POINTS_RACES[activeSeason]?.has(race.id)) {
-              pointsForPosition *= 2;
-            }
-
-            if (!driverPoints[position.driverId]) {
-              driverPoints[position.driverId] = 0;
-            }
-            if (!raceDriverPoints[position.driverId]) {
-              raceDriverPoints[position.driverId] = 0;
-            }
-            driverPoints[position.driverId] += pointsForPosition;
-            raceDriverPoints[position.driverId] += pointsForPosition;
-
-            if (!race.isSprint && position.position >= 1) {
-              if (!driverFinishes[position.driverId]) {
-                driverFinishes[position.driverId] = [];
-              }
-              const finishIndex = position.position - 1;
-              driverFinishes[position.driverId][finishIndex] =
-                (driverFinishes[position.driverId][finishIndex] || 0) + 1;
-            }
-
-            const raceResult = raceResults.find(r => r.driverId === position.driverId);
-            let teamId: string | undefined;
-            if (raceResult) {
-              teamId = raceResult.teamId;
-            } else {
-              const driver = drivers.find(d => d.id === position.driverId);
-              teamId = driver?.team;
-            }
-
-            // Normalize mid-season renames (e.g. 2006 mf1 → spyker_mf1)
-            // so both eras of the same team aggregate to one constructor.
-            if (teamId) {
-              teamId = getCanonicalTeamId(activeSeason, teamId);
-            }
-
-            if (teamId) {
-              if (!teamPoints[teamId]) {
-                teamPoints[teamId] = 0;
-              }
-              if (!raceTeamPoints[teamId]) {
-                raceTeamPoints[teamId] = 0;
-              }
-
-              // Check if this team's points are excluded before their reset round
-              const resetRules = CONSTRUCTOR_POINTS_RESET[activeSeason];
-              const isResetExcluded = resetRules?.some(
-                r => r.teamId === teamId && roundNum < r.fromRound
-              );
-              const isFullSeasonExcluded =
-                CONSTRUCTOR_EXCLUSIONS[activeSeason]?.has(teamId);
-
-              if (!isResetExcluded && !isFullSeasonExcluded) {
-                teamPoints[teamId] += pointsForPosition;
-                raceTeamPoints[teamId] += pointsForPosition;
-
-                if (!race.isSprint && position.position >= 1) {
-                  if (!teamFinishes[teamId]) {
-                    teamFinishes[teamId] = [];
-                  }
-                  const finishIndex = position.position - 1;
-                  teamFinishes[teamId][finishIndex] =
-                    (teamFinishes[teamId][finishIndex] || 0) + 1;
-                }
-              }
-            }
-          }
-        });
-
-        Object.entries(raceDriverPoints).forEach(([driverId, points]) => {
-          driverHistories.push({
-            raceId: race.id,
-            driverId,
-            points,
-            cumulativePoints: driverPoints[driverId]
-          });
-        });
-
-        Object.entries(raceTeamPoints).forEach(([teamId, points]) => {
-          teamHistories.push({
-            raceId: race.id,
-            teamId,
-            points,
-            cumulativePoints: teamPoints[teamId]
-          });
-        });
-      });
-
-      const deductions = CONSTRUCTOR_POINTS_DEDUCTION[getActiveSeason()];
-      if (deductions) {
-        Object.entries(deductions).forEach(([teamId, deduction]) => {
-          if (teamPoints[teamId] !== undefined) {
-            teamPoints[teamId] = Math.max(0, teamPoints[teamId] - deduction);
-          }
-        });
-      }
-
-      return { driverPoints, teamPoints, driverHistories, teamHistories, driverFinishes, teamFinishes };
-    };
-
+    const season = getActiveSeason();
+    const base = { positions, races, drivers, pastResults, pointsSystem, season };
     return {
-      official: calculatePoints(true),
-      total: calculatePoints(false)
+      official: computeRawPoints({ ...base, filterOfficialOnly: true }),
+      total: computeRawPoints({ ...base, filterOfficialOnly: false }),
     };
   }
 );

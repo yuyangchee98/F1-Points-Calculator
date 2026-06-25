@@ -7,15 +7,47 @@ export interface FastestLapRule {
 
 export type SprintFormat = 'none' | '2021' | '2022+';
 
+// Historic "best N results count" rules (1961–1990). A season is either a single
+// block (keep the best `bestOf` results across the whole year) OR a two-half split
+// (1967–1980: keep the best N in each half, then sum the two halves).
+export interface DroppedScoresRule {
+  bestOf?: number;                                   // single-block: keep best N races
+  split?: {                                          // two-half seasons
+    splitAfterRound: number;                         // last round of the FIRST half
+    firstHalfBest: number;
+    secondHalfBest: number;
+  };
+}
+
+// Constructor scoring quirks that differ from the drivers' rules.
+export interface ConstructorRules {
+  bestCarPerRaceOnly?: boolean;                      // 1961–1978: only the top car scores
+  droppedScores?: DroppedScoresRule;                 // if it differs from drivers
+}
+
 export interface SeasonRules {
   fastestLap?: FastestLapRule;
   sprintFormat: SprintFormat;
   // ID into POINTS_SYSTEMS (data/pointsSystems.ts). When set, used as the default
   // points system for this year unless the user has explicitly chosen one.
   defaultPointsSystem?: string;
+  // Historic scoring rules (see BACKFILL_HISTORIC_SEASONS.md). Absent for modern
+  // seasons where every race counts.
+  droppedScores?: DroppedScoresRule;                 // drivers' dropped-scores rule
+  constructorRules?: ConstructorRules;               // constructor-specific scoring
+  excludedDrivers?: string[];                        // dropped from driver standings (e.g. 1997 Schumacher DSQ)
 }
 
 export const SEASON_RULES: Record<number, SeasonRules> = {
+  1991: { sprintFormat: 'none', defaultPointsSystem: '1991-2002' },
+  1992: { sprintFormat: 'none', defaultPointsSystem: '1991-2002' },
+  1993: { sprintFormat: 'none', defaultPointsSystem: '1991-2002' },
+  1994: { sprintFormat: 'none', defaultPointsSystem: '1991-2002' },
+  1995: { sprintFormat: 'none', defaultPointsSystem: '1991-2002' },
+  1996: { sprintFormat: 'none', defaultPointsSystem: '1991-2002' },
+  // 1997: Michael Schumacher disqualified from the championship (Jerez collision);
+  // he keeps his race results but is removed from the drivers' standings.
+  1997: { sprintFormat: 'none', defaultPointsSystem: '1991-2002', excludedDrivers: ['michael_schumacher'] },
   1998: { sprintFormat: 'none', defaultPointsSystem: '1991-2002' },
   1999: { sprintFormat: 'none', defaultPointsSystem: '1991-2002' },
   2000: { sprintFormat: 'none', defaultPointsSystem: '1991-2002' },

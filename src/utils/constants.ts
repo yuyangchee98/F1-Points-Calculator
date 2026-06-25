@@ -39,6 +39,15 @@ const SEASON_DRIVER_COUNT: { [key: number]: number } = {
   2000: 22,
   1999: 22,
   1998: 22,
+  // Pre-qualifying era: large grids. Values are the max classified finishing
+  // position that season, so no official result is clipped when seeding the grid.
+  1997: 22,
+  1996: 22,
+  1995: 26,
+  1994: 27,
+  1993: 26,
+  1992: 26,
+  1991: 26,
 };
 
 export const getGridPositions = (season: number): number => {

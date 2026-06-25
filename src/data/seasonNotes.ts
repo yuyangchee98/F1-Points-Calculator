@@ -21,6 +21,25 @@ export interface SeasonNote {
 }
 
 export const SEASON_NOTES: Record<number, SeasonNote[]> = {
+  1991: [
+    {
+      scope: 'race',
+      raceId: 'australian',
+      title: 'Australian GP — half points',
+      detail:
+        'The Adelaide finale was stopped after 14 laps (torrential rain) — the shortest race in F1 history. All positions get half points.',
+    },
+  ],
+
+  1997: [
+    {
+      scope: 'season',
+      title: 'Michael Schumacher excluded from the championship',
+      detail:
+        'After deliberately colliding with title rival Jacques Villeneuve at the Jerez finale, Schumacher was disqualified from the entire 1997 Drivers\' Championship. He keeps his race results (so Ferrari keep their Constructors\' points), but he is removed from the drivers\' standings despite scoring 78 points.',
+    },
+  ],
+
   2002: [
     {
       scope: 'team',

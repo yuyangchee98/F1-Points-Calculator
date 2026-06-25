@@ -5,8 +5,8 @@ import SeasonNotesSection from '../components/seo/SeasonNotesSection.astro';
 const schemaData = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  "name": "F1 Points Calculator 2021 - Championship Predictor",
-  "description": "F1 championship calculator and standings predictor. Simulate Formula 1 race results and calculate driver points for the 2021 season.",
+  "name": "F1 Points Calculator 1996 - Championship Predictor",
+  "description": "F1 championship calculator and standings predictor. Simulate Formula 1 race results and calculate driver points for the 1996 season.",
   "applicationCategory": "Sports Calculator",
   "operatingSystem": "Web Browser",
   "author": {
@@ -18,31 +18,37 @@ const schemaData = {
 ---
 
 <BaseLayout
-  title="F1 Points Calculator 2021 - Championship Predictor"
-  description="F1 points calculator for 2021. Explore Formula 1 race results, calculate driver points, and simulate championship standings with our interactive drag-and-drop tool."
-  keywords="F1, Formula 1, 2021 season, points calculator, championship predictor, race simulator, F1 standings, predictions"
-  canonicalPath="/2021"
-  ogTitle="F1 Points Calculator 2021 - Championship Predictor"
-  ogDescription="Predict F1 race results and championship standings with our interactive calculator"
+  title="F1 Points Calculator 1996 - Championship Predictor"
+  description="F1 points calculator for 1996. Replay Damon Hill's championship for Williams-Renault, rookie Jacques Villeneuve's challenge and Schumacher's move to Ferrari, with our drag-and-drop simulator."
+  keywords="F1, Formula 1, 1996 season, Damon Hill, Villeneuve, Schumacher, Williams, Renault, Ferrari, points calculator, championship predictor, race simulator, F1 standings"
+  canonicalPath="/1996"
+  ogTitle="F1 Points Calculator 1996 - Championship Predictor"
+  ogDescription="Replay Damon Hill's title and Villeneuve's rookie challenge with our interactive F1 calculator"
   schemaData={schemaData}
-  initialYear={2021}
+  initialYear={1996}
 >
   <!-- SEO content — always in HTML, hidden once React mounts -->
   <div id="seo-content" style="padding: 20px; max-width: 900px; margin: 0 auto; font-family: system-ui, sans-serif; line-height: 1.6;">
-    <h1 style="color: #dc2626;">F1 Points Calculator - 2021 Season</h1>
+    <h1 style="color: #dc2626;">F1 Points Calculator - 1996 Season</h1>
 
-    <p>Explore the 2021 Formula 1 World Championship results and simulate alternative standings.
-    Use our drag-and-drop calculator to see how different race outcomes would have affected
-    the championship.</p>
+    <p>Explore the 1996 Formula 1 World Championship results and simulate alternative
+    standings. Use our drag-and-drop calculator to replay Damon Hill's championship for
+    Williams-Renault — becoming the first son of a World Champion to win the title himself —
+    against rookie team-mate Jacques Villeneuve, in the classic 10-6-4-3-2-1 points era.</p>
 
-    <h2>2021 F1 Season Highlights</h2>
+    <h2>1996 F1 Season Highlights</h2>
     <ul>
-      <li>22 races across 20 countries</li>
-      <li>3 Sprint Qualifying weekends (Silverstone, Monza, Interlagos)</li>
-      <li>Max Verstappen - World Champion</li>
+      <li>16 races — opening at <strong>Melbourne, Australia</strong> (its debut) and closing at <strong>Suzuka, Japan</strong></li>
+      <li><strong>Damon Hill wins the World Championship</strong> (97 pts, 8 wins) for Williams-Renault — the first second-generation champion, son of double champion Graham Hill</li>
+      <li><strong>Jacques Villeneuve P2</strong> (78 pts) starred as a rookie, taking pole on debut in Australia and four wins in his first season</li>
+      <li><strong>Michael Schumacher P3</strong> (59 pts) in his first year at Ferrari, with three wins — a stunning wet-weather drive in Spain, plus Belgium and Ferrari's home race at Monza</li>
+      <li><strong>Williams-Renault take a dominant Constructors' Championship</strong> (175 pts to Ferrari's 70)</li>
+      <li><strong>Hill dropped for 1997</strong> — Williams replaced their new champion with Heinz-Harald Frentzen for the following year</li>
+      <li><strong>Classic 10-6-4-3-2-1 points system</strong> — only the top six score</li>
+      <li>No Sprint races, no fastest lap bonus point</li>
     </ul>
 
-    <SeasonNotesSection year={2021} />
+    <SeasonNotesSection year={1996} />
 
     <h2>Other Seasons</h2>
     <ul>
@@ -51,6 +57,7 @@ const schemaData = {
       <li><a href="/2024">2024 F1 Season</a></li>
       <li><a href="/2023">2023 F1 Season</a></li>
       <li><a href="/2022">2022 F1 Season</a></li>
+      <li><a href="/2021">2021 F1 Season</a></li>
       <li><a href="/2020">2020 F1 Season</a></li>
       <li><a href="/2019">2019 F1 Season</a></li>
       <li><a href="/2018">2018 F1 Season</a></li>
@@ -75,7 +82,6 @@ const schemaData = {
       <li><a href="/1999">1999 F1 Season</a></li>
       <li><a href="/1998">1998 F1 Season</a></li>
       <li><a href="/1997">1997 F1 Season</a></li>
-      <li><a href="/1996">1996 F1 Season</a></li>
       <li><a href="/1995">1995 F1 Season</a></li>
       <li><a href="/1994">1994 F1 Season</a></li>
       <li><a href="/1993">1993 F1 Season</a></li>
@@ -91,6 +97,6 @@ const schemaData = {
     </p>
   </div>
 
-  <AppIsland year="2021" client:only="react" />
+  <AppIsland year="1996" client:only="react" />
   <script is:inline>document.getElementById('seo-content').style.display='none';</script>
 </BaseLayout>

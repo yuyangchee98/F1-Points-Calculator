@@ -5,8 +5,8 @@ import SeasonNotesSection from '../components/seo/SeasonNotesSection.astro';
 const schemaData = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  "name": "F1 Points Calculator 2021 - Championship Predictor",
-  "description": "F1 championship calculator and standings predictor. Simulate Formula 1 race results and calculate driver points for the 2021 season.",
+  "name": "F1 Points Calculator 1995 - Championship Predictor",
+  "description": "F1 championship calculator and standings predictor. Simulate Formula 1 race results and calculate driver points for the 1995 season.",
   "applicationCategory": "Sports Calculator",
   "operatingSystem": "Web Browser",
   "author": {
@@ -18,31 +18,38 @@ const schemaData = {
 ---
 
 <BaseLayout
-  title="F1 Points Calculator 2021 - Championship Predictor"
-  description="F1 points calculator for 2021. Explore Formula 1 race results, calculate driver points, and simulate championship standings with our interactive drag-and-drop tool."
-  keywords="F1, Formula 1, 2021 season, points calculator, championship predictor, race simulator, F1 standings, predictions"
-  canonicalPath="/2021"
-  ogTitle="F1 Points Calculator 2021 - Championship Predictor"
-  ogDescription="Predict F1 race results and championship standings with our interactive calculator"
+  title="F1 Points Calculator 1995 - Championship Predictor"
+  description="F1 points calculator for 1995. Replay Michael Schumacher's second title for Benetton-Renault and his rivalry with Damon Hill, with our drag-and-drop championship simulator."
+  keywords="F1, Formula 1, 1995 season, Schumacher, Damon Hill, Coulthard, Benetton, Williams, Renault, points calculator, championship predictor, race simulator, F1 standings"
+  canonicalPath="/1995"
+  ogTitle="F1 Points Calculator 1995 - Championship Predictor"
+  ogDescription="Replay Schumacher's second title and his battle with Damon Hill with our interactive F1 calculator"
   schemaData={schemaData}
-  initialYear={2021}
+  initialYear={1995}
 >
   <!-- SEO content — always in HTML, hidden once React mounts -->
   <div id="seo-content" style="padding: 20px; max-width: 900px; margin: 0 auto; font-family: system-ui, sans-serif; line-height: 1.6;">
-    <h1 style="color: #dc2626;">F1 Points Calculator - 2021 Season</h1>
+    <h1 style="color: #dc2626;">F1 Points Calculator - 1995 Season</h1>
 
-    <p>Explore the 2021 Formula 1 World Championship results and simulate alternative standings.
-    Use our drag-and-drop calculator to see how different race outcomes would have affected
-    the championship.</p>
+    <p>Explore the 1995 Formula 1 World Championship results and simulate alternative
+    standings. Use our drag-and-drop calculator to replay Michael Schumacher's second
+    straight title for Benetton-Renault and his fierce, often fractious rivalry with
+    Damon Hill, in the classic 10-6-4-3-2-1 points era.</p>
 
-    <h2>2021 F1 Season Highlights</h2>
+    <h2>1995 F1 Season Highlights</h2>
     <ul>
-      <li>22 races across 20 countries</li>
-      <li>3 Sprint Qualifying weekends (Silverstone, Monza, Interlagos)</li>
-      <li>Max Verstappen - World Champion</li>
+      <li>17 races — opening at <strong>Interlagos, Brazil</strong> and closing at <strong>Adelaide, Australia</strong></li>
+      <li><strong>Michael Schumacher wins his second World Championship</strong> (102 pts, 9 wins) for Benetton — now with Renault power</li>
+      <li><strong>Damon Hill P2</strong> (69 pts) for Williams-Renault, the pair clashing on track several times during the year</li>
+      <li><strong>David Coulthard P3</strong> (49 pts) took his maiden win at the Portuguese GP for Williams</li>
+      <li><strong>Benetton-Renault take their only Constructors' Championship</strong> (147 pts to Williams' 118)</li>
+      <li><strong>Schumacher's last year at Benetton</strong> — he moved to Ferrari for 1996, beginning a new era at Maranello</li>
+      <li><strong>Johnny Herbert</strong> won twice (Britain and Italy) in the sister Benetton</li>
+      <li><strong>Classic 10-6-4-3-2-1 points system</strong> — only the top six score</li>
+      <li>No Sprint races, no fastest lap bonus point</li>
     </ul>
 
-    <SeasonNotesSection year={2021} />
+    <SeasonNotesSection year={1995} />
 
     <h2>Other Seasons</h2>
     <ul>
@@ -51,6 +58,7 @@ const schemaData = {
       <li><a href="/2024">2024 F1 Season</a></li>
       <li><a href="/2023">2023 F1 Season</a></li>
       <li><a href="/2022">2022 F1 Season</a></li>
+      <li><a href="/2021">2021 F1 Season</a></li>
       <li><a href="/2020">2020 F1 Season</a></li>
       <li><a href="/2019">2019 F1 Season</a></li>
       <li><a href="/2018">2018 F1 Season</a></li>
@@ -76,7 +84,6 @@ const schemaData = {
       <li><a href="/1998">1998 F1 Season</a></li>
       <li><a href="/1997">1997 F1 Season</a></li>
       <li><a href="/1996">1996 F1 Season</a></li>
-      <li><a href="/1995">1995 F1 Season</a></li>
       <li><a href="/1994">1994 F1 Season</a></li>
       <li><a href="/1993">1993 F1 Season</a></li>
       <li><a href="/1992">1992 F1 Season</a></li>
@@ -91,6 +98,6 @@ const schemaData = {
     </p>
   </div>
 
-  <AppIsland year="2021" client:only="react" />
+  <AppIsland year="1995" client:only="react" />
   <script is:inline>document.getElementById('seo-content').style.display='none';</script>
 </BaseLayout>
