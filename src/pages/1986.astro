@@ -1,11 +1,12 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import AppIsland from '../components/AppIsland';
+import SeasonNotesSection from '../components/seo/SeasonNotesSection.astro';
 const schemaData = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  "name": "F1 Points Calculator 2015 - Championship Predictor",
-  "description": "F1 championship calculator and standings predictor. Simulate Formula 1 race results and calculate driver points for the 2015 season.",
+  "name": "F1 Points Calculator 1986 - Championship Predictor",
+  "description": "F1 championship calculator and standings predictor. Simulate Formula 1 race results and calculate driver points for the 1986 season.",
   "applicationCategory": "Sports Calculator",
   "operatingSystem": "Web Browser",
   "author": {
@@ -17,31 +18,37 @@ const schemaData = {
 ---
 
 <BaseLayout
-  title="F1 Points Calculator 2015 - Championship Predictor"
-  description="F1 points calculator for 2015. Explore Formula 1 race results, calculate driver points, and simulate championship standings with our interactive drag-and-drop tool."
-  keywords="F1, Formula 1, 2015 season, points calculator, championship predictor, race simulator, F1 standings, predictions"
-  canonicalPath="/2015"
-  ogTitle="F1 Points Calculator 2015 - Championship Predictor"
-  ogDescription="Predict F1 race results and championship standings with our interactive calculator"
+  title="F1 Points Calculator 1986 - Championship Predictor"
+  description="F1 points calculator for 1986. Replay the three-way Adelaide decider where Mansell's tyre blew and Prost stole the title, with our drag-and-drop simulator."
+  keywords="F1, Formula 1, 1986 season, Prost, Mansell, Piquet, McLaren, Williams Honda, Adelaide, points calculator, championship predictor, race simulator, F1 standings"
+  canonicalPath="/1986"
+  ogTitle="F1 Points Calculator 1986 - Championship Predictor"
+  ogDescription="Replay the Adelaide three-way decider and Mansell's blowout with our interactive F1 calculator"
   schemaData={schemaData}
-  initialYear={2015}
+  initialYear={1986}
 >
   <!-- SEO content — always in HTML, hidden once React mounts -->
   <div id="seo-content" style="padding: 20px; max-width: 900px; margin: 0 auto; font-family: system-ui, sans-serif; line-height: 1.6;">
-    <h1 style="color: #dc2626;">F1 Points Calculator - 2015 Season</h1>
+    <h1 style="color: #dc2626;">F1 Points Calculator - 1986 Season</h1>
 
-    <p>Explore the 2015 Formula 1 World Championship results and simulate alternative standings.
-    Use our drag-and-drop calculator to see how different race outcomes would have affected
-    the championship.</p>
+    <p>Explore the 1986 Formula 1 World Championship results and simulate alternative
+    standings. Use our drag-and-drop calculator to replay one of the great title finales —
+    a three-way Adelaide decider — under the classic 9-6-4-3-2-1 system with only a driver's
+    best 11 results counting.</p>
 
-    <h2>2015 F1 Season Highlights</h2>
+    <h2>1986 F1 Season Highlights</h2>
     <ul>
-      <li>19 races across 19 countries</li>
-      <li>10 teams, 20 drivers on the grid (22 total with mid-season replacements)</li>
-      <li>No Sprint races</li>
-      <li>No fastest lap bonus point</li>
-      <li>Lewis Hamilton - 3x World Champion</li>
+      <li>16 races — opening in <strong>Brazil (Rio)</strong> and closing at the <strong>Australian GP, Adelaide</strong></li>
+      <li><strong>Alain Prost wins back-to-back World Championships</strong> (72 pts) for McLaren, the first repeat champion since the 1960s</li>
+      <li><strong>Nigel Mansell P2</strong> (70 pts) — led the title into the Adelaide finale before a <strong>spectacular rear-tyre blowout</strong> at 180 mph ended his bid</li>
+      <li><strong>Nelson Piquet P3</strong> (69 pts) — Williams pitted him for precaution, handing Prost the title in a <strong>three-way decider</strong></li>
+      <li><strong>Williams-Honda take a dominant Constructors' Championship</strong> (141 pts to McLaren's 96), but their drivers took points off each other</li>
+      <li><strong>FW11 vs MP4/2C</strong> — Honda power against McLaren consistency defined the year</li>
+      <li><strong>Classic 9-6-4-3-2-1 points system</strong> — only the top six score, best 11 results count</li>
+      <li>No Sprint races, no fastest lap bonus point</li>
     </ul>
+
+    <SeasonNotesSection year={1986} />
 
     <h2>Other Seasons</h2>
     <ul>
@@ -56,6 +63,7 @@ const schemaData = {
       <li><a href="/2018">2018 F1 Season</a></li>
       <li><a href="/2017">2017 F1 Season</a></li>
       <li><a href="/2016">2016 F1 Season</a></li>
+      <li><a href="/2015">2015 F1 Season</a></li>
       <li><a href="/2014">2014 F1 Season</a></li>
       <li><a href="/2013">2013 F1 Season</a></li>
       <li><a href="/2012">2012 F1 Season</a></li>
@@ -84,7 +92,6 @@ const schemaData = {
       <li><a href="/1989">1989 F1 Season</a></li>
       <li><a href="/1988">1988 F1 Season</a></li>
       <li><a href="/1987">1987 F1 Season</a></li>
-      <li><a href="/1986">1986 F1 Season</a></li>
       <li><a href="/1985">1985 F1 Season</a></li>
       <li><a href="/1984">1984 F1 Season</a></li>
       <li><a href="/1983">1983 F1 Season</a></li>
@@ -100,6 +107,6 @@ const schemaData = {
     </p>
   </div>
 
-  <AppIsland year="2015" client:only="react" />
+  <AppIsland year="1986" client:only="react" />
   <script is:inline>document.getElementById('seo-content').style.display='none';</script>
 </BaseLayout>

@@ -1,11 +1,12 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import AppIsland from '../components/AppIsland';
+import SeasonNotesSection from '../components/seo/SeasonNotesSection.astro';
 const schemaData = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  "name": "F1 Points Calculator 2015 - Championship Predictor",
-  "description": "F1 championship calculator and standings predictor. Simulate Formula 1 race results and calculate driver points for the 2015 season.",
+  "name": "F1 Points Calculator 1988 - Championship Predictor",
+  "description": "F1 championship calculator and standings predictor. Simulate Formula 1 race results and calculate driver points for the 1988 season.",
   "applicationCategory": "Sports Calculator",
   "operatingSystem": "Web Browser",
   "author": {
@@ -17,31 +18,40 @@ const schemaData = {
 ---
 
 <BaseLayout
-  title="F1 Points Calculator 2015 - Championship Predictor"
-  description="F1 points calculator for 2015. Explore Formula 1 race results, calculate driver points, and simulate championship standings with our interactive drag-and-drop tool."
-  keywords="F1, Formula 1, 2015 season, points calculator, championship predictor, race simulator, F1 standings, predictions"
-  canonicalPath="/2015"
-  ogTitle="F1 Points Calculator 2015 - Championship Predictor"
-  ogDescription="Predict F1 race results and championship standings with our interactive calculator"
+  title="F1 Points Calculator 1988 - Championship Predictor"
+  description="F1 points calculator for 1988. Replay Senna vs Prost in the all-conquering McLaren-Honda MP4/4, with our drag-and-drop championship simulator."
+  keywords="F1, Formula 1, 1988 season, Senna, Prost, McLaren, Honda, MP4/4, Berger, Ferrari, dropped scores, best 11, points calculator, championship predictor, race simulator, F1 standings"
+  canonicalPath="/1988"
+  ogTitle="F1 Points Calculator 1988 - Championship Predictor"
+  ogDescription="Replay Senna's first title over Prost in the dominant McLaren-Honda with our interactive F1 calculator"
   schemaData={schemaData}
-  initialYear={2015}
+  initialYear={1988}
 >
   <!-- SEO content — always in HTML, hidden once React mounts -->
   <div id="seo-content" style="padding: 20px; max-width: 900px; margin: 0 auto; font-family: system-ui, sans-serif; line-height: 1.6;">
-    <h1 style="color: #dc2626;">F1 Points Calculator - 2015 Season</h1>
+    <h1 style="color: #dc2626;">F1 Points Calculator - 1988 Season</h1>
 
-    <p>Explore the 2015 Formula 1 World Championship results and simulate alternative standings.
-    Use our drag-and-drop calculator to see how different race outcomes would have affected
-    the championship.</p>
+    <p>Explore the 1988 Formula 1 World Championship results and simulate alternative
+    standings. Use our drag-and-drop calculator to replay the McLaren-Honda team-mate war
+    between Ayrton Senna and Alain Prost in the legendary MP4/4 — the final season of the
+    first turbo era, scored under the classic 9-6-4-3-2-1 system with only a driver's best
+    11 results counting.</p>
 
-    <h2>2015 F1 Season Highlights</h2>
+    <h2>1988 F1 Season Highlights</h2>
     <ul>
-      <li>19 races across 19 countries</li>
-      <li>10 teams, 20 drivers on the grid (22 total with mid-season replacements)</li>
-      <li>No Sprint races</li>
-      <li>No fastest lap bonus point</li>
-      <li>Lewis Hamilton - 3x World Champion</li>
+      <li>16 races — opening in <strong>Brazil (Rio)</strong> and closing at <strong>Adelaide, Australia</strong></li>
+      <li><strong>Ayrton Senna wins his first World Championship</strong> (90 pts), clinching the title at the penultimate round in Japan after recovering from a stall on the grid at Suzuka</li>
+      <li><strong>McLaren-Honda's MP4/4 won 15 of 16 races</strong> — one of the most dominant cars in F1 history</li>
+      <li><strong>Senna 8 wins to Prost's 7</strong>, the win count proving decisive under the dropped-scores rule</li>
+      <li><strong>Alain Prost P2</strong> (87 pts) — Prost actually scored more raw points across the year (105 to Senna's 94), but only each driver's best 11 results counted, handing the title to Senna</li>
+      <li><strong>Gerhard Berger P3</strong> (41 pts) took the season's only non-McLaren win at <strong>Monza</strong>, an emotional Ferrari 1-2 weeks after Enzo Ferrari's death</li>
+      <li><strong>McLaren-Honda take a record Constructors' Championship</strong> (199 pts to Ferrari's 65)</li>
+      <li><strong>End of the turbo era</strong> — 1988 was the last year for turbocharged engines, run alongside 3.5L naturally-aspirated cars with turbos restricted to 2.5 bar boost and 150 litres of fuel</li>
+      <li><strong>Classic 9-6-4-3-2-1 points system</strong> — only the top six score, best 11 results count</li>
+      <li>No Sprint races, no fastest lap bonus point</li>
     </ul>
+
+    <SeasonNotesSection year={1988} />
 
     <h2>Other Seasons</h2>
     <ul>
@@ -56,6 +66,7 @@ const schemaData = {
       <li><a href="/2018">2018 F1 Season</a></li>
       <li><a href="/2017">2017 F1 Season</a></li>
       <li><a href="/2016">2016 F1 Season</a></li>
+      <li><a href="/2015">2015 F1 Season</a></li>
       <li><a href="/2014">2014 F1 Season</a></li>
       <li><a href="/2013">2013 F1 Season</a></li>
       <li><a href="/2012">2012 F1 Season</a></li>
@@ -82,7 +93,6 @@ const schemaData = {
       <li><a href="/1991">1991 F1 Season</a></li>
       <li><a href="/1990">1990 F1 Season</a></li>
       <li><a href="/1989">1989 F1 Season</a></li>
-      <li><a href="/1988">1988 F1 Season</a></li>
       <li><a href="/1987">1987 F1 Season</a></li>
       <li><a href="/1986">1986 F1 Season</a></li>
       <li><a href="/1985">1985 F1 Season</a></li>
@@ -100,6 +110,6 @@ const schemaData = {
     </p>
   </div>
 
-  <AppIsland year="2015" client:only="react" />
+  <AppIsland year="1988" client:only="react" />
   <script is:inline>document.getElementById('seo-content').style.display='none';</script>
 </BaseLayout>

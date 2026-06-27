@@ -1,11 +1,12 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import AppIsland from '../components/AppIsland';
+import SeasonNotesSection from '../components/seo/SeasonNotesSection.astro';
 const schemaData = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  "name": "F1 Points Calculator 2015 - Championship Predictor",
-  "description": "F1 championship calculator and standings predictor. Simulate Formula 1 race results and calculate driver points for the 2015 season.",
+  "name": "F1 Points Calculator 1982 - Championship Predictor",
+  "description": "F1 championship calculator and standings predictor. Simulate Formula 1 race results and calculate driver points for the 1982 season.",
   "applicationCategory": "Sports Calculator",
   "operatingSystem": "Web Browser",
   "author": {
@@ -17,31 +18,38 @@ const schemaData = {
 ---
 
 <BaseLayout
-  title="F1 Points Calculator 2015 - Championship Predictor"
-  description="F1 points calculator for 2015. Explore Formula 1 race results, calculate driver points, and simulate championship standings with our interactive drag-and-drop tool."
-  keywords="F1, Formula 1, 2015 season, points calculator, championship predictor, race simulator, F1 standings, predictions"
-  canonicalPath="/2015"
-  ogTitle="F1 Points Calculator 2015 - Championship Predictor"
-  ogDescription="Predict F1 race results and championship standings with our interactive calculator"
+  title="F1 Points Calculator 1982 - Championship Predictor"
+  description="F1 points calculator for 1982. Replay the most open season in F1 history — Keke Rosberg champion with a single win — with our drag-and-drop simulator."
+  keywords="F1, Formula 1, 1982 season, Rosberg, Pironi, Watson, Villeneuve, Ferrari, Williams, points calculator, championship predictor, race simulator, F1 standings"
+  canonicalPath="/1982"
+  ogTitle="F1 Points Calculator 1982 - Championship Predictor"
+  ogDescription="Replay the wildest season ever — 11 winners, Rosberg champion on one win — with our interactive F1 calculator"
   schemaData={schemaData}
-  initialYear={2015}
+  initialYear={1982}
 >
   <!-- SEO content — always in HTML, hidden once React mounts -->
   <div id="seo-content" style="padding: 20px; max-width: 900px; margin: 0 auto; font-family: system-ui, sans-serif; line-height: 1.6;">
-    <h1 style="color: #dc2626;">F1 Points Calculator - 2015 Season</h1>
+    <h1 style="color: #dc2626;">F1 Points Calculator - 1982 Season</h1>
 
-    <p>Explore the 2015 Formula 1 World Championship results and simulate alternative standings.
-    Use our drag-and-drop calculator to see how different race outcomes would have affected
-    the championship.</p>
+    <p>Explore the 1982 Formula 1 World Championship results and simulate alternative
+    standings. Use our drag-and-drop calculator to replay the most open — and most tragic —
+    season in F1 history, scored under the classic 9-6-4-3-2-1 system with only a driver's
+    best 11 results counting.</p>
 
-    <h2>2015 F1 Season Highlights</h2>
+    <h2>1982 F1 Season Highlights</h2>
     <ul>
-      <li>19 races across 19 countries</li>
-      <li>10 teams, 20 drivers on the grid (22 total with mid-season replacements)</li>
-      <li>No Sprint races</li>
-      <li>No fastest lap bonus point</li>
-      <li>Lewis Hamilton - 3x World Champion</li>
+      <li>16 races — opening at <strong>Kyalami, South Africa</strong> and closing at the <strong>Caesars Palace GP, Las Vegas</strong></li>
+      <li><strong>Keke Rosberg wins the World Championship</strong> (44 pts) for Williams with just <strong>one race win</strong> — the most open title fight ever, with <strong>11 different winners</strong></li>
+      <li><strong>Didier Pironi P2</strong> (39 pts) for Ferrari — led the championship until a career-ending crash in practice at Hockenheim</li>
+      <li><strong>John Watson P2-equal</strong> (39 pts) for McLaren, classified behind Pironi on countback</li>
+      <li><strong>A season marked by tragedy</strong> — Gilles Villeneuve killed in qualifying at Zolder, Riccardo Paletti at the Canadian GP</li>
+      <li><strong>Ferrari take the Constructors' Championship</strong> (74 pts to McLaren's 69) despite losing both their lead drivers</li>
+      <li><strong>Drivers' strike</strong> at the South African opener over superlicence terms</li>
+      <li><strong>Classic 9-6-4-3-2-1 points system</strong> — only the top six score, best 11 results count</li>
+      <li>No Sprint races, no fastest lap bonus point</li>
     </ul>
+
+    <SeasonNotesSection year={1982} />
 
     <h2>Other Seasons</h2>
     <ul>
@@ -56,6 +64,7 @@ const schemaData = {
       <li><a href="/2018">2018 F1 Season</a></li>
       <li><a href="/2017">2017 F1 Season</a></li>
       <li><a href="/2016">2016 F1 Season</a></li>
+      <li><a href="/2015">2015 F1 Season</a></li>
       <li><a href="/2014">2014 F1 Season</a></li>
       <li><a href="/2013">2013 F1 Season</a></li>
       <li><a href="/2012">2012 F1 Season</a></li>
@@ -88,7 +97,6 @@ const schemaData = {
       <li><a href="/1985">1985 F1 Season</a></li>
       <li><a href="/1984">1984 F1 Season</a></li>
       <li><a href="/1983">1983 F1 Season</a></li>
-      <li><a href="/1982">1982 F1 Season</a></li>
       <li><a href="/1981">1981 F1 Season</a></li>
     </ul>
 
@@ -100,6 +108,6 @@ const schemaData = {
     </p>
   </div>
 
-  <AppIsland year="2015" client:only="react" />
+  <AppIsland year="1982" client:only="react" />
   <script is:inline>document.getElementById('seo-content').style.display='none';</script>
 </BaseLayout>

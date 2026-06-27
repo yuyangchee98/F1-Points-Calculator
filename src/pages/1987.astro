@@ -1,11 +1,12 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import AppIsland from '../components/AppIsland';
+import SeasonNotesSection from '../components/seo/SeasonNotesSection.astro';
 const schemaData = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  "name": "F1 Points Calculator 2015 - Championship Predictor",
-  "description": "F1 championship calculator and standings predictor. Simulate Formula 1 race results and calculate driver points for the 2015 season.",
+  "name": "F1 Points Calculator 1987 - Championship Predictor",
+  "description": "F1 championship calculator and standings predictor. Simulate Formula 1 race results and calculate driver points for the 1987 season.",
   "applicationCategory": "Sports Calculator",
   "operatingSystem": "Web Browser",
   "author": {
@@ -17,31 +18,37 @@ const schemaData = {
 ---
 
 <BaseLayout
-  title="F1 Points Calculator 2015 - Championship Predictor"
-  description="F1 points calculator for 2015. Explore Formula 1 race results, calculate driver points, and simulate championship standings with our interactive drag-and-drop tool."
-  keywords="F1, Formula 1, 2015 season, points calculator, championship predictor, race simulator, F1 standings, predictions"
-  canonicalPath="/2015"
-  ogTitle="F1 Points Calculator 2015 - Championship Predictor"
-  ogDescription="Predict F1 race results and championship standings with our interactive calculator"
+  title="F1 Points Calculator 1987 - Championship Predictor"
+  description="F1 points calculator for 1987. Replay Nelson Piquet's third title against Williams team-mate Nigel Mansell with our drag-and-drop championship simulator."
+  keywords="F1, Formula 1, 1987 season, Piquet, Mansell, Senna, Williams Honda, Lotus, Suzuka, points calculator, championship predictor, race simulator, F1 standings"
+  canonicalPath="/1987"
+  ogTitle="F1 Points Calculator 1987 - Championship Predictor"
+  ogDescription="Replay Piquet's third title and the Williams-Honda war with our interactive F1 calculator"
   schemaData={schemaData}
-  initialYear={2015}
+  initialYear={1987}
 >
   <!-- SEO content — always in HTML, hidden once React mounts -->
   <div id="seo-content" style="padding: 20px; max-width: 900px; margin: 0 auto; font-family: system-ui, sans-serif; line-height: 1.6;">
-    <h1 style="color: #dc2626;">F1 Points Calculator - 2015 Season</h1>
+    <h1 style="color: #dc2626;">F1 Points Calculator - 1987 Season</h1>
 
-    <p>Explore the 2015 Formula 1 World Championship results and simulate alternative standings.
-    Use our drag-and-drop calculator to see how different race outcomes would have affected
-    the championship.</p>
+    <p>Explore the 1987 Formula 1 World Championship results and simulate alternative
+    standings. Use our drag-and-drop calculator to replay the Williams-Honda civil war that
+    ended in Nelson Piquet's third title, scored under the classic 9-6-4-3-2-1 system with
+    only a driver's best 11 results counting.</p>
 
-    <h2>2015 F1 Season Highlights</h2>
+    <h2>1987 F1 Season Highlights</h2>
     <ul>
-      <li>19 races across 19 countries</li>
-      <li>10 teams, 20 drivers on the grid (22 total with mid-season replacements)</li>
-      <li>No Sprint races</li>
-      <li>No fastest lap bonus point</li>
-      <li>Lewis Hamilton - 3x World Champion</li>
+      <li>16 races — opening in <strong>Brazil (Rio)</strong> and closing at the <strong>Australian GP, Adelaide</strong></li>
+      <li><strong>Nelson Piquet wins his third World Championship</strong> (73 pts) for Williams-Honda, on consistency over outright pace</li>
+      <li><strong>Nigel Mansell P2</strong> (61 pts) — <strong>six wins to Piquet's three</strong>, but a heavy practice crash at <strong>Suzuka</strong> ended his title bid and his season</li>
+      <li><strong>Ayrton Senna P3</strong> (57 pts) for Lotus-Honda, with the active-suspension 99T</li>
+      <li><strong>Williams-Honda take another dominant Constructors' Championship</strong> (137 pts to McLaren's 76)</li>
+      <li><strong>Last year of unrestricted turbos</strong> before pop-off valves and the naturally-aspirated transition began</li>
+      <li><strong>Classic 9-6-4-3-2-1 points system</strong> — only the top six score, best 11 results count</li>
+      <li>No Sprint races, no fastest lap bonus point</li>
     </ul>
+
+    <SeasonNotesSection year={1987} />
 
     <h2>Other Seasons</h2>
     <ul>
@@ -56,6 +63,7 @@ const schemaData = {
       <li><a href="/2018">2018 F1 Season</a></li>
       <li><a href="/2017">2017 F1 Season</a></li>
       <li><a href="/2016">2016 F1 Season</a></li>
+      <li><a href="/2015">2015 F1 Season</a></li>
       <li><a href="/2014">2014 F1 Season</a></li>
       <li><a href="/2013">2013 F1 Season</a></li>
       <li><a href="/2012">2012 F1 Season</a></li>
@@ -83,7 +91,6 @@ const schemaData = {
       <li><a href="/1990">1990 F1 Season</a></li>
       <li><a href="/1989">1989 F1 Season</a></li>
       <li><a href="/1988">1988 F1 Season</a></li>
-      <li><a href="/1987">1987 F1 Season</a></li>
       <li><a href="/1986">1986 F1 Season</a></li>
       <li><a href="/1985">1985 F1 Season</a></li>
       <li><a href="/1984">1984 F1 Season</a></li>
@@ -100,6 +107,6 @@ const schemaData = {
     </p>
   </div>
 
-  <AppIsland year="2015" client:only="react" />
+  <AppIsland year="1987" client:only="react" />
   <script is:inline>document.getElementById('seo-content').style.display='none';</script>
 </BaseLayout>

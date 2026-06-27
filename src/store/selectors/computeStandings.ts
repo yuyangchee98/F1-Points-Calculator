@@ -34,6 +34,31 @@ export const DOUBLE_POINTS_RACES: Record<number, Set<string>> = {
   2014: new Set(['abu-dhabi']),
 };
 
+// Official points that diverge from the position→points map for a specific
+// finisher — post-race DSQ reclassifications (where the cars behind were NOT
+// promoted for points) and entries that were classified but not nominated for
+// championship points. Jolpica's standings oracle reflects these; scoring purely
+// by finishing position would over-count. Keyed season → raceId (slug) → driverId.
+// Applied only to the real, unmodified official result (not to what-if drags).
+export const OFFICIAL_RESULT_POINTS: Record<number, Record<string, Record<string, number>>> = {
+  1983: {
+    // Brazilian GP: Keke Rosberg finished 2nd on the road but was disqualified
+    // (push start); finishers behind him kept their on-road scoring positions
+    // rather than being promoted, so each scored one place lower than classified.
+    brazilian: { lauda: 4, laffite: 3, tambay: 2, surer: 1, prost: 0 },
+  },
+  1984: {
+    // Italian GP: Gartner (Osella's 2nd car) and Berger (ATS) were classified in
+    // the points but their entries were not nominated for championship points.
+    italian: { gartner: 0, berger: 0 },
+  },
+  1987: {
+    // Australian GP: Yannick Dalmas drove a second Larrousse not registered for
+    // the championship, so his 5th place scored nothing.
+    australian: { dalmas: 0 },
+  },
+};
+
 // Constructor points resets (team excluded from constructor points before a given round)
 // Force India went into administration before round 13 (Belgian GP) in 2018;
 // FIA reset their constructor points to 0, but driver points were retained.
@@ -162,6 +187,17 @@ export const computeRawPoints = ({
 
       if (DOUBLE_POINTS_RACES[season]?.has(race.id)) {
         pointsForPosition *= 2;
+      }
+
+      // Correct the rare official result whose awarded points differ from its
+      // finishing position (DSQ reclassification / non-nominated entry). Only
+      // the genuine, unmodified official result is overridden — what-if moves
+      // keep position-based scoring so the calculator stays interactive.
+      if (position.isOfficialResult) {
+        const override = OFFICIAL_RESULT_POINTS[season]?.[race.id]?.[position.driverId];
+        if (override !== undefined) {
+          pointsForPosition = override;
+        }
       }
 
       if (!driverPoints[position.driverId]) {

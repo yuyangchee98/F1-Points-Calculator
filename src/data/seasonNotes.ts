@@ -21,6 +21,16 @@ export interface SeasonNote {
 }
 
 export const SEASON_NOTES: Record<number, SeasonNote[]> = {
+  1984: [
+    {
+      scope: 'race',
+      raceId: 'monaco',
+      title: 'Monaco GP — half points',
+      detail:
+        'Stopped after 31 laps in torrential rain (with Senna closing fast on Prost). Under two race distance, so all positions get half points — which is why several 1984 totals end in .5 and Prost lost the title to Lauda by half a point (71.5 to 72).',
+    },
+  ],
+
   1991: [
     {
       scope: 'race',

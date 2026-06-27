@@ -1,11 +1,12 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import AppIsland from '../components/AppIsland';
+import SeasonNotesSection from '../components/seo/SeasonNotesSection.astro';
 const schemaData = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  "name": "F1 Points Calculator 2015 - Championship Predictor",
-  "description": "F1 championship calculator and standings predictor. Simulate Formula 1 race results and calculate driver points for the 2015 season.",
+  "name": "F1 Points Calculator 1984 - Championship Predictor",
+  "description": "F1 championship calculator and standings predictor. Simulate Formula 1 race results and calculate driver points for the 1984 season.",
   "applicationCategory": "Sports Calculator",
   "operatingSystem": "Web Browser",
   "author": {
@@ -17,31 +18,37 @@ const schemaData = {
 ---
 
 <BaseLayout
-  title="F1 Points Calculator 2015 - Championship Predictor"
-  description="F1 points calculator for 2015. Explore Formula 1 race results, calculate driver points, and simulate championship standings with our interactive drag-and-drop tool."
-  keywords="F1, Formula 1, 2015 season, points calculator, championship predictor, race simulator, F1 standings, predictions"
-  canonicalPath="/2015"
-  ogTitle="F1 Points Calculator 2015 - Championship Predictor"
-  ogDescription="Predict F1 race results and championship standings with our interactive calculator"
+  title="F1 Points Calculator 1984 - Championship Predictor"
+  description="F1 points calculator for 1984. Replay Niki Lauda's half-point title over McLaren team-mate Alain Prost with our drag-and-drop championship simulator."
+  keywords="F1, Formula 1, 1984 season, Lauda, Prost, McLaren, TAG Porsche, half point, Senna Toleman Monaco, points calculator, championship predictor, race simulator, F1 standings"
+  canonicalPath="/1984"
+  ogTitle="F1 Points Calculator 1984 - Championship Predictor"
+  ogDescription="Replay Lauda's title by half a point over Prost with our interactive F1 calculator"
   schemaData={schemaData}
-  initialYear={2015}
+  initialYear={1984}
 >
   <!-- SEO content — always in HTML, hidden once React mounts -->
   <div id="seo-content" style="padding: 20px; max-width: 900px; margin: 0 auto; font-family: system-ui, sans-serif; line-height: 1.6;">
-    <h1 style="color: #dc2626;">F1 Points Calculator - 2015 Season</h1>
+    <h1 style="color: #dc2626;">F1 Points Calculator - 1984 Season</h1>
 
-    <p>Explore the 2015 Formula 1 World Championship results and simulate alternative standings.
-    Use our drag-and-drop calculator to see how different race outcomes would have affected
-    the championship.</p>
+    <p>Explore the 1984 Formula 1 World Championship results and simulate alternative
+    standings. Use our drag-and-drop calculator to replay the closest title fight in F1
+    history — Niki Lauda beating his McLaren team-mate Alain Prost by half a point — scored
+    under the classic 9-6-4-3-2-1 system with only a driver's best 11 results counting.</p>
 
-    <h2>2015 F1 Season Highlights</h2>
+    <h2>1984 F1 Season Highlights</h2>
     <ul>
-      <li>19 races across 19 countries</li>
-      <li>10 teams, 20 drivers on the grid (22 total with mid-season replacements)</li>
-      <li>No Sprint races</li>
-      <li>No fastest lap bonus point</li>
-      <li>Lewis Hamilton - 3x World Champion</li>
+      <li>16 races — opening in <strong>Brazil (Rio)</strong> and closing at <strong>Estoril, Portugal</strong></li>
+      <li><strong>Niki Lauda wins his third World Championship</strong> (72 pts), beating McLaren team-mate Alain Prost by <strong>just half a point</strong> — the smallest margin ever</li>
+      <li><strong>Alain Prost P2</strong> (71.5 pts) despite winning <strong>seven races to Lauda's five</strong> — the half-point Monaco result decided the title</li>
+      <li><strong>McLaren-TAG Porsche domination</strong> — 12 wins from 16 races and a crushing Constructors' Championship (143.5 pts to Ferrari's 57.5)</li>
+      <li><strong>Monaco GP stopped early in the rain</strong> — half points awarded, and a young <strong>Ayrton Senna starred in a Toleman</strong>, climbing to 2nd before the red flag</li>
+      <li><strong>Tyrrell excluded</strong> from the championship mid-season over technical infringements</li>
+      <li><strong>Classic 9-6-4-3-2-1 points system</strong> — only the top six score, best 11 results count</li>
+      <li>No Sprint races, no fastest lap bonus point</li>
     </ul>
+
+    <SeasonNotesSection year={1984} />
 
     <h2>Other Seasons</h2>
     <ul>
@@ -56,6 +63,7 @@ const schemaData = {
       <li><a href="/2018">2018 F1 Season</a></li>
       <li><a href="/2017">2017 F1 Season</a></li>
       <li><a href="/2016">2016 F1 Season</a></li>
+      <li><a href="/2015">2015 F1 Season</a></li>
       <li><a href="/2014">2014 F1 Season</a></li>
       <li><a href="/2013">2013 F1 Season</a></li>
       <li><a href="/2012">2012 F1 Season</a></li>
@@ -86,7 +94,6 @@ const schemaData = {
       <li><a href="/1987">1987 F1 Season</a></li>
       <li><a href="/1986">1986 F1 Season</a></li>
       <li><a href="/1985">1985 F1 Season</a></li>
-      <li><a href="/1984">1984 F1 Season</a></li>
       <li><a href="/1983">1983 F1 Season</a></li>
       <li><a href="/1982">1982 F1 Season</a></li>
       <li><a href="/1981">1981 F1 Season</a></li>
@@ -100,6 +107,6 @@ const schemaData = {
     </p>
   </div>
 
-  <AppIsland year="2015" client:only="react" />
+  <AppIsland year="1984" client:only="react" />
   <script is:inline>document.getElementById('seo-content').style.display='none';</script>
 </BaseLayout>

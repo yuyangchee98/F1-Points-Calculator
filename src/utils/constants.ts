@@ -48,6 +48,17 @@ const SEASON_DRIVER_COUNT: { [key: number]: number } = {
   1993: 26,
   1992: 26,
   1991: 26,
+  // 1981–1990 turbo era (from grid-size.ts; max kept finishing position per season).
+  1990: 27,
+  1989: 26,
+  1988: 27,
+  1987: 27,
+  1986: 27,
+  1985: 27,
+  1984: 27,
+  1983: 26,
+  1982: 28,
+  1981: 27,
 };
 
 export const getGridPositions = (season: number): number => {

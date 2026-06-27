@@ -13,6 +13,8 @@ const COMPLETED_YEARS = [
   2004, 2003, 2002, 2001, 2000,
   1999, 1998, 1997, 1996, 1995,
   1994, 1993, 1992, 1991,
+  1990, 1989, 1988, 1987, 1986,
+  1985, 1984, 1983, 1982, 1981,
 ];
 
 const getSeasonUrl = (year: number): string =>
@@ -288,7 +290,7 @@ const SeasonSelector: React.FC<Props> = ({ activeSeason }) => {
             role="dialog"
             aria-label="Choose season"
             aria-modal="true"
-            className="fixed z-[70] left-0 right-0 bottom-0 bg-white rounded-t-2xl shadow-2xl flex flex-col overflow-hidden motion-reduce:transition-none"
+            className="fixed z-[70] left-0 right-0 bottom-0 max-h-[88dvh] bg-white rounded-t-2xl shadow-2xl flex flex-col overflow-hidden motion-reduce:transition-none"
             style={{
               transform: sheetVisible
                 ? `translateY(${dragY}px)`
@@ -413,7 +415,7 @@ const SheetContents: React.FC<SheetContentsProps> = ({
       <div className="h-px bg-gray-200" aria-hidden="true" />
 
       {/* Year grid */}
-      <div className={isMobile ? 'px-4 pt-3 pb-3' : 'px-2.5 pt-2.5 pb-2.5'}>
+      <div className={isMobile ? 'flex-1 min-h-0 flex flex-col px-4 pt-3 pb-3' : 'px-2.5 pt-2.5 pb-2.5'}>
         <div className="px-1 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-500">
           Completed
         </div>
@@ -421,7 +423,9 @@ const SheetContents: React.FC<SheetContentsProps> = ({
           role="group"
           aria-label="Completed seasons"
           className={`grid ${
-            isMobile ? 'grid-cols-4 gap-2' : 'grid-cols-5 gap-1'
+            isMobile
+              ? 'grid-cols-4 gap-2 flex-1 min-h-0 overflow-y-auto'
+              : 'grid-cols-5 gap-1 max-h-[260px] overflow-y-auto'
           }`}
           onKeyDown={handleGridKeyDown}
         >

@@ -39,6 +39,21 @@ export interface SeasonRules {
 }
 
 export const SEASON_RULES: Record<number, SeasonRules> = {
+  // 1981–1990: drivers' title decided on the best 11 results of the season
+  // (9-6-4-3-2-1). Constructors counted ALL races, both cars — so no constructorRules
+  // (the defaults are correct). In 1988 this is what makes Senna champion (90) over
+  // Prost (87) despite Prost out-scoring him on raw points (105 vs 94). The 1984 Monaco
+  // GP was a half-points race (see HALF_POINTS_RACES in computeStandings.ts).
+  1981: { sprintFormat: 'none', defaultPointsSystem: '1960s-1980s', droppedScores: { bestOf: 11 } },
+  1982: { sprintFormat: 'none', defaultPointsSystem: '1960s-1980s', droppedScores: { bestOf: 11 } },
+  1983: { sprintFormat: 'none', defaultPointsSystem: '1960s-1980s', droppedScores: { bestOf: 11 } },
+  1984: { sprintFormat: 'none', defaultPointsSystem: '1960s-1980s', droppedScores: { bestOf: 11 } },
+  1985: { sprintFormat: 'none', defaultPointsSystem: '1960s-1980s', droppedScores: { bestOf: 11 } },
+  1986: { sprintFormat: 'none', defaultPointsSystem: '1960s-1980s', droppedScores: { bestOf: 11 } },
+  1987: { sprintFormat: 'none', defaultPointsSystem: '1960s-1980s', droppedScores: { bestOf: 11 } },
+  1988: { sprintFormat: 'none', defaultPointsSystem: '1960s-1980s', droppedScores: { bestOf: 11 } },
+  1989: { sprintFormat: 'none', defaultPointsSystem: '1960s-1980s', droppedScores: { bestOf: 11 } },
+  1990: { sprintFormat: 'none', defaultPointsSystem: '1960s-1980s', droppedScores: { bestOf: 11 } },
   1991: { sprintFormat: 'none', defaultPointsSystem: '1991-2002' },
   1992: { sprintFormat: 'none', defaultPointsSystem: '1991-2002' },
   1993: { sprintFormat: 'none', defaultPointsSystem: '1991-2002' },
