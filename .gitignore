@@ -9,3 +9,5 @@ automatic-updates/*
 dist/*
 .claude
 .wrangler
+# Astro generated cache
+.astro/
