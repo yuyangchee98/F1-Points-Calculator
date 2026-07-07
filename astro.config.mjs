@@ -35,6 +35,15 @@ export default defineConfig({
           target: 'http://localhost:52313',
           changeOrigin: true,
         },
+        // Blog is SSR'd by the worker (covers /blog, /blog/:slug, /blog/widgets.js)
+        '/blog': {
+          target: 'http://localhost:52313',
+          changeOrigin: true,
+        },
+        '/sitemap-blog.xml': {
+          target: 'http://localhost:52313',
+          changeOrigin: true,
+        },
       },
     },
   },
