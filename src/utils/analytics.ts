@@ -82,6 +82,18 @@ export const updateUserProperties = (properties: {
   }
 };
 
+// The GA `_ga` cookie looks like "GA1.1.1234567890.1234567890"; the client_id
+// GA4 expects is the last two dot-separated segments ("1234567890.1234567890").
+// Returned to pass through Stripe so the server-side purchase event (fired from
+// the webhook via Measurement Protocol) attributes to this visitor's session.
+export const getGaClientId = (): string | undefined => {
+  if (typeof document === 'undefined') return undefined;
+  const match = document.cookie.match(/(?:^|;\s*)_ga=([^;]+)/);
+  if (!match) return undefined;
+  const parts = decodeURIComponent(match[1]).split('.');
+  return parts.length >= 4 ? parts.slice(-2).join('.') : undefined;
+};
+
 const PREDICTIONS_COUNT_KEY = 'f1_predictions_count';
 
 export const incrementPredictionCount = () => {

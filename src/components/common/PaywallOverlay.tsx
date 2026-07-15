@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import type { RootState } from '../../store';
 import { openAuthModal } from '../../store/slices/authSlice';
 import { API_BASE_URL } from '../../utils/constants';
+import { getGaClientId } from '../../utils/analytics';
 import GridSkeleton from './GridSkeleton';
 
 interface Props {
@@ -43,6 +44,7 @@ const PaywallOverlay: React.FC<Props> = ({ priceLabel = '$4.99' }) => {
           tier: 'archive',
           successUrl: returnUrl,
           cancelUrl: returnUrl,
+          gaClientId: getGaClientId(),
         }),
       });
       if (!res.ok) {
