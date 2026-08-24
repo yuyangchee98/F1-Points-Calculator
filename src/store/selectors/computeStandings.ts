@@ -88,6 +88,24 @@ export interface CalculatedResults {
   teamFinishes: Record<string, number[]>;
 }
 
+/**
+ * Championship countback tie-break: with points level, the competitor with more
+ * wins ranks ahead, then more 2nds, and so on. `finishes[i]` is the count of
+ * (i+1)th-place finishes. Lives here (a leaf module) rather than in the selector
+ * so the standings tables and the verification harnesses share one comparator.
+ */
+export const compareByCountback = (finishesA: number[], finishesB: number[]): number => {
+  const maxLength = Math.max(finishesA.length, finishesB.length);
+  for (let i = 0; i < maxLength; i++) {
+    const countA = finishesA[i] || 0;
+    const countB = finishesB[i] || 0;
+    if (countA !== countB) {
+      return countB - countA;
+    }
+  }
+  return 0;
+};
+
 export interface ComputeParams {
   positions: GridPosition[];
   races: Race[];

@@ -11,3 +11,13 @@ dist/*
 .wrangler
 # Astro generated cache
 .astro/
+
+# Playwright
+test-results/
+playwright-report/
+
+# Test suite — deliberately not published. The fixtures redistribute Jolpica data
+# and the suite is kept private; see TESTING.md at the project root.
+tests/
+vitest.config.ts
+playwright.config.ts

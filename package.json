@@ -7,7 +7,12 @@
     "dev": "astro dev --port 5173",
     "build": "astro check && astro build",
     "preview": "astro preview",
-    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "snapshot:seasons": "tsx scripts/snapshot-seasons.ts",
+    "verify:season": "tsx scripts/verify-season.ts",
+    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.7",
@@ -27,6 +32,7 @@
     "react-redux": "^9.1.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.1",
     "@types/react": "^18.2.55",
     "@types/react-dom": "^18.2.19",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
@@ -38,6 +44,8 @@
     "eslint-plugin-react-refresh": "^0.4.5",
     "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5.9.3"
+    "tsx": "^4.23.12",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.10"
   }
 }

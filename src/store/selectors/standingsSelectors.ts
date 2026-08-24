@@ -2,7 +2,7 @@ import { createSelector } from '@reduxjs/toolkit';
 import type { RootState } from '../index';
 import type { DriverStanding, TeamStanding, PointsHistory, TeamPointsHistory } from '../../types';
 import { getActiveSeason } from '../../utils/constants';
-import { computeRawPoints } from './computeStandings';
+import { computeRawPoints, compareByCountback } from './computeStandings';
 import type { CalculatedResults } from './computeStandings';
 
 const selectGridPositions = (state: RootState) => state.grid.positions;
@@ -10,18 +10,6 @@ const selectRaces = (state: RootState) => state.seasonData.races;
 const selectDrivers = (state: RootState) => state.seasonData.drivers;
 const selectPastResults = (state: RootState) => state.seasonData.pastResults;
 const selectPointsSystem = (state: RootState) => state.ui.selectedPointsSystem;
-
-const compareByCountback = (finishesA: number[], finishesB: number[]): number => {
-  const maxLength = Math.max(finishesA.length, finishesB.length);
-  for (let i = 0; i < maxLength; i++) {
-    const countA = finishesA[i] || 0;
-    const countB = finishesB[i] || 0;
-    if (countA !== countB) {
-      return countB - countA;
-    }
-  }
-  return 0;
-};
 
 const selectCalculatedPoints = createSelector(
   [selectGridPositions, selectRaces, selectDrivers, selectPastResults, selectPointsSystem],
