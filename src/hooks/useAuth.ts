@@ -42,7 +42,7 @@ export function useAuth() {
   };
 
   const handleSignUp = async (email: string, password: string, name: string) => {
-    const result = await signUp.email({ email, password, name, callbackURL: window.location.origin });
+    const result = await signUp.email({ email, password, name, callbackURL: window.location.href });
     if (result.error) {
       throw new Error(result.error.message);
     }
@@ -51,7 +51,7 @@ export function useAuth() {
   };
 
   const handleResendVerification = async (email: string) => {
-    const result = await sendVerificationEmail({ email, callbackURL: window.location.origin });
+    const result = await sendVerificationEmail({ email, callbackURL: window.location.href });
     if (result.error) {
       throw new Error(result.error.message);
     }
