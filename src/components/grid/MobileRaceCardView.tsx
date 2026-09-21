@@ -18,6 +18,12 @@ interface MobileRaceCardViewProps {
   onOpenHistory: () => void;
   onOpenExport: () => void;
   showOfficialResults: boolean;
+  /**
+   * Card chrome above the race. App.tsx passes null because the toolbar is now
+   * the page's section bar and is rendered once, higher up. Matches the same
+   * escape hatch on RaceGrid; omit for the built-in toolbar.
+   */
+  toolbar?: React.ReactNode;
 }
 
 const ROW_HEIGHT = 48;
@@ -31,6 +37,7 @@ const MobileRaceCardView: React.FC<MobileRaceCardViewProps> = ({
   onOpenHistory,
   onOpenExport,
   showOfficialResults,
+  toolbar,
 }) => {
   const dispatch = useAppDispatch();
   const races = useSelector((state: RootState) => state.seasonData.races);
@@ -94,18 +101,23 @@ const MobileRaceCardView: React.FC<MobileRaceCardViewProps> = ({
     <div className="flex flex-col h-full bg-surface shadow-xs rounded-lg border overflow-hidden">
       {/* Toolbar */}
       <div className="shrink-0">
-        <GridToolbar
-          onReset={onReset}
-          onToggleOfficialResults={onToggleOfficialResults}
-          onOpenHistory={onOpenHistory}
-          onOpenExport={onOpenExport}
-          showOfficialResults={showOfficialResults}
-          onToggleConsensus={() => {
-            dispatch(toggleConsensus());
-            trackEvent(GA_EVENTS.GRID_ACTIONS.TOGGLE_CONSENSUS, 'Grid Actions', !showConsensus ? 'show' : 'hide');
-          }}
-          showConsensus={showConsensus}
-        />
+        {toolbar !== undefined ? (
+          toolbar
+        ) : (
+          <GridToolbar
+            activeSeason={getActiveSeason()}
+            onReset={onReset}
+            onToggleOfficialResults={onToggleOfficialResults}
+            onOpenHistory={onOpenHistory}
+            onOpenExport={onOpenExport}
+            showOfficialResults={showOfficialResults}
+            onToggleConsensus={() => {
+              dispatch(toggleConsensus());
+              trackEvent(GA_EVENTS.GRID_ACTIONS.TOGGLE_CONSENSUS, 'Grid Actions', !showConsensus ? 'show' : 'hide');
+            }}
+            showConsensus={showConsensus}
+          />
+        )}
       </div>
 
       {/* Compact race navigation: single row */}

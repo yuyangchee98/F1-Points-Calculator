@@ -1,0 +1,104 @@
+---
+/**
+ * The Tracks index — the section's front door.
+ *
+ * Deliberately `src/pages/tracks.astro` and NOT `src/pages/tracks/index.astro`.
+ * Both produce the route /tracks, but the build is `format: 'file'` with
+ * `trailingSlash: 'never'` (astro.config.mjs), and the sibling-file form emits a
+ * flat dist/tracks.html alongside the existing dist/tracks/ directory. The
+ * index.astro form emits dist/tracks/index.html, which is exactly the
+ * directory-vs-file resolution that the comment in astro.config.mjs says
+ * 308-redirects on Cloudflare Pages.
+ *
+ * Until this page existed the 40-odd circuit pages were reachable only from a
+ * race-column header inside the JS-rendered grid — no index, and the breadcrumb
+ * on each track page pointed at a "Tracks" parent that did not exist.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionBar from '../components/nav/SectionBar.astro';
+import CircuitPicker from '../components/nav/CircuitPicker.astro';
+import { fetchCircuitList, groupByCountry, flagCodeFor, circuitVenue } from '../utils/circuits';
+
+// Same single call, same fail-the-build contract as /tracks/[track].
+const circuits = await fetchCircuitList();
+const grouped = groupByCountry(circuits);
+
+const siteUrl = 'https://f1pointscalculator.chyuang.com';
+const schemaData = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'Formula 1 circuits',
+  description: 'Every Formula 1 circuit, with full race results by year.',
+  numberOfItems: circuits.length,
+  itemListElement: circuits.map((c, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: c.fullName,
+    url: `${siteUrl}/tracks/${c.slug}`,
+  })),
+};
+---
+
+<BaseLayout
+  title="F1 Circuits: Every Grand Prix Winner & Results by Year | F1 Points Calculator"
+  description={`All ${circuits.length} Formula 1 circuits. Browse full race results, winners and podiums by year for every Grand Prix venue.`}
+  keywords="F1 circuits, Formula 1 tracks, Grand Prix winners, race results by year, F1 track list, circuit history"
+  canonicalPath="/tracks"
+  ogTitle="Every F1 Circuit — Results and Winners by Year"
+  ogDescription={`All ${circuits.length} Formula 1 circuits, with full race results and winners for every year.`}
+  schemaData={schemaData}
+>
+  <SectionBar title="Circuits">
+    <CircuitPicker circuits={circuits} label="Jump to circuit" />
+    <span class="flex-1"></span>
+    <span class="text-xs text-ink-muted hidden sm:inline">
+      {circuits.length} circuits · {grouped.length} countries
+    </span>
+  </SectionBar>
+
+  <main class="max-w-5xl mx-auto px-4 py-6">
+    <h1 class="text-2xl font-display font-bold tracking-tight mb-2">
+      Formula 1 Circuits
+    </h1>
+    <p class="text-ink-secondary max-w-2xl mb-8">
+      Every venue the Formula 1 World Championship has visited. Pick a circuit for its
+      full classification year by year — winners, podiums and the complete finishing
+      order for each Grand Prix held there.
+    </p>
+
+    {grouped.map((group) => (
+      <section class="mb-8">
+        <h2 class="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-ink-muted mb-3">
+          {flagCodeFor(group.country) && (
+            <img
+              src={`https://flagcdn.com/w20/${flagCodeFor(group.country)}.png`}
+              width="20"
+              height="15"
+              alt=""
+              loading="lazy"
+              class="rounded-sm shadow-xs"
+            />
+          )}
+          {group.country}
+        </h2>
+
+        <ul class="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {group.circuits.map((c) => (
+            <li>
+              <a
+                href={`/tracks/${c.slug}`}
+                class="block h-full bg-surface border rounded-lg px-3 py-2.5 shadow-xs
+                       hover:border-strong hover:shadow-sm transition-all"
+              >
+                <span class="block text-sm font-semibold text-ink leading-snug">{c.fullName}</span>
+                <span class="block text-xs text-ink-muted mt-0.5">
+                  {circuitVenue(c) || 'Results by year'}
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+  </main>
+</BaseLayout>

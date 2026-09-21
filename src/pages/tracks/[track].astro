@@ -1,45 +1,28 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import TrackResultsIsland from '../../components/tracks/TrackResultsIsland';
-import { COUNTRY_CODE_MAP } from '../../utils/constants';
+import SectionBar from '../../components/nav/SectionBar.astro';
+import CircuitPicker from '../../components/nav/CircuitPicker.astro';
+import { fetchCircuitList, flagCodeFor } from '../../utils/circuits';
 import type { CircuitHistory, CircuitListItem } from '../../types/track';
 
 const API_BASE_URL = import.meta.env.PUBLIC_API_BASE_URL;
 
 // ---------------------------------------------------------------------------
-// Which track pages to generate. getStaticPaths pulls the full circuit list from
-// the Worker and renders a page per circuit. If the Worker is unreachable or
-// returns no circuits at build time, we FAIL THE BUILD rather than silently
-// shipping a near-empty set of pages — a partial build would 404 every track
-// link in the calculator. Re-run the deploy once the Worker is healthy.
+// Which track pages to generate — one per circuit. fetchCircuitList owns the
+// fail-the-build contract (src/utils/circuits.ts): an unreachable Worker or an
+// empty list aborts rather than shipping a near-empty set of pages, since a
+// partial build would 404 every track link in the calculator. The whole list is
+// also passed to each page so the circuit picker can link to its siblings.
 // ---------------------------------------------------------------------------
 export async function getStaticPaths() {
-  let circuits: CircuitListItem[];
-  try {
-    const res = await fetch(`${import.meta.env.PUBLIC_API_BASE_URL}/api/circuits`);
-    if (!res.ok) {
-      throw new Error(`/api/circuits returned HTTP ${res.status}`);
-    }
-    const data = (await res.json()) as { circuits?: CircuitListItem[] };
-    circuits = data.circuits ?? [];
-  } catch (err) {
-    throw new Error(
-      `[tracks] Cannot build track pages: failed to load the circuit list from the Worker ` +
-      `(${API_BASE_URL}/api/circuits). ${err instanceof Error ? err.message : String(err)}`
-    );
-  }
-
-  if (circuits.length === 0) {
-    throw new Error(
-      `[tracks] Cannot build track pages: /api/circuits returned an empty list. ` +
-      `Refusing to ship a track-page-less build.`
-    );
-  }
-
-  return circuits.map((c) => ({ params: { track: c.slug }, props: c }));
+  const circuits = await fetchCircuitList();
+  return circuits.map((c) => ({ params: { track: c.slug }, props: { ...c, circuits } }));
 }
 
-const { circuitId, fullName, country } = Astro.props as CircuitListItem;
+const { circuitId, fullName, country, circuits } = Astro.props as CircuitListItem & {
+  circuits: CircuitListItem[];
+};
 const slug = Astro.params.track;
 
 // Build-time fetch (unauthenticated): free years full, premium years locked.
@@ -57,11 +40,9 @@ const circuitName = history?.fullName ?? fullName;
 const seasons = editions.map((e) => e.season);
 const latestSeason = seasons.length ? Math.max(...seasons) : null;
 const earliestSeason = seasons.length ? Math.min(...seasons) : null;
-const countryCode = COUNTRY_CODE_MAP[country.toLowerCase()] ?? '';
-// flagcdn keys by ISO 3166-1 alpha-2 — the UK is 'gb' there, not 'uk'. The
-// calculator grid uses a local /flags/uk.webp, so the shared map keeps 'uk';
-// translate only for the flagcdn URL below.
-const flagCode = countryCode === 'uk' ? 'gb' : countryCode;
+// flagcdn keys by ISO 3166-1 alpha-2 (see flagCodeFor in utils/circuits.ts).
+const flagCode = flagCodeFor(country);
+const countryCode = flagCode;
 
 // Aggregate trivia computed server-side over the full history (incl. premium years).
 const stats = history?.stats;
@@ -121,6 +102,22 @@ const schemaData = {
   canonicalPath={`/tracks/${slug}`}
   schemaData={schemaData}
 >
+  {/* The section bar replaces the old breadcrumb, whose middle crumb ("Tracks")
+      was a plain <span> because no index page existed. The spine now lights
+      Tracks for us, so this carries what the page actually needs: which circuit,
+      and a way to reach the others. */}
+  {/* Desktop wrapper: one viewport-minus-spine column, section bar fixed at its
+      natural height and the grid taking the rest. A flex column rather than a
+      second calc() so the bar's height is never guessed — it can wrap at narrow
+      widths and the grid still gets exactly what is left. Mobile is untouched
+      (natural page scroll), which is what the note below is warning about. */}
+  <div class="sm:h-[calc(100dvh_-_var(--spine-h))] sm:flex sm:flex-col sm:overflow-hidden">
+  <SectionBar title={fullName} class="sm:flex-nowrap">
+    <CircuitPicker circuits={circuits} current={slug} />
+    <span class="flex-1"></span>
+    {yearRange && <span class="text-xs text-ink-muted hidden sm:inline">{yearRange} · {editions.length} editions</span>}
+  </SectionBar>
+
   {/* Responsive shell. Mobile (single column): identity → results → records,
       stacked in source order with natural page scroll. Desktop (sm+): a CSS
       grid reassembles the left rail (identity pinned over scrolling records) and
@@ -130,17 +127,11 @@ const schemaData = {
   <div
     class="grid grid-cols-1 min-h-[100dvh] text-ink
            sm:grid-cols-[20rem_minmax(0,1fr)] sm:grid-rows-[auto_minmax(0,1fr)]
-           sm:h-[100dvh] sm:min-h-0 sm:overflow-hidden"
+           sm:flex-1 sm:min-h-0 sm:overflow-hidden"
   >
     {/* Identity — circuit name + at-a-glance facts. Top of the left rail on
         desktop; first thing on mobile. */}
     <header class="bg-surface border-b sm:border-b-0 sm:border-r p-4 flex flex-col gap-3 sm:col-start-1 sm:row-start-1">
-      <nav class="text-xs text-ink-muted" aria-label="Breadcrumb">
-        <a href="/" class="hover:text-ink">Calculator</a>
-        <span class="mx-1">/</span>
-        <span class="text-ink-secondary">Tracks</span>
-      </nav>
-
       <div>
         <div class="flex items-center gap-2 mb-1.5">
           {countryCode && (
@@ -293,5 +284,6 @@ const schemaData = {
           Open the Points Calculator
         </a>
     </aside>
+  </div>
   </div>
 </BaseLayout>

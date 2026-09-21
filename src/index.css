@@ -142,10 +142,44 @@
   box-shadow: inset 0 0 0 2px rgb(var(--interactive) / 0.5);
 }
 
-/* App shell — viewport lock for app-like feel (scoped to .app pages only) */
+/* App shell — viewport lock for app-like feel (scoped to .app pages only).
+ *
+ * The spine (SiteSpine.astro) is a sibling ABOVE .app in the document, and the
+ * mobile section tab bar (SiteTabBar.astro) is fixed to the bottom. .app must
+ * give back exactly their heights or the grid's last position row falls off a
+ * body that cannot scroll — there is no scrollbar to rescue it.
+ *
+ * --spine-h is the single source of truth: the spine element is sized
+ * h-[var(--spine-h)], so the variable and the rendered height cannot drift.
+ * Never give the spine vertical padding or a margin that grows it past this.
+ */
+:root {
+  --spine-h: 3rem;     /* 48px — mobile */
+  --bottombar-h: 4rem; /* 64px — the mobile section tab bar */
+}
+@media (min-width: 640px) {
+  :root {
+    --spine-h: 3.25rem;  /* 52px — a little more room once labels appear */
+    --bottombar-h: 0px;  /* the tab bar is sm:hidden */
+  }
+}
+
 html, body { height: 100%; margin: 0; }
 body:has(.app) { overflow: hidden; }
-.app { height: 100vh; height: 100dvh; overflow: hidden; }
+
+/* Non-app pages keep the document scroller; reserve room for the fixed tab bar
+   so their last line isn't hidden behind it. */
+body:not(:has(.app)) { padding-bottom: var(--bottombar-h); }
+
+.app {
+  height: calc(100vh - var(--spine-h));
+  height: calc(100dvh - var(--spine-h));
+  overflow: hidden;
+  /* Lets the calculator's section bar span the full width above the
+     sidebar + main split, which the old in-<main> header could not. */
+  display: flex;
+  flex-direction: column;
+}
 
 /* Base styles */
 body {

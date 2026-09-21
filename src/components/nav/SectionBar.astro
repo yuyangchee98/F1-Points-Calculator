@@ -1,0 +1,21 @@
+---
+/**
+ * Tier 2 of the site chrome, for sections whose bar needs no client state.
+ * Calculator and Compete render theirs from React instead (they need Redux and
+ * tab state), but all three share the classes in ./sectionBar.ts so they read as
+ * one bar.
+ */
+import { SECTION_BAR_CLASS, SECTION_BAR_TITLE_CLASS } from './sectionBar';
+
+interface Props {
+  title?: string;
+  class?: string;
+}
+
+const { title, class: className = '' } = Astro.props;
+---
+
+<div class={`${SECTION_BAR_CLASS} ${className}`}>
+  {title && <span class={SECTION_BAR_TITLE_CLASS}>{title}</span>}
+  <slot />
+</div>

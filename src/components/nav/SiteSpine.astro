@@ -1,0 +1,196 @@
+---
+/**
+ * The spine — tier 1 of the site's chrome.
+ *
+ * Identical on every page, and the only place top-level navigation lives. What
+ * belongs here: the four sections, and nothing else. Section-specific controls
+ * (season, points system, tabs, circuit pickers) belong in the section bar
+ * immediately below — see components/nav/sectionBar.ts.
+ *
+ * ── Two rules this component must keep ──
+ *
+ * 1. HEIGHT. The element is sized h-[var(--spine-h)], and .app subtracts exactly
+ *    that (src/index.css). Never add vertical padding, a margin, or a taller
+ *    child that grows it — the calculator's body cannot scroll, so any extra
+ *    pixel silently cuts the bottom row off the race grid.
+ *
+ * 2. NO DATA. Nothing here may enumerate circuits, drivers, or seasons. Global
+ *    chrome renders on every page including the paywalled archive seasons, so a
+ *    circuit list here would leak withheld race names into the DOM of all 44 of
+ *    them at once — which tests/e2e/calculator.spec.ts asserts against on /2011.
+ *    The circuit picker lives in the Tracks section bar, never here.
+ */
+import { SECTIONS, type SectionId } from '../../utils/nav';
+import SpineAccountIsland from './SpineAccountIsland';
+
+interface Props {
+  section: SectionId;
+  /**
+   * Whether to mount the React account island.
+   *
+   * It costs ~220 KB of JS (React + Redux + the auth client), which is the whole
+   * payload of pages like /about and /changelog that otherwise ship none. Those
+   * pass false and get the static link below instead. The link is deliberately
+   * labelled "Account" rather than "Sign In": without the island there is no
+   * session to read, and a "Sign In" button shown to an already-signed-in user
+   * is worse than a neutral one.
+   */
+  account?: boolean;
+}
+
+const { section, account = true } = Astro.props;
+---
+
+<header
+  class="sticky top-0 z-header h-[var(--spine-h)] shrink-0 bg-surface border-b
+         flex items-center gap-1 px-2 sm:px-4"
+>
+  <a href="/" class="flex items-center gap-2 mr-2 sm:mr-5 shrink-0" aria-label="F1 Points Calculator, home">
+    <span class="bg-brand text-white text-2xs sm:text-xs font-bold px-1.5 py-1 rounded-sm leading-none">F1</span>
+    <span class="hidden sm:inline font-display font-bold text-sm text-ink tracking-tight">Points Calculator</span>
+  </a>
+
+  <nav aria-label="Sections" class="flex items-center h-full min-w-0">
+    {SECTIONS.map((s) => (
+      <a
+        href={s.href}
+        aria-current={s.id === section ? 'page' : undefined}
+        class:list={[
+          'relative flex items-center h-full px-2 sm:px-3.5 text-xs sm:text-sm font-semibold transition-colors',
+          'after:absolute after:inset-x-1.5 after:-bottom-px after:h-[2.5px] after:rounded-t-sm',
+          s.id === section
+            ? 'text-ink after:bg-brand'
+            : 'text-ink-secondary hover:text-ink after:bg-transparent',
+        ]}
+      >
+        {s.label}
+      </a>
+    ))}
+  </nav>
+
+  <div class="ml-auto flex items-center gap-1.5 sm:gap-2 shrink-0">
+    {/* Cross-promo, shown at lg+ where there is room for it. Below lg it lives
+        in the overflow menu instead — the two are mutually exclusive by
+        breakpoint, so changing one without the other leaves a gap where Draw
+        Line Racing appears nowhere at all. */}
+    <a
+      href="https://drawlineracing.chyuang.com/"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Try Draw Line Racing"
+      title="Try my new game: Draw Line Racing!"
+      class="group hidden lg:inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-sm font-medium
+             bg-brand-subtle text-brand-strong border border-brand/25 hover:bg-brand-subtle/70 transition-colors"
+    >
+      <span class="text-sm leading-none" aria-hidden="true">🏎️</span>
+      <span>Draw Line Racing</span>
+      <svg
+        class="h-3 w-3 group-hover:translate-x-0.5 transition-transform"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+      </svg>
+    </a>
+
+    <a
+      href="https://f2pointscalculator.chyuang.com"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="hidden lg:inline-flex items-center gap-1 text-xs text-ink-muted hover:text-ink-secondary transition-colors"
+    >
+      F2 calculator
+      <span aria-hidden="true">↗</span>
+    </a>
+
+    {/* A native <details> so the overflow menu works with zero JS — /about and
+        /changelog ship no React at all and must still be navigable. */}
+    <details class="spine-more relative">
+      <summary
+        class="list-none inline-flex items-center justify-center h-7 sm:h-8 w-7 sm:w-8 rounded-md
+               border text-ink-secondary hover:bg-carbon-100 cursor-pointer transition-colors"
+        aria-label="More"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </summary>
+
+      <nav
+        aria-label="More"
+        class="absolute right-0 mt-2 w-52 bg-surface rounded-lg shadow-lg border py-1 z-overlay"
+      >
+        <a href="/about" class="block px-4 py-2 text-sm text-ink-secondary hover:bg-carbon-100">About</a>
+        <a href="/changelog" class="block px-4 py-2 text-sm text-ink-secondary hover:bg-carbon-100">Changelog</a>
+        <a
+          href="https://github.com/yuyangchee98/F1-Points-Calculator/issues"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="block px-4 py-2 text-sm text-ink-secondary hover:bg-carbon-100"
+        >Feedback</a>
+        <a
+          href="https://buymeacoffee.com/yaang"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="block px-4 py-2 text-sm font-medium text-brand hover:bg-brand-subtle"
+        >Support</a>
+        <a
+          href="https://drawlineracing.chyuang.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="lg:hidden px-4 py-2 text-sm text-ink-secondary hover:bg-carbon-100 flex items-center gap-2"
+        >
+          <span class="text-base leading-none" aria-hidden="true">🏎️</span>
+          Try Draw Line Racing
+        </a>
+        <a
+          href="https://f2pointscalculator.chyuang.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="lg:hidden block px-4 py-2 text-sm text-ink-secondary hover:bg-carbon-100"
+        >F2 calculator ↗</a>
+      </nav>
+    </details>
+
+    {/* Reserve the slot so the island mounting doesn't shift the row. */}
+    <div class="flex items-center justify-end min-w-[2rem] h-7 sm:h-8">
+      {account && <SpineAccountIsland client:only="react" />}
+      {!account && (
+        <a
+          href="/compete"
+          class="inline-flex items-center gap-1.5 h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm font-medium
+                 text-ink-secondary bg-surface border rounded-md hover:bg-carbon-100 transition-colors"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+          <span class="hidden sm:inline">Account</span>
+        </a>
+      )}
+    </div>
+  </div>
+</header>
+
+<style>
+  /* Safari still paints the default disclosure triangle without this. */
+  .spine-more > summary::-webkit-details-marker { display: none; }
+</style>
+
+<script is:inline>
+  // <details> closes on its own summary, but not on outside-click or Escape.
+  (function () {
+    document.addEventListener('click', function (e) {
+      document.querySelectorAll('details.spine-more[open]').forEach(function (d) {
+        if (!d.contains(e.target)) d.removeAttribute('open');
+      });
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      document.querySelectorAll('details.spine-more[open]').forEach(function (d) {
+        d.removeAttribute('open');
+      });
+    });
+  })();
+</script>

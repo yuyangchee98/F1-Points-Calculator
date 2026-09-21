@@ -112,4 +112,8 @@ export const COUNTRY_CODE_MAP: Record<string, string> = {
   'san marino': 'sm',
   'korea': 'kr',
   'india': 'in',
+  // Historic-only venues, surfaced once /tracks listed every circuit rather
+  // than only the ones on a modern calendar.
+  'argentina': 'ar',
+  'south africa': 'za',
 } as const;

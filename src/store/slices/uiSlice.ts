@@ -41,8 +41,14 @@ export const uiSlice = createSlice({
     setMobileView: (state, action: PayloadAction<MobileView>) => {
       state.mobileView = action.payload;
 
+      // The write must be symmetric. It used to only ever *set* 'standings' and
+      // never clear it, so initializeUiState below restored 'standings' on every
+      // subsequent visit — one tap pinned the user to the standings pane forever,
+      // with no way back short of clearing site data.
       if (action.payload === 'standings') {
         localStorage.setItem('mobile-view', action.payload);
+      } else {
+        localStorage.removeItem('mobile-view');
       }
     },
 

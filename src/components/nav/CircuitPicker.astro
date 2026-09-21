@@ -1,0 +1,106 @@
+---
+/**
+ * Jump to another circuit, from any Tracks page.
+ *
+ * Deliberately a plain <details> with 40-odd real <a> tags rather than a
+ * hydrated combobox: the crawlable internal links ARE the point. Before this,
+ * /tracks/* pages were reachable only from a race-column header inside the
+ * JS-rendered grid, which left them all but invisible to crawlers and to anyone
+ * who did not already know they existed.
+ *
+ * This belongs to the Tracks SECTION BAR and must never be lifted into the
+ * spine — global chrome renders on paywalled archive pages, where a list of
+ * circuit names would leak withheld race names into the DOM. See the note on
+ * SiteSpine.astro.
+ */
+import { groupByCountry, flagCodeFor, circuitVenue } from '../../utils/circuits';
+import type { CircuitListItem } from '../../types/track';
+
+interface Props {
+  circuits: CircuitListItem[];
+  /** Slug of the circuit currently being viewed, if any. */
+  current?: string;
+  label?: string;
+}
+
+const { circuits, current, label = 'Change circuit' } = Astro.props;
+const grouped = groupByCountry(circuits);
+---
+
+<details class="circuit-picker relative shrink-0">
+  <summary
+    class="list-none inline-flex items-center gap-1.5 h-8 px-2.5 bg-surface border rounded-md
+           text-sm text-ink-secondary hover:bg-carbon-100 cursor-pointer transition-colors select-none"
+  >
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0zM15 11a3 3 0 11-6 0 3 3 0 016 0z"
+      />
+    </svg>
+    {label}
+    <svg class="w-3 h-3 text-ink-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+    </svg>
+  </summary>
+
+  <nav
+    aria-label="All circuits"
+    class="absolute left-0 mt-2 w-72 max-h-[70vh] overflow-y-auto bg-surface rounded-lg shadow-lg border py-1 z-overlay"
+  >
+    {grouped.map((group) => (
+      <div>
+        <p class="px-3 pt-2 pb-1 text-2xs font-bold uppercase tracking-wider text-ink-muted flex items-center gap-1.5">
+          {flagCodeFor(group.country) && (
+            <img
+              src={`https://flagcdn.com/w20/${flagCodeFor(group.country)}.png`}
+              width="16"
+              height="12"
+              alt=""
+              loading="lazy"
+              class="rounded-sm"
+            />
+          )}
+          {group.country}
+        </p>
+        {group.circuits.map((c) => (
+          <a
+            href={`/tracks/${c.slug}`}
+            aria-current={c.slug === current ? 'page' : undefined}
+            class:list={[
+              'block px-3 py-1.5 text-sm hover:bg-carbon-100',
+              c.slug === current ? 'text-ink font-semibold bg-carbon-50' : 'text-ink-secondary',
+            ]}
+          >
+            {c.fullName}
+            {circuitVenue(c) && (
+              <span class="text-ink-muted font-normal"> · {circuitVenue(c)}</span>
+            )}
+          </a>
+        ))}
+      </div>
+    ))}
+  </nav>
+</details>
+
+<style>
+  .circuit-picker > summary::-webkit-details-marker { display: none; }
+</style>
+
+<script is:inline>
+  (function () {
+    document.addEventListener('click', function (e) {
+      document.querySelectorAll('details.circuit-picker[open]').forEach(function (d) {
+        if (!d.contains(e.target)) d.removeAttribute('open');
+      });
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      document.querySelectorAll('details.circuit-picker[open]').forEach(function (d) {
+        d.removeAttribute('open');
+      });
+    });
+  })();
+</script>

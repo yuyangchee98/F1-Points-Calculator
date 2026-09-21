@@ -9,7 +9,6 @@ import {
   selectOverallAccuracy,
   selectLockedRaceCount,
   selectScoredRaceCount,
-  selectNextRaceToLock,
   selectNextWeekendRacesToLock,
   selectAwaitingResultsRaces,
   selectScoredRaces,
@@ -27,14 +26,16 @@ import SingleRaceGrid from '../components/compete/SingleRaceGrid';
 import LockConfirmationModal from '../components/predictions/LockConfirmationModal';
 import ToastContainer from '../components/common/ToastContainer';
 import { getLeaderboard, type LeaderboardEntry, type PendingEntry } from '../api/leaderboard';
-import AuthModal from '../components/auth/AuthModal';
+import CompeteSectionBar from '../components/nav/CompeteSectionBar';
+import { useCompeteTab, type CompeteTab } from './compete/useCompeteTab';
 import { selectDriver } from '../store/slices/uiSlice';
 import { selectTeamsByIdMap, getDriverLastName } from '../store/selectors/dataSelectors';
 import useWindowSize from '../hooks/useWindowSize';
 
 // ─── Helpers ──────────────────────────────────────────
 
-type Tab = 'predict' | 'results' | 'leaderboard';
+/** Re-exported from the hook so the section bar and this view cannot drift. */
+type Tab = CompeteTab;
 
 const formatName = (name: string) =>
   name.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
@@ -75,7 +76,6 @@ const Compete: React.FC = () => {
   const overallAccuracy = useSelector(selectOverallAccuracy);
   const lockedCount = useSelector(selectLockedRaceCount);
   const scoredCount = useSelector(selectScoredRaceCount);
-  const nextRaceToLock = useSelector(selectNextRaceToLock);
   const nextWeekendRaces = useSelector(selectNextWeekendRacesToLock);
   const awaitingResults = useSelector(selectAwaitingResultsRaces);
   const scoredRaces = useSelector(selectScoredRaces);
@@ -92,33 +92,9 @@ const Compete: React.FC = () => {
   const [leaderboardTotalUsers, setLeaderboardTotalUsers] = useState(0);
   const [leaderboardLoading, setLeaderboardLoading] = useState(false);
 
-  // Smart default tab
-  const getDefaultTab = (): Tab => {
-    const hash = window.location.hash.replace('#', '') as Tab;
-    if (['predict', 'results', 'leaderboard'].includes(hash)) return hash;
-    if (nextRaceToLock) return 'predict';
-    if (scoredRaces.length > 0) return 'results';
-    return 'leaderboard';
-  };
-
-  const [activeTab, setActiveTab] = useState<Tab>(getDefaultTab);
-
-  // Sync hash
-  useEffect(() => {
-    window.location.hash = activeTab;
-  }, [activeTab]);
-
-  // Listen for hash changes (browser back/forward)
-  useEffect(() => {
-    const onHashChange = () => {
-      const hash = window.location.hash.replace('#', '') as Tab;
-      if (['predict', 'results', 'leaderboard'].includes(hash)) {
-        setActiveTab(hash);
-      }
-    };
-    window.addEventListener('hashchange', onHashChange);
-    return () => window.removeEventListener('hashchange', onHashChange);
-  }, []);
+  // Tab state + hash sync live in the hook so the section bar and the panels
+  // can share them (src/views/compete/useCompeteTab.ts).
+  const { tab: activeTab, setTab: setActiveTab } = useCompeteTab();
 
   useRaceResults(CURRENT_SEASON);
 
@@ -229,24 +205,12 @@ const Compete: React.FC = () => {
       <div className="min-h-screen bg-surface-sunken">
         <ToastContainer />
 
-        {/* Header */}
-        <header className="bg-surface border-b">
-          <div className="mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
-            <a href="/" className="flex items-center gap-2">
-              <span className="bg-brand text-white text-sm font-bold px-2 py-1 rounded-sm">F1</span>
-              <span className="text-lg font-display font-semibold text-ink">Compete</span>
-            </a>
-            <a
-              href="/"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-ink-secondary hover:text-ink transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
-              Sandbox
-            </a>
-          </div>
-        </header>
+        {/* No header here — the spine (components/nav/SiteSpine.astro, rendered
+            by BaseLayout) is the site's chrome now. The old one had a
+            "← Sandbox" back link that framed Compete as a child of the
+            calculator; it is a sibling section, so there is nothing to go back
+            to, only other sections to switch to. */}
+        <CompeteSectionBar tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
 
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
@@ -371,23 +335,8 @@ const Compete: React.FC = () => {
             </div>
           )}
 
-          {/* Tab Bar */}
-          <div className="flex border-b mb-6 max-w-3xl mx-auto">
-            {tabs.map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                  activeTab === tab.id
-                    ? 'border-brand text-brand'
-                    : 'border-transparent text-ink-muted hover:text-ink-secondary hover:border-strong'
-                }`}
-              >
-                {tab.icon}
-                {tab.label}
-              </button>
-            ))}
-          </div>
+          {/* The tab bar moved up into CompeteSectionBar, directly under the
+              spine — the same slot the calculator uses for its season selector. */}
 
           {/* ─── Predict Tab ─── */}
           {activeTab === 'predict' && (
@@ -980,7 +929,8 @@ const Compete: React.FC = () => {
           )}
         </main>
 
-        <AuthModal />
+        {/* No <AuthModal/> — SpineAccountIsland owns the one instance for the
+            whole site. Rendering a second here would open two stacked modals. */}
       </div>
     </LazyDndProvider>
   );

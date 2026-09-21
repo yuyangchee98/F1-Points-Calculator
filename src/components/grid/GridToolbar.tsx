@@ -1,13 +1,29 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import PointsSystemSelector from '../common/PointsSystemSelector';
+import SeasonSelector from '../common/SeasonSelector';
+import SegmentedControl from '../ui/SegmentedControl';
 import useWindowSize from '../../hooks/useWindowSize';
-import { useAuth } from '../../hooks/useAuth';
-import { selectNextRaceToLock } from '../../store/selectors/lockedPredictionsSelectors';
 import { getActiveSeason, CURRENT_SEASON } from '../../utils/constants';
-import Button, { ButtonLink } from '../ui/Button';
+import { setMobileView } from '../../store/slices/uiSlice';
+import { useAppDispatch, type RootState } from '../../store';
+import type { MobileView } from '../../types';
+import Button from '../ui/Button';
+import { SECTION_BAR_CLASS } from '../nav/sectionBar';
 
+/**
+ * The calculator's section bar — tier 2 of the site chrome.
+ *
+ * Rendered once by App.tsx directly under the spine, spanning the full width
+ * above the sidebar/grid split. It used to live inside each grid view as card
+ * chrome and was rendered twice; both views now pass toolbar={null}.
+ *
+ * Everything here is calculator-scoped on purpose. Site-level navigation went
+ * up to the spine, which is also where the old /compete button belonged — that
+ * was a promo surface, not a control, and Compete is now a section.
+ */
 interface GridToolbarProps {
+  activeSeason: number;
   onReset: () => void;
   onToggleOfficialResults: () => void;
   onOpenHistory: () => void;
@@ -17,7 +33,13 @@ interface GridToolbarProps {
   showConsensus: boolean;
 }
 
+const MOBILE_VIEWS: { value: MobileView; label: string }[] = [
+  { value: 'grid', label: 'Grid' },
+  { value: 'standings', label: 'Standings' },
+];
+
 const GridToolbar: React.FC<GridToolbarProps> = ({
+  activeSeason,
   onReset,
   onToggleOfficialResults,
   onOpenHistory,
@@ -29,9 +51,8 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
   const { isMobile, isTablet } = useWindowSize();
   const isCompact = isMobile || isTablet;
   const isCurrentSeason = getActiveSeason() === CURRENT_SEASON;
-  const { isAuthenticated } = useAuth();
-  const nextRaceToLock = useSelector(selectNextRaceToLock);
-  const showNotification = isAuthenticated && !!nextRaceToLock;
+  const dispatch = useAppDispatch();
+  const mobileView = useSelector((state: RootState) => state.ui.mobileView);
   const [showHowToUse, setShowHowToUse] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const moreMenuRef = useRef<HTMLDivElement>(null);
@@ -62,9 +83,25 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
   };
 
   return (
-    <div className="bg-surface border-b rounded-t-lg">
-      <div className="p-2">
-        <div className="flex flex-wrap gap-1 md:gap-2 items-center">
+    <div className="shrink-0">
+      <div className={SECTION_BAR_CLASS}>
+          {/* Which pane the phone is showing. The bottom bar carries the site's
+              sections now, so this pane switch lives here — and only here,
+              where there is actually a grid and a standings table to swap. */}
+          <div className="sm:hidden shrink-0">
+            <SegmentedControl
+              options={MOBILE_VIEWS}
+              value={mobileView}
+              fill={false}
+              onChange={(view) => dispatch(setMobileView(view))}
+              aria-label="Calculator view"
+            />
+          </div>
+
+          <div className="shrink-0">
+            <SeasonSelector activeSeason={activeSeason} />
+          </div>
+
           {/* View Settings */}
           <div className="flex items-center gap-2 shrink-0">
             {!isCompact && <span className="text-sm text-ink-muted font-medium">Points:</span>}
@@ -164,26 +201,6 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
           {/* Spacer */}
           <div className="flex-1 min-w-0" />
 
-          {/* Compete Button - only show for current season */}
-          {isCurrentSeason && (
-            <ButtonLink
-              href="/compete"
-              variant="primary"
-              iconOnly={isMobile}
-              className="relative shrink-0"
-              aria-label="Compete"
-              title="Compete"
-            >
-              {showNotification && (
-                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-carbon-900 ring-2 ring-white rounded-full animate-pulse" />
-              )}
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-              </svg>
-              {!isMobile && <span>Compete</span>}
-            </ButtonLink>
-          )}
-
           <Button
             onClick={onReset}
             variant="danger"
@@ -197,7 +214,6 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
             </svg>
             {!isMobile && <span>Reset</span>}
           </Button>
-        </div>
       </div>
 
       {isCurrentSeason && showConsensus && (

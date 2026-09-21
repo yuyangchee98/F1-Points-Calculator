@@ -1,5 +1,8 @@
 ---
 import '../index.css';
+import SiteSpine from '../components/nav/SiteSpine.astro';
+import SiteTabBar from '../components/nav/SiteTabBar.astro';
+import { sectionForPath, type SectionId } from '../utils/nav';
 
 interface Props {
   title: string;
@@ -11,6 +14,18 @@ interface Props {
   ogType?: string;
   schemaData?: object;
   initialYear?: number;
+  /**
+   * Which spine item to highlight. Defaults to whatever the URL says, so the 44
+   * season pages — and every future one — need no prop at all. Pass it only to
+   * override (see src/utils/nav.ts).
+   */
+  section?: SectionId;
+  /**
+   * Set false on pages that ship no React today (/about, /changelog, /404) to
+   * keep them that way; the spine then renders a plain sign-in link instead of
+   * the account island.
+   */
+  spineAccount?: boolean;
 }
 
 const {
@@ -23,6 +38,8 @@ const {
   ogType = 'website',
   schemaData,
   initialYear,
+  section = sectionForPath(Astro.url.pathname),
+  spineAccount = true,
 } = Astro.props;
 
 const siteUrl = 'https://f1pointscalculator.chyuang.com';
@@ -75,7 +92,14 @@ const ogImage = `${siteUrl}/og-image.jpg`;
     )}
   </head>
   <body class="bg-surface-sunken">
+    {/* Rendered outside <slot/>, so it is a sibling of each page's #seo-content
+        div rather than a child — the inline script that hides that div at parse
+        time must never take the navigation with it. */}
+    <SiteSpine section={section} account={spineAccount} />
+
     <slot />
+
+    <SiteTabBar section={section} />
 
     <!-- Static footer for crawlers — visually hidden via sr-only, still in the DOM for SEO / a11y -->
     <footer id="static-footer" class="sr-only" aria-label="Site navigation">

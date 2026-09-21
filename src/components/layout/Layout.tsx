@@ -1,11 +1,9 @@
 import React, { type ReactNode, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../store';
-import MobileNavigation from '../navigation/MobileNavigation';
 import useWindowSize from '../../hooks/useWindowSize';
 import { setMobileView } from '../../store/slices/uiSlice';
 import { useAppDispatch } from '../../store';
-import AuthModal from '../auth/AuthModal';
 import SidebarResizeHandle from './SidebarResizeHandle';
 
 interface LayoutProps {
@@ -37,7 +35,7 @@ const Layout: React.FC<LayoutProps> = ({ sidebar, content }) => {
           // full-width (class-driven) so we omit the style entirely.
           style={!isMobile ? { width: sidebarWidth } : undefined}
           className={`
-            ${mobileView === 'standings' ? 'block w-full h-[calc(100dvh-64px)] z-30' : 'hidden'}
+            ${mobileView === 'standings' ? 'block w-full h-[calc(100dvh_-_var(--spine-h)_-_var(--bottombar-h))] z-30' : 'hidden'}
             sm:block bg-white border-r border-gray-200 overflow-hidden shadow-md
             sm:w-72 min-w-[280px]
             sm:h-full sm:z-20 relative
@@ -59,13 +57,7 @@ const Layout: React.FC<LayoutProps> = ({ sidebar, content }) => {
             {content}
           </div>
         </main>
-
-        <div className="sm:hidden">
-          <MobileNavigation />
-        </div>
       </div>
-
-      <AuthModal />
     </div>
   );
 };

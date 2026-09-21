@@ -1,5 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useAuth } from '../../hooks/useAuth';
+
+/**
+ * The modal is portalled to <body> because its mount point is now site chrome.
+ *
+ * SpineAccountIsland renders it from inside the spine's <header>, which is
+ * `sticky` with a z-index and therefore opens a stacking context — a plain
+ * `z-50` child of that header cannot paint above the calculator behind it, so
+ * the grid and sidebar showed through the overlay. Portalling to <body> makes
+ * the modal independent of wherever it happens to be mounted.
+ */
+const modalRoot = (node: React.ReactNode) =>
+  typeof document === 'undefined' ? null : createPortal(node, document.body);
 
 // Google Icon SVG component
 const GoogleIcon: React.FC<{ className?: string }> = ({ className }) => (
@@ -106,8 +119,8 @@ const AuthModal: React.FC = () => {
 
   // Verification sent screen
   if (verificationSent) {
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    return modalRoot(
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-modal p-4">
         <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
           <div className="text-center">
             <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
@@ -151,8 +164,8 @@ const AuthModal: React.FC = () => {
     );
   }
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+  return modalRoot(
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-modal p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold">

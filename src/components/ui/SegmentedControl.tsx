@@ -8,6 +8,13 @@ interface SegmentedControlProps<T extends string> {
   value: T;
   onChange: (value: T) => void;
   className?: string;
+  /**
+   * Whether the options split the container's width equally. True (the default)
+   * keeps the original sidebar behaviour; pass false in a crowded row like the
+   * calculator's section bar, where the control should only be as wide as its
+   * labels.
+   */
+  fill?: boolean;
   'aria-label'?: string;
 }
 
@@ -18,6 +25,7 @@ function SegmentedControl<T extends string>({
   value,
   onChange,
   className = '',
+  fill = true,
   'aria-label': ariaLabel,
 }: SegmentedControlProps<T>) {
   return (
@@ -33,7 +41,7 @@ function SegmentedControl<T extends string>({
             key={option.value}
             role="tab"
             aria-selected={selected}
-            className={`flex-1 px-3 py-1 text-sm font-medium rounded-md transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-interactive ${
+            className={`${fill ? 'flex-1' : ''} px-3 py-1 text-sm font-medium rounded-md whitespace-nowrap transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-interactive ${
               selected
                 ? 'bg-surface text-ink shadow-xs'
                 : 'text-ink-secondary hover:text-ink'

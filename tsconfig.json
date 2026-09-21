@@ -1,5 +1,12 @@
 {
   "extends": "astro/tsconfigs/strict",
+  // `npm run build` is `astro check && astro build`, so anything typechecked
+  // here gates the build. tests/ is deliberately unpublished (see .gitignore),
+  // which means it is absent on a clean checkout but present locally — where it
+  // was failing the check and stopping the build from ever running. It is not
+  // part of the shipped artifact, so it does not belong in the build's typecheck.
+  // Vitest transpiles without consulting this, so the suites are unaffected.
+  "exclude": ["tests", "dist", "node_modules"],
   "compilerOptions": {
     "jsx": "react-jsx",
     "jsxImportSource": "react",

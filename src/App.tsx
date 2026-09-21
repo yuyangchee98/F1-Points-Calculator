@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import LazyDndProvider from './components/common/LazyDndProvider';
-import { initializeUiState, setMobileView, syncPointsSystemForYear, toggleOfficialResults as toggleOfficialResultsUI } from './store/slices/uiSlice';
+import { initializeUiState, setMobileView, syncPointsSystemForYear, toggleConsensus, toggleOfficialResults as toggleOfficialResultsUI } from './store/slices/uiSlice';
 import type { RootState } from './store';
 import { moveDriver, resetGrid, toggleOfficialResults } from './store/slices/gridSlice';
 import { fetchLockedPredictions } from './store/slices/lockedPredictionsSlice';
@@ -16,15 +16,11 @@ import ToastContainer from './components/common/ToastContainer';
 import HorizontalScrollBar from './components/common/HorizontalScrollBar';
 import VersionHistory from './components/common/VersionHistory';
 import ExportModal from './components/common/ExportModal';
-import DrawLineRacingPromo from './components/common/DrawLineRacingPromo';
-import HeaderMenu from './components/common/HeaderMenu';
-import CalculatorDropdown from './components/common/CalculatorDropdown';
 import GridSkeleton from './components/common/GridSkeleton';
 import DriverSelectionSkeleton from './components/common/DriverSelectionSkeleton';
 import PaywallOverlay from './components/common/PaywallOverlay';
 import DriverSelection from './components/drivers/DriverSelection';
-import SeasonSelector from './components/common/SeasonSelector';
-import UserMenu from './components/auth/UserMenu';
+import GridToolbar from './components/grid/GridToolbar';
 import { SandboxGridProvider } from './contexts/GridContext';
 import { useAppDispatch } from './store';
 import useWindowSize from './hooks/useWindowSize';
@@ -48,6 +44,7 @@ const App: React.FC<{ year?: string }> = ({ year }) => {
   useAutoSave();
   const mobileView = useSelector((state: RootState) => state.ui.mobileView);
   const showOfficialResults = useSelector((state: RootState) => state.ui.showOfficialResults);
+  const showConsensus = useSelector((state: RootState) => state.ui.showConsensus);
   const pastResults = useSelector((state: RootState) => state.seasonData.pastResults);
   const isLoading = useSelector((state: RootState) => state.seasonData.isLoading);
   const requiresSubscription = useSelector((state: RootState) => state.seasonData.requiresSubscription);
@@ -83,6 +80,18 @@ const App: React.FC<{ year?: string }> = ({ year }) => {
     const newValue = !showOfficialResults;
     dispatch(toggleOfficialResultsUI(newValue));
     dispatch(toggleOfficialResults({ show: newValue, pastResults }));
+  };
+
+  // Lifted from RaceGrid/MobileRaceCardView, which each owned a copy while they
+  // rendered their own toolbar. The toolbar is the page's section bar now, so
+  // the handler belongs at the level that renders it.
+  const handleToggleConsensus = () => {
+    dispatch(toggleConsensus());
+    trackEvent(
+      GA_EVENTS.GRID_ACTIONS.TOGGLE_CONSENSUS,
+      'Grid Actions',
+      !showConsensus ? 'show' : 'hide',
+    );
   };
 
   const handleLoadVersion = async (version: string) => {
@@ -134,35 +143,26 @@ const App: React.FC<{ year?: string }> = ({ year }) => {
       <div className="app">
         <ToastContainer />
 
+        {/* The section bar: full width, above the sidebar/grid split. The old
+            header row that sat here is gone — its navigation moved up to the
+            spine (components/nav/SiteSpine.astro) and its season selector moved
+            into the toolbar, which is the calculator's section bar now. */}
+        <GridToolbar
+          activeSeason={activeSeason}
+          onReset={handleReset}
+          onToggleOfficialResults={handleToggleOfficialResults}
+          onOpenHistory={() => setShowHistory(true)}
+          onOpenExport={() => setShowExport(true)}
+          showOfficialResults={showOfficialResults}
+          onToggleConsensus={handleToggleConsensus}
+          showConsensus={showConsensus}
+        />
+
+        <div className="flex-1 min-h-0">
         <Layout
           sidebar={<StandingsSidebar activeSeason={activeSeason} />}
           content={
-            <div className="flex-1 min-h-0 flex flex-col px-2 sm:px-3 pt-2 pb-16 sm:pb-0 w-full">
-              <div className="mb-1.5 shrink-0">
-                {/* Single header row — unified sizing */}
-                <div className="flex items-center gap-1.5 sm:gap-2 flex-nowrap">
-                  <h1 className="text-sm sm:text-base lg:text-lg font-display font-bold text-ink flex items-center min-w-0 shrink">
-                    <CalculatorDropdown />
-                    <span className="truncate">Points Calculator</span>
-                  </h1>
-
-                  {/* Right-side controls */}
-                  <div className="flex items-center gap-1.5 sm:gap-2 ml-auto shrink-0">
-                    <SeasonSelector activeSeason={activeSeason} />
-
-                    {/* Promo only visible at lg+ where there's room */}
-                    <div className="hidden lg:inline-flex">
-                      <DrawLineRacingPromo />
-                    </div>
-
-                    <HeaderMenu />
-
-                    <UserMenu />
-                  </div>
-                </div>
-              </div>
-
-
+            <div className="flex-1 min-h-0 flex flex-col px-2 sm:px-3 pt-2 pb-[var(--bottombar-h)] w-full">
               <div className={`flex-1 min-h-0 flex flex-col ${(mobileView === 'grid' || !isMobile) ? '' : 'hidden'}`}>
                 {requiresSubscription ? (
                   <div className="flex-1 min-h-0 overflow-hidden">
@@ -191,6 +191,7 @@ const App: React.FC<{ year?: string }> = ({ year }) => {
                         onOpenHistory={() => setShowHistory(true)}
                         onOpenExport={() => setShowExport(true)}
                         showOfficialResults={showOfficialResults}
+                        toolbar={null}
                       />
                     </div>
                   ) : (
@@ -204,6 +205,7 @@ const App: React.FC<{ year?: string }> = ({ year }) => {
                           onOpenHistory={() => setShowHistory(true)}
                           onOpenExport={() => setShowExport(true)}
                           showOfficialResults={showOfficialResults}
+                          toolbar={null}
                         />
                       </div>
                     </>
@@ -215,6 +217,7 @@ const App: React.FC<{ year?: string }> = ({ year }) => {
             </div>
           }
         />
+        </div>
 
 
         {showHistory && (

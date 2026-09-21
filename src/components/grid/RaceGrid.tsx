@@ -96,6 +96,7 @@ const RaceGrid: React.FC<RaceGridProps> = ({
 
   const toolbarContent = toolbar !== undefined ? toolbar : (
     <GridToolbar
+      activeSeason={getActiveSeason()}
       onReset={onReset}
       onToggleOfficialResults={onToggleOfficialResults}
       onOpenHistory={onOpenHistory}
