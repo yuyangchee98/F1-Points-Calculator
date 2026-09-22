@@ -23,6 +23,36 @@
 import { SECTIONS, type SectionId } from '../../utils/nav';
 import SpineAccountIsland from './SpineAccountIsland';
 
+/**
+ * House ad inventory for the spine's one promo slot.
+ *
+ * One slot, one advertiser per pageview, picked at random. Add an entry here and
+ * it joins the rotation — nothing else needs to change.
+ *
+ * Rotation has to happen client-side. The site is `output: 'static'` behind a
+ * CDN, so there is no per-request render: picking at build time would bake one
+ * advertiser into each URL until the next deploy, and anyone who always lands on
+ * /2026 would only ever see that one. The script below is ~200 bytes, inline and
+ * synchronous, and every entry is server-rendered — so there is no flash, no
+ * layout shift, and no-JS visitors still get the first entry.
+ */
+const ADS = [
+  {
+    id: 'drawlineracing',
+    href: 'https://drawlineracing.chyuang.com/',
+    emoji: '🏎️',
+    label: 'Draw Line Racing',
+    title: 'Try my new game: Draw Line Racing!',
+  },
+  {
+    id: 'f2',
+    href: 'https://f2pointscalculator.chyuang.com',
+    emoji: '🏁',
+    label: 'F2 Calculator',
+    title: 'The same calculator, for Formula 2',
+  },
+];
+
 interface Props {
   section: SectionId;
   /**
@@ -69,41 +99,52 @@ const { section, account = true } = Astro.props;
   </nav>
 
   <div class="ml-auto flex items-center gap-1.5 sm:gap-2 shrink-0">
-    {/* Cross-promo, shown at lg+ where there is room for it. Below lg it lives
-        in the overflow menu instead — the two are mutually exclusive by
-        breakpoint, so changing one without the other leaves a gap where Draw
-        Line Racing appears nowhere at all. */}
-    <a
-      href="https://drawlineracing.chyuang.com/"
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label="Try Draw Line Racing"
-      title="Try my new game: Draw Line Racing!"
-      class="group hidden lg:inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-sm font-medium
-             bg-brand-subtle text-brand-strong border border-brand/25 hover:bg-brand-subtle/70 transition-colors"
-    >
-      <span class="text-sm leading-none" aria-hidden="true">🏎️</span>
-      <span>Draw Line Racing</span>
-      <svg
-        class="h-3 w-3 group-hover:translate-x-0.5 transition-transform"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-        aria-hidden="true"
-      >
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-      </svg>
-    </a>
-
-    <a
-      href="https://f2pointscalculator.chyuang.com"
-      target="_blank"
-      rel="noopener noreferrer"
-      class="hidden lg:inline-flex items-center gap-1 text-xs text-ink-muted hover:text-ink-secondary transition-colors"
-    >
-      F2 calculator
-      <span aria-hidden="true">↗</span>
-    </a>
+    {/* The promo slot. Shown at lg+ where there is room; below lg both
+        destinations live in the overflow menu as ordinary links, since a menu is
+        navigation rather than ad inventory. */}
+    <div class="hidden lg:flex items-center shrink-0" data-ad-slot>
+      {ADS.map((ad, i) => (
+        <a
+          href={ad.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-ad={ad.id}
+          aria-label={ad.title}
+          title={ad.title}
+          style={i === 0 ? undefined : 'display:none'}
+          class="group inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-sm font-medium whitespace-nowrap
+                 bg-brand-subtle text-brand-strong border border-brand/25 hover:bg-brand-subtle/70 transition-colors"
+        >
+          <span class="text-sm leading-none" aria-hidden="true">{ad.emoji}</span>
+          <span>{ad.label}</span>
+          <svg
+            class="h-3 w-3 group-hover:translate-x-0.5 transition-transform"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </a>
+      ))}
+    </div>
+    <script is:inline>
+      // Runs during parse, before first paint, so the swap is never visible.
+      // Toggles inline style rather than a class or the `hidden` attribute:
+      // Tailwind's display utilities would otherwise win on specificity and the
+      // "hidden" ad would stay on screen next to the chosen one.
+      (function () {
+        var slot = document.currentScript.previousElementSibling;
+        if (!slot) return;
+        var ads = slot.querySelectorAll('[data-ad]');
+        if (ads.length < 2) return;
+        var pick = Math.floor(Math.random() * ads.length);
+        for (var i = 0; i < ads.length; i++) {
+          ads[i].style.display = i === pick ? '' : 'none';
+        }
+      })();
+    </script>
 
     {/* A native <details> so the overflow menu works with zero JS — /about and
         /changelog ship no React at all and must still be navigable. */}
