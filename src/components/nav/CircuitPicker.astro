@@ -13,7 +13,7 @@
  * circuit names would leak withheld race names into the DOM. See the note on
  * SiteSpine.astro.
  */
-import { groupByCountry, flagCodeFor, circuitVenue } from '../../utils/circuits';
+import { groupByCountry, flagSrcFor, circuitVenue } from '../../utils/circuits';
 import type { CircuitListItem } from '../../types/track';
 
 interface Props {
@@ -53,11 +53,11 @@ const grouped = groupByCountry(circuits);
     {grouped.map((group) => (
       <div>
         <p class="px-3 pt-2 pb-1 text-2xs font-bold uppercase tracking-wider text-ink-muted flex items-center gap-1.5">
-          {flagCodeFor(group.country) && (
+          {flagSrcFor(group.country) && (
             <img
-              src={`https://flagcdn.com/w20/${flagCodeFor(group.country)}.png`}
+              src={flagSrcFor(group.country)}
               width="16"
-              height="12"
+              height="11"
               alt=""
               loading="lazy"
               class="rounded-sm"

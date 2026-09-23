@@ -22,6 +22,7 @@
  */
 import { SECTIONS, type SectionId } from '../../utils/nav';
 import SpineAccountIsland from './SpineAccountIsland';
+import SpineCompeteDot, { COMPETE_LINK_ID } from './SpineCompeteDot';
 
 /**
  * House ad inventory for the spine's one promo slot.
@@ -84,6 +85,7 @@ const { section, account = true } = Astro.props;
     {SECTIONS.map((s) => (
       <a
         href={s.href}
+        id={s.id === 'compete' ? COMPETE_LINK_ID : undefined}
         aria-current={s.id === section ? 'page' : undefined}
         class:list={[
           'relative flex items-center h-full px-2 sm:px-3.5 text-xs sm:text-sm font-semibold transition-colors',
@@ -194,6 +196,13 @@ const { section, account = true } = Astro.props;
         >F2 calculator ↗</a>
       </nav>
     </details>
+
+    {/* Renders nothing here — it portals a deadline marker into the Compete
+        link above. Mounted in this group rather than inside that link because an
+        island's hydration bootstrap would otherwise become part of the link's
+        accessible name; see SpineCompeteDot.tsx. Gated on `account` with the
+        island below so /about and /changelog stay React-free. */}
+    {account && <SpineCompeteDot client:only="react" />}
 
     {/* Reserve the slot so the island mounting doesn't shift the row. */}
     <div class="flex items-center justify-end min-w-[2rem] h-7 sm:h-8">

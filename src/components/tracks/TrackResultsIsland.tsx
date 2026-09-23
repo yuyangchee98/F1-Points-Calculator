@@ -17,8 +17,8 @@ interface Props {
   /** id of the server-rendered static table to hide once this island mounts. */
   staticContainerId: string;
   country: string;
-  /** ISO 3166-1 alpha-2 code already translated for flagcdn (uk -> gb). */
-  flagCode: string;
+  /** Local flag asset path, or '' when there is none for this country. */
+  flagSrc: string;
 }
 
 // Match the calculator grid's dimensions exactly.
@@ -132,7 +132,7 @@ const TrackResultsEnhancer: React.FC<Props> = ({
   initialEditions,
   staticContainerId,
   country,
-  flagCode,
+  flagSrc,
 }) => {
   useAuth(); // bootstraps the Better-Auth session into Redux for the paywall
   const { isMobile } = useWindowSize();
@@ -172,7 +172,7 @@ const TrackResultsEnhancer: React.FC<Props> = ({
         <MobileTrackResults
           editions={editions}
           country={country}
-          flagCode={flagCode}
+          flagSrc={flagSrc}
           onUnlock={openPaywall}
         />
       ) : (

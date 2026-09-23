@@ -3,7 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import TrackResultsIsland from '../../components/tracks/TrackResultsIsland';
 import SectionBar from '../../components/nav/SectionBar.astro';
 import CircuitPicker from '../../components/nav/CircuitPicker.astro';
-import { fetchCircuitList, flagCodeFor } from '../../utils/circuits';
+import { fetchCircuitList, flagSrcFor } from '../../utils/circuits';
 import type { CircuitHistory, CircuitListItem } from '../../types/track';
 
 const API_BASE_URL = import.meta.env.PUBLIC_API_BASE_URL;
@@ -40,9 +40,9 @@ const circuitName = history?.fullName ?? fullName;
 const seasons = editions.map((e) => e.season);
 const latestSeason = seasons.length ? Math.max(...seasons) : null;
 const earliestSeason = seasons.length ? Math.min(...seasons) : null;
-// flagcdn keys by ISO 3166-1 alpha-2 (see flagCodeFor in utils/circuits.ts).
-const flagCode = flagCodeFor(country);
-const countryCode = flagCode;
+// Local asset under public/flags (see flagSrcFor in utils/circuits.ts). '' when
+// there is no flag for this country, which both renderers treat as "no flag".
+const flagSrc = flagSrcFor(country);
 
 // Aggregate trivia computed server-side over the full history (incl. premium years).
 const stats = history?.stats;
@@ -134,11 +134,11 @@ const schemaData = {
     <header class="bg-surface border-b sm:border-b-0 sm:border-r p-4 flex flex-col gap-3 sm:col-start-1 sm:row-start-1">
       <div>
         <div class="flex items-center gap-2 mb-1.5">
-          {countryCode && (
+          {flagSrc && (
             <img
-              src={`https://flagcdn.com/w40/${flagCode}.png`}
+              src={flagSrc}
               width="28"
-              height="21"
+              height="19"
               alt={`${country} flag`}
               class="rounded shadow-sm"
               loading="eager"
@@ -199,7 +199,7 @@ const schemaData = {
             initialEditions={editions}
             staticContainerId="track-results-static"
             country={country}
-            flagCode={flagCode}
+            flagSrc={flagSrc}
           />
         </div>
       )}

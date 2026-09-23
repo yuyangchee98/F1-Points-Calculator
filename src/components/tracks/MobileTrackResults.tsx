@@ -6,8 +6,8 @@ import type { CircuitEdition } from '../../types/track';
 interface Props {
   editions: CircuitEdition[];
   country: string;
-  /** ISO 3166-1 alpha-2 code already translated for flagcdn (uk -> gb). */
-  flagCode: string;
+  /** Local flag asset path, or '' when there is none for this country. */
+  flagSrc: string;
   /** Opens the shared paywall modal owned by the island. */
   onUnlock: () => void;
 }
@@ -17,7 +17,7 @@ const ROW_HEIGHT = 48;
 // Mobile twin of the desktop year-matrix: one season at a time as a swipeable
 // card, mirroring the main calculator's <MobileRaceCardView> (prev/next header +
 // 2-column P1/P2… grid with dark podium badges). Newest season first.
-const MobileTrackResults: React.FC<Props> = ({ editions, country, flagCode, onUnlock }) => {
+const MobileTrackResults: React.FC<Props> = ({ editions, country, flagSrc, onUnlock }) => {
   // Newest-first, same ordering as the desktop columns.
   const cols = useMemo(() => [...editions].sort((a, b) => b.season - a.season), [editions]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -62,11 +62,11 @@ const MobileTrackResults: React.FC<Props> = ({ editions, country, flagCode, onUn
         </button>
 
         <div className="flex-1 flex items-center justify-center gap-1.5 min-w-0 px-1 overflow-hidden py-2">
-          {flagCode && (
+          {flagSrc && (
             <img
-              src={`https://flagcdn.com/w40/${flagCode}.png`}
+              src={flagSrc}
               width="24"
-              height="18"
+              height="16"
               alt={`${country} flag`}
               className="rounded shadow-sm shrink-0"
             />

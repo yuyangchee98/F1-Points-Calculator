@@ -39,13 +39,25 @@ export async function fetchCircuitList(): Promise<CircuitListItem[]> {
 }
 
 /**
- * flagcdn keys by ISO 3166-1 alpha-2, where the UK is 'gb', not 'uk'. The
- * calculator grid uses a local /flags/uk.webp so the shared map keeps 'uk';
- * translate only for flagcdn URLs.
+ * The local flag asset for a country, as `/flags/<code>.webp`.
+ *
+ * Returns '' for a country with no flag on disk, which every caller renders as
+ * "no flag" rather than a broken image.
+ *
+ * The Tracks section used to point these at flagcdn.com — 31 requests to a
+ * third party on the index alone, on the most crawlable pages the site has, for
+ * images the calculator was already serving locally. public/flags/ is the same
+ * asset set the race grid uses, so the codes here are the map's own (the UK is
+ * 'uk', not flagcdn's 'gb') and no translation is needed any more.
  */
 export function flagCodeFor(country: string): string {
-  const code = COUNTRY_CODE_MAP[country.toLowerCase()] ?? '';
-  return code === 'uk' ? 'gb' : code;
+  return COUNTRY_CODE_MAP[country.toLowerCase()] ?? '';
+}
+
+/** Source for a country's flag, or '' when there is no asset for it. */
+export function flagSrcFor(country: string): string {
+  const code = flagCodeFor(country);
+  return code ? `/flags/${code}.webp` : '';
 }
 
 /**

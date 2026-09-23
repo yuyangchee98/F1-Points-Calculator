@@ -17,7 +17,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionBar from '../components/nav/SectionBar.astro';
 import CircuitPicker from '../components/nav/CircuitPicker.astro';
-import { fetchCircuitList, groupByCountry, flagCodeFor, circuitVenue } from '../utils/circuits';
+import { fetchCircuitList, groupByCountry, flagSrcFor, circuitVenue } from '../utils/circuits';
 
 // Same single call, same fail-the-build contract as /tracks/[track].
 const circuits = await fetchCircuitList();
@@ -69,11 +69,11 @@ const schemaData = {
     {grouped.map((group) => (
       <section class="mb-8">
         <h2 class="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-ink-muted mb-3">
-          {flagCodeFor(group.country) && (
+          {flagSrcFor(group.country) && (
             <img
-              src={`https://flagcdn.com/w20/${flagCodeFor(group.country)}.png`}
+              src={flagSrcFor(group.country)}
               width="20"
-              height="15"
+              height="14"
               alt=""
               loading="lazy"
               class="rounded-sm shadow-xs"

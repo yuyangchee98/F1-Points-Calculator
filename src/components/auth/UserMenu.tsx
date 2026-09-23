@@ -26,15 +26,21 @@ const UserMenu: React.FC = () => {
 
   if (!isAuthenticated) {
     return (
+      // "Account", not "Sign In", so the spine reads the same on every page.
+      // /leaderboard and /user/* are rendered by the Worker, which has no
+      // session to check and so has always shown a neutral "Account" link —
+      // two labels for the same control in the same navigation bar, depending
+      // only on which deploy served the page. "Account" is the one that is
+      // never wrong: "Sign In" shown to someone already signed in would be.
       <button
         onClick={openSignIn}
         className="inline-flex items-center gap-1.5 h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md transition-colors"
-        aria-label="Sign In"
+        aria-label="Sign in to your account"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
         </svg>
-        <span className="hidden sm:inline">Sign In</span>
+        <span className="hidden sm:inline">Account</span>
       </button>
     );
   }
