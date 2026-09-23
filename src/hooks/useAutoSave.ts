@@ -12,7 +12,7 @@ export const useAutoSave = () => {
   const dispatch = useAppDispatch();
   const { positions } = useSelector((state: RootState) => state.grid);
   const { selectedPointsSystem } = useSelector((state: RootState) => state.ui);
-  const { fingerprint, isDirty } = useSelector((state: RootState) => state.predictions);
+  const { fingerprint, isDirty, forceNewVersion } = useSelector((state: RootState) => state.predictions);
   const { user } = useSelector((state: RootState) => state.auth);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastSavedDataRef = useRef<string>('');
@@ -53,19 +53,20 @@ export const useAutoSave = () => {
     }
 
     try {
-      const response = await savePrediction(identifier, positions, selectedPointsSystem, activeSeason);
+      const response = await savePrediction(identifier, positions, selectedPointsSystem, activeSeason, forceNewVersion);
 
       if (response.success) {
         dispatch(setSaveInfo({
           timestamp: response.timestamp,
-          version: response.version
+          version: response.version,
+          startedNewVersion: forceNewVersion
         }));
         lastSavedDataRef.current = currentData;
       }
     } catch (error) {
       toastService.addToast('Failed to save predictions', 'warning', 3000, '#ef4444');
     }
-  }, [getIdentifier, positions, selectedPointsSystem, isDirty, dispatch]);
+  }, [getIdentifier, positions, selectedPointsSystem, isDirty, forceNewVersion, dispatch]);
 
   useEffect(() => {
     const identifier = getIdentifier();

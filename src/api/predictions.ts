@@ -32,7 +32,8 @@ export async function savePrediction(
   identifier: UserIdentifier,
   grid: GridPosition[],
   pointsSystem: string,
-  season: number
+  season: number,
+  newVersion = false
 ): Promise<SaveResponse> {
   const response = await fetch(`${API_BASE_URL}/api/predictions/save`, {
     method: 'POST',
@@ -45,6 +46,7 @@ export async function savePrediction(
       grid,
       pointsSystem,
       season,
+      newVersion,
     }),
   });
 
