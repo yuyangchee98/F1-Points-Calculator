@@ -150,7 +150,7 @@ const PointsSystemSelector: React.FC = () => {
 
       {isOpen && (
         <div
-          className="absolute z-20 mt-2 left-0 bg-white border border-gray-200 rounded-lg shadow-xl"
+          className="absolute z-overlay mt-2 left-0 bg-white border border-gray-200 rounded-lg shadow-xl"
           style={{
             width: '24rem',
             maxWidth: 'calc(100vw - 1rem)',

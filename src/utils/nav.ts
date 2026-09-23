@@ -44,7 +44,11 @@ export function sectionForPath(pathname: string): SectionId {
   // Normalise away a trailing slash so '/tracks/' and '/tracks' agree. The site
   // is trailingSlash:'never' (astro.config.mjs), but the Worker and hand-typed
   // URLs are not bound by that.
-  const path = pathname.replace(/\/+$/, '') || '/';
+  //
+  // Also strip '.html': with build.format 'file', Astro.url.pathname at BUILD
+  // time is '/2025.html', '/tracks.html' (only '/' stays bare). Dev serves
+  // '/2025', so without this the highlight works in dev and vanishes in prod.
+  const path = pathname.replace(/\.html$/, '').replace(/\/+$/, '') || '/';
 
   if (path === '/' || /^\/(?:19|20)\d{2}$/.test(path)) return 'calculator';
   if (path === '/tracks' || path.startsWith('/tracks/')) return 'tracks';

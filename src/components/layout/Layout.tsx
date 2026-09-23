@@ -35,7 +35,7 @@ const Layout: React.FC<LayoutProps> = ({ sidebar, content }) => {
           // full-width (class-driven) so we omit the style entirely.
           style={!isMobile ? { width: sidebarWidth } : undefined}
           className={`
-            ${mobileView === 'standings' ? 'block w-full h-[calc(100dvh_-_var(--spine-h)_-_var(--bottombar-h))] z-30' : 'hidden'}
+            ${mobileView === 'standings' ? 'block w-full h-full pb-[var(--bottombar-h)] z-30' : 'hidden'}
             sm:block bg-white border-r border-gray-200 overflow-hidden shadow-md
             sm:w-72 min-w-[280px]
             sm:h-full sm:z-20 relative

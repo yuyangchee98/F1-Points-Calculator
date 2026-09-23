@@ -266,7 +266,7 @@ const SeasonSelector: React.FC<Props> = ({ activeSeason }) => {
         <div
           role="dialog"
           aria-label="Choose season"
-          className={`absolute z-30 right-0 top-full mt-1 w-[280px] bg-white border border-gray-200 rounded-lg shadow-xl overflow-hidden origin-top-right transition-all duration-150 ease-out motion-reduce:transition-none ${
+          className={`absolute z-30 left-0 top-full mt-1 w-[280px] bg-white border border-gray-200 rounded-lg shadow-xl overflow-hidden origin-top-left transition-all duration-150 ease-out motion-reduce:transition-none ${
             popoverVisible
               ? 'opacity-100 translate-y-0'
               : 'opacity-0 -translate-y-1'
