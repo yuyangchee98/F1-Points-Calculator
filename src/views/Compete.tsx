@@ -1,92 +1,65 @@
-import React, { useEffect, useState, useMemo } from 'react';
-import { useSelector } from 'react-redux';
-import { type RootState, useAppDispatch } from '../store';
-import TeamColorStripe from '../components/common/TeamColorStripe';
-import { CompeteGridProvider } from '../contexts/GridContext';
-import { openAuthModal } from '../store/slices/authSlice';
+import React, { useEffect, useState } from 'react';
+import { useAppDispatch } from '../store';
 import { fetchLockedPredictions } from '../store/slices/lockedPredictionsSlice';
-import {
-  selectOverallAccuracy,
-  selectLockedRaceCount,
-  selectScoredRaceCount,
-  selectNextWeekendRacesToLock,
-  selectAwaitingResultsRaces,
-  selectScoredRaces,
-  selectLockedPredictions,
-} from '../store/selectors/lockedPredictionsSelectors';
-import { selectDriversByIdMap } from '../store/selectors/dataSelectors';
 import { useAuth } from '../hooks/useAuth';
-import { useCountdown } from '../hooks/useCountdown';
 import useRaceResults from '../hooks/useRaceResults';
-import { CURRENT_SEASON, getGridPositions } from '../utils/constants';
-import type { Race } from '../types';
+import { CURRENT_SEASON } from '../utils/constants';
 import LazyDndProvider from '../components/common/LazyDndProvider';
-import DriverCard from '../components/drivers/DriverCard';
-import SingleRaceGrid from '../components/compete/SingleRaceGrid';
-import LockConfirmationModal from '../components/predictions/LockConfirmationModal';
 import ToastContainer from '../components/common/ToastContainer';
 import { getLeaderboard, type LeaderboardEntry, type PendingEntry } from '../api/leaderboard';
 import CompeteSectionBar from '../components/nav/CompeteSectionBar';
+import { PAGE_CONTAINER_CLASS } from '../components/nav/sectionBar';
 import { useCompeteTab, type CompeteTab } from './compete/useCompeteTab';
-import { selectDriver } from '../store/slices/uiSlice';
-import { selectTeamsByIdMap, getDriverLastName } from '../store/selectors/dataSelectors';
-import useWindowSize from '../hooks/useWindowSize';
+import PredictPanel from './compete/PredictPanel';
+import ResultsPanel from './compete/ResultsPanel';
+import LeaderboardPanel from './compete/LeaderboardPanel';
+import SeasonRail from './compete/SeasonRail';
 
-// ─── Helpers ──────────────────────────────────────────
+/**
+ * Compete — section bar, then one content column plus the "Your season" rail.
+ *
+ * This file owns the data (locked predictions, results, the leaderboard page)
+ * and the tab; each tab's panel lives in ./compete/. The rail is outside the
+ * panels on purpose: it is the same on every tab.
+ */
 
-/** Re-exported from the hook so the section bar and this view cannot drift. */
-type Tab = CompeteTab;
-
-const formatName = (name: string) =>
-  name.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-
-const getDriverCode = (driver: { code?: string; familyName: string } | undefined): string => {
-  if (!driver) return '---';
-  return driver.code || driver.familyName.substring(0, 3).toUpperCase();
-};
-
-function getInitials(name: string): string {
-  return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-}
-
-function getRankBadge(rank: number): string {
-  if (rank === 1) return '🥇';
-  if (rank === 2) return '🥈';
-  if (rank === 3) return '🥉';
-  return `#${rank}`;
-}
-
-const Countdown: React.FC<{ date: string; prefix?: string }> = ({ date, prefix }) => {
-  const countdown = useCountdown(date);
-  if (!countdown || countdown.isPast) return null;
-  return <span>{prefix && `${prefix} `}{countdown.formatted}</span>;
-};
-
-// ─── Component ────────────────────────────────────────
+const TABS: { id: CompeteTab; label: string; icon: React.ReactNode }[] = [
+  {
+    id: 'predict',
+    label: 'Predict',
+    icon: (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+      </svg>
+    ),
+  },
+  {
+    id: 'results',
+    label: 'Results',
+    icon: (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+      </svg>
+    ),
+  },
+  {
+    id: 'leaderboard',
+    label: 'Leaderboard',
+    icon: (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 21h8m-4-4v4M7 4h10v5a5 5 0 01-10 0V4zM7 7H5a2 2 0 000 4h2m10-4h2a2 2 0 010 4h-2" />
+      </svg>
+    ),
+  },
+];
 
 const Compete: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { user, isAuthenticated } = useAuth();
-  const allDrivers = useSelector((state: RootState) => state.seasonData.drivers);
-  const driverById = useSelector(selectDriversByIdMap);
-  const teamById = useSelector(selectTeamsByIdMap);
-  const selectedDriverId = useSelector((state: RootState) => state.ui.selectedDriver);
-  const lockedPredictions = useSelector(selectLockedPredictions);
-  const { isMobile } = useWindowSize();
-  const overallAccuracy = useSelector(selectOverallAccuracy);
-  const lockedCount = useSelector(selectLockedRaceCount);
-  const scoredCount = useSelector(selectScoredRaceCount);
-  const nextWeekendRaces = useSelector(selectNextWeekendRacesToLock);
-  const awaitingResults = useSelector(selectAwaitingResultsRaces);
-  const scoredRaces = useSelector(selectScoredRaces);
+  const { user, isLoading: authLoading } = useAuth();
 
-  const [raceToLock, setRaceToLock] = useState<Race | null>(null);
-  const [expandedRaceId, setExpandedRaceId] = useState<string | null>(null);
-  const [activeRaceIndex, setActiveRaceIndex] = useState(0);
-
-  // Leaderboard state
   const [leaderboardEntries, setLeaderboardEntries] = useState<LeaderboardEntry[]>([]);
   const [leaderboardPending, setLeaderboardPending] = useState<PendingEntry[]>([]);
+  const [leaderboardMe, setLeaderboardMe] = useState<LeaderboardEntry | null | undefined>(undefined);
   const [leaderboardPage, setLeaderboardPage] = useState(1);
   const [leaderboardTotalPages, setLeaderboardTotalPages] = useState(1);
   const [leaderboardTotalUsers, setLeaderboardTotalUsers] = useState(0);
@@ -98,107 +71,42 @@ const Compete: React.FC = () => {
 
   useRaceResults(CURRENT_SEASON);
 
-  // Fetch locked predictions
   useEffect(() => {
     if (user?.id) {
       dispatch(fetchLockedPredictions({ identifier: { userId: user.id }, season: CURRENT_SEASON }));
     }
   }, [user, dispatch]);
 
-  // Fetch leaderboard
+  // Fetched on mount whatever the tab, not only on Leaderboard: the rail shows
+  // the user's rank on every tab, and `me` ranks them against the whole field
+  // so they need not be on the page being viewed.
+  //
+  // Waits for the session: fetching before it resolves would go out without
+  // `me` and then again with it, two requests on every signed-in visit.
   useEffect(() => {
+    if (authLoading) return;
     let cancelled = false;
     setLeaderboardLoading(true);
-    getLeaderboard(leaderboardPage, CURRENT_SEASON)
+    getLeaderboard(leaderboardPage, CURRENT_SEASON, user?.id)
       .then(data => {
         if (cancelled) return;
         setLeaderboardEntries(data.entries);
         setLeaderboardPending(data.pendingEntries);
         setLeaderboardTotalPages(data.totalPages);
         setLeaderboardTotalUsers(data.totalUsers);
+        setLeaderboardMe(data.me);
       })
       .catch(() => {})
       .finally(() => {
         if (!cancelled) setLeaderboardLoading(false);
       });
     return () => { cancelled = true; };
-  }, [leaderboardPage, activeTab]);
+  }, [leaderboardPage, user?.id, authLoading]);
 
-  const handleDriverClick = (driverId: string) => {
-    dispatch(selectDriver(selectedDriverId === driverId ? null : driverId));
-  };
-
-  // Weekend-aware state
-  const isSprintWeekend = nextWeekendRaces.length > 1;
-  const activeRace = nextWeekendRaces[activeRaceIndex] || null;
-  const isActiveRaceLocked = activeRace ? !!lockedPredictions[activeRace.id] : false;
-  const allWeekendLocked = nextWeekendRaces.length > 0 &&
-    nextWeekendRaces.every(r => !!lockedPredictions[r.id]);
-
-  // Default to the first unlocked race in the weekend (e.g., skip locked sprint)
-  useEffect(() => {
-    if (nextWeekendRaces.length === 0) return;
-    if (activeRaceIndex >= nextWeekendRaces.length) {
-      setActiveRaceIndex(0);
-      return;
-    }
-    // On initial load or when locked state changes, jump to first unlocked race
-    const firstUnlockedIdx = nextWeekendRaces.findIndex(r => !lockedPredictions[r.id]);
-    if (firstUnlockedIdx >= 0 && lockedPredictions[nextWeekendRaces[activeRaceIndex]?.id]) {
-      setActiveRaceIndex(firstUnlockedIdx);
-    }
-  }, [nextWeekendRaces, lockedPredictions]);
-
-  const handleLockRace = () => {
-    if (!user?.id) {
-      dispatch(openAuthModal('signup'));
-      return;
-    }
-    if (activeRace && !isActiveRaceLocked) setRaceToLock(activeRace);
-  };
-
-  // Count filled positions for the active race in the compete grid
-  const competeGridPositions = useSelector((state: RootState) => state.competeGrid.positions);
-  const filledCount = activeRace
-    ? competeGridPositions.filter(p => p.raceId === activeRace.id && p.driverId).length
-    : 0;
-  const gridPositionCount = getGridPositions(CURRENT_SEASON);
-
-  // User's leaderboard rank
-  const userRank = useMemo(() => {
-    if (!user?.id) return null;
-    return leaderboardEntries.find(e => e.userId === user.id) || null;
-  }, [leaderboardEntries, user]);
-
-  const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
-    {
-      id: 'predict',
-      label: 'Predict',
-      icon: (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-        </svg>
-      ),
-    },
-    {
-      id: 'results',
-      label: 'Results',
-      icon: (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-        </svg>
-      ),
-    },
-    {
-      id: 'leaderboard',
-      label: 'Leaderboard',
-      icon: (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
-      ),
-    },
-  ];
+  // Before the Worker ships `me`, fall back to finding the user on the page.
+  const me = leaderboardMe !== undefined
+    ? leaderboardMe
+    : leaderboardEntries.find(e => e.userId === user?.id) ?? null;
 
   return (
     <LazyDndProvider>
@@ -206,727 +114,28 @@ const Compete: React.FC = () => {
         <ToastContainer />
 
         {/* No header here — the spine (components/nav/SiteSpine.astro, rendered
-            by BaseLayout) is the site's chrome now. The old one had a
-            "← Sandbox" back link that framed Compete as a child of the
-            calculator; it is a sibling section, so there is nothing to go back
-            to, only other sections to switch to. */}
-        <CompeteSectionBar tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
+            by BaseLayout) is the site's chrome. Compete is a sibling section of
+            the calculator, not a child, so there is nothing to go back to. */}
+        <CompeteSectionBar tabs={TABS} activeTab={activeTab} onChange={setActiveTab} />
 
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-
-          {/* How it works */}
-          <div className="max-w-3xl mx-auto mb-6 bg-surface rounded-lg border shadow-xs p-4 flex gap-5 items-center">
-            {/* Explanation */}
-            <div className="text-sm text-ink-secondary min-w-0">
-              <div className="font-semibold text-ink mb-1">Predict. Lock. Score.</div>
-              <p>
-                Drag drivers into your predicted finishing order and lock your prediction before the race starts. After the race, you score a point for every position you got exactly right. Lock every race to climb the season leaderboard.
-              </p>
-            </div>
-
-            {/* Mini prediction vs actual visual */}
-            <div className="flex-shrink-0 hidden sm:block">
-              <div className="flex gap-2 text-[10px] text-ink-muted font-medium mb-1.5 pl-7">
-                <span className="w-16 text-center">Your pick</span>
-                <span className="w-16 text-center">Actual</span>
-              </div>
-              {[
-                { pos: 1, pick: 'VER', actual: 'VER', color: '#3671C6', exact: true },
-                { pos: 2, pick: 'NOR', actual: 'LEC', color: '#FF8000', actualColor: '#E80020', exact: false },
-                { pos: 3, pick: 'PIA', actual: 'PIA', color: '#FF8000', exact: true },
-                { pos: 4, pick: 'SAI', actual: 'HAM', color: '#E80020', actualColor: '#27F4D2', exact: false },
-              ].map(row => (
-                <div key={row.pos} className={`flex items-center gap-2 mb-1 rounded px-1 py-0.5 ${row.exact ? 'bg-green-50' : ''}`}>
-                  <span className={`w-5 text-[10px] font-bold text-center rounded py-px ${row.pos <= 3 ? 'bg-carbon-800 text-white' : 'bg-carbon-100 text-ink-muted'}`}>
-                    {row.pos}
-                  </span>
-                  <div className="w-16 flex items-center gap-1 bg-white rounded border px-1.5 py-1 shadow-sm">
-                    <div className="w-1 h-3 rounded-sm" style={{ backgroundColor: row.color }} />
-                    <span className="text-[10px] font-bold text-ink-secondary">{row.pick}</span>
-                  </div>
-                  <div className="w-16 flex items-center gap-1 bg-white rounded border px-1.5 py-1 shadow-sm">
-                    <div className="w-1 h-3 rounded-sm" style={{ backgroundColor: row.exact ? row.color : row.actualColor }} />
-                    <span className="text-[10px] font-bold text-ink-secondary">{row.actual}</span>
-                  </div>
-                  {row.exact ? (
-                    <svg className="w-3 h-3 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                    </svg>
-                  ) : (
-                    <svg className="w-3 h-3 text-carbon-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  )}
-                </div>
-              ))}
-            </div>
+        <main className={`${PAGE_CONTAINER_CLASS} grid gap-6 xl:grid-cols-[minmax(0,1fr)_17rem] items-start`}>
+          <div className="min-w-0">
+            {activeTab === 'predict' && <PredictPanel />}
+            {activeTab === 'results' && <ResultsPanel />}
+            {activeTab === 'leaderboard' && (
+              <LeaderboardPanel
+                entries={leaderboardEntries}
+                pending={leaderboardPending}
+                me={me}
+                page={leaderboardPage}
+                totalPages={leaderboardTotalPages}
+                totalUsers={leaderboardTotalUsers}
+                loading={leaderboardLoading}
+                onPage={setLeaderboardPage}
+              />
+            )}
           </div>
-
-          {/* Sign-in banner */}
-          {!isAuthenticated && (
-            <div className="max-w-3xl mx-auto bg-brand rounded-lg p-5 mb-6 text-white">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-lg font-display font-bold">Join the Competition</h2>
-                  <p className="text-white/85 text-sm mt-1">
-                    Lock predictions before races, get scored on accuracy, climb the leaderboard.
-                  </p>
-                </div>
-                <button
-                  onClick={() => dispatch(openAuthModal('signup'))}
-                  className="flex-shrink-0 bg-white text-brand font-semibold py-2 px-5 rounded-md hover:bg-red-50 transition-colors"
-                >
-                  Sign In
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Hero Card — show for the active race in the weekend */}
-          {activeRace && !allWeekendLocked && (
-            <div className="max-w-3xl mx-auto bg-surface rounded-lg border shadow-xs shadow-sm p-5 mb-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  {activeRace.countryCode && (
-                    <img
-                      src={`/flags/${activeRace.countryCode}.webp`}
-                      alt={activeRace.country}
-                      className="w-8 h-6 object-cover rounded shadow-sm"
-                    />
-                  )}
-                  <div>
-                    <h2 className="text-lg font-display font-bold text-ink">{formatName(activeRace.name)}</h2>
-                    <div className="flex items-center gap-2 text-sm text-ink-muted mt-0.5">
-                      {activeRace.date && !isActiveRaceLocked && <Countdown date={activeRace.date} prefix="Locks in" />}
-                      {isActiveRaceLocked ? (
-                        <span className="inline-flex items-center gap-1 text-success font-medium">
-                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                          Locked
-                        </span>
-                      ) : filledCount > 0 ? (
-                        <span className="text-amber-600 font-medium">
-                          {filledCount}/{gridPositionCount} filled
-                        </span>
-                      ) : (
-                        <span className="text-ink-muted">No predictions yet</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {!isActiveRaceLocked && activeRace && isAuthenticated && (
-                  <button
-                    onClick={handleLockRace}
-                    disabled={filledCount === 0}
-                    className="flex-shrink-0 bg-brand hover:bg-brand-strong disabled:bg-carbon-300 disabled:cursor-not-allowed text-white font-semibold py-2 px-5 rounded-md transition-colors flex items-center gap-2"
-                  >
-                    Lock Prediction
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
-
-          {nextWeekendRaces.length === 0 && awaitingResults.length === 0 && (
-            <div className="max-w-3xl mx-auto bg-surface rounded-lg border shadow-xs p-5 mb-6 text-center">
-              <p className="text-ink-muted">No upcoming races. Season complete!</p>
-            </div>
-          )}
-
-          {/* The tab bar moved up into CompeteSectionBar, directly under the
-              spine — the same slot the calculator uses for its season selector. */}
-
-          {/* ─── Predict Tab ─── */}
-          {activeTab === 'predict' && (
-            <>
-              {!isAuthenticated ? (
-                <div className="text-center py-12">
-                  <p className="text-ink-muted mb-4">Sign in to set your predictions.</p>
-                  <button
-                    onClick={() => dispatch(openAuthModal('signup'))}
-                    className="bg-brand hover:bg-brand-strong text-white font-medium py-2 px-6 rounded-md transition-colors"
-                  >
-                    Sign In
-                  </button>
-                </div>
-              ) : nextWeekendRaces.length === 0 && awaitingResults.length > 0 ? (
-                <div className="max-w-3xl mx-auto">
-                  {awaitingResults.map(({ race, lockedPrediction }) => (
-                    <div key={race.id} className="bg-surface rounded-lg border shadow-xs p-5 mb-4">
-                      <div className="flex items-center gap-3 mb-3">
-                        {race.countryCode && (
-                          <img
-                            src={`/flags/${race.countryCode}.webp`}
-                            alt={race.country}
-                            className="w-6 h-4 object-cover rounded shadow-sm"
-                          />
-                        )}
-                        <span className="font-semibold text-ink">{formatName(race.name)}</span>
-                        <span className="inline-flex items-center gap-1 text-success text-sm font-medium">
-                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                          Locked
-                        </span>
-                      </div>
-                      <p className="text-sm text-ink-muted mb-3">
-                        Your prediction is locked. Results will be scored after the race finishes. Next predictions open once results are in.
-                      </p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {[...lockedPrediction.positions]
-                          .sort((a, b) => a.position - b.position)
-                          .slice(0, 5)
-                          .map(pos => {
-                            const driver = driverById[pos.driverId];
-                            return (
-                              <span key={pos.position} className="text-xs bg-carbon-100 text-ink-secondary px-2 py-1 rounded-md font-medium">
-                                P{pos.position} {getDriverCode(driver)}
-                              </span>
-                            );
-                          })}
-                        {lockedPrediction.positions.length > 5 && (
-                          <span className="text-xs text-ink-muted px-2 py-1">
-                            +{lockedPrediction.positions.length - 5} more
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : nextWeekendRaces.length === 0 ? (
-                <div className="text-center py-12">
-                  <p className="text-ink-muted">No upcoming races to predict.</p>
-                </div>
-              ) : allWeekendLocked ? (
-                <div className="max-w-3xl mx-auto">
-                  {nextWeekendRaces.map(race => {
-                    const lp = lockedPredictions[race.id];
-                    if (!lp) return null;
-                    return (
-                      <div key={race.id} className="bg-surface rounded-lg border shadow-xs p-5 mb-4">
-                        <div className="flex items-center gap-3 mb-3">
-                          {race.countryCode && (
-                            <img
-                              src={`/flags/${race.countryCode}.webp`}
-                              alt={race.country}
-                              className="w-6 h-4 object-cover rounded shadow-sm"
-                            />
-                          )}
-                          <span className="font-semibold text-ink">{formatName(race.name)}</span>
-                          <span className="inline-flex items-center gap-1 text-success text-sm font-medium">
-                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
-                            Locked
-                          </span>
-                        </div>
-                        <p className="text-sm text-ink-muted mb-3">
-                          Your prediction is locked. Results will be scored after the race finishes.
-                        </p>
-                        <div className="flex flex-wrap gap-1.5">
-                          {[...lp.positions]
-                            .sort((a, b) => a.position - b.position)
-                            .slice(0, 5)
-                            .map(pos => {
-                              const driver = driverById[pos.driverId];
-                              return (
-                                <span key={pos.position} className="text-xs bg-carbon-100 text-ink-secondary px-2 py-1 rounded-md font-medium">
-                                  P{pos.position} {getDriverCode(driver)}
-                                </span>
-                              );
-                            })}
-                          {lp.positions.length > 5 && (
-                            <span className="text-xs text-ink-muted px-2 py-1">
-                              +{lp.positions.length - 5} more
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <CompeteGridProvider>
-                  {/* Active race is locked — show compact summary */}
-                  {isActiveRaceLocked && activeRace && lockedPredictions[activeRace.id] && (
-                    <div className="max-w-3xl mx-auto">
-                      <div className="bg-surface rounded-lg border shadow-xs p-5 mb-4">
-                        <div className="flex items-center gap-3 mb-3">
-                          <span className="font-semibold text-ink">{formatName(activeRace.name)}</span>
-                          <span className="inline-flex items-center gap-1 text-success text-sm font-medium">
-                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
-                            Locked
-                          </span>
-                        </div>
-                        <p className="text-sm text-ink-muted mb-3">
-                          Your prediction is locked. Results will be scored after the race finishes.
-                        </p>
-                        <div className="flex flex-wrap gap-1.5">
-                          {[...lockedPredictions[activeRace.id].positions]
-                            .sort((a, b) => a.position - b.position)
-                            .slice(0, 5)
-                            .map(pos => {
-                              const driver = driverById[pos.driverId];
-                              return (
-                                <span key={pos.position} className="text-xs bg-carbon-100 text-ink-secondary px-2 py-1 rounded-md font-medium">
-                                  P{pos.position} {getDriverCode(driver)}
-                                </span>
-                              );
-                            })}
-                          {lockedPredictions[activeRace.id].positions.length > 5 && (
-                            <span className="text-xs text-ink-muted px-2 py-1">
-                              +{lockedPredictions[activeRace.id].positions.length - 5} more
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Active race is unlocked — show prediction grid */}
-                  {!isActiveRaceLocked && activeRace && (
-                    <>
-                      {/* Mobile: horizontal driver chip strip */}
-                      {isMobile && (
-                        <div className="mb-4 -mx-4 px-4">
-                          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                            {allDrivers.map(driver => {
-                              const team = teamById[driver.team];
-                              const isSelected = selectedDriverId === driver.id;
-                              return (
-                                <button
-                                  key={driver.id}
-                                  onClick={() => handleDriverClick(driver.id)}
-                                  className={`relative overflow-hidden flex-shrink-0 flex items-center gap-1.5 py-1.5 pr-2.5 rounded-md text-xs font-bold transition-all ${
-                                    isSelected
-                                      ? 'ring-2 ring-interactive shadow-md scale-105'
-                                      : 'hover:scale-105'
-                                  }`}
-                                  style={{
-                                    paddingLeft: '13px',
-                                    backgroundColor: isSelected ? `${team?.color}15` : 'white',
-                                  }}
-                                >
-                                  <TeamColorStripe team={team} widthPx={3} />
-                                  <span style={{ color: team?.color || '#555' }}>
-                                    {getDriverLastName(driver.id).slice(0, 3).toUpperCase()}
-                                  </span>
-                                </button>
-                              );
-                            })}
-                          </div>
-                          {selectedDriverId && (
-                            <div className="flex items-center justify-between mt-2 px-2 py-1.5 bg-blue-50 rounded-md text-sm">
-                              <span className="text-blue-700 font-medium">
-                                {getDriverLastName(selectedDriverId)} selected — tap a position to place
-                              </span>
-                              <button
-                                onClick={() => dispatch(selectDriver(null))}
-                                className="text-blue-500 hover:text-blue-700 font-bold ml-2"
-                              >
-                                Cancel
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {/* Desktop: side-by-side layout */}
-                      {!isMobile ? (
-                        <div className="flex gap-4">
-                          <div className="flex-1 min-w-0">
-                            <h3 className="text-sm font-semibold text-ink-muted uppercase tracking-wide mb-2">Drivers</h3>
-                            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 max-h-[calc(100vh-240px)] overflow-y-auto pr-1 pb-2">
-                              {allDrivers.map(driver => (
-                                <DriverCard
-                                  key={driver.id}
-                                  driver={driver}
-                                  isSelected={selectedDriverId === driver.id}
-                                  onClick={() => handleDriverClick(driver.id)}
-                                />
-                              ))}
-                            </div>
-                          </div>
-                          <div className="w-[500px] flex-shrink-0">
-                            <SingleRaceGrid race={activeRace} weekendRaces={isSprintWeekend ? nextWeekendRaces : undefined} onRaceSwitch={isSprintWeekend ? setActiveRaceIndex : undefined} />
-                          </div>
-                        </div>
-                      ) : (
-                        <SingleRaceGrid race={activeRace} columns={2} weekendRaces={isSprintWeekend ? nextWeekendRaces : undefined} onRaceSwitch={isSprintWeekend ? setActiveRaceIndex : undefined} />
-                      )}
-                    </>
-                  )}
-
-                  {/* Lock confirmation modal */}
-                  {raceToLock && (
-                    <LockConfirmationModal
-                      race={raceToLock}
-                      onClose={() => setRaceToLock(null)}
-                      onSuccess={() => {
-                        setRaceToLock(null);
-                        if (user?.id) {
-                          dispatch(fetchLockedPredictions({ identifier: { userId: user.id }, season: CURRENT_SEASON }));
-                        }
-                        // Auto-switch to the other race tab on sprint weekends
-                        if (isSprintWeekend && nextWeekendRaces.length === 2) {
-                          setActiveRaceIndex(activeRaceIndex === 0 ? 1 : 0);
-                        }
-                      }}
-                    />
-                  )}
-                </CompeteGridProvider>
-              )}
-            </>
-          )}
-
-          {/* ─── Results Tab ─── */}
-          {activeTab === 'results' && (
-            <div className="max-w-3xl mx-auto">
-              {!isAuthenticated ? (
-                <div className="text-center py-12">
-                  <p className="text-ink-muted mb-4">Sign in to see your results.</p>
-                  <button
-                    onClick={() => dispatch(openAuthModal('signup'))}
-                    className="bg-brand hover:bg-brand-strong text-white font-medium py-2 px-6 rounded-md transition-colors"
-                  >
-                    Sign In
-                  </button>
-                </div>
-              ) : (
-                <>
-                  {/* Stats */}
-                  <div className="grid grid-cols-3 gap-3 mb-6">
-                    <div className="bg-surface rounded-lg border shadow-xs p-4 text-center">
-                      <div className="text-2xl font-display font-bold text-ink tnum">
-                        {scoredCount > 0 ? `${overallAccuracy.percentage}%` : '--'}
-                      </div>
-                      <div className="text-xs text-ink-muted mt-1">Accuracy</div>
-                    </div>
-                    <div className="bg-surface rounded-lg border shadow-xs p-4 text-center">
-                      <div className="text-2xl font-display font-bold text-ink tnum">{lockedCount}</div>
-                      <div className="text-xs text-ink-muted mt-1">Locked</div>
-                    </div>
-                    <div className="bg-surface rounded-lg border shadow-xs p-4 text-center">
-                      <div className="text-2xl font-display font-bold text-ink tnum">{scoredCount}</div>
-                      <div className="text-xs text-ink-muted mt-1">Scored</div>
-                    </div>
-                  </div>
-
-                  {/* Scored Races */}
-                  {scoredRaces.length > 0 && (
-                    <div className="mb-6">
-                      <h3 className="text-sm font-semibold text-ink-muted uppercase tracking-wide mb-3">Scored Races</h3>
-                      <div className="space-y-3">
-                        {scoredRaces.map(({ race, lockedPrediction }) => {
-                          const isExpanded = expandedRaceId === race.id;
-                          const score = lockedPrediction.score;
-                          return (
-                            <div key={race.id} className="bg-surface rounded-lg border shadow-xs overflow-hidden">
-                              <button
-                                onClick={() => setExpandedRaceId(isExpanded ? null : race.id)}
-                                className="w-full flex items-center justify-between p-4 text-left hover:bg-carbon-50 transition-colors"
-                              >
-                                <div className="flex items-center gap-3">
-                                  {race.countryCode && (
-                                    <img
-                                      src={`/flags/${race.countryCode}.webp`}
-                                      alt={race.country}
-                                      className="w-6 h-4 object-cover rounded shadow-sm"
-                                    />
-                                  )}
-                                  <span className="font-medium text-ink">{formatName(race.name)}</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
-                                    (score?.percentage ?? 0) >= 40 ? 'bg-green-100 text-green-700' :
-                                    (score?.percentage ?? 0) >= 25 ? 'bg-amber-100 text-amber-700' :
-                                    'bg-carbon-100 text-ink-secondary'
-                                  }`}>
-                                    {score?.exact}/{score?.total} exact ({score?.percentage}%)
-                                  </span>
-                                  <svg className={`w-4 h-4 text-ink-muted transition-transform ${isExpanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                  </svg>
-                                </div>
-                              </button>
-
-                              {isExpanded && lockedPrediction.breakdown && (
-                                <div className="border-t border-carbon-100">
-                                  <table className="w-full text-sm">
-                                    <thead>
-                                      <tr className="bg-carbon-50 text-xs text-ink-muted uppercase">
-                                        <th className="px-4 py-2 text-left w-14">Pos</th>
-                                        <th className="px-4 py-2 text-left">Your Pick</th>
-                                        <th className="px-4 py-2 text-left">Actual</th>
-                                        <th className="px-4 py-2 text-center w-12"></th>
-                                      </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-carbon-50">
-                                      {lockedPrediction.breakdown.map(item => {
-                                        const predicted = driverById[item.predictedDriverId];
-                                        const actual = item.actualDriverId ? driverById[item.actualDriverId] : null;
-                                        return (
-                                          <tr
-                                            key={item.position}
-                                            className={item.isExact ? 'bg-green-50' : ''}
-                                          >
-                                            <td className="px-4 py-2 font-medium text-ink-muted">P{item.position}</td>
-                                            <td className="px-4 py-2 font-medium text-ink">
-                                              {getDriverCode(predicted)}
-                                            </td>
-                                            <td className="px-4 py-2 text-ink-secondary">
-                                              {actual ? getDriverCode(actual) : '--'}
-                                            </td>
-                                            <td className="px-4 py-2 text-center">
-                                              {item.isExact ? (
-                                                <svg className="w-4 h-4 text-success mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                                </svg>
-                                              ) : (
-                                                <svg className="w-4 h-4 text-carbon-300 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                                </svg>
-                                              )}
-                                            </td>
-                                          </tr>
-                                        );
-                                      })}
-                                    </tbody>
-                                  </table>
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Awaiting Results */}
-                  {awaitingResults.length > 0 && (
-                    <div className="mb-6">
-                      <h3 className="text-sm font-semibold text-ink-muted uppercase tracking-wide mb-3">Awaiting Results</h3>
-                      <div className="space-y-3">
-                        {awaitingResults.map(({ race, lockedPrediction }) => (
-                          <div key={race.id} className="bg-surface rounded-lg border shadow-xs p-4">
-                            <div className="flex items-center justify-between mb-2">
-                              <div className="flex items-center gap-3">
-                                {race.countryCode && (
-                                  <img
-                                    src={`/flags/${race.countryCode}.webp`}
-                                    alt={race.country}
-                                    className="w-6 h-4 object-cover rounded shadow-sm"
-                                  />
-                                )}
-                                <span className="font-medium text-ink">{formatName(race.name)}</span>
-                              </div>
-                              {race.date && (
-                                <span className="text-sm text-ink-muted"><Countdown date={race.date} /></span>
-                              )}
-                            </div>
-                            <div className="flex flex-wrap gap-1">
-                              {[...lockedPrediction.positions]
-                                .sort((a, b) => a.position - b.position)
-                                .slice(0, 10)
-                                .map(pos => {
-                                  const driver = driverById[pos.driverId];
-                                  return (
-                                    <span key={pos.position} className="text-xs bg-carbon-100 text-ink-secondary px-2 py-0.5 rounded font-medium">
-                                      P{pos.position} {getDriverCode(driver)}
-                                    </span>
-                                  );
-                                })}
-                              {lockedPrediction.positions.length > 10 && (
-                                <span className="text-xs text-ink-muted px-2 py-0.5">
-                                  +{lockedPrediction.positions.length - 10} more
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {scoredRaces.length === 0 && awaitingResults.length === 0 && (
-                    <div className="text-center py-12">
-                      <p className="text-ink-muted mb-2">No results yet.</p>
-                      <p className="text-sm text-ink-muted">Lock a prediction and wait for the race to finish.</p>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-          )}
-
-          {/* ─── Leaderboard Tab ─── */}
-          {activeTab === 'leaderboard' && (
-            <div className="max-w-3xl mx-auto">
-              {/* User rank summary */}
-              {userRank && (
-                <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg border border-amber-200 p-4 mb-4 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">{getRankBadge(userRank.rank || 0)}</span>
-                    <div>
-                      <div className="font-bold text-ink">Your Rank</div>
-                      <div className="text-sm text-ink-secondary">
-                        {userRank.accuracy}% accuracy · {userRank.exactMatches}/{userRank.totalPositions} exact
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              <div className="text-sm text-ink-muted mb-3">
-                {leaderboardTotalUsers} predictor{leaderboardTotalUsers !== 1 ? 's' : ''} this season
-              </div>
-
-              {leaderboardLoading ? (
-                <div className="bg-surface rounded-lg border shadow-xs p-8 text-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand mx-auto"></div>
-                  <p className="text-ink-muted mt-3 text-sm">Loading leaderboard...</p>
-                </div>
-              ) : leaderboardEntries.length === 0 && leaderboardPending.length === 0 ? (
-                <div className="bg-surface rounded-lg border shadow-xs p-8 text-center">
-                  <p className="text-ink-muted">No predictions yet. Be the first!</p>
-                </div>
-              ) : leaderboardEntries.length === 0 ? (
-                <div className="bg-surface rounded-lg border shadow-xs p-6 text-center mb-6">
-                  <p className="text-ink-muted">No races scored yet. Check back after the first race!</p>
-                </div>
-              ) : (
-                <div className="bg-surface rounded-lg border shadow-xs overflow-hidden">
-                  <table className="w-full">
-                    <thead className="bg-carbon-50 border-b">
-                      <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wide w-14">Rank</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wide">Predictor</th>
-                        <th className="px-4 py-3 text-right text-xs font-medium text-ink-muted uppercase tracking-wide w-16">Races</th>
-                        <th className="px-4 py-3 text-right text-xs font-medium text-ink-muted uppercase tracking-wide w-24">Accuracy</th>
-                        <th className="px-4 py-3 text-right text-xs font-medium text-ink-muted uppercase tracking-wide w-20">Exact</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-carbon-100">
-                      {leaderboardEntries.map(entry => {
-                        const isCurrentUser = user?.id === entry.userId;
-                        return (
-                          <tr
-                            key={entry.userId}
-                            className={`transition-colors ${isCurrentUser ? 'bg-amber-50' : 'hover:bg-carbon-50'}`}
-                          >
-                            <td className="px-4 py-3">
-                              <span className="text-lg">{getRankBadge(entry.rank || 0)}</span>
-                            </td>
-                            <td className="px-4 py-3">
-                              <div className="flex items-center gap-3">
-                                {entry.image ? (
-                                  <img src={entry.image} alt={entry.name} className="w-7 h-7 rounded-full object-cover" />
-                                ) : (
-                                  <div className="w-7 h-7 rounded-full bg-brand text-white flex items-center justify-center text-xs font-bold">
-                                    {getInitials(entry.name)}
-                                  </div>
-                                )}
-                                <span className={`font-medium ${isCurrentUser ? 'text-amber-700' : 'text-ink'}`}>
-                                  {entry.name} {isCurrentUser && <span className="text-xs text-amber-500">(you)</span>}
-                                </span>
-                              </div>
-                            </td>
-                            <td className="px-4 py-3 text-right text-sm text-ink-secondary">{entry.racesScored}</td>
-                            <td className="px-4 py-3 text-right">
-                              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${
-                                entry.accuracy >= 40 ? 'bg-green-100 text-green-700' :
-                                entry.accuracy >= 25 ? 'bg-amber-100 text-amber-700' :
-                                'bg-carbon-100 text-ink-secondary'
-                              }`}>
-                                {entry.accuracy}%
-                              </span>
-                            </td>
-                            <td className="px-4 py-3 text-right text-sm text-ink-secondary">
-                              {entry.exactMatches}/{entry.totalPositions}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-
-                  {leaderboardTotalPages > 1 && (
-                    <div className="flex items-center justify-center gap-2 p-4 border-t">
-                      <button
-                        onClick={() => setLeaderboardPage(p => Math.max(1, p - 1))}
-                        disabled={leaderboardPage <= 1}
-                        className="px-3 py-1.5 text-sm font-medium text-ink-secondary bg-white border border-strong rounded-md hover:bg-carbon-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        Prev
-                      </button>
-                      <span className="px-3 py-1.5 text-sm text-ink-muted">
-                        {leaderboardPage} / {leaderboardTotalPages}
-                      </span>
-                      <button
-                        onClick={() => setLeaderboardPage(p => Math.min(leaderboardTotalPages, p + 1))}
-                        disabled={leaderboardPage >= leaderboardTotalPages}
-                        className="px-3 py-1.5 text-sm font-medium text-ink-secondary bg-white border border-strong rounded-md hover:bg-carbon-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        Next
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Pending predictions */}
-              {leaderboardPending.length > 0 && (
-                <div className="mt-6">
-                  <h3 className="text-sm font-semibold text-ink-muted uppercase tracking-wide mb-3">Upcoming Predictions</h3>
-                  <div className="space-y-3">
-                    {leaderboardPending.map(entry => (
-                      <div key={entry.userId} className="bg-surface rounded-lg border shadow-xs overflow-hidden">
-                        <div className="px-4 py-3 border-b border-carbon-100 flex items-center gap-3">
-                          {entry.image ? (
-                            <img src={entry.image} alt={entry.name} className="w-7 h-7 rounded-full object-cover" />
-                          ) : (
-                            <div className="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold">
-                              {getInitials(entry.name)}
-                            </div>
-                          )}
-                          <span className="font-medium text-ink">{entry.name}</span>
-                        </div>
-                        <div className="px-4 py-3 space-y-2">
-                          {entry.predictions.map(pred => (
-                            <div key={pred.raceName} className="flex items-center gap-3">
-                              <span className="text-sm font-medium text-ink-secondary w-32 flex-shrink-0">{pred.raceName}</span>
-                              <div className="flex gap-1 flex-wrap">
-                                {pred.drivers.slice(0, 5).map((driver, i) => (
-                                  <span
-                                    key={i}
-                                    className={`text-xs px-2 py-0.5 rounded font-medium ${
-                                      i === 0 ? 'bg-yellow-100 text-yellow-800' :
-                                      i === 1 ? 'bg-carbon-200 text-ink-secondary' :
-                                      i === 2 ? 'bg-amber-100 text-amber-800' :
-                                      'bg-carbon-100 text-ink-secondary'
-                                    }`}
-                                  >
-                                    {i === 0 ? 'P1' : i === 1 ? 'P2' : i === 2 ? 'P3' : `P${i + 1}`} {driver}
-                                  </span>
-                                ))}
-                                {pred.drivers.length > 5 && (
-                                  <span className="text-xs text-ink-muted px-2 py-0.5">+{pred.drivers.length - 5} more</span>
-                                )}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
+          <SeasonRail me={me} totalUsers={leaderboardTotalUsers} />
         </main>
 
         {/* No <AuthModal/> — SpineAccountIsland owns the one instance for the

@@ -30,14 +30,18 @@ export interface LeaderboardResponse {
   totalPages: number;
   totalUsers: number;
   season: number | null;
+  /** The caller's own ranked row; present only when `me` was passed. */
+  me?: LeaderboardEntry | null;
 }
 
 export async function getLeaderboard(
   page: number = 1,
-  season?: number
+  season?: number,
+  meUserId?: string
 ): Promise<LeaderboardResponse> {
   const params = new URLSearchParams({ page: String(page) });
   if (season) params.set('season', String(season));
+  if (meUserId) params.set('me', meUserId);
 
   const response = await fetch(`${API_BASE_URL}/api/leaderboard?${params}`, {
     credentials: 'include',

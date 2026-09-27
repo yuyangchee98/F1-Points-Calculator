@@ -1,0 +1,32 @@
+---
+/** Astro twin of PageHead.tsx — see ./pageHeadClasses.ts. Slots: leading, actions. */
+import {
+  PAGE_HEAD_CLASS,
+  PAGE_HEAD_EYEBROW_CLASS,
+  PAGE_HEAD_TITLE_CLASS,
+  PAGE_HEAD_ACTIONS_CLASS,
+} from './pageHeadClasses';
+
+interface Props {
+  title: string;
+  eyebrow?: string;
+}
+
+const { title, eyebrow } = Astro.props;
+const hasActions = Astro.slots.has('actions');
+---
+
+<div class={PAGE_HEAD_CLASS}>
+  <div class="flex items-center gap-3 min-w-0">
+    <slot name="leading" />
+    <div class="min-w-0">
+      {eyebrow && <div class={PAGE_HEAD_EYEBROW_CLASS}>{eyebrow}</div>}
+      <h1 class={PAGE_HEAD_TITLE_CLASS}>{title}</h1>
+    </div>
+  </div>
+  {hasActions && (
+    <div class={PAGE_HEAD_ACTIONS_CLASS}>
+      <slot name="actions" />
+    </div>
+  )}
+</div>

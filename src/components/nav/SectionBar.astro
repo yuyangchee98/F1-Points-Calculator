@@ -5,17 +5,22 @@
  * tab state), but all three share the classes in ./sectionBar.ts so they read as
  * one bar.
  */
-import { SECTION_BAR_CLASS, SECTION_BAR_TITLE_CLASS } from './sectionBar';
+import { SECTION_BAR_CLASS, SECTION_BAR_CONTAINED_CLASS, SECTION_BAR_TITLE_CLASS } from './sectionBar';
 
 interface Props {
   title?: string;
   class?: string;
+  /**
+   * Drop the bar's own side padding so a SECTION_BAR_INNER_CLASS child can line
+   * up with a PAGE_CONTAINER_CLASS page below (the Tracks index).
+   */
+  contained?: boolean;
 }
 
-const { title, class: className = '' } = Astro.props;
+const { title, class: className = '', contained = false } = Astro.props;
 ---
 
-<div class={`${SECTION_BAR_CLASS} ${className}`}>
+<div class={`${contained ? SECTION_BAR_CONTAINED_CLASS : SECTION_BAR_CLASS} ${className}`}>
   {title && <span class={SECTION_BAR_TITLE_CLASS}>{title}</span>}
   <slot />
 </div>

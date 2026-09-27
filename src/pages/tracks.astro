@@ -17,6 +17,13 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionBar from '../components/nav/SectionBar.astro';
 import CircuitPicker from '../components/nav/CircuitPicker.astro';
+import PageHead from '../components/layout/PageHead.astro';
+import {
+  SECTION_BAR_INNER_CLASS,
+  SECTION_BAR_STATUS_CLASS,
+  SECTION_BAR_TITLE_CLASS,
+  PAGE_CONTAINER_CLASS,
+} from '../components/nav/sectionBar';
 import { fetchCircuitList, groupByCountry, flagSrcFor, circuitVenue } from '../utils/circuits';
 
 // Same single call, same fail-the-build contract as /tracks/[track].
@@ -48,18 +55,18 @@ const schemaData = {
   ogDescription={`All ${circuits.length} Formula 1 circuits, with full race results and winners for every year.`}
   schemaData={schemaData}
 >
-  <SectionBar title="Circuits">
-    <CircuitPicker circuits={circuits} label="Jump to circuit" />
-    <span class="flex-1"></span>
-    <span class="text-xs text-ink-muted hidden sm:inline">
-      {circuits.length} circuits · {grouped.length} countries
-    </span>
+  <SectionBar contained>
+    <div class={SECTION_BAR_INNER_CLASS}>
+      <span class={SECTION_BAR_TITLE_CLASS}>Circuits</span>
+      <CircuitPicker circuits={circuits} label="Jump to circuit" />
+      <div class={SECTION_BAR_STATUS_CLASS}>
+        <span class="hidden sm:inline">{circuits.length} circuits · {grouped.length} countries</span>
+      </div>
+    </div>
   </SectionBar>
 
-  <main class="max-w-5xl mx-auto px-4 py-6">
-    <h1 class="text-2xl font-display font-bold tracking-tight mb-2">
-      Formula 1 Circuits
-    </h1>
+  <main class={PAGE_CONTAINER_CLASS}>
+    <PageHead eyebrow="Every Grand Prix venue since 1950" title="Formula 1 Circuits" />
     <p class="text-ink-secondary max-w-2xl mb-8">
       Every venue the Formula 1 World Championship has visited. Pick a circuit for its
       full classification year by year — winners, podiums and the complete finishing
@@ -82,7 +89,7 @@ const schemaData = {
           {group.country}
         </h2>
 
-        <ul class="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        <ul class="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {group.circuits.map((c) => (
             <li>
               <a

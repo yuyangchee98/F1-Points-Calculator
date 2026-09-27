@@ -11,6 +11,12 @@ import {
 interface LockedPredictionsState {
   lockedPredictions: Record<string, LockedPrediction>;  // keyed by raceId
   isLoading: boolean;
+  /**
+   * True once a fetch has settled (either way). isLoading alone cannot tell
+   * "not asked yet" from "asked, nothing locked", and Compete must not render a
+   * prediction grid for a race it has not yet learned is locked.
+   */
+  hasFetched: boolean;
   isLocking: boolean;
   error: string | null;
 }
@@ -18,6 +24,7 @@ interface LockedPredictionsState {
 const initialState: LockedPredictionsState = {
   lockedPredictions: {},
   isLoading: false,
+  hasFetched: false,
   isLocking: false,
   error: null,
 };
@@ -90,6 +97,7 @@ export const lockedPredictionsSlice = createSlice({
       })
       .addCase(fetchLockedPredictions.fulfilled, (state, action) => {
         state.isLoading = false;
+        state.hasFetched = true;
         state.lockedPredictions = {};
         action.payload.forEach((prediction) => {
           state.lockedPredictions[prediction.raceId] = prediction;
@@ -97,6 +105,7 @@ export const lockedPredictionsSlice = createSlice({
       })
       .addCase(fetchLockedPredictions.rejected, (state, action) => {
         state.isLoading = false;
+        state.hasFetched = true;
         state.error = action.error.message || 'Failed to load locked predictions';
       })
       // Lock prediction

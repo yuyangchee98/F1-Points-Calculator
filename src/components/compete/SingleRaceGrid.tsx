@@ -8,6 +8,11 @@ interface SingleRaceGridProps {
   columns?: 2 | 3;
   weekendRaces?: Race[];
   onRaceSwitch?: (index: number) => void;
+  /**
+   * Skip the race header. Compete names the race (and holds the sprint/race
+   * switch) in its PageHead, so a second header here would repeat it.
+   */
+  hideHeader?: boolean;
 }
 
 const ROW_HEIGHT = 56;
@@ -15,7 +20,7 @@ const ROW_HEIGHT = 56;
 const formatName = (name: string) =>
   name.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
-const SingleRaceGrid: React.FC<SingleRaceGridProps> = ({ race, columns = 3, weekendRaces, onRaceSwitch }) => {
+const SingleRaceGrid: React.FC<SingleRaceGridProps> = ({ race, columns = 3, weekendRaces, onRaceSwitch, hideHeader = false }) => {
   const posCount = getGridPositions(CURRENT_SEASON);
   const colSize = Math.ceil(posCount / columns);
   const cols = Array.from({ length: columns }, (_, c) =>
@@ -50,7 +55,7 @@ const SingleRaceGrid: React.FC<SingleRaceGridProps> = ({ race, columns = 3, week
   return (
     <div>
       {/* Race header — becomes a selector on sprint weekends */}
-      {hasSelector ? (
+      {hideHeader ? null : hasSelector ? (
         <div className="race-header mb-3 flex flex-row gap-2" style={{ height: 56 }}>
           {race.countryCode && (
             <img

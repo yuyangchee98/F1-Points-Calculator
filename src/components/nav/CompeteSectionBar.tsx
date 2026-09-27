@@ -1,6 +1,13 @@
 import React from 'react';
 import type { CompeteTab } from '../../views/compete/useCompeteTab';
-import { SECTION_BAR_CLASS } from './sectionBar';
+import {
+  SECTION_BAR_CONTAINED_CLASS,
+  SECTION_BAR_INNER_CLASS,
+  SECTION_BAR_STATUS_CLASS,
+  SECTION_BAR_TITLE_CLASS,
+} from './sectionBar';
+import DeadlineChip from '../compete/DeadlineChip';
+import { CURRENT_SEASON } from '../../utils/constants';
 
 /**
  * Compete's section bar — tier 2, the same slot the calculator gives its season
@@ -8,7 +15,8 @@ import { SECTION_BAR_CLASS } from './sectionBar';
  * belong here and not in the spine, which only ever switches sections.
  *
  * Full-bleed like the bar on every other section, with the contents constrained
- * to max-w-7xl so they line up with Compete's <main>.
+ * by SECTION_BAR_INNER_CLASS (see sectionBar.ts) so they line up with Compete's <main>. The right
+ * slot carries the season and the next lock deadline.
  */
 interface Props {
   tabs: { id: CompeteTab; label: string; icon: React.ReactNode }[];
@@ -17,8 +25,9 @@ interface Props {
 }
 
 const CompeteSectionBar: React.FC<Props> = ({ tabs, activeTab, onChange }) => (
-  <div className={SECTION_BAR_CLASS}>
-    <div className="max-w-7xl w-full mx-auto sm:px-2 lg:px-4 flex items-center gap-1">
+  <div className={SECTION_BAR_CONTAINED_CLASS}>
+    <div className={SECTION_BAR_INNER_CLASS}>
+      <span className={`${SECTION_BAR_TITLE_CLASS} hidden sm:inline`}>Compete</span>
       <nav className="flex items-center gap-1" aria-label="Compete views">
         {tabs.map((t) => {
           const selected = t.id === activeTab;
@@ -39,6 +48,10 @@ const CompeteSectionBar: React.FC<Props> = ({ tabs, activeTab, onChange }) => (
           );
         })}
       </nav>
+      <div className={SECTION_BAR_STATUS_CLASS}>
+        <span className="hidden md:inline">{CURRENT_SEASON} season</span>
+        <DeadlineChip />
+      </div>
     </div>
   </div>
 );
