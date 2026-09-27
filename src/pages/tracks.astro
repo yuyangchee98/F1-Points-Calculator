@@ -67,7 +67,11 @@ const schemaData = {
   </SectionBar>
 
   <main class={PAGE_CONTAINER_CLASS}>
-    <PageHead eyebrow="Every Grand Prix venue since 1950" title="Formula 1 Circuits" />
+    {/* 1958 tracks EARLIEST_SEASON in the API's circuits.ts — the listing genuinely
+        starts there, because pre-1958 shared drives put several drivers at the same
+        finishing position and the results table is keyed by position. Update both
+        together if the floor ever moves. */}
+    <PageHead eyebrow="Every Grand Prix venue since 1958" title="Formula 1 Circuits" />
     <CircuitMap circuits={circuits} />
 
     <h2 class="font-display text-lg font-bold text-ink mb-4">By country</h2>
