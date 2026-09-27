@@ -61,33 +61,32 @@ export function flagSrcFor(country: string): string {
 }
 
 /**
- * The venue, when the race name alone is ambiguous.
+ * The venue's own name, e.g. "Circuit de Spa-Francorchamps".
  *
- * `fullName` is the RACE name, not the circuit's, and 14 of the circuits share
- * one with another venue — three different "United States Grand Prix", two
- * "Japanese", and so on. Listing those side by side reads as a duplicate entry.
- *
- * The slug already disambiguates them (`australian-grand-prix` vs
- * `australian-grand-prix-adelaide`), so the venue is recoverable from the part
- * of the slug the race name does not account for. That avoids 46 extra
- * /api/circuit round trips at build time purely to fetch `locality`.
- *
- * Returns '' when the slug adds nothing — i.e. the name is already unambiguous.
+ * The API supplies this directly now. It used to be reverse-engineered from the
+ * part of the slug the race name did not account for, which was a workaround for
+ * not having the venue at all — and it silently returned '' as soon as the race
+ * name itself began carrying a venue qualifier.
  */
 export function circuitVenue(circuit: CircuitListItem): string {
-  const nameSlug = circuit.fullName
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '');
+  return circuit.circuitName;
+}
 
-  if (!circuit.slug.startsWith(`${nameSlug}-`)) return '';
+/**
+ * Drop the venue qualifier the API appends to keep page titles unique, leaving the
+ * plain race name. The qualifier belongs in a <title>, where two pages must be
+ * told apart, but not in prose — "Every French Grand Prix (Reims-Gueux) winner at
+ * Reims-Gueux" says it twice — and not in the comparison that decides whether an
+ * edition ran under a FORMER name, which would otherwise treat every edition of a
+ * qualified circuit as a rename.
+ */
+export function stripVenueQualifier(fullName: string): string {
+  return fullName.replace(/\s*\([^)]*\)$/, '');
+}
 
-  return circuit.slug
-    .slice(nameSlug.length + 1)
-    .split('-')
-    .filter(Boolean)
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
+/** The race name for a listed circuit, without the venue qualifier. */
+export function circuitRaceName(circuit: CircuitListItem): string {
+  return stripVenueQualifier(circuit.fullName);
 }
 
 /** Countries A–Z, circuits A–Z within each. Used by the index and the picker. */

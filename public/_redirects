@@ -1,3 +1,10 @@
 /race/2022/* /2022 301
 /race/2023/* /2023 301
 /race/2024/* /2024 301
+
+# Track-page slugs moved from the circuit's LOCALITY to its actual name when page
+# titles gained a venue qualifier (2026-09): "Oyama" and "Castle Donington" are
+# not what anyone searches for, or calls these circuits.
+/tracks/japanese-grand-prix-oyama /tracks/japanese-grand-prix-fuji 301
+/tracks/european-grand-prix-jerez-de-la-frontera /tracks/european-grand-prix-jerez 301
+/tracks/european-grand-prix-castle-donington /tracks/european-grand-prix-donington-park 301

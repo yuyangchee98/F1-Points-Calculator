@@ -64,15 +64,14 @@ export const CIRCUIT_COORDS: Record<string, [number, number]> = {
   zandvoort: [52.3888, 4.54092],
 
   // Historic venues, ahead of the 1961–1997 backfill
-  ain_diab: [33.5786, -7.6875],
-  'ain-diab': [33.5786, -7.6875],
+  'ain-diab': [33.5786, -7.6875], // upstream hyphenates this one id
   aintree: [53.4769, -2.94056],
   anderstorp: [57.2653, 13.6042],
   avus: [52.4806, 13.2514],
   boavista: [41.1705, -8.67325],
   brands_hatch: [51.3569, 0.263056],
   bremgarten: [46.9589, 7.40194],
-  caesars_palace: [36.1162, -115.174],
+  las_vegas: [36.1162, -115.174], // Caesars Palace car park, 1981-82 (`vegas` is today's Strip circuit)
   charade: [45.7472, 3.03889],
   dallas: [32.7774, -96.7587],
   detroit: [42.3298, -83.0401],
@@ -96,6 +95,7 @@ export const CIRCUIT_COORDS: Record<string, [number, number]> = {
   watkins_glen: [42.3369, -76.9272],
   zeltweg: [47.2039, 14.7478],
   zolder: [50.9894, 5.25694],
+  indianapolis_500: [39.795, -86.2347], // the oval; `indianapolis` is the road course at the same complex
 };
 
 // The viewBox of public/maps/world-*.svg, in projected units. Must match the

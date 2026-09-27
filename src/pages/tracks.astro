@@ -25,7 +25,7 @@ import {
   SECTION_BAR_TITLE_CLASS,
   PAGE_CONTAINER_CLASS,
 } from '../components/nav/sectionBar';
-import { fetchCircuitList, groupByCountry, flagSrcFor, circuitVenue } from '../utils/circuits';
+import { fetchCircuitList, groupByCountry, flagSrcFor, circuitVenue, circuitRaceName } from '../utils/circuits';
 
 // Same single call, same fail-the-build contract as /tracks/[track].
 const circuits = await fetchCircuitList();
@@ -96,7 +96,7 @@ const schemaData = {
                 class="block h-full bg-surface border rounded-lg px-3 py-2.5 shadow-xs
                        hover:border-strong hover:shadow-sm transition-all"
               >
-                <span class="block text-sm font-semibold text-ink leading-snug">{c.fullName}</span>
+                <span class="block text-sm font-semibold text-ink leading-snug">{circuitRaceName(c)}</span>
                 <span class="block text-xs text-ink-muted mt-0.5">
                   {circuitVenue(c) || 'Results by year'}
                 </span>

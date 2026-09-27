@@ -3,7 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import TrackResultsIsland from '../../components/tracks/TrackResultsIsland';
 import SectionBar from '../../components/nav/SectionBar.astro';
 import CircuitPicker from '../../components/nav/CircuitPicker.astro';
-import { fetchCircuitList, flagSrcFor } from '../../utils/circuits';
+import { fetchCircuitList, flagSrcFor, stripVenueQualifier} from '../../utils/circuits';
 import type { CircuitHistory, CircuitListItem } from '../../types/track';
 
 const API_BASE_URL = import.meta.env.PUBLIC_API_BASE_URL;
@@ -20,7 +20,7 @@ export async function getStaticPaths() {
   return circuits.map((c) => ({ params: { track: c.slug }, props: { ...c, circuits } }));
 }
 
-const { circuitId, fullName, country, circuits } = Astro.props as CircuitListItem & {
+const { circuitId, fullName, circuitName: listedCircuitName, country, circuits } = Astro.props as CircuitListItem & {
   circuits: CircuitListItem[];
 };
 const slug = Astro.params.track;
@@ -36,7 +36,13 @@ try {
 
 const editions = history?.editions ?? [];
 const locality = history?.locality ?? '';
-const circuitName = history?.fullName ?? fullName;
+// The VENUE, not the race — used for the page copy and as the Place in the
+// structured data, where a Grand Prix name would be wrong.
+const circuitName = history?.circuitName ?? listedCircuitName;
+// The race WITHOUT the venue qualifier that keeps page titles unique. The title
+// and <h1> want the qualified form ("British Grand Prix (Aintree)"); a sentence
+// that already names the venue does not.
+const raceName = stripVenueQualifier(fullName);
 const seasons = editions.map((e) => e.season);
 const latestSeason = seasons.length ? Math.max(...seasons) : null;
 const earliestSeason = seasons.length ? Math.min(...seasons) : null;
@@ -54,7 +60,7 @@ const latestWinner = latestEdition?.results?.find((p) => p.position === 1);
 // name; the Worker now names the page after the most recent RACED edition, so
 // anything else here is genuinely a FORMER name (no provisional future round
 // leaks in). Empty for circuits that never renamed.
-const canonicalName = fullName.replace(/\s+Grand Prix$/i, '');
+const canonicalName = raceName.replace(/\s+Grand Prix$/i, '');
 const formerRanges = new Map<string, { min: number; max: number }>();
 for (const e of editions) {
   if (!e.name || e.name === canonicalName) continue;
@@ -76,7 +82,7 @@ const formerlyPhrase = formerNames.map((f) => `the ${f.label} (${f.range})`).joi
 
 const title = `${fullName} Winners & Results by Year | F1 Points Calculator`;
 const yearRange = earliestSeason && latestSeason ? `${earliestSeason}–${latestSeason}` : '';
-const description = `Every ${fullName} winner and podium at ${circuitName}${locality ? `, ${locality}` : ''}. Full Formula 1 results year by year${yearRange ? ` (${yearRange})` : ''}.${formerNames.length ? ` Previously ${formerlyPhrase}.` : ''}`;
+const description = `Every ${raceName} winner and podium at ${circuitName}${locality ? `, ${locality}` : ''}. Full Formula 1 results year by year${yearRange ? ` (${yearRange})` : ''}.${formerNames.length ? ` Previously ${formerlyPhrase}.` : ''}`;
 
 const schemaData = {
   '@context': 'https://schema.org',
@@ -98,7 +104,7 @@ const schemaData = {
 <BaseLayout
   title={title}
   description={description}
-  keywords={`${fullName}, ${circuitName}, ${fullName} winners, ${country} grand prix results, F1 podium history, Formula 1 results by year${formerNames.length ? `, ${formerNames.map((f) => f.label).join(', ')}` : ''}`}
+  keywords={`${raceName}, ${circuitName}, ${raceName} winners, ${circuitName} F1 results, ${country} grand prix results, F1 podium history, Formula 1 results by year${formerNames.length ? `, ${formerNames.map((f) => f.label).join(', ')}` : ''}`}
   canonicalPath={`/tracks/${slug}`}
   schemaData={schemaData}
 >
@@ -274,7 +280,7 @@ const schemaData = {
         )}
 
         <p class="text-xs text-ink-secondary leading-relaxed">
-          Every {fullName} at {circuitName}, with the full classification year by year.
+          Every {raceName} at {circuitName}, with the full classification year by year.
         </p>
 
         <a

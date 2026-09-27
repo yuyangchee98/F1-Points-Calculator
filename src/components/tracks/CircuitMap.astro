@@ -8,7 +8,7 @@
  * percentages, so they stay crawlable and a constant size at any width.
  */
 import type { CircuitListItem } from '../../types/track';
-import { circuitVenue } from '../../utils/circuits';
+import { circuitVenue, circuitRaceName } from '../../utils/circuits';
 import { MAP_ASPECT, pinPosition } from '../../utils/circuitMap';
 
 interface Props {
@@ -24,7 +24,7 @@ const pins = circuits.flatMap((c) => {
     return [];
   }
   const venue = circuitVenue(c);
-  return [{ ...c, ...pos, label: venue ? `${c.fullName} · ${venue}` : c.fullName }];
+  return [{ ...c, ...pos, label: venue ? `${circuitRaceName(c)} · ${venue}` : circuitRaceName(c) }];
 });
 
 const mask = (file: string) =>

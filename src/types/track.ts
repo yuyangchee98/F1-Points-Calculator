@@ -39,7 +39,11 @@ export interface CircuitStats {
 
 export interface CircuitHistory {
   circuitId: string;
+  /** The race name, carrying a venue qualifier when other circuits share it:
+   *  "British Grand Prix (Aintree)". Unique across circuits. */
   fullName: string;
+  /** The venue itself, e.g. "Silverstone Circuit". */
+  circuitName: string;
   country: string;
   locality: string;
   editions: CircuitEdition[];
@@ -51,5 +55,6 @@ export interface CircuitListItem {
   circuitId: string;
   slug: string;
   fullName: string;
+  circuitName: string;
   country: string;
 }
