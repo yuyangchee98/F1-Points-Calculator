@@ -1,0 +1,109 @@
+---
+/**
+ * The /tracks world map: one pin per circuit, linking to its page.
+ *
+ * Fully static. The outlines are Natural Earth shapes in public/maps/ (see
+ * scripts/build-world-map.mjs), applied as CSS masks so they take the theme's
+ * colour tokens and cache as ordinary files. Pins are plain <a> links placed in
+ * percentages, so they stay crawlable and a constant size at any width.
+ */
+import type { CircuitListItem } from '../../types/track';
+import { circuitVenue } from '../../utils/circuits';
+import { MAP_ASPECT, pinPosition } from '../../utils/circuitMap';
+
+interface Props {
+  circuits: CircuitListItem[];
+}
+
+const { circuits } = Astro.props;
+
+const pins = circuits.flatMap((c) => {
+  const pos = pinPosition(c.circuitId);
+  if (!pos) {
+    console.warn(`[tracks] No map coordinates for ${c.circuitId} — add it to src/utils/circuitMap.ts.`);
+    return [];
+  }
+  const venue = circuitVenue(c);
+  return [{ ...c, ...pos, label: venue ? `${c.fullName} · ${venue}` : c.fullName }];
+});
+
+const mask = (file: string) =>
+  `-webkit-mask:url(/maps/${file}) center/100% 100% no-repeat;mask:url(/maps/${file}) center/100% 100% no-repeat;`;
+---
+
+<div class="relative mb-10" style={`aspect-ratio:${MAP_ASPECT}`} aria-label="Map of Formula 1 circuits">
+  <div class="absolute inset-0 bg-carbon-200" style={mask('world-land.svg')} aria-hidden="true" />
+  <div class="absolute inset-0 bg-surface-sunken" style={mask('world-borders.svg')} aria-hidden="true" />
+
+  {pins.map((p) => (
+    <a
+      href={`/tracks/${p.slug}`}
+      class="circuit-pin"
+      style={`left:${p.left.toFixed(3)}%;top:${p.top.toFixed(3)}%`}
+      aria-label={p.label}
+    >
+      <span class:list={['circuit-pin-label', p.left < 15 && 'is-left', p.left > 85 && 'is-right']} aria-hidden="true">
+        {p.label}
+      </span>
+    </a>
+  ))}
+</div>
+
+<style>
+  .circuit-pin {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    margin: -8px 0 0 -8px;
+    border-radius: 9999px;
+  }
+  .circuit-pin::before {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border-radius: 9999px;
+    background: rgb(var(--brand));
+    box-shadow: 0 0 0 1.5px rgb(var(--surface));
+    transition: transform 120ms ease;
+  }
+  .circuit-pin:hover,
+  .circuit-pin:focus-visible {
+    z-index: 1;
+  }
+  .circuit-pin:hover::before,
+  .circuit-pin:focus-visible::before {
+    transform: scale(1.5);
+  }
+
+  .circuit-pin-label {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    color: rgb(var(--text-primary));
+    background: rgb(var(--surface));
+    border: 1px solid rgb(var(--border));
+    box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 120ms ease;
+  }
+  .circuit-pin-label.is-left {
+    left: 0;
+    transform: none;
+  }
+  .circuit-pin-label.is-right {
+    left: auto;
+    right: 0;
+    transform: none;
+  }
+  .circuit-pin:hover > .circuit-pin-label,
+  .circuit-pin:focus-visible > .circuit-pin-label {
+    opacity: 1;
+  }
+</style>

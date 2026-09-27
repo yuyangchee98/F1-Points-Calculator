@@ -18,6 +18,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionBar from '../components/nav/SectionBar.astro';
 import CircuitPicker from '../components/nav/CircuitPicker.astro';
 import PageHead from '../components/layout/PageHead.astro';
+import CircuitMap from '../components/tracks/CircuitMap.astro';
 import {
   SECTION_BAR_INNER_CLASS,
   SECTION_BAR_STATUS_CLASS,
@@ -67,11 +68,9 @@ const schemaData = {
 
   <main class={PAGE_CONTAINER_CLASS}>
     <PageHead eyebrow="Every Grand Prix venue since 1950" title="Formula 1 Circuits" />
-    <p class="text-ink-secondary max-w-2xl mb-8">
-      Every venue the Formula 1 World Championship has visited. Pick a circuit for its
-      full classification year by year — winners, podiums and the complete finishing
-      order for each Grand Prix held there.
-    </p>
+    <CircuitMap circuits={circuits} />
+
+    <h2 class="font-display text-lg font-bold text-ink mb-4">By country</h2>
 
     {grouped.map((group) => (
       <section class="mb-8">
