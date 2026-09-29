@@ -23,8 +23,7 @@ import type { CareerSeason, DriverListItem, Milestone } from '../../types/driver
 
 // ---------------------------------------------------------------------------
 // One page per driver since 1958. fetchDriverIndex owns the fail-the-build
-// contract. Every driver gets a page so no link ever 404s; drivers below the
-// index threshold (no points and under 20 starts) are built noindex.
+// contract. Every driver gets a page, and every page is indexed.
 // ---------------------------------------------------------------------------
 export async function getStaticPaths() {
   const [drivers, circuits] = await Promise.all([fetchDriverIndex(), fetchCircuitList()]);
@@ -203,7 +202,6 @@ const delta = t.todayPoints - t.scored;
   keywords={`${career.name}, ${career.name} stats, ${career.name} wins, ${career.name} career, ${career.familyName} F1, ${career.name} teammates, ${teamNames.join(', ')}`}
   canonicalPath={canonicalPath}
   schemaData={schemaData}
-  noindex={!entry.indexed}
 >
   <SectionBar title={career.name}>
     <a href="/drivers" class="text-xs text-ink-secondary hover:text-ink">All drivers</a>
