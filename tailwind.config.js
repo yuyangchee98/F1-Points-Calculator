@@ -44,6 +44,7 @@ export default {
         },
         interactive: rgb('--interactive'),
         success: rgb('--success'),
+        gold: rgb('--gold'),
         warning: rgb('--warning'),
         danger: rgb('--danger'),
       },

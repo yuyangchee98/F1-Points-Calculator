@@ -1,0 +1,427 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionBar from '../../components/nav/SectionBar.astro';
+import DriverCareerIsland from '../../components/driverPages/DriverCareerIsland';
+import { fetchCircuitList } from '../../utils/circuits';
+import {
+  allTimeRanks,
+  fetchDriverCareer,
+  fetchDriverIndex,
+  flagEmoji,
+  fmtPoints,
+  isActive,
+  ordinal,
+  pct,
+  seasonHref,
+  teamSwatch,
+  titleLine,
+  verdict,
+  yearList,
+} from '../../utils/drivers';
+import type { CareerSeason, DriverListItem, Milestone } from '../../types/driver';
+
+// ---------------------------------------------------------------------------
+// One page per driver since 1958. fetchDriverIndex owns the fail-the-build
+// contract. Every driver gets a page so no link ever 404s; drivers below the
+// index threshold (no points and under 20 starts) are built noindex.
+// ---------------------------------------------------------------------------
+export async function getStaticPaths() {
+  const [drivers, circuits] = await Promise.all([fetchDriverIndex(), fetchCircuitList()]);
+  const trackSlugs = Object.fromEntries(circuits.map((c) => [c.circuitId, c.slug]));
+  return drivers.map((d) => ({ params: { driver: d.slug }, props: { entry: d, drivers, trackSlugs } }));
+}
+
+const { entry, drivers, trackSlugs } = Astro.props as {
+  entry: DriverListItem;
+  drivers: DriverListItem[];
+  trackSlugs: Record<string, string>;
+};
+
+// Build-time fetch (unauthenticated): every season's totals, and race-by-race
+// sheets only for non-archive seasons. The island refetches for subscribers.
+const career = await fetchDriverCareer(entry.driverId);
+const t = career.totals;
+const active = isActive(career);
+const slugById = new Map(drivers.map((d) => [d.driverId, d.slug]));
+const driverHref = (id: string) => (slugById.has(id) ? `/drivers/${slugById.get(id)}` : null);
+
+const { lead, rest } = verdict(career);
+const description = `${lead ? `${lead} ` : ''}${rest}`.trim();
+const flag = flagEmoji(career.nationality);
+const yearsActive = career.firstSeason === career.lastSeason ? `${career.firstSeason}` : `${career.firstSeason}–${active ? 'present' : career.lastSeason}`;
+const teamNames = [...new Set(career.seasons.flatMap((s) => s.teams.map((tm) => tm.name)))];
+const ranks = allTimeRanks(career.driverId, drivers);
+const helmet = teamSwatch(career.latestTeam);
+const PAID_SEASON_THRESHOLD = 2012;
+
+// Milestones, in career order. The final start only means something once a
+// career is over.
+const ms = career.milestones;
+const race = (m: Milestone) => `${m.season} ${m.name} GP`;
+const milestones: Array<[string, string]> = [
+  ms.debut && ['Debut', `${race(ms.debut)} · ${ms.debut.team}`],
+  ms.firstPoints && ['First points', `${race(ms.firstPoints)} · ${ordinal(ms.firstPoints.pos)}`],
+  ms.firstPodium && ['First podium', `${race(ms.firstPodium)} · ${ordinal(ms.firstPodium.pos)}`],
+  ms.firstWin && ['First win', `${race(ms.firstWin)} · start ${ms.firstWin.start}`],
+  ms.winStreak && ['Best run', `${ms.winStreak.count} wins in a row · ${ms.winStreak.from.season === ms.winStreak.to.season ? ms.winStreak.from.season : `${ms.winStreak.from.season}–${ms.winStreak.to.season}`}`],
+  ms.mostWinsInSeason && ms.mostWinsInSeason.wins > 1 && ['Best season', `${ms.mostWinsInSeason.wins} wins in ${ms.mostWinsInSeason.season}`],
+  ms.lastWin && ms.firstWin && ms.lastWin.start !== ms.firstWin.start && ['Last win', race(ms.lastWin)],
+  !active && ms.finalStart && ['Final start', race(ms.finalStart)],
+].filter(Boolean) as Array<[string, string]>;
+
+// Teammates: points in races together lead (always right); the finished-ahead
+// count comes second and says what it is — without retirement data a DNF
+// classified 16th still counts as a finish.
+const mates = career.teammates;
+const TOP_MATES = 4;
+
+// Best circuits: wins, then podiums, then average finish.
+const circuits = career.circuits.slice(0, 5);
+const byWins = circuits.some((c) => c.wins > 0);
+
+// Today's points system: the career total, and any title it would flip.
+const flips = career.seasons.filter(
+  (s) => s.position != null && s.todayPosition != null && (s.position === 1) !== (s.todayPosition === 1)
+);
+const showcase =
+  [...career.seasons].reverse().find((s) => s.position === 1 && s.todayPoints !== s.scored) ??
+  [...career.seasons].sort((a, b) => b.todayPoints - b.scored - (a.todayPoints - a.scored))[0];
+const showToday = t.todayPoints !== t.scored || flips.length > 0;
+const showcaseLine = showcase
+  ? `${showcase.season}: ${fmtPoints(showcase.scored)} → ${fmtPoints(showcase.todayPoints)}` +
+    (showcase.position && showcase.todayPosition && showcase.position !== showcase.todayPosition
+      ? ` (${ordinal(showcase.position)} → ${ordinal(showcase.todayPosition)})`
+      : '') +
+    '.'
+  : '';
+
+const nameOf = (id: string) => mates.find((m) => m.driverId === id)?.name ?? id;
+const mateNames = Object.fromEntries(mates.map((m) => [m.driverId, m.name]));
+const seasonTeammates = (s: CareerSeason) => s.teammates.slice(0, 2);
+
+const title = `${career.name}: F1 career stats, wins & teammates | F1 Points Calculator`;
+const canonicalPath = `/drivers/${entry.slug}`;
+const schemaData = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Person',
+      name: career.name,
+      givenName: career.givenName,
+      familyName: career.familyName,
+      ...(career.nationality ? { nationality: career.nationality } : {}),
+      description,
+      url: `https://f1pointscalculator.chyuang.com${canonicalPath}`,
+      jobTitle: 'Formula 1 driver',
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Drivers', item: 'https://f1pointscalculator.chyuang.com/drivers' },
+        { '@type': 'ListItem', position: 2, name: career.name, item: `https://f1pointscalculator.chyuang.com${canonicalPath}` },
+      ],
+    },
+  ],
+};
+const tile = 'rounded-[10px] border bg-surface-sunken px-3 py-2.5';
+const label = 'text-2xs uppercase tracking-wide font-semibold text-ink-muted';
+const card = 'rounded-lg border bg-surface p-3 sm:p-4 min-w-0';
+const cardTitle = 'font-display font-bold text-[15px]';
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  keywords={`${career.name}, ${career.name} stats, ${career.name} wins, ${career.name} career, ${career.familyName} F1, ${career.name} teammates, ${teamNames.join(', ')}`}
+  canonicalPath={canonicalPath}
+  schemaData={schemaData}
+  noindex={!entry.indexed}
+>
+  <SectionBar title={career.name}>
+    <a href="/drivers" class="text-xs text-ink-secondary hover:text-ink">All drivers</a>
+    <span class="flex-1"></span>
+    <span class="text-xs text-ink-muted hidden sm:inline">{yearsActive} · {t.starts} starts</span>
+  </SectionBar>
+
+  <div class="grid grid-cols-1 text-ink sm:grid-cols-[19rem_minmax(0,1fr)] min-h-[100dvh]">
+    {/* Rail: identity, verdict, tiles, ranks, milestones. */}
+    <aside class="bg-surface border-b sm:border-b-0 sm:border-r p-4 flex flex-col gap-4 content-start">
+      <div class="flex items-center gap-3">
+        <div class="dp-helmet" style={helmet} aria-hidden="true"></div>
+        <div>
+          <h1 class="font-display font-extrabold text-[22px] leading-[1.1] tracking-tight">{career.name}</h1>
+          <p class="text-xs text-ink-secondary mt-0.5">
+            {[career.code, `${flag ? `${flag} ` : ''}${career.nationality}`.trim(), yearsActive].filter(Boolean).join(' · ')}
+          </p>
+        </div>
+      </div>
+
+      <p class="text-[14.5px] leading-normal">
+        {lead && <b>{lead}</b>} {rest}
+      </p>
+
+      <div class="grid grid-cols-2 gap-2">
+        <div class={t.titles ? 'rounded-[10px] border border-gold/45 bg-gold/10 px-3 py-2.5' : tile}>
+          <div class={label}>Titles</div>
+          <div class={`font-display font-extrabold text-2xl leading-tight tnum ${t.titles ? 'text-gold' : ''}`}>{t.titles}</div>
+          <div class="text-2xs text-ink-muted">{t.titles ? yearList(t.titleYears) : t.bestChampionship ? `Best: ${ordinal(t.bestChampionship)}` : 'Never classified'}</div>
+        </div>
+        <div class={tile}>
+          <div class={label}>Wins</div>
+          <div class="font-display font-extrabold text-2xl leading-tight tnum">{t.wins}</div>
+          <div class="text-2xs text-ink-muted">{pct(t.wins, t.starts)} of starts</div>
+        </div>
+        <div class={tile}>
+          <div class={label}>Podiums</div>
+          <div class="font-display font-extrabold text-2xl leading-tight tnum">{t.podiums}</div>
+          <div class="text-2xs text-ink-muted">{pct(t.podiums, t.starts)} of starts</div>
+        </div>
+        <div class={tile}>
+          <div class={label}>Starts</div>
+          <div class="font-display font-extrabold text-2xl leading-tight tnum">{t.starts}</div>
+          <div class="text-2xs text-ink-muted">{t.seasons} season{t.seasons === 1 ? '' : 's'} · {t.teams} team{t.teams === 1 ? '' : 's'}</div>
+        </div>
+        <div class={`${tile} col-span-2 flex items-baseline justify-between gap-2`}>
+          <div>
+            <div class={label}>Career points</div>
+            <div class="text-2xs text-ink-muted">
+              {t.scored !== t.points ? `${fmtPoints(t.points)} counted towards titles` : 'as scored at the time'}
+            </div>
+          </div>
+          <div class="font-display font-extrabold text-2xl leading-tight tnum">{fmtPoints(t.scored)}</div>
+        </div>
+        {(t.sprintStarts > 0 || t.fastestLaps > 0) && (
+          <p class="col-span-2 text-2xs text-ink-muted">
+            {[
+              t.sprintStarts > 0 && `${t.sprintWins} sprint win${t.sprintWins === 1 ? '' : 's'} from ${t.sprintStarts}`,
+              t.fastestLaps > 0 && `${t.fastestLaps} fastest lap${t.fastestLaps === 1 ? '' : 's'} (recorded 1958–59 and 2004 on)`,
+            ].filter(Boolean).join(' · ')}
+          </p>
+        )}
+      </div>
+
+      {ranks.length > 0 && (
+        <div>
+          <div class={`${label} mb-1.5`}>All-time, since 1958</div>
+          <div class="flex flex-wrap gap-1.5">
+            {ranks.map((r) => (
+              <span class="rounded-md border bg-surface-sunken px-2 py-1 text-xs text-ink-secondary">
+                <strong class="text-ink">{r.tied ? '=' : ''}{ordinal(r.rank)}</strong> in {r.label}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {milestones.length > 0 && (
+        <div>
+          <div class={`${label} mb-1`}>Milestones</div>
+          <dl>
+            {milestones.map(([k, v]) => (
+              <div class="grid grid-cols-[7.2rem_1fr] gap-2 py-1.5 border-t text-[12.5px]">
+                <dt class="text-ink-muted">{k}</dt>
+                <dd>{v}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      )}
+    </aside>
+
+    <main class="p-2 sm:p-3 bg-surface-sunken flex flex-col gap-3 min-w-0">
+      {/* Static strip for crawlers / no-JS: each season links to its calculator
+          page. The island replaces it with the interactive strip + drill-down. */}
+      <div id="driver-career-static" class="flex flex-col gap-3">
+        {career.current && active && (
+          <section class={card} aria-label="This season">
+            <h2 class={cardTitle}>This season</h2>
+            <p class="text-sm mt-1">
+              {career.current.position ? ordinal(career.current.position) : '–'} in {career.current.season} with {fmtPoints(career.current.points)} points. {titleLine(career)}
+            </p>
+          </section>
+        )}
+        <section class={card} aria-label="Championship position by season">
+          <h2 class={`${cardTitle} mb-2.5`}>Championship position by season</h2>
+          <div class="overflow-x-auto -mx-1 px-1 pt-0.5 pb-1">
+            <div class="dp-strip">
+              {career.seasons.map((s) => (
+                <a class="dp-yr" href={seasonHref(s.season)} aria-label={`${s.season}: ${s.position ? ordinal(s.position) : 'not classified'}`}>
+                  <span class={`p ${s.position === 1 ? 'ch' : s.position && s.position <= 3 ? 't3' : ''}`} style={s.teams[0] ? teamSwatch(s.teams[0]) : undefined}>
+                    {s.position ?? '–'}
+                  </span>
+                  <span class="y">'{String(s.season).slice(2)}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <DriverCareerIsland
+        client:only="react"
+        driverId={career.driverId}
+        familyName={career.familyName}
+        initialSeasons={career.seasons}
+        current={active ? career.current : undefined}
+        mateNames={mateNames}
+        staticContainerId="driver-career-static"
+        lastArchiveSeason={PAID_SEASON_THRESHOLD - 1}
+      />
+
+      <div class="grid grid-cols-1 gap-3 lg:grid-cols-[1.25fr_1fr]">
+        {mates.length > 0 && (
+          <section class={card} aria-label="Teammates">
+            <div class="flex flex-wrap items-baseline justify-between gap-2 mb-2.5">
+              <h2 class={cardTitle}>Against {career.familyName === career.name ? 'teammates' : `${career.familyName}'s teammates`}</h2>
+              <span class="text-2xs text-ink-muted">Points in races together</span>
+            </div>
+            {[mates.slice(0, TOP_MATES), mates.slice(TOP_MATES)].map((group, gi) => {
+              const rows = group.map((m) => {
+                const total = m.points + m.matePoints || 1;
+                const href = driverHref(m.driverId);
+                const span = m.seasons.length === 1 ? `${m.seasons[0]}` : `${m.seasons[0]}–${String(m.seasons[m.seasons.length - 1]).slice(2)}`;
+                return (
+                  <div class="grid grid-cols-[minmax(0,1fr)_auto] gap-x-2.5 gap-y-1 py-2 border-t first:border-t-0 first:pt-0 items-center">
+                    <span class="text-[13px] font-semibold truncate">
+                      {href ? <a href={href} class="hover:underline">{m.name}</a> : m.name}
+                      <span class="font-normal text-2xs text-ink-muted ml-1">{span} · {m.races} races</span>
+                    </span>
+                    <span class="text-[12.5px] font-bold tnum whitespace-nowrap">
+                      <span class={m.points > m.matePoints ? 'text-success' : ''}>{fmtPoints(m.points)}</span> – {fmtPoints(m.matePoints)}
+                    </span>
+                    <span class="col-span-2 flex h-1.5 rounded-sm overflow-hidden bg-carbon-100" aria-hidden="true">
+                      <i class="block h-full bg-ink" style={`width:${(m.points / total) * 100}%`}></i>
+                      <i class="block h-full bg-carbon-300" style={`width:${(m.matePoints / total) * 100}%`}></i>
+                    </span>
+                    <span class="col-span-2 text-2xs text-ink-muted">Ahead on the results sheet {m.ahead}–{m.behind}</span>
+                  </div>
+                );
+              });
+              return gi === 0 ? (
+                <div>{rows}</div>
+              ) : group.length > 0 ? (
+                <details class="mt-1">
+                  <summary class="cursor-pointer pt-2 text-xs font-semibold text-interactive">Show all {mates.length} teammates</summary>
+                  <div class="mt-2">{rows}</div>
+                </details>
+              ) : null;
+            })}
+          </section>
+        )}
+
+        {circuits.length > 0 && (
+          <section class={card} aria-label="Best circuits">
+            <div class="flex flex-wrap items-baseline justify-between gap-2 mb-2.5">
+              <h2 class={cardTitle}>Best circuits</h2>
+              <span class="text-2xs text-ink-muted">{byWins ? 'By wins' : 'By podiums, then average finish'}</span>
+            </div>
+            {circuits.map((c) => {
+              const slug = trackSlugs[c.circuitId];
+              return (
+                <div class="grid grid-cols-[auto_minmax(0,1fr)_auto] gap-2.5 items-center py-1.5 border-t first:border-t-0 first:pt-0 text-[13px]">
+                  <span class="font-display font-extrabold text-base w-6 text-center tnum">{byWins ? c.wins : c.podiums}</span>
+                  <span class="truncate">
+                    {c.name}
+                    <span class="block text-2xs text-ink-muted truncate">
+                      {c.wins > 0 ? `${c.wins === 1 ? 'Won' : 'Wins'} ${c.winYears.join(' · ')}` : `Best ${ordinal(c.best)}`} · {c.starts} start{c.starts === 1 ? '' : 's'} · avg {c.avgFinish}
+                    </span>
+                  </span>
+                  {slug && <a href={`/tracks/${slug}`} class="text-xs text-interactive hover:underline whitespace-nowrap">Track →</a>}
+                </div>
+              );
+            })}
+          </section>
+        )}
+      </div>
+
+      {showToday && showcase && (
+        <section class={card} aria-label="Under today's points system">
+          <div class="flex flex-wrap items-baseline justify-between gap-2 mb-2">
+            <h2 class={cardTitle}>Under today's points system</h2>
+            <span class="text-2xs text-ink-muted">25-18-15-12-10-8-6-4-2-1, scored by the calculator</span>
+          </div>
+          <div class="flex flex-wrap items-center gap-3.5">
+            <span class="font-display font-extrabold text-[26px] tnum">{fmtPoints(t.scored)}</span>
+            <span class="text-ink-muted">→</span>
+            <span class="font-display font-extrabold text-[26px] tnum text-interactive">{fmtPoints(t.todayPoints)}</span>
+            <p class="text-[12.5px] text-ink-secondary flex-[1_1_220px]">
+              Career points re-scored with today's table. {showcaseLine}{' '}
+              <a href={seasonHref(showcase.season)} class="text-interactive hover:underline">Replay {showcase.season} in the calculator →</a>
+            </p>
+          </div>
+          {flips.length > 0 && (
+            <ul class="mt-2.5 text-[13px] flex flex-col gap-1">
+              {flips.map((s) => (
+                <li>
+                  <b>{s.season}:</b>{' '}
+                  {s.todayPosition === 1
+                    ? `would have been champion (was ${ordinal(s.position!)})`
+                    : `would have finished ${ordinal(s.todayPosition!)} instead of winning the title`}
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
+
+      <section class={card} aria-label="All seasons">
+        <div class="flex flex-wrap items-baseline justify-between gap-2 mb-2">
+          <h2 class={cardTitle}>All seasons</h2>
+          <span class="text-2xs text-ink-muted">Points as counted for the championship</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full min-w-[480px] border-collapse text-[12.5px]">
+            <thead>
+              <tr class="text-2xs uppercase tracking-wide text-ink-muted">
+                <th class="text-left font-semibold py-1.5 px-2 border-b">Year</th>
+                <th class="text-left font-semibold py-1.5 px-2 border-b">Team</th>
+                <th class="text-right font-semibold py-1.5 px-2 border-b">Pos</th>
+                <th class="text-right font-semibold py-1.5 px-2 border-b">Pts</th>
+                <th class="text-right font-semibold py-1.5 px-2 border-b">Wins</th>
+                <th class="text-right font-semibold py-1.5 px-2 border-b">Podiums</th>
+                <th class="text-left font-semibold py-1.5 px-2 border-b">Teammate</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[...career.seasons].reverse().map((s) => (
+                <tr class="text-ink-secondary">
+                  <td class={`py-1.5 px-2 border-b whitespace-nowrap ${s.position === 1 ? 'text-gold font-bold' : ''}`}>
+                    <a href={seasonHref(s.season)} class="hover:underline">{s.season}</a>
+                  </td>
+                  <td class="py-1.5 px-2 border-b whitespace-nowrap">
+                    {s.teams[0] && <span class="dp-sw" style={teamSwatch(s.teams[0])}></span>}
+                    {s.teams.map((tm) => tm.name).join(' / ')}
+                  </td>
+                  <td class="py-1.5 px-2 border-b text-right tnum">{s.excluded ? 'DSQ' : s.position ?? '–'}</td>
+                  <td class="py-1.5 px-2 border-b text-right tnum whitespace-nowrap">
+                    {fmtPoints(s.points)}{s.scored !== s.points && <span class="text-ink-muted"> ({fmtPoints(s.scored)} scored)</span>}
+                  </td>
+                  <td class="py-1.5 px-2 border-b text-right tnum">{s.wins || ''}</td>
+                  <td class="py-1.5 px-2 border-b text-right tnum">{s.podiums || ''}</td>
+                  <td class="py-1.5 px-2 border-b whitespace-nowrap">
+                    {seasonTeammates(s).map((id, i) => {
+                      const href = driverHref(id);
+                      return (
+                        <>
+                          {i > 0 && ', '}
+                          {href ? <a href={href} class="hover:underline">{nameOf(id)}</a> : nameOf(id)}
+                        </>
+                      );
+                    })}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {career.seasons.some((s) => s.excluded) && (
+          <p class="mt-2 text-2xs text-ink-muted">DSQ: excluded from that year's drivers' championship; the race results stand.</p>
+        )}
+      </section>
+
+      <p class="text-2xs text-ink-muted px-1 pb-2">
+        Starts count Grands Prix with a classified result, sprints excluded. Figures cover the World Championship from 1958.
+      </p>
+    </main>
+  </div>
+</BaseLayout>

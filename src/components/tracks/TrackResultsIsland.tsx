@@ -93,15 +93,24 @@ const DesktopTrackGrid: React.FC<{ editions: CircuitEdition[]; onUnlock: () => v
             </div>
           ))}
 
-          {/* Cells — one tall locked block per premium year, else a card per row */}
+          {/* Cells — a premium year shows its (public) winner, then one tall
+              locked block for the rest; free years get a card per row. */}
           {cols.map((e, ci) =>
             e.locked ? (
+              <React.Fragment key={`lock-${e.season}-${e.raceId}`}>
+              {e.winner && (
+                <div style={{ gridColumn: ci + 2, gridRow: 2 }}>
+                  <TrackDriverCard entry={e.winner} />
+                </div>
+              )}
               <button
-                key={`lock-${e.season}-${e.raceId}`}
                 type="button"
                 onClick={onUnlock}
                 className="race-slot !border-solid !border-strong bg-surface-sunken text-ink-muted hover:text-ink hover:bg-carbon-100 transition-colors !items-start !justify-start"
-                style={{ gridColumn: ci + 2, gridRow: `2 / span ${maxPos}` }}
+                style={{
+                  gridColumn: ci + 2,
+                  gridRow: e.winner ? `3 / span ${Math.max(1, maxPos - 1)}` : `2 / span ${maxPos}`,
+                }}
                 aria-label={`Unlock the ${e.season} archive season`}
               >
                 {/* Pinned so the lock stays visible while scrolling the tall column */}
@@ -113,6 +122,7 @@ const DesktopTrackGrid: React.FC<{ editions: CircuitEdition[]; onUnlock: () => v
                   <span className="text-2xs font-semibold text-brand">Unlock</span>
                 </span>
               </button>
+              </React.Fragment>
             ) : (
               positions.map((pos) => (
                 <div key={`c-${e.season}-${e.raceId}-${pos}`} style={{ gridColumn: ci + 2, gridRow: pos + 1 }}>

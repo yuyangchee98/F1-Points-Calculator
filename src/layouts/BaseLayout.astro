@@ -26,6 +26,9 @@ interface Props {
    * the account island.
    */
   spineAccount?: boolean;
+  /** Keep the page out of search results while still letting crawlers follow
+   *  its links (thin driver pages: built so links never 404, but not indexed). */
+  noindex?: boolean;
 }
 
 const {
@@ -40,6 +43,7 @@ const {
   initialYear,
   section = sectionForPath(Astro.url.pathname),
   spineAccount = true,
+  noindex = false,
 } = Astro.props;
 
 const siteUrl = 'https://f1pointscalculator.chyuang.com';
@@ -58,6 +62,7 @@ const ogImage = `${siteUrl}/og-image.jpg`;
     <meta name="description" content={description} />
     <meta name="keywords" content={keywords} />
     <link rel="canonical" href={canonicalUrl} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content={ogType} />

@@ -5,6 +5,7 @@ import SectionBar from '../../components/nav/SectionBar.astro';
 import CircuitPicker from '../../components/nav/CircuitPicker.astro';
 import { fetchCircuitList, flagSrcFor, stripVenueQualifier} from '../../utils/circuits';
 import type { CircuitHistory, CircuitListItem } from '../../types/track';
+import { fetchDriverIndex } from '../../utils/drivers';
 
 const API_BASE_URL = import.meta.env.PUBLIC_API_BASE_URL;
 
@@ -16,13 +17,17 @@ const API_BASE_URL = import.meta.env.PUBLIC_API_BASE_URL;
 // also passed to each page so the circuit picker can link to its siblings.
 // ---------------------------------------------------------------------------
 export async function getStaticPaths() {
-  const circuits = await fetchCircuitList();
-  return circuits.map((c) => ({ params: { track: c.slug }, props: { ...c, circuits } }));
+  const [circuits, drivers] = await Promise.all([fetchCircuitList(), fetchDriverIndex()]);
+  const driverSlugs = Object.fromEntries(drivers.map((d) => [d.driverId, d.slug]));
+  return circuits.map((c) => ({ params: { track: c.slug }, props: { ...c, circuits, driverSlugs } }));
 }
 
-const { circuitId, fullName, circuitName: listedCircuitName, country, circuits } = Astro.props as CircuitListItem & {
+const { circuitId, fullName, circuitName: listedCircuitName, country, circuits, driverSlugs } = Astro.props as CircuitListItem & {
   circuits: CircuitListItem[];
+  driverSlugs: Record<string, string>;
 };
+// Crawlable links from every classified name to its driver page.
+const driverHref = (driverId: string) => (driverSlugs[driverId] ? `/drivers/${driverSlugs[driverId]}` : undefined);
 const slug = Astro.params.track;
 
 // Build-time fetch (unauthenticated): free years full, premium years locked.
@@ -179,13 +184,16 @@ const schemaData = {
                 <h2 class="text-sm font-semibold mb-1">{e.name} Grand Prix {e.season} — result</h2>
                 {e.locked || !e.results ? (
                   <p class="text-xs text-ink-muted">
+                    {e.winner && (
+                      <>Won by <a href={driverHref(e.winner.driverId)} class="text-ink font-medium hover:underline">{e.winner.driverName}</a> ({e.winner.teamName}). </>
+                    )}
                     🔒 Archive season — <a href="/" class="text-brand hover:underline">unlock to view the full classification</a>.
                   </p>
                 ) : (
                   <ol class="text-xs text-ink-secondary list-decimal pl-5 space-y-0.5">
                     {e.results.map((p) => (
                       <li>
-                        <span class="text-ink font-medium">{p.driverName}</span>
+                        <a href={driverHref(p.driverId)} class="text-ink font-medium hover:underline">{p.driverName}</a>
                         <span class="text-ink-muted"> — {p.teamName}</span>
                       </li>
                     ))}

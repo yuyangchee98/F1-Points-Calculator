@@ -12,7 +12,7 @@
  * needs this same mapping — keep the two copies byte-identical.
  */
 
-export type SectionId = 'calculator' | 'tracks' | 'compete' | 'blog' | 'none';
+export type SectionId = 'calculator' | 'tracks' | 'drivers' | 'compete' | 'blog' | 'none';
 
 export interface Section {
   id: Exclude<SectionId, 'none'>;
@@ -24,6 +24,7 @@ export interface Section {
 export const SECTIONS: readonly Section[] = [
   { id: 'calculator', label: 'Calculator', href: '/' },
   { id: 'tracks', label: 'Tracks', href: '/tracks' },
+  { id: 'drivers', label: 'Drivers', href: '/drivers' },
   { id: 'compete', label: 'Compete', href: '/compete' },
   { id: 'blog', label: 'Blog', href: '/blog' },
 ] as const;
@@ -52,6 +53,7 @@ export function sectionForPath(pathname: string): SectionId {
 
   if (path === '/' || /^\/(?:19|20)\d{2}$/.test(path)) return 'calculator';
   if (path === '/tracks' || path.startsWith('/tracks/')) return 'tracks';
+  if (path === '/drivers' || path.startsWith('/drivers/')) return 'drivers';
   if (path === '/compete' || path === '/leaderboard' || path.startsWith('/user/')) return 'compete';
   if (path === '/blog' || path.startsWith('/blog/')) return 'blog';
 

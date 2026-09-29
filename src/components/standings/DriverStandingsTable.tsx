@@ -5,6 +5,7 @@ import type { RootState } from '../../store';
 import { selectDriversByIdMap, getDriverLastName, selectTeamsByIdMap } from '../../store/selectors/dataSelectors';
 import { useStandingsAnimation } from '../../hooks/useStandingsAnimation';
 import { teamFillStyle } from '../../utils/color';
+import { useDriverHref } from '../../hooks/useDriverHref';
 
 interface DriverStandingsTableProps {
   standings: DriverStanding[];
@@ -14,6 +15,7 @@ const DriverStandingsTable: React.FC<DriverStandingsTableProps> = ({ standings }
   const driverById = useSelector(selectDriversByIdMap);
   const teamById = useSelector(selectTeamsByIdMap);
   const showDelta = useSelector((state: RootState) => state.ui.driverShowDelta);
+  const driverHref = useDriverHref();
 
   const animationOptions = useMemo(() => ({
     getItemId: (standing: DriverStanding) => standing.driverId,
@@ -76,7 +78,16 @@ const DriverStandingsTable: React.FC<DriverStandingsTableProps> = ({ standings }
                         style={teamFillStyle(team)}
                       />
                       <div>
-                        <div className="font-medium text-sm text-ink">{getDriverLastName(driver.id)}</div>
+                        {driverHref(driver.id) ? (
+                          <a
+                            href={driverHref(driver.id)!}
+                            className="font-medium text-sm text-ink hover:underline"
+                          >
+                            {getDriverLastName(driver.id)}
+                          </a>
+                        ) : (
+                          <div className="font-medium text-sm text-ink">{getDriverLastName(driver.id)}</div>
+                        )}
                       </div>
                     </div>
                   </td>

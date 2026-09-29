@@ -8,6 +8,13 @@ import GridSkeleton from './GridSkeleton';
 
 interface Props {
   priceLabel?: string;
+  /** Replaces the default "Unlock the F1 Archive" headline, e.g. a driver page's
+   *  "Unlock Senna's 1988–1993 McLaren years". */
+  headline?: string;
+  /** Which surface opened the paywall ('driver', …) and its subject id. Carried
+   *  into the Stripe metadata and the GA purchase event for attribution. */
+  source?: string;
+  sourceId?: string;
 }
 
 const CHEAP_LINES = [
@@ -15,7 +22,7 @@ const CHEAP_LINES = [
   '14× cheaper than F1 25.',
 ];
 
-const PaywallOverlay: React.FC<Props> = ({ priceLabel = '$4.99' }) => {
+const PaywallOverlay: React.FC<Props> = ({ priceLabel = '$4.99', headline, source, sourceId }) => {
   const dispatch = useDispatch();
   const { isAuthenticated, user } = useSelector((s: RootState) => s.auth);
   const [submitting, setSubmitting] = useState(false);
@@ -45,6 +52,8 @@ const PaywallOverlay: React.FC<Props> = ({ priceLabel = '$4.99' }) => {
           successUrl: returnUrl,
           cancelUrl: returnUrl,
           gaClientId: getGaClientId(),
+          ...(source ? { source } : {}),
+          ...(sourceId ? { sourceId } : {}),
         }),
       });
       if (!res.ok) {
@@ -90,7 +99,7 @@ const PaywallOverlay: React.FC<Props> = ({ priceLabel = '$4.99' }) => {
           </div>
 
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
-            Unlock the F1 Archive
+            {headline ?? 'Unlock the F1 Archive'}
           </h2>
           <p className="mt-2 text-sm text-gray-600 leading-relaxed">
             Every historical season lives in the Archive &mdash; one payment, kept forever.

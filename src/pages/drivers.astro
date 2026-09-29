@@ -1,0 +1,168 @@
+---
+/**
+ * The Drivers index — every driver since 1958.
+ *
+ * `drivers.astro`, not `drivers/index.astro`, for the same flat-file reason as
+ * tracks.astro: the build is format:'file' with trailingSlash:'never', and the
+ * index.astro form emits a directory index that Cloudflare Pages 308-redirects.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionBar from '../components/nav/SectionBar.astro';
+import PageHead from '../components/layout/PageHead.astro';
+import {
+  SECTION_BAR_INNER_CLASS,
+  SECTION_BAR_STATUS_CLASS,
+  SECTION_BAR_TITLE_CLASS,
+  PAGE_CONTAINER_CLASS,
+} from '../components/nav/sectionBar';
+import { fetchDriverIndex, flagEmoji, fmtPoints, isActive, teamSwatch } from '../utils/drivers';
+import type { DriverListItem } from '../types/driver';
+
+const drivers = await fetchDriverIndex();
+
+const current = drivers
+  .filter(isActive)
+  .sort((a, b) => a.teamName.localeCompare(b.teamName) || a.familyName.localeCompare(b.familyName));
+const champions = drivers
+  .filter((d) => d.titles > 0)
+  .sort((a, b) => b.titles - a.titles || b.wins - a.wins);
+
+const byLetter = new Map<string, DriverListItem[]>();
+for (const d of drivers) {
+  const letter = d.familyName.normalize('NFD').replace(/[̀-ͯ]/g, '').charAt(0).toUpperCase() || '#';
+  byLetter.set(letter, [...(byLetter.get(letter) ?? []), d]);
+}
+const letters = [...byLetter.keys()].sort();
+
+/** Decades a driver raced in, for the era filter. */
+const decades = (d: DriverListItem) => {
+  const out: number[] = [];
+  for (let y = Math.floor(d.firstSeason / 10) * 10; y <= d.lastSeason; y += 10) out.push(y);
+  return out.join(' ');
+};
+const ERAS = [1950, 1960, 1970, 1980, 1990, 2000, 2010, 2020];
+const years = (d: DriverListItem) => (d.firstSeason === d.lastSeason ? `${d.firstSeason}` : `${d.firstSeason}–${isActive(d) ? 'now' : d.lastSeason}`);
+
+const siteUrl = 'https://f1pointscalculator.chyuang.com';
+const schemaData = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'Formula 1 drivers',
+  description: 'Career stats for every Formula 1 driver since 1958.',
+  numberOfItems: champions.length,
+  itemListElement: champions.map((d, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: d.name,
+    url: `${siteUrl}/drivers/${d.slug}`,
+  })),
+};
+---
+
+<BaseLayout
+  title="F1 Drivers: Career Stats, Wins & Titles for Every Driver | F1 Points Calculator"
+  description={`Career stats for all ${drivers.length} Formula 1 drivers since 1958: titles, wins, podiums, points and teammate records, with every season linked to the points calculator.`}
+  keywords="F1 drivers, Formula 1 driver stats, F1 world champions, most F1 wins, F1 career stats, F1 teammates"
+  canonicalPath="/drivers"
+  schemaData={schemaData}
+>
+  <SectionBar contained>
+    <div class={SECTION_BAR_INNER_CLASS}>
+      <span class={SECTION_BAR_TITLE_CLASS}>Drivers</span>
+      <div class={SECTION_BAR_STATUS_CLASS}>
+        <span class="hidden sm:inline">{drivers.length} drivers · {champions.length} champions</span>
+      </div>
+    </div>
+  </SectionBar>
+
+  <main class={PAGE_CONTAINER_CLASS}>
+    <PageHead eyebrow="Every driver since 1958" title="Formula 1 Drivers" />
+
+    {current.length > 0 && (
+      <section class="mb-8">
+        <h2 class="font-display text-lg font-bold text-ink mb-3">Current grid</h2>
+        <ul class="grid gap-2 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
+          {current.map((d) => (
+            <li>
+              <a href={`/drivers/${d.slug}`} class="flex items-center gap-2 h-full bg-surface border rounded-lg px-3 py-2.5 shadow-xs hover:border-strong hover:shadow-sm transition-all">
+                <span class="dp-sw !h-8" style={teamSwatch({ color: d.teamColor, secondaryColor: d.teamSecondaryColor })}></span>
+                <span class="min-w-0">
+                  <span class="block text-sm font-semibold text-ink leading-snug truncate">{d.name}</span>
+                  <span class="block text-xs text-ink-muted truncate">{d.teamName}</span>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    <section class="mb-8">
+      <h2 class="font-display text-lg font-bold text-ink mb-3">World Champions</h2>
+      <ul class="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {champions.map((d) => (
+          <li>
+            <a href={`/drivers/${d.slug}`} class="flex items-baseline justify-between gap-2 h-full bg-surface border rounded-lg px-3 py-2.5 shadow-xs hover:border-strong hover:shadow-sm transition-all">
+              <span class="min-w-0">
+                <span class="block text-sm font-semibold text-ink leading-snug truncate">{flagEmoji(d.nationality)} {d.name}</span>
+                <span class="block text-xs text-ink-muted">{years(d)} · {d.wins} wins</span>
+              </span>
+              <span class="font-display font-extrabold text-gold tnum">{d.titles}×</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section>
+      <div class="flex flex-wrap items-center gap-2 mb-3">
+        <h2 class="font-display text-lg font-bold text-ink mr-2">All drivers</h2>
+        <div class="flex flex-wrap gap-1" role="group" aria-label="Filter by era" id="era-filter">
+          <button type="button" data-era="" aria-pressed="true" class="era-btn">All</button>
+          {ERAS.map((e) => <button type="button" data-era={String(e)} aria-pressed="false" class="era-btn">{e === 1950 ? '1958–59' : `${e}s`}</button>)}
+        </div>
+      </div>
+
+      {letters.map((letter) => (
+        <section class="mb-6 letter-group">
+          <h3 class="text-sm font-bold uppercase tracking-wider text-ink-muted mb-2">{letter}</h3>
+          <ul class="grid gap-x-4 gap-y-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 text-sm">
+            {byLetter.get(letter)!.map((d) => (
+              <li data-eras={decades(d)} class="flex items-baseline justify-between gap-2 py-0.5 border-b border-dashed">
+                <a href={`/drivers/${d.slug}`} class="text-ink hover:underline truncate">{d.name}</a>
+                <span class="text-2xs text-ink-muted tnum whitespace-nowrap">
+                  {years(d)}{d.wins > 0 ? ` · ${d.wins}W` : d.points > 0 ? ` · ${fmtPoints(d.points)} pts` : ''}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .era-btn { font: 600 12px/1 system-ui, sans-serif; padding: 6px 10px; border-radius: 6px; border: 1px solid rgb(var(--border)); background: rgb(var(--surface)); color: rgb(var(--text-secondary)); cursor: pointer; }
+  .era-btn[aria-pressed='true'] { background: rgb(var(--text-primary)); color: rgb(var(--surface)); border-color: transparent; }
+</style>
+
+<script>
+  // Era filter: show drivers who raced in the chosen decade; hide empty letters.
+  const buttons = document.querySelectorAll<HTMLButtonElement>('#era-filter .era-btn');
+  buttons.forEach((btn) =>
+    btn.addEventListener('click', () => {
+      const era = btn.dataset.era ?? '';
+      buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+      document.querySelectorAll<HTMLElement>('.letter-group').forEach((group) => {
+        let shown = 0;
+        group.querySelectorAll<HTMLElement>('li[data-eras]').forEach((li) => {
+          const match = !era || (li.dataset.eras ?? '').split(' ').includes(era);
+          li.hidden = !match;
+          if (match) shown++;
+        });
+        group.hidden = shown === 0;
+      });
+    }),
+  );
+</script>

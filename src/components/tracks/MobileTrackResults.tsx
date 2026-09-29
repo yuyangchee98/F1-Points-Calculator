@@ -122,11 +122,19 @@ const MobileTrackResults: React.FC<Props> = ({ editions, country, flagSrc, onUnl
       <div {...swipeHandlers} key={edition.raceId} className="flex-1 min-h-0 overflow-y-auto p-2">
         {edition.locked || results.length === 0 ? (
           <div className="h-full min-h-[12rem] flex flex-col items-center justify-center text-center gap-3 p-6">
+            {edition.winner && (
+              <div className="w-full max-w-[16rem] text-left">
+                <div className="text-2xs uppercase tracking-wide text-ink-muted mb-1">Winner</div>
+                <div className="h-[60px]">
+                  <TrackDriverCard entry={edition.winner} />
+                </div>
+              </div>
+            )}
             <span className="text-3xl">🔒</span>
             <div>
               <div className="font-display font-semibold text-ink">{edition.season} archive season</div>
               <p className="text-xs text-ink-secondary mt-1 max-w-[16rem]">
-                Unlock the archive to view the full {edition.name} Grand Prix classification.
+                Unlock the archive to view the full {edition.name} Grand Prix classification{edition.winner ? ' behind the winner' : ''}.
               </p>
             </div>
             <button

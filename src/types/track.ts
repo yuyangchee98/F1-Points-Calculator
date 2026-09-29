@@ -18,6 +18,8 @@ export interface CircuitEdition {
   date: string;
   locked: boolean;
   results?: PodiumEntry[]; // full finishing classification (position 1..N)
+  /** A locked edition's winner: the one public row of an archive classification. */
+  winner?: PodiumEntry;
 }
 
 export interface StatLeader {
