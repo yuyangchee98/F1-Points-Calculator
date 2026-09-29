@@ -124,7 +124,7 @@ export function flagEmoji(nationality: string): string {
  * "2009 World Champion. Won 15 of 307 starts across 18 seasons, and outscored
  *  Lewis Hamilton over 58 races as teammates."
  */
-export function verdict(c: DriverCareer): { lead: string; rest: string } {
+export function verdict(c: DriverCareer, { withCurrent = true } = {}): { lead: string; rest: string } {
   const t = c.totals;
   const seasons = `${t.seasons} season${t.seasons === 1 ? '' : 's'}`;
   const lead =
@@ -153,7 +153,8 @@ export function verdict(c: DriverCareer): { lead: string; rest: string } {
   }
   body += '.';
 
-  if (c.current && isActive(c)) {
+  // Off when the page shows the current season on its own line.
+  if (withCurrent && c.current && isActive(c)) {
     body += ` ${c.current.position ? ordinal(c.current.position) : 'Unclassified'} in ${c.current.season} with ${fmtPoints(c.current.points)} points.`;
   }
   return { lead, rest: body };

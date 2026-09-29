@@ -7,6 +7,7 @@ import PaywallOverlay from '../common/PaywallOverlay';
 import { API_BASE_URL } from '../../utils/constants';
 import { fmtPoints, ordinal, seasonHref, teamSwatch, titleLine, yearList } from '../../utils/drivers';
 import type { CareerCurrent, CareerSeason, DriverCareer } from '../../types/driver';
+import { ChartLegend, SeasonChart, ThisSeason } from './CareerParts';
 
 interface Props {
   driverId: string;
@@ -27,39 +28,6 @@ const defaultSeason = (seasons: CareerSeason[]) =>
 
 const posClass = (pos: number, pts: number) =>
   pos === 1 ? 'p1' : pos === 2 ? 'p2' : pos === 3 ? 'p3' : pts > 0 ? 'pts' : '';
-
-const ThisSeason: React.FC<{ current: CareerCurrent; line: string | null }> = ({ current, line }) => (
-  <section className="rounded-lg border bg-surface p-3 sm:p-4" aria-label="This season">
-    <div className="flex flex-wrap items-baseline justify-between gap-2 mb-2">
-      <h2 className="font-display font-bold text-[15px]">This season</h2>
-      <a href="/" className="text-xs font-semibold text-interactive hover:underline">
-        Open {current.season} in the calculator →
-      </a>
-    </div>
-    <div className="flex flex-wrap items-center gap-4">
-      <div>
-        <div className="text-2xs uppercase tracking-wide text-ink-muted font-semibold">Championship</div>
-        <div className="font-display font-extrabold text-2xl leading-none tnum">
-          {current.position ? ordinal(current.position) : '–'}
-          <span className="text-sm font-semibold text-ink-secondary ml-2">{fmtPoints(current.points)} pts</span>
-        </div>
-      </div>
-      {current.recent.length > 0 && (
-        <div>
-          <div className="text-2xs uppercase tracking-wide text-ink-muted font-semibold mb-1">Last {current.recent.length} races</div>
-          <div className="flex gap-1">
-            {current.recent.map((r, i) => (
-              <span key={i} title={`${r.name}: ${ordinal(r.pos)}`} className={`dp-pos ${posClass(r.pos, r.pts)}`}>
-                P{r.pos}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-    {line && <p className="mt-2 text-sm text-ink">{line}</p>}
-  </section>
-);
 
 const CareerEnhancer: React.FC<Props> = ({
   driverId,
@@ -110,57 +78,41 @@ const CareerEnhancer: React.FC<Props> = ({
   const gp = sel?.races.filter((r) => !r.sprint) ?? [];
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-9 min-w-0 [&>*]:min-w-0">
       {cur && <ThisSeason current={cur} line={titleLine({ driverId, current: cur } as DriverCareer)} />}
 
-      <section className="rounded-lg border bg-surface p-3 sm:p-4" aria-label="Championship position by season">
-        <div className="flex flex-wrap items-baseline justify-between gap-2 mb-2.5">
-          <h2 className="font-display font-bold text-[15px]">Championship position by season</h2>
-          <span className="text-2xs text-ink-muted">Pick a season · underline = team colours</span>
+      <section aria-label="Championship finish by season">
+        <div className="flex flex-wrap items-baseline justify-between gap-x-3.5 gap-y-1 mb-3.5">
+          <h2 className="font-display font-extrabold text-[19px]">Championship finish by season</h2>
+          <span className="text-[13px] text-ink-muted">Pick a season to see it race by race</span>
         </div>
-        <div className="overflow-x-auto -mx-1 px-1 pt-0.5 pb-1">
-          <div className="dp-strip" role="group" aria-label="Seasons">
-            {seasons.map((s) => {
-              const cls = s.position === 1 ? 'ch' : s.position && s.position <= 3 ? 't3' : '';
-              return (
-                <button
-                  key={s.season}
-                  type="button"
-                  className="dp-yr"
-                  aria-pressed={s.season === selected}
-                  aria-label={`${s.season}: ${s.position ? ordinal(s.position) : 'not classified'}${s.locked ? ', archive season' : ''}`}
-                  onClick={() => setSelected(s.season)}
-                >
-                  <span className={`p ${cls}`} style={teamSwatchStyle(s)}>
-                    {s.position ?? '–'}
-                    {s.locked && <span className="lk" aria-hidden="true">🔒</span>}
-                  </span>
-                  <span className="y">{`'${String(s.season).slice(2)}`}</span>
-                </button>
-              );
-            })}
-          </div>
+        <div className="overflow-x-auto -mx-1 px-1">
+          <SeasonChart seasons={seasons} selected={selected} onSelect={setSelected} />
         </div>
+        <ChartLegend seasons={seasons} />
 
         {sel && (
-          <div className="mt-3 border-t pt-3 flex flex-col gap-2.5">
+          <div className="mt-3.5 rounded-[10px] border px-4 py-3.5 flex flex-col gap-3" aria-live="polite">
             <div className="flex flex-wrap items-baseline gap-x-3.5 gap-y-1">
-              <span className="font-display font-extrabold text-[17px]">{sel.season}</span>
-              <span className="text-xs text-ink-secondary">
+              <span className="font-display font-black text-[22px] leading-none">{sel.season}</span>
+              <span className="text-sm text-ink-secondary flex-[1_1_280px]">
                 {sel.teams[0] && <span className="dp-sw" style={swatch(sel.teams[0])} />}
                 {sel.teams.map((t) => t.name).join(' / ')} ·{' '}
-                {sel.excluded ? 'Excluded from the standings' : sel.position ? ordinal(sel.position) : 'Not classified'} ·{' '}
-                {fmtPoints(sel.points)} pts
-                {sel.scored !== sel.points && ` (${fmtPoints(sel.scored)} scored)`} · {sel.wins} win{sel.wins === 1 ? '' : 's'}
+                <b className="text-ink">
+                  {sel.excluded ? 'Excluded from the standings' : sel.position ? ordinal(sel.position) : 'Not classified'}
+                </b>{' '}
+                · {fmtPoints(sel.points)} pts
+                {sel.scored !== sel.points && ` (${fmtPoints(sel.scored)} scored)`} · {sel.wins} win{sel.wins === 1 ? '' : 's'} ·{' '}
+                {sel.podiums} podium{sel.podiums === 1 ? '' : 's'}
                 {sel.teammates.length > 0 && ` · teammate ${sel.teammates.slice(0, 2).map((id) => mateNames[id] ?? id).join(', ')}`}
                 {sel.position === 1 && (
-                  <span className="ml-1.5 inline-block rounded-full bg-gold/15 text-gold px-2 py-px text-2xs font-bold uppercase tracking-wide align-[2px]">
+                  <span className="ml-1.5 inline-block rounded-full bg-gold/15 text-gold px-2 py-px text-2xs font-bold uppercase tracking-wide align-[1px]">
                     Champion
                   </span>
                 )}
               </span>
-              <a href={seasonHref(sel.season)} className="ml-auto text-xs font-semibold text-interactive hover:underline whitespace-nowrap">
-                Open {sel.season} in calculator →
+              <a href={seasonHref(sel.season)} className="text-[13.5px] font-semibold text-interactive hover:underline whitespace-nowrap">
+                Open {sel.season} in the calculator →
               </a>
             </div>
 
@@ -243,8 +195,6 @@ function swatch(t: CareerSeason['teams'][number]): React.CSSProperties {
   }
   return style as React.CSSProperties;
 }
-
-const teamSwatchStyle = (s: CareerSeason) => (s.teams[0] ? swatch(s.teams[0]) : undefined);
 
 export default function DriverCareerIsland(props: Props) {
   return (
