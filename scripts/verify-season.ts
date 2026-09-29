@@ -12,11 +12,19 @@
  * season, when investigating a suspected upstream data change, or to confirm a
  * fixture is still faithful before refreshing it with snapshot-seasons.ts.
  *
+ * Before 1981 the expected standings are formula1.com's (committed in
+ * scripts/data/official-standings.json); race rows still come from Jolpica.
+ *
  * Exits non-zero with a diff on any mismatch.
  */
 import { computeRawPoints } from '../src/store/selectors/computeStandings';
 import { getDefaultPointsSystem } from '../src/data/seasonRules';
+import { readFileSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
+  FIRST_JOLPICA_ORACLE_SEASON,
+  toOracleRows,
   buildEngineInput,
   compareToOracle,
   rank,
@@ -49,6 +57,7 @@ const toRow = (r: any) => ({
   driver: r.Driver.driverId,
   team: r.Constructor.constructorId,
   fl: r.FastestLap?.rank === '1',
+  points: parseFloat(r.points ?? '0'),
 });
 
 /** Page through a results/sprint collection, merging races split across pages. */
@@ -106,25 +115,38 @@ async function main() {
   await fetchRaces(year, 'results', 'Results', false, byRace);
   await fetchRaces(year, 'sprint', 'SprintResults', true, byRace);
 
-  const [driverData, teamData] = await Promise.all([
-    getJSON(`${JOLPICA}/${year}/driverStandings.json?limit=100`),
-    getJSON(`${JOLPICA}/${year}/constructorStandings.json?limit=100`),
-  ]);
+  let driverStandings: FixtureStanding[];
+  let constructorStandings: FixtureStanding[];
+  if (year < FIRST_JOLPICA_ORACLE_SEASON) {
+    const official = JSON.parse(
+      readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'data', 'official-standings.json'), 'utf8')
+    )[year];
+    if (!official) throw new Error(`no official standings for ${year} in scripts/data/official-standings.json`);
+    driverStandings = toOracleRows(official.drivers);
+    constructorStandings = toOracleRows(official.constructors);
+  } else {
+    const [driverData, teamData] = await Promise.all([
+      getJSON(`${JOLPICA}/${year}/driverStandings.json?limit=100`),
+      getJSON(`${JOLPICA}/${year}/constructorStandings.json?limit=100`),
+    ]);
+    driverStandings = toStandings(
+      driverData.MRData.StandingsTable.StandingsLists[0]?.DriverStandings ?? [],
+      'Driver',
+      'driverId'
+    );
+    constructorStandings = toStandings(
+      teamData.MRData.StandingsTable.StandingsLists[0]?.ConstructorStandings ?? [],
+      'Constructor',
+      'constructorId'
+    );
+  }
 
   const fixture: SeasonFixture = {
     season: year,
     fetchedAt: new Date().toISOString(),
     races: [...byRace.values()].filter((r) => r.results.length > 0),
-    driverStandings: toStandings(
-      driverData.MRData.StandingsTable.StandingsLists[0]?.DriverStandings ?? [],
-      'Driver',
-      'driverId'
-    ),
-    constructorStandings: toStandings(
-      teamData.MRData.StandingsTable.StandingsLists[0]?.ConstructorStandings ?? [],
-      'Constructor',
-      'constructorId'
-    ),
+    driverStandings,
+    constructorStandings,
   };
 
   const sprints = fixture.races.filter((r) => r.isSprint).length;

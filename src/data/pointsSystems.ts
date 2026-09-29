@@ -195,6 +195,33 @@ export const POINTS_SYSTEMS: Record<string, PointsSystem> = {
       20: 0,
     }
   },
+  '1960': {
+    id: '1960',
+    name: '1960 System',
+    description: 'Sixth place scores for the first time; no fastest-lap point',
+    regular: {
+      1: 8,
+      2: 6,
+      3: 4,
+      4: 3,
+      5: 2,
+      6: 1,
+      7: 0,
+      8: 0,
+      9: 0,
+      10: 0,
+      11: 0,
+      12: 0,
+      13: 0,
+      14: 0,
+      15: 0,
+      16: 0,
+      17: 0,
+      18: 0,
+      19: 0,
+      20: 0,
+    }
+  },
   '1950s': {
     id: '1950s',
     name: '1950s Original',

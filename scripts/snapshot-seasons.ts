@@ -9,20 +9,25 @@
  * non-scoring ones) plus the official driver/constructor standings that serve as
  * the oracle. Rows stay raw so the scoring filter remains falsifiable.
  *
+ * Before 1981 the oracle is formula1.com's final standings, kept (mapped to our
+ * ids) in scripts/data/official-standings.json — race rows still come from
+ * Jolpica, only the expected totals differ in source.
+ *
  * Re-run only to add a season or refresh the in-progress one — the fixtures are
  * committed, and the test suite itself never touches the network.
  */
-import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { writeFileSync, mkdirSync, existsSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { SeasonFixture, FixtureRace, FixtureResultRow, FixtureStanding } from './lib/seasonFixture';
+import { FIRST_JOLPICA_ORACLE_SEASON, toOracleRows } from './lib/seasonFixture';
 
 const JOLPICA = 'https://api.jolpi.ca/ergast/f1';
 const UA = 'Mozilla/5.0 (f1pointscalculator fixture snapshot)';
 const FIXTURE_DIR = join(dirname(fileURLToPath(import.meta.url)), '..', 'tests', 'fixtures', 'seasons');
 
 // Every season the site ships a page for (src/pages/<year>.astro + [year].astro).
-const FIRST_SEASON = 1981;
+const FIRST_SEASON = 1958;
 const LAST_SEASON = 2026;
 
 // Jolpica allows a short 4 req/s burst but enforces a much lower SUSTAINED hourly
@@ -101,6 +106,7 @@ const toRow = (r: any): FixtureResultRow => ({
   driver: r.Driver.driverId,
   team: r.Constructor.constructorId,
   fl: r.FastestLap?.rank === '1',
+  points: parseFloat(r.points ?? '0'),
 });
 
 /** Merge paginated rows into one entry per race — a single race's results can be
@@ -137,6 +143,11 @@ const toStandings = (list: any[], key: 'Driver' | 'Constructor', idField: string
     pos: s.position != null && s.position !== '' ? parseInt(s.position, 10) : null,
   }));
 
+type OfficialStandings = Record<string, { drivers: { id: string; points: number }[]; constructors: { id: string; points: number }[] }>;
+const OFFICIAL_STANDINGS: OfficialStandings = JSON.parse(
+  readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'data', 'official-standings.json'), 'utf8')
+);
+
 // F1's first sprint was 2021 Silverstone; asking earlier seasons for sprint
 // results spends quota to be told "none".
 const FIRST_SPRINT_SEASON = 2021;
@@ -149,14 +160,26 @@ async function snapshotSeason(year: number): Promise<SeasonFixture> {
     await fetchAllPages(`${year}/sprint.json`, (races) => collect(byRace, races, true, 'SprintResults'));
   }
 
+  const races = [...byRace.values()]
+    .filter((r) => r.results.length > 0)
+    .sort((a, b) => a.round - b.round || Number(b.isSprint) - Number(a.isSprint));
+
+  if (year < FIRST_JOLPICA_ORACLE_SEASON) {
+    const official = OFFICIAL_STANDINGS[year];
+    if (!official) throw new Error(`no official standings for ${year} in scripts/data/official-standings.json`);
+    return {
+      season: year,
+      fetchedAt: new Date().toISOString(),
+      races,
+      driverStandings: toOracleRows(official.drivers),
+      constructorStandings: toOracleRows(official.constructors),
+    };
+  }
+
   const [driverData, teamData] = [
     await getJSON(`${JOLPICA}/${year}/driverStandings.json?limit=100`),
     await getJSON(`${JOLPICA}/${year}/constructorStandings.json?limit=100`),
   ];
-
-  const races = [...byRace.values()]
-    .filter((r) => r.results.length > 0)
-    .sort((a, b) => a.round - b.round || Number(b.isSprint) - Number(a.isSprint));
 
   return {
     season: year,

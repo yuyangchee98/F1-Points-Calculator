@@ -2,9 +2,9 @@
  * The site's top-level sections — the "spine".
  *
  * Every page belongs to exactly one section, and the spine highlights it. The
- * mapping lives here rather than as a prop on each page because there are 44
- * hand-rolled season pages (1981.astro … 2024.astro) plus index.astro and
- * [year].astro, and threading a `section` prop through all of them would mean 46
+ * mapping lives here rather than as a prop on each page because there are 67
+ * hand-rolled season pages (1958.astro … 2024.astro) plus index.astro and
+ * [year].astro, and threading a `section` prop through all of them would mean 69
  * edits every time the nav changes. Deriving it from the pathname means zero.
  *
  * The Worker renders /blog, /leaderboard and /user/* from a separate template

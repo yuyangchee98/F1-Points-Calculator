@@ -44,7 +44,7 @@ const PointsSystemSelector: React.FC = () => {
   };
 
   const categorizedSystems = {
-    'F1 Historical': ['current', '2003-2009', '1991-2002', '1960s-1980s', '1950s'],
+    'F1 Historical': ['current', '2003-2009', '1991-2002', '1960s-1980s', '1960', '1950s'],
     'Other Motorsports': ['motogp', 'indycar', 'formula-e'],
     'Mathematical': ['linear', 'exponential', 'fibonacci', 'square-root', 'progressive'],
     'Creative': ['winner-takes-all', 'top-heavy', 'olympic', 'reliability', 'underdog', 'win-bonus']
@@ -66,6 +66,8 @@ const PointsSystemSelector: React.FC = () => {
         return 'Traditional F1 scoring rewarding only the top 6 finishers. Winner got 10 points, but the gap to second (6 points) was larger, making wins more valuable than consistency. Note: Sprint races use the same points as regular races.';
       case '1960s-1980s':
         return 'The classic F1 era where every point was precious. Only top 6 scored: 9-6-4-3-2-1. Small point totals meant every position mattered immensely. Championships were often decided by single points.';
+      case '1960':
+        return 'Used for the 1960 season only. Sixth place scored for the first time (8-6-4-3-2-1) and the fastest-lap point was dropped. The Constructors\' Cup kept this table for one more year, in 1961.';
       case '1950s':
         return 'The original F1 points system from the championship\'s inception. Only top 5 finishers scored: 8-6-4-3-2. In this era, reliability was poor and just finishing was an achievement.';
       case 'linear':

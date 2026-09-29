@@ -20,7 +20,161 @@ export interface SeasonNote {
   detail: string;
 }
 
+const INDY_500_NOTE = (round: string, winner: string): SeasonNote => ({
+  scope: 'race',
+  raceId: 'indianapolis-500',
+  title: 'Indianapolis 500 — drivers only',
+  detail:
+    `The Indy 500 (${round}) counted towards the Drivers' Championship, ${winner}, but not the Constructors' Cup, so its roadster teams score nothing in the team table. Its 33-car field is shown only as deep as the Grand Prix grid; nobody below the points finished high enough to score.`,
+});
+
 export const SEASON_NOTES: Record<number, SeasonNote[]> = {
+  1958: [
+    {
+      scope: 'season',
+      title: 'Fastest-lap point and the Constructors\' Cup',
+      detail:
+        'Drivers scored a point for fastest lap wherever they finished, even after retiring. The first Constructors\' Cup counted only each team\'s best-placed car, without the fastest-lap point.',
+    },
+    INDY_500_NOTE('round 4', 'so Jimmy Bryan\'s win is in the drivers\' standings'),
+    {
+      scope: 'race',
+      raceId: 'german',
+      title: 'German GP — Formula 2 class',
+      detail:
+        'Bruce McLaren finished 5th overall in a Formula 2 Cooper, which was not eligible for championship points, so his 5th scores nothing.',
+    },
+    {
+      scope: 'race',
+      raceId: 'italian',
+      title: 'Italian GP — shared car',
+      detail:
+        'Carroll Shelby and Masten Gregory shared the Maserati that finished 4th. From 1958 a shared drive scored no points, so neither scores. The grid shows the first driver only (Brooks and Lewis-Evans also shared a Vanwall at the French GP, outside the points).',
+    },
+  ],
+
+  1959: [
+    {
+      scope: 'season',
+      title: 'Fastest-lap point and the Constructors\' Cup',
+      detail:
+        'Drivers scored a point for fastest lap wherever they finished. The Constructors\' Cup counted only each team\'s best-placed car, without the fastest-lap point.',
+    },
+    INDY_500_NOTE('round 2', 'so Rodger Ward\'s win is in the drivers\' standings'),
+    {
+      scope: 'race',
+      raceId: 'french',
+      title: 'French GP — Moss disqualified, fastest lap kept',
+      detail:
+        'Stirling Moss was disqualified for a push start but kept the fastest-lap point, which counts in his best-five total. He appears at his classified position, 12th.',
+    },
+    {
+      scope: 'race',
+      raceId: 'british',
+      title: 'British GP — shared fastest lap',
+      detail:
+        'Moss and Bruce McLaren set the same fastest lap, so the point was split: 6.5 for Moss (2nd) and 4.5 for McLaren (3rd).',
+    },
+  ],
+
+  1960: [
+    INDY_500_NOTE('round 3', 'so Jim Rathmann\'s win is in the drivers\' standings'),
+    {
+      scope: 'race',
+      raceId: 'argentine',
+      title: 'Argentine GP — shared car',
+      detail:
+        'Maurice Trintignant and Stirling Moss shared the Cooper that finished 3rd. A shared drive scored no points, so neither scores. The grid shows the first driver only.',
+    },
+  ],
+
+  1961: [
+    {
+      scope: 'season',
+      title: 'Constructors still paid 8 for a win',
+      detail:
+        'Drivers moved to 9 points for a win in 1961, but the Constructors\' Cup stayed on 8-6-4-3-2-1 for one more year and counted only each team\'s best-placed car.',
+    },
+  ],
+
+  1963: [
+    {
+      scope: 'race',
+      raceId: 'french',
+      title: 'French GP — Hill\'s 3rd scores nothing',
+      detail:
+        'Graham Hill finished 3rd but was given no points, penalised for a push start. The drivers behind him were not moved up.',
+    },
+  ],
+
+  1966: [
+    {
+      scope: 'race',
+      raceId: 'monaco',
+      title: 'Monaco GP — only four finishers scored',
+      detail:
+        'Only four cars were classified. Richie Ginther (listed 5th after retiring) and Guy Ligier (running, but too far behind) score nothing.',
+    },
+    {
+      scope: 'race',
+      raceId: 'belgian',
+      title: 'Belgian GP — Ligier not classified',
+      detail:
+        'Guy Ligier was running at the finish but too far behind to be classified, so he scores nothing.',
+    },
+  ],
+
+  1967: [
+    {
+      scope: 'race',
+      raceId: 'german',
+      title: 'German GP — Formula 2 cars in the field',
+      detail:
+        'Formula 2 cars ran alongside the F1 field. F1 cars were scored by their position among F1 cars only, so Jackie Oliver (F2) scores nothing and Jo Bonnier and Guy Ligier take the points for 5th and 6th.',
+    },
+  ],
+
+  1968: [
+    {
+      scope: 'race',
+      raceId: 'spanish',
+      title: 'Spanish GP — 6th place not a finisher',
+      detail: 'Bruce McLaren was classified 6th after retiring, which did not score.',
+    },
+    {
+      scope: 'race',
+      raceId: 'monaco',
+      title: 'Monaco GP — 6th place not a finisher',
+      detail: 'John Surtees was classified 6th after retiring, which did not score.',
+    },
+  ],
+
+  1970: [
+    {
+      scope: 'race',
+      raceId: 'spanish',
+      title: 'Spanish GP — 6th place not a finisher',
+      detail: 'John Surtees was classified 6th after retiring, which did not score.',
+    },
+  ],
+
+  1975: [
+    {
+      scope: 'race',
+      raceId: 'spanish',
+      title: 'Spanish GP — half points',
+      detail:
+        'Stopped after 29 laps when Rolf Stommelen\'s crash killed spectators. Under 60% distance, so all positions get half points. Lella Lombardi\'s 6th earned half a point.',
+    },
+    {
+      scope: 'race',
+      raceId: 'austrian',
+      title: 'Austrian GP — half points',
+      detail:
+        'Stopped early in torrential rain with Vittorio Brambilla leading. Under 60% distance, so all positions get half points, which is why Lauda\'s total ends in .5.',
+    },
+  ],
+
   1984: [
     {
       scope: 'race',

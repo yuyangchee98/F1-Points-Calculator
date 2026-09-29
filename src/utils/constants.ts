@@ -59,6 +59,32 @@ const SEASON_DRIVER_COUNT: { [key: number]: number } = {
   1983: 26,
   1982: 28,
   1981: 27,
+  // 1958–1980 (max kept finishing position per season, from the fixtures). For
+  // 1958–60 this is the Grand Prix depth: the Indy 500 classified 33, but nothing
+  // below its top five (plus the fastest lap) scored, so clipping it changes no total.
+  1980: 26,
+  1979: 25,
+  1978: 26,
+  1977: 26,
+  1976: 27,
+  1975: 28,
+  1974: 31,
+  1973: 29,
+  1972: 31,
+  1971: 29,
+  1970: 24,
+  1969: 20,
+  1968: 23,
+  1967: 24,
+  1966: 20,
+  1965: 23,
+  1964: 23,
+  1963: 23,
+  1962: 26,
+  1961: 32,
+  1960: 24,
+  1959: 24,
+  1958: 26,
 };
 
 export const getGridPositions = (season: number): number => {

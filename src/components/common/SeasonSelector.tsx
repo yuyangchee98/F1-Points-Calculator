@@ -2,20 +2,44 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../store';
 import { CURRENT_SEASON, getGridPositions, isPaidSeason } from '../../utils/constants';
-import { getSeasonRules } from '../../data/seasonRules';
+import { getSeasonRules, SEASON_RULES } from '../../data/seasonRules';
 import useWindowSize from '../../hooks/useWindowSize';
 
-const COMPLETED_YEARS = [
-  2025, 2024, 2023, 2022, 2021,
-  2020, 2019, 2018, 2017, 2016,
-  2015, 2014, 2013, 2012, 2011,
-  2010, 2009, 2008, 2007, 2006, 2005,
-  2004, 2003, 2002, 2001, 2000,
-  1999, 1998, 1997, 1996, 1995,
-  1994, 1993, 1992, 1991,
-  1990, 1989, 1988, 1987, 1986,
-  1985, 1984, 1983, 1982, 1981,
-];
+// Every season with a rules entry, newest first. Adding a year to SEASON_RULES
+// is what puts it in the picker.
+const COMPLETED_YEARS = Object.keys(SEASON_RULES)
+  .map(Number)
+  .filter((y) => y < CURRENT_SEASON)
+  .sort((a, b) => b - a);
+
+// Grouped by decade so a year near the floor has a landmark, not 14 bare rows.
+const DECADES: { label: string; years: number[] }[] = [];
+for (const year of COMPLETED_YEARS) {
+  const label = `${Math.floor(year / 10) * 10}s`;
+  const last = DECADES[DECADES.length - 1];
+  if (last?.label === label) last.years.push(year);
+  else DECADES.push({ label, years: [year] });
+}
+
+/** Visual row/column of every tile, for arrow-key moves across decade breaks. */
+const tileLayout = (cols: number): { row: number; col: number }[] => {
+  const layout: { row: number; col: number }[] = [];
+  let rowBase = 0;
+  for (const decade of DECADES) {
+    decade.years.forEach((_, i) => layout.push({ row: rowBase + Math.floor(i / cols), col: i % cols }));
+    rowBase += Math.ceil(decade.years.length / cols);
+  }
+  return layout;
+};
+
+/** Index of the tile in `row` nearest to `col`, or -1 if the row doesn't exist. */
+const tileInRow = (layout: { row: number; col: number }[], row: number, col: number): number => {
+  let best = -1;
+  layout.forEach((t, i) => {
+    if (t.row === row && t.col <= col) best = i;
+  });
+  return best;
+};
 
 const getSeasonUrl = (year: number): string =>
   year === CURRENT_SEASON ? '/' : `/${year}`;
@@ -144,6 +168,7 @@ const SeasonSelector: React.FC<Props> = ({ activeSeason }) => {
 
   const cols = isMobile ? 4 : 5;
   const total = COMPLETED_YEARS.length;
+  const layout = tileLayout(cols);
 
   const handleGridKeyDown = (e: React.KeyboardEvent) => {
     const currentIdx = COMPLETED_YEARS.indexOf(focusedYear);
@@ -156,17 +181,22 @@ const SeasonSelector: React.FC<Props> = ({ activeSeason }) => {
       case 'ArrowLeft':
         next = Math.max(currentIdx - 1, 0);
         break;
-      case 'ArrowDown':
-        next = Math.min(currentIdx + cols, total - 1);
+      case 'ArrowDown': {
+        const { row, col } = layout[currentIdx];
+        const below = tileInRow(layout, row + 1, col);
+        if (below >= 0) next = below;
         break;
-      case 'ArrowUp':
-        if (currentIdx < cols) {
+      }
+      case 'ArrowUp': {
+        const { row, col } = layout[currentIdx];
+        if (row === 0) {
           e.preventDefault();
           liveRef.current?.focus();
           return;
         }
-        next = currentIdx - cols;
+        next = tileInRow(layout, row - 1, col);
         break;
+      }
       case 'Home':
         next = 0;
         break;
@@ -422,64 +452,73 @@ const SheetContents: React.FC<SheetContentsProps> = ({
         <div
           role="group"
           aria-label="Completed seasons"
-          className={`grid ${
-            isMobile
-              ? 'grid-cols-4 gap-2 flex-1 min-h-0 overflow-y-auto'
-              : 'grid-cols-5 gap-1 max-h-[260px] overflow-y-auto'
-          }`}
+          className={isMobile ? 'flex-1 min-h-0 overflow-y-auto' : 'max-h-[260px] overflow-y-auto'}
           onKeyDown={handleGridKeyDown}
         >
-          {COMPLETED_YEARS.map((year, idx) => {
-            const isSelected = year === activeSeason;
-            const isFocusedTile = year === focusedYear;
-            const isPaid = isPaidSeason(year);
-            return (
-              <a
-                key={year}
-                ref={(el) => {
-                  tilesRef.current[idx] = el;
-                }}
-                href={getSeasonUrl(year)}
-                tabIndex={isFocusedTile ? 0 : -1}
-                aria-current={isSelected ? 'page' : undefined}
-                aria-label={isPaid ? `${year} (premium)` : String(year)}
-                onMouseEnter={() => setFocusedYear(year)}
-                onFocus={() => setFocusedYear(year)}
-                className={`relative ${
-                  isMobile ? 'h-[52px] text-[17px] gap-1' : 'h-10 text-[15px]'
-                } flex items-center justify-center rounded font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 transition-colors ${
-                  isSelected
-                    ? 'bg-gray-900 text-white border border-gray-900'
-                    : 'bg-white text-gray-900 border border-gray-200 hover:bg-gray-50 hover:border-gray-300'
-                }`}
+          {DECADES.map((decade, decadeIdx) => (
+            <div key={decade.label}>
+              <div
+                className={`px-1 ${decadeIdx === 0 ? 'pt-0' : 'pt-2'} pb-1 text-[10px] font-semibold uppercase tracking-wider text-gray-400`}
+                aria-hidden="true"
               >
-                {isSelected && (
-                  <span
-                    className="absolute left-0 top-0 bottom-0 w-[3px] bg-red-600 rounded-l"
-                    aria-hidden="true"
-                  />
-                )}
-                <span>{year}</span>
-                {isPaid && (
-                  <svg
-                    className={`${
-                      isMobile
-                        ? 'relative w-3 h-3'
-                        : 'absolute top-0.5 right-0.5 w-2.5 h-2.5'
-                    } ${isSelected ? 'text-white' : 'text-gray-400'}`}
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                    aria-hidden="true"
-                  >
-                    <rect x="5" y="11" width="14" height="9" rx="2" />
-                    <path strokeLinecap="round" d="M8 11V8a4 4 0 1 1 8 0v3" />
-                  </svg>
-                )}
-              </a>
-            );
-          })}
+                {decade.label}
+              </div>
+              <div className={`grid ${isMobile ? 'grid-cols-4 gap-2' : 'grid-cols-5 gap-1'}`}>
+                {decade.years.map((year) => {
+                  const idx = COMPLETED_YEARS.indexOf(year);
+                  const isSelected = year === activeSeason;
+                  const isFocusedTile = year === focusedYear;
+                  const isPaid = isPaidSeason(year);
+                  return (
+                    <a
+                      key={year}
+                      ref={(el) => {
+                        tilesRef.current[idx] = el;
+                      }}
+                      href={getSeasonUrl(year)}
+                      tabIndex={isFocusedTile ? 0 : -1}
+                      aria-current={isSelected ? 'page' : undefined}
+                      aria-label={isPaid ? `${year} (premium)` : String(year)}
+                      onMouseEnter={() => setFocusedYear(year)}
+                      onFocus={() => setFocusedYear(year)}
+                      className={`relative ${
+                        isMobile ? 'h-[52px] text-[17px] gap-1' : 'h-10 text-[15px]'
+                      } flex items-center justify-center rounded font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 transition-colors ${
+                        isSelected
+                          ? 'bg-gray-900 text-white border border-gray-900'
+                          : 'bg-white text-gray-900 border border-gray-200 hover:bg-gray-50 hover:border-gray-300'
+                      }`}
+                    >
+                      {isSelected && (
+                        <span
+                          className="absolute left-0 top-0 bottom-0 w-[3px] bg-red-600 rounded-l"
+                          aria-hidden="true"
+                        />
+                      )}
+                      <span>{year}</span>
+                      {isPaid && (
+                        <svg
+                          className={`${
+                            isMobile
+                              ? 'relative w-3 h-3'
+                              : 'absolute top-0.5 right-0.5 w-2.5 h-2.5'
+                          } ${isSelected ? 'text-white' : 'text-gray-400'}`}
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                          aria-hidden="true"
+                        >
+                          <rect x="5" y="11" width="14" height="9" rx="2" />
+                          <path strokeLinecap="round" d="M8 11V8a4 4 0 1 1 8 0v3" />
+                        </svg>
+                      )}
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 

@@ -7,7 +7,7 @@ export interface FastestLapRule {
 
 export type SprintFormat = 'none' | '2021' | '2022+';
 
-// Historic "best N results count" rules (1961–1990). A season is either a single
+// Historic "best N results count" rules (1958–1990). A season is either a single
 // block (keep the best `bestOf` results across the whole year) OR a two-half split
 // (1967–1980: keep the best N in each half, then sum the two halves).
 export interface DroppedScoresRule {
@@ -21,8 +21,11 @@ export interface DroppedScoresRule {
 
 // Constructor scoring quirks that differ from the drivers' rules.
 export interface ConstructorRules {
-  bestCarPerRaceOnly?: boolean;                      // 1961–1978: only the top car scores
+  bestCarPerRaceOnly?: boolean;                      // 1958–1978: only the top car scores
   droppedScores?: DroppedScoresRule;                 // if it differs from drivers
+  excludeFastestLapPoint?: boolean;                  // 1958–59: the Cup ignored the FL point
+  excludedRaces?: string[];                          // raceIds that score for drivers only (Indy 500, 1958–60)
+  pointsSystem?: string;                             // 1961: Cup stayed 8-6-4-3-2-1 while drivers got 9 for a win
 }
 
 export interface SeasonRules {
@@ -38,7 +41,65 @@ export interface SeasonRules {
   excludedDrivers?: string[];                        // dropped from driver standings (e.g. 1997 Schumacher DSQ)
 }
 
+const split = (splitAfterRound: number, firstHalfBest: number, secondHalfBest: number): DroppedScoresRule =>
+  ({ split: { splitAfterRound, firstHalfBest, secondHalfBest } });
+
+// 1958–1978 constructors: only the best-placed car scored each race, under the
+// same dropped-scores rule as the drivers.
+const bestCar = (droppedScores: DroppedScoresRule, extra: Partial<ConstructorRules> = {}): ConstructorRules =>
+  ({ bestCarPerRaceOnly: true, droppedScores, ...extra });
+
+// The Indianapolis 500 was a World Championship round 1950–60 for drivers only.
+const INDY_500 = 'indianapolis-500';
+
 export const SEASON_RULES: Record<number, SeasonRules> = {
+  // 1958–59: 8-6-4-3-2 plus a point for fastest lap, awarded wherever the driver
+  // finished (even after retiring — hence no position cap). A tied fastest lap
+  // split the point (see OFFICIAL_RESULT_POINTS). The Constructors' Cup ignored
+  // the fastest-lap point and the Indy 500.
+  1958: {
+    sprintFormat: 'none', defaultPointsSystem: '1950s', droppedScores: { bestOf: 6 },
+    fastestLap: { points: 1, maxEligiblePosition: 99 },
+    constructorRules: bestCar({ bestOf: 6 }, { excludeFastestLapPoint: true, excludedRaces: [INDY_500] }),
+  },
+  1959: {
+    sprintFormat: 'none', defaultPointsSystem: '1950s', droppedScores: { bestOf: 5 },
+    fastestLap: { points: 1, maxEligiblePosition: 99 },
+    constructorRules: bestCar({ bestOf: 5 }, { excludeFastestLapPoint: true, excludedRaces: [INDY_500] }),
+  },
+  // 1960: sixth place scores, the fastest-lap point is gone — one year only.
+  1960: {
+    sprintFormat: 'none', defaultPointsSystem: '1960', droppedScores: { bestOf: 6 },
+    constructorRules: bestCar({ bestOf: 6 }, { excludedRaces: [INDY_500] }),
+  },
+  // 1961: drivers move to 9 for a win; the Constructors' Cup stays on 8 for a year.
+  1961: {
+    sprintFormat: 'none', defaultPointsSystem: '1960s-1980s', droppedScores: { bestOf: 5 },
+    constructorRules: bestCar({ bestOf: 5 }, { pointsSystem: '1960' }),
+  },
+  1962: { sprintFormat: 'none', defaultPointsSystem: '1960s-1980s', droppedScores: { bestOf: 5 }, constructorRules: bestCar({ bestOf: 5 }) },
+  1963: { sprintFormat: 'none', defaultPointsSystem: '1960s-1980s', droppedScores: { bestOf: 6 }, constructorRules: bestCar({ bestOf: 6 }) },
+  1964: { sprintFormat: 'none', defaultPointsSystem: '1960s-1980s', droppedScores: { bestOf: 6 }, constructorRules: bestCar({ bestOf: 6 }) },
+  1965: { sprintFormat: 'none', defaultPointsSystem: '1960s-1980s', droppedScores: { bestOf: 6 }, constructorRules: bestCar({ bestOf: 6 }) },
+  1966: { sprintFormat: 'none', defaultPointsSystem: '1960s-1980s', droppedScores: { bestOf: 5 }, constructorRules: bestCar({ bestOf: 5 }) },
+  // 1967–1980: two-half seasons — best N of the first `splitAfterRound` rounds plus
+  // best M of the rest.
+  1967: { sprintFormat: 'none', defaultPointsSystem: '1960s-1980s', droppedScores: split(6, 5, 4), constructorRules: bestCar(split(6, 5, 4)) },
+  1968: { sprintFormat: 'none', defaultPointsSystem: '1960s-1980s', droppedScores: split(6, 5, 5), constructorRules: bestCar(split(6, 5, 5)) },
+  1969: { sprintFormat: 'none', defaultPointsSystem: '1960s-1980s', droppedScores: split(6, 5, 4), constructorRules: bestCar(split(6, 5, 4)) },
+  1970: { sprintFormat: 'none', defaultPointsSystem: '1960s-1980s', droppedScores: split(7, 6, 5), constructorRules: bestCar(split(7, 6, 5)) },
+  1971: { sprintFormat: 'none', defaultPointsSystem: '1960s-1980s', droppedScores: split(6, 5, 4), constructorRules: bestCar(split(6, 5, 4)) },
+  1972: { sprintFormat: 'none', defaultPointsSystem: '1960s-1980s', droppedScores: split(6, 5, 5), constructorRules: bestCar(split(6, 5, 5)) },
+  1973: { sprintFormat: 'none', defaultPointsSystem: '1960s-1980s', droppedScores: split(8, 7, 6), constructorRules: bestCar(split(8, 7, 6)) },
+  1974: { sprintFormat: 'none', defaultPointsSystem: '1960s-1980s', droppedScores: split(8, 7, 6), constructorRules: bestCar(split(8, 7, 6)) },
+  1975: { sprintFormat: 'none', defaultPointsSystem: '1960s-1980s', droppedScores: split(7, 6, 6), constructorRules: bestCar(split(7, 6, 6)) },
+  1976: { sprintFormat: 'none', defaultPointsSystem: '1960s-1980s', droppedScores: split(8, 7, 7), constructorRules: bestCar(split(8, 7, 7)) },
+  1977: { sprintFormat: 'none', defaultPointsSystem: '1960s-1980s', droppedScores: split(9, 8, 7), constructorRules: bestCar(split(9, 8, 7)) },
+  1978: { sprintFormat: 'none', defaultPointsSystem: '1960s-1980s', droppedScores: split(8, 7, 7), constructorRules: bestCar(split(8, 7, 7)) },
+  // 1979–80: drivers keep the split; constructors count every race and every car.
+  1979: { sprintFormat: 'none', defaultPointsSystem: '1960s-1980s', droppedScores: split(7, 4, 4) },
+  1980: { sprintFormat: 'none', defaultPointsSystem: '1960s-1980s', droppedScores: split(7, 5, 5) },
+
   // 1981–1990: drivers' title decided on the best 11 results of the season
   // (9-6-4-3-2-1). Constructors counted ALL races, both cars — so no constructorRules
   // (the defaults are correct). In 1988 this is what makes Senna champion (90) over

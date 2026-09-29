@@ -12,6 +12,7 @@ import {
   getFastestLapPoints,
   getCanonicalTeamId,
   getSeasonRules,
+  getDefaultPointsSystem,
 } from '../../data/seasonRules';
 import type { DroppedScoresRule } from '../../data/seasonRules';
 
@@ -36,11 +37,53 @@ export const DOUBLE_POINTS_RACES: Record<number, Set<string>> = {
 
 // Official points that diverge from the position→points map for a specific
 // finisher — post-race DSQ reclassifications (where the cars behind were NOT
-// promoted for points) and entries that were classified but not nominated for
-// championship points. Jolpica's standings oracle reflects these; scoring purely
-// by finishing position would over-count. Keyed season → raceId (slug) → driverId.
-// Applied only to the real, unmodified official result (not to what-if drags).
+// promoted for points), entries that were classified but not nominated for
+// championship points, shared drives and class-scored F2 cars. The official
+// standings reflect these; scoring purely by finishing position would over-count.
+// Keyed season → raceId (slug) → driverId. Each value is the driver's full points
+// for that race, fastest-lap point included. Applied only to the real, unmodified
+// official result (not to what-if drags).
 export const OFFICIAL_RESULT_POINTS: Record<number, Record<string, Record<string, number>>> = {
+  1958: {
+    // German GP: McLaren's P5 came in a Formula 2 Cooper, not eligible for points.
+    german: { mclaren: 0 },
+    // Italian GP: Shelby and Gregory shared the car that finished 4th. From 1958
+    // a shared drive scored nothing.
+    italian: { shelby: 0, gregory: 0 },
+  },
+  1959: {
+    // British GP: Moss and McLaren tied for fastest lap and split the point.
+    british: { moss: 6.5, mclaren: 4.5 },
+  },
+  1960: {
+    // Argentine GP: Trintignant and Moss shared the 3rd-placed Cooper — no points.
+    argentine: { moss: 0, trintignant: 0 },
+  },
+  1963: {
+    // French GP: Graham Hill classified 3rd but given no points (push start).
+    french: { hill: 0 },
+  },
+  1966: {
+    // Monaco and Belgian GPs: running at the finish but too far behind to be
+    // classified.
+    monaco: { ginther: 0, ligier: 0 },
+    belgian: { ligier: 0 },
+  },
+  1967: {
+    // German GP: the F2 cars ran with the F1 field. F1 cars scored by their
+    // position among F1 cars only, so Oliver (F2) scored nothing and Bonnier and
+    // Ligier moved up to 5th and 6th.
+    german: { oliver: 0, bonnier: 2, ligier: 1 },
+  },
+  1968: {
+    // Spanish and Monaco GPs: classified 6th on a retirement, not a finisher.
+    spanish: { mclaren: 0 },
+    monaco: { surtees: 0 },
+  },
+  1970: {
+    // Spanish GP: classified 6th on a retirement, not a finisher.
+    spanish: { surtees: 0 },
+  },
   1983: {
     // Brazilian GP: Keke Rosberg finished 2nd on the road but was disqualified
     // (push start); finishers behind him kept their on-road scoring positions
@@ -170,7 +213,16 @@ export const computeRawPoints = ({
     }
   });
 
-  const bestCarPerRaceOnly = rules.constructorRules?.bestCarPerRaceOnly;
+  const constructorRules = rules.constructorRules;
+  const bestCarPerRaceOnly = constructorRules?.bestCarPerRaceOnly;
+  // The Constructors' Cup ran its own table only in 1961. Honour it only while
+  // the season is scored under its own points system — a what-if system applies
+  // to both championships alike.
+  const constructorPointsSystem =
+    constructorRules?.pointsSystem && pointsSystem === getDefaultPointsSystem(season)
+      ? constructorRules.pointsSystem
+      : undefined;
+  const capConstructorPoints = !!constructorPointsSystem || !!constructorRules?.excludeFastestLapPoint;
 
   races.forEach(race => {
     const racePositions = positions.filter(p =>
@@ -182,6 +234,10 @@ export const computeRawPoints = ({
     const raceTeamCarPoints: Record<string, number[]> = {};
     const raceResults = pastResults[race.id] || [];
     const roundNum = race.round ? parseInt(race.round, 10) : 0;
+    const isHalfPoints = !!HALF_POINTS_RACES[season]?.has(race.id);
+    const isDoublePoints = !!DOUBLE_POINTS_RACES[season]?.has(race.id);
+    // A drivers-only round (the Indy 500, 1958–60) adds nothing for constructors.
+    const excludedFromConstructors = !!constructorRules?.excludedRaces?.includes(race.id);
 
     racePositions.forEach(position => {
       if (!position.driverId) {
@@ -199,11 +255,11 @@ export const computeRawPoints = ({
         pointsForPosition += getFastestLapPoints(position.position, season);
       }
 
-      if (HALF_POINTS_RACES[season]?.has(race.id)) {
+      if (isHalfPoints) {
         pointsForPosition *= 0.5;
       }
 
-      if (DOUBLE_POINTS_RACES[season]?.has(race.id)) {
+      if (isDoublePoints) {
         pointsForPosition *= 2;
       }
 
@@ -261,11 +317,25 @@ export const computeRawPoints = ({
         );
         const isFullSeasonExcluded = CONSTRUCTOR_EXCLUSIONS[season]?.has(teamId);
 
-        if (!isResetExcluded && !isFullSeasonExcluded) {
+        if (!isResetExcluded && !isFullSeasonExcluded && !excludedFromConstructors) {
+          // 1958–59 the Cup paid no fastest-lap point, and 1961 it paid 8 for a
+          // win rather than 9: cap the car at its positional value in the Cup's
+          // table. The min() keeps any lower official value (shared drive, F2).
+          let carPoints = pointsForPosition;
+          if (capConstructorPoints && !race.isSprint) {
+            let positional = getPointsForPositionWithSystem(
+              position.position,
+              constructorPointsSystem ?? pointsSystem
+            );
+            if (isHalfPoints) positional *= 0.5;
+            if (isDoublePoints) positional *= 2;
+            carPoints = Math.min(carPoints, positional);
+          }
+
           if (!raceTeamCarPoints[teamId]) {
             raceTeamCarPoints[teamId] = [];
           }
-          raceTeamCarPoints[teamId].push(pointsForPosition);
+          raceTeamCarPoints[teamId].push(carPoints);
 
           if (!race.isSprint && position.position >= 1) {
             if (!teamFinishes[teamId]) {
@@ -294,7 +364,7 @@ export const computeRawPoints = ({
     });
 
     // Aggregate each team's contribution this race: sum of both cars normally, or
-    // just the single best-placed car for 1961–1978.
+    // just the single best-placed car for 1958–1978.
     Object.entries(raceTeamCarPoints).forEach(([teamId, carPoints]) => {
       const contribution = bestCarPerRaceOnly
         ? Math.max(...carPoints)

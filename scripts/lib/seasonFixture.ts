@@ -23,6 +23,10 @@ export interface FixtureResultRow {
   team: string;
   /** FastestLap.rank === '1' */
   fl: boolean;
+  /** Points Jolpica awarded this row. Recorded from 1958–1980 fixtures on, where
+   *  it recovers the fastest-lap point (no lap data before 2004) and the one
+   *  disqualified row that still scored. */
+  points?: number;
 }
 
 export interface FixtureRace {
@@ -34,7 +38,9 @@ export interface FixtureRace {
 }
 
 /** A row of the official standings oracle. `pos` is null for zero-point entries,
- *  whose order Jolpica leaves undefined. */
+ *  whose order the source leaves undefined, and for entries tied on points
+ *  (compared by points only). Seasons before 1981 take their standings from
+ *  formula1.com (scripts/data/official-standings.json). */
 export interface FixtureStanding {
   id: string;
   points: number;
@@ -49,6 +55,23 @@ export interface SeasonFixture {
   driverStandings: FixtureStanding[];
   constructorStandings: FixtureStanding[];
 }
+
+// ---------------------------------------------------------------------------
+// Official standings for the pre-1981 seasons
+// ---------------------------------------------------------------------------
+
+/** Seasons before this take their expected standings from formula1.com (via
+ *  scripts/data/official-standings.json) instead of Jolpica's standings. */
+export const FIRST_JOLPICA_ORACLE_SEASON = 1981;
+
+/** Final standings in official order -> oracle rows. Entries tied on points get
+ *  pos null (compared on points only), as do zero-point entries. */
+export const toOracleRows = (rows: { id: string; points: number }[]): FixtureStanding[] =>
+  rows.map((r, i) => ({
+    id: r.id,
+    points: r.points,
+    pos: r.points === 0 || rows.some((o) => o !== r && o.points === r.points) ? null : i + 1,
+  }));
 
 // ---------------------------------------------------------------------------
 // Row filtering — mirrors the Worker's jolpica.ts isNonScoringResult
@@ -72,10 +95,24 @@ export const NEVER_SCORES_STATUSES = new Set([
  * officially classified in a points position (Frentzen, P4 at 1996 Monaco) DID
  * score. Laps completed is what separates them.
  */
-export const isNonScoringResult = (status: string, laps: string): boolean => {
-  if (NEVER_SCORES_STATUSES.has(status)) return true;
+export const isNonScoringResult = (status: string, laps: string, points?: number): boolean => {
+  // A never-scores row that was nonetheless awarded points stays: Moss, DSQ at
+  // the 1959 French GP, kept his fastest-lap point.
+  if (NEVER_SCORES_STATUSES.has(status)) return !((points ?? 0) > 0);
   if (status === 'Withdrew') return parseInt(laps || '0', 10) === 0;
   return false;
+};
+
+/** Mirrors the Worker's jolpica.ts tookFastestLap: before 2004 there is no lap
+ *  data, so for the 1950s fastest-lap point a row paid more than its position
+ *  (8-6-4-3-2) is the one that took it. */
+const LAST_FASTEST_LAP_POINT_SEASON = 1959;
+const POSITIONAL_POINTS_1950S: Record<number, number> = { 1: 8, 2: 6, 3: 4, 4: 3, 5: 2 };
+
+export const tookFastestLap = (row: FixtureResultRow, season: number): boolean => {
+  if (row.fl) return true;
+  if (season > LAST_FASTEST_LAP_POINT_SEASON) return false;
+  return (row.points ?? 0) > (POSITIONAL_POINTS_1950S[row.pos] ?? 0);
 };
 
 /** Jolpica raceName -> the app's raceId. MUST match the Worker's derivation
@@ -131,12 +168,13 @@ export const buildEngineInput = (fixture: SeasonFixture): EngineInput => {
 
     pastResults[id] = [];
     for (const row of race.results) {
-      if (isNonScoringResult(row.status, row.laps)) continue;
+      if (isNonScoringResult(row.status, row.laps, row.points)) continue;
+      const fl = tookFastestLap(row, fixture.season);
       pastResults[id].push({
         driverId: row.driver,
         teamId: row.team,
         position: row.pos,
-        fastestLap: row.fl,
+        fastestLap: fl,
       });
       positions.push({
         raceId: id,
@@ -144,7 +182,7 @@ export const buildEngineInput = (fixture: SeasonFixture): EngineInput => {
         driverId: row.driver,
         teamId: row.team,
         isOfficialResult: true,
-        hasFastestLap: row.fl,
+        hasFastestLap: fl,
       });
       driverTeam.set(row.driver, row.team);
     }
