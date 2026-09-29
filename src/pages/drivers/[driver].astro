@@ -55,7 +55,6 @@ const flag = flagEmoji(career.nationality);
 const yearsActive = career.firstSeason === career.lastSeason ? `${career.firstSeason}` : `${career.firstSeason}–${active ? 'present' : career.lastSeason}`;
 const teamNames = [...new Set(career.seasons.flatMap((s) => s.teams.map((tm) => tm.name)))];
 const ranks = allTimeRanks(career.driverId, drivers);
-const helmet = teamSwatch(career.latestTeam);
 const PAID_SEASON_THRESHOLD = 2012;
 
 // Milestones, in career order. Firsts that fell on the same race merge into
@@ -210,14 +209,11 @@ const delta = t.todayPoints - t.scored;
   <div class="bg-surface text-ink min-h-[100dvh] w-full min-w-0">
     <div class="max-w-[1080px] min-w-0 mx-auto px-4 sm:px-8 pt-7 pb-10 sm:pt-9 flex flex-col gap-9 [&>*]:min-w-0">
       <header class="flex flex-col gap-5">
-        <div class="flex items-center gap-4">
-          <div class="dp-helmet" style={helmet} aria-hidden="true"></div>
-          <div class="min-w-0">
-            <h1 class="font-display font-black text-[30px] sm:text-[44px] leading-none tracking-[-0.02em]">{career.name}</h1>
-            <p class="mt-1.5 text-sm text-ink-secondary flex flex-wrap gap-x-3.5 gap-y-0.5">
-              {metaLine.map((m) => <span class="whitespace-nowrap">{m}</span>)}
-            </p>
-          </div>
+        <div class="min-w-0">
+          <h1 class="font-display font-black text-[30px] sm:text-[44px] leading-none tracking-[-0.02em]">{career.name}</h1>
+          <p class="mt-1.5 text-sm text-ink-secondary flex flex-wrap gap-x-3.5 gap-y-0.5">
+            {metaLine.map((m) => <span class="whitespace-nowrap">{m}</span>)}
+          </p>
         </div>
 
         <p class="max-w-[62ch] text-[17px] leading-normal">

@@ -150,7 +150,7 @@ export interface DriverCareer {
   nationality: string;
   firstSeason: number;
   lastSeason: number;
-  /** The team of the driver's most recent race — the helmet disc's colours. */
+  /** The team of the driver's most recent race. */
   latestTeam: CareerTeam;
   totals: CareerTotals;
   seasons: CareerSeason[];
