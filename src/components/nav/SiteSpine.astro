@@ -25,10 +25,13 @@ import SpineAccountIsland from './SpineAccountIsland';
 import SpineCompeteDot, { COMPETE_LINK_ID } from './SpineCompeteDot';
 
 /**
- * House ad inventory for the spine's one promo slot.
+ * House ad inventory for the spine's promo slot.
  *
- * One slot, one advertiser per pageview, picked at random. Add an entry here and
- * it joins the rotation — nothing else needs to change.
+ * A `pinned` entry is always on screen. The rest share one rotating position,
+ * one advertiser per pageview, picked at random — and only at xl+, because at
+ * lg the section nav and account button leave room for one pill, not two. Add
+ * an unpinned entry here and it joins the rotation — nothing else needs to
+ * change.
  *
  * Rotation has to happen client-side. The site is `output: 'static'` behind a
  * CDN, so there is no per-request render: picking at build time would bake one
@@ -38,6 +41,14 @@ import SpineCompeteDot, { COMPETE_LINK_ID } from './SpineCompeteDot';
  * layout shift, and no-JS visitors still get the first entry.
  */
 const ADS = [
+  {
+    id: 'globeprix',
+    href: 'https://globeprix.chyuang.com/',
+    emoji: '🌍',
+    label: 'Globe Prix',
+    title: 'Try my new game: Globe Prix, race every country on Earth!',
+    pinned: true,
+  },
   {
     id: 'drawlineracing',
     href: 'https://drawlineracing.chyuang.com/',
@@ -60,6 +71,7 @@ const ADS = [
     title: 'The same calculator, for Formula 2',
   },
 ];
+const ROTATING_ADS = ADS.filter((ad) => !ad.pinned);
 
 interface Props {
   section: SectionId;
@@ -108,21 +120,25 @@ const { section, account = true } = Astro.props;
   </nav>
 
   <div class="ml-auto flex items-center gap-1.5 sm:gap-2 shrink-0">
-    {/* The promo slot. Shown at lg+ where there is room; below lg both
+    {/* The promo slot. Shown at lg+ where there is room; below lg the
         destinations live in the overflow menu as ordinary links, since a menu is
         navigation rather than ad inventory. */}
-    <div class="hidden lg:flex items-center shrink-0" data-ad-slot>
-      {ADS.map((ad, i) => (
+    <div class="hidden lg:flex items-center gap-2 shrink-0" data-ad-slot>
+      {ADS.map((ad) => (
         <a
           href={ad.href}
           target="_blank"
           rel="noopener noreferrer"
           data-ad={ad.id}
+          data-ad-rotate={ad.pinned ? undefined : ''}
           aria-label={ad.title}
           title={ad.title}
-          style={i === 0 ? undefined : 'display:none'}
-          class="group inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-sm font-medium whitespace-nowrap
-                 bg-brand-subtle text-brand-strong border border-brand/25 hover:bg-brand-subtle/70 transition-colors"
+          style={ROTATING_ADS.indexOf(ad) > 0 ? 'display:none' : undefined}
+          class:list={[
+            'group items-center gap-1.5 h-8 px-3 rounded-md text-sm font-medium whitespace-nowrap',
+            'bg-brand-subtle text-brand-strong border border-brand/25 hover:bg-brand-subtle/70 transition-colors',
+            ad.pinned ? 'inline-flex' : 'hidden xl:inline-flex',
+          ]}
         >
           <span class="text-sm leading-none" aria-hidden="true">{ad.emoji}</span>
           <span>{ad.label}</span>
@@ -146,7 +162,7 @@ const { section, account = true } = Astro.props;
       (function () {
         var slot = document.currentScript.previousElementSibling;
         if (!slot) return;
-        var ads = slot.querySelectorAll('[data-ad]');
+        var ads = slot.querySelectorAll('[data-ad-rotate]');
         if (ads.length < 2) return;
         var pick = Math.floor(Math.random() * ads.length);
         for (var i = 0; i < ads.length; i++) {
@@ -186,6 +202,15 @@ const { section, account = true } = Astro.props;
           rel="noopener noreferrer"
           class="block px-4 py-2 text-sm font-medium text-brand hover:bg-brand-subtle"
         >Support</a>
+        <a
+          href="https://globeprix.chyuang.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="lg:hidden px-4 py-2 text-sm font-medium text-brand hover:bg-brand-subtle flex items-center gap-2"
+        >
+          <span class="text-base leading-none" aria-hidden="true">🌍</span>
+          Play Globe Prix
+        </a>
         <a
           href="https://drawlineracing.chyuang.com/"
           target="_blank"
