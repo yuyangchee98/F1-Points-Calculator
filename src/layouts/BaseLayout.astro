@@ -90,6 +90,16 @@ const ogImage = `${siteUrl}/og-image.jpg`;
       <script type="application/ld+json" set:html={JSON.stringify(schemaData)} />
     )}
 
+    <!-- Google Analytics queue: defined first thing, so an event fired before
+         gtag.js arrives (it loads after the page, below) waits in dataLayer
+         instead of being dropped — e.g. My 9's share-link view on arrival. -->
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = function () { dataLayer.push(arguments); };
+      gtag('js', new Date());
+      gtag('config', 'G-GJ61RX1FZJ', { cookie_domain: 'f1pointscalculator.chyuang.com' });
+    </script>
+
     {initialYear && (
       <script define:vars={{ initialYear }}>
         window.INITIAL_YEAR = initialYear;
@@ -150,7 +160,8 @@ const ogImage = `${siteUrl}/og-image.jpg`;
       </div>
     </footer>
 
-    <!-- Google Analytics - Deferred to not block rendering -->
+    <!-- Google Analytics library - deferred to not block rendering; it then
+         sends everything queued in dataLayer (see <head>). -->
     <script is:inline>
       window.addEventListener('load', function() {
         setTimeout(function() {
@@ -158,12 +169,6 @@ const ogImage = `${siteUrl}/og-image.jpg`;
           script.src = 'https://www.googletagmanager.com/gtag/js?id=G-GJ61RX1FZJ';
           script.async = true;
           document.head.appendChild(script);
-
-          window.dataLayer = window.dataLayer || [];
-          function gtag() { dataLayer.push(arguments); }
-          window.gtag = gtag;
-          gtag('js', new Date());
-          gtag('config', 'G-GJ61RX1FZJ', { cookie_domain: 'f1pointscalculator.chyuang.com' });
         }, 100);
       });
     </script>
