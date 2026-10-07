@@ -204,6 +204,8 @@ const delta = t.todayPoints - t.scored;
 >
   <SectionBar title={career.name}>
     <a href="/drivers" class="text-xs text-ink-secondary hover:text-ink">All drivers</a>
+    {/* Every race this driver started, offered as their tile on My 9. */}
+    <a href={`/my9?q=${encodeURIComponent(career.name)}`} class="ml-auto text-xs font-semibold text-interactive hover:underline whitespace-nowrap">My 9 as {career.familyName} →</a>
   </SectionBar>
 
   <div class="bg-surface text-ink min-h-[100dvh] w-full min-w-0">

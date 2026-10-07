@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import useSwipe from '../../hooks/useSwipe';
 import TrackDriverCard from './TrackDriverCard';
 import type { CircuitEdition } from '../../types/track';
+import My9Plus from '../my9/My9Plus';
 
 interface Props {
   editions: CircuitEdition[];
@@ -78,6 +79,7 @@ const MobileTrackResults: React.FC<Props> = ({ editions, country, flagSrc, onUnl
           {edition.locked && (
             <span className="text-2xs text-ink-muted shrink-0" aria-label="Archive season">🔒</span>
           )}
+          <My9Plus season={edition.season} raceId={edition.raceId} className="shrink-0 ml-auto" />
         </div>
 
         <button

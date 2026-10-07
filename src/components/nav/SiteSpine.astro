@@ -100,21 +100,26 @@ const { section, account = true } = Astro.props;
     <span class="hidden sm:inline font-display font-bold text-sm text-ink tracking-tight">Points Calculator</span>
   </a>
 
-  <nav aria-label="Sections" class="flex items-center h-full min-w-0">
+  {/* Six sections outgrow a phone's width, so below sm the row scrolls
+      sideways; the bottom tab bar carries every section there anyway. */}
+  <nav aria-label="Sections" class="flex items-center h-full min-w-0 max-sm:overflow-x-auto max-sm:overflow-y-hidden scrollbar-hide">
     {SECTIONS.map((s) => (
       <a
         href={s.href}
         id={s.id === 'compete' ? COMPETE_LINK_ID : undefined}
         aria-current={s.id === section ? 'page' : undefined}
         class:list={[
-          'relative flex items-center h-full px-2 sm:px-3.5 text-xs sm:text-sm font-semibold transition-colors',
-          'after:absolute after:inset-x-1.5 after:-bottom-px after:h-[2.5px] after:rounded-t-sm',
+          'relative flex items-center shrink-0 whitespace-nowrap h-full px-2 sm:px-3.5 text-xs sm:text-sm font-semibold transition-colors',
+          // Below sm the row scrolls, which clips anything past its edge, so
+          // the underline sits inside it there.
+          'after:absolute after:inset-x-1.5 after:-bottom-px max-sm:after:bottom-0 after:h-[2.5px] after:rounded-t-sm',
           s.id === section
             ? 'text-ink after:bg-brand'
             : 'text-ink-secondary hover:text-ink after:bg-transparent',
         ]}
       >
         {s.label}
+        {s.fresh && <span class="ml-1.5 w-1.5 h-1.5 rounded-full bg-brand" aria-label="new" />}
       </a>
     ))}
   </nav>

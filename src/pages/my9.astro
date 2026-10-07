@@ -1,0 +1,53 @@
+---
+/**
+ * My 9 Races — pick the nine Grands Prix you'd keep, with the driver you
+ * remember each for, and share the grid as an image or a link.
+ *
+ * `my9.astro`, not `my9/index.astro`: the build is format:'file'. The same shell
+ * also answers /my9/<code> — the Worker fetches this page and rewrites its title
+ * and unfurl tags for that grid (f1-points-calculator-api/src/lib/my9/handler.ts),
+ * and the island reads the code from the path. So the <title>, description,
+ * canonical and og:/twitter: tags below must stay in BaseLayout's shape.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionBar from '../components/nav/SectionBar.astro';
+import My9Island from '../components/my9/My9Island';
+import { FAMOUS } from '../utils/my9/famous';
+
+const title = "My 9 F1 Races: Pick the Nine Grands Prix You'd Keep | F1 Points Calculator";
+const description =
+  'Pick the nine Formula 1 races that made you a fan — any Grand Prix since 1958, with the driver you remember it for — and share your grid as an image or a link.';
+
+// "san-marino" -> "San Marino"; good enough for the crawlable shelf below.
+const raceName = (id: string) => id.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+const shelf = FAMOUS.slice(0, 24).map((f) => `${f.y} ${raceName(f.race)} Grand Prix`);
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  keywords="favourite F1 races, best F1 races of all time, greatest Grands Prix, my 9 races, F1 3x3 grid, Formula 1 fan card"
+  canonicalPath="/my9"
+  ogTitle="My 9 F1 Races"
+  ogDescription="Pick the nine Grands Prix you'd keep. Make yours and share it."
+>
+  <SectionBar title="My 9 Races">
+    <span class="ml-auto text-xs text-ink-muted hidden sm:inline">Every Grand Prix since 1958</span>
+  </SectionBar>
+
+  <My9Island client:only="react" />
+
+  {/* For crawlers and no-JS visitors; the island removes it on mount. */}
+  <div id="my9-static" class="max-w-3xl mx-auto px-4 py-8">
+    <h1 class="font-display text-2xl font-extrabold tracking-tight text-ink">My 9 Races</h1>
+    <p class="text-sm text-ink-secondary mt-2 max-w-prose">
+      Nine Grands Prix, one grid. Pick any race since 1958, choose the driver you remember it for — the winner, or
+      the one who lost it — and say why: you were there, it was where it started, it still hurts. Each tile is drawn
+      from the track as it was raced that year, in that driver's colours.
+    </p>
+    <h2 class="font-display text-lg font-bold text-ink mt-6 mb-2">Where people start</h2>
+    <ul class="text-sm text-ink-secondary grid sm:grid-cols-2 gap-x-6 gap-y-1">
+      {shelf.map((s) => <li>{s}</li>)}
+    </ul>
+  </div>
+</BaseLayout>

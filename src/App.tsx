@@ -28,6 +28,11 @@ import { GA_EVENTS, trackEvent } from './utils/analytics';
 import { CURRENT_SEASON } from './utils/constants';
 
 
+/** A season opened from a My 9 tile carries ?from=my9, so an archive checkout
+ *  that starts there is attributed to it (Stripe metadata + GA purchase). */
+const paywallSource = (): { source?: string } =>
+  typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('from') === 'my9' ? { source: 'my9' } : {};
+
 const App: React.FC<{ year?: string }> = ({ year }) => {
   const dispatch = useAppDispatch();
 
@@ -166,7 +171,7 @@ const App: React.FC<{ year?: string }> = ({ year }) => {
               <div className={`flex-1 min-h-0 flex flex-col ${(mobileView === 'grid' || !isMobile) ? '' : 'hidden'}`}>
                 {requiresSubscription ? (
                   <div className="flex-1 min-h-0 overflow-hidden">
-                    <PaywallOverlay />
+                    <PaywallOverlay {...paywallSource()} />
                   </div>
                 ) : isLoading ? (
                   <>

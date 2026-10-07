@@ -12,12 +12,14 @@
  * needs this same mapping — keep the two copies byte-identical.
  */
 
-export type SectionId = 'calculator' | 'tracks' | 'drivers' | 'compete' | 'blog' | 'none';
+export type SectionId = 'calculator' | 'tracks' | 'drivers' | 'my9' | 'compete' | 'blog' | 'none';
 
 export interface Section {
   id: Exclude<SectionId, 'none'>;
   label: string;
   href: string;
+  /** Marked with a red dot in the spine while it is new (My 9's launch). */
+  fresh?: boolean;
 }
 
 /** Display order in the spine and the mobile tab bar. */
@@ -25,6 +27,7 @@ export const SECTIONS: readonly Section[] = [
   { id: 'calculator', label: 'Calculator', href: '/' },
   { id: 'tracks', label: 'Tracks', href: '/tracks' },
   { id: 'drivers', label: 'Drivers', href: '/drivers' },
+  { id: 'my9', label: 'My 9', href: '/my9', fresh: true },
   { id: 'compete', label: 'Compete', href: '/compete' },
   { id: 'blog', label: 'Blog', href: '/blog' },
 ] as const;
@@ -54,6 +57,7 @@ export function sectionForPath(pathname: string): SectionId {
   if (path === '/' || /^\/(?:19|20)\d{2}$/.test(path)) return 'calculator';
   if (path === '/tracks' || path.startsWith('/tracks/')) return 'tracks';
   if (path === '/drivers' || path.startsWith('/drivers/')) return 'drivers';
+  if (path === '/my9' || path.startsWith('/my9/')) return 'my9';
   if (path === '/compete' || path === '/leaderboard' || path.startsWith('/user/')) return 'compete';
   if (path === '/blog' || path.startsWith('/blog/')) return 'blog';
 

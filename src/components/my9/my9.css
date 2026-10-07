@@ -1,0 +1,102 @@
+/* My 9 Races: the parts Tailwind does not reach — the rail/main split, the
+   card stage, the drag ghost and the phone bottom sheet. */
+
+.my9-grid {
+  display: grid;
+  grid-template-columns: 24rem minmax(0, 1fr);
+  align-items: start;
+}
+/* The rail is pinned under the spine at full height: the search stays put and
+   only the race list scrolls, so the year scrubber always spans the list. */
+.my9-rail {
+  position: sticky;
+  top: var(--spine-h);
+  height: calc(100dvh - var(--spine-h));
+  overflow-y: auto;
+  background: rgb(var(--surface));
+  border-right: 1px solid rgb(var(--border));
+  padding: 20px 16px 12px;
+}
+/* Searching: a fixed frame whose results list scrolls. By season: the rail
+   itself scrolls, with the season bar (‹ 2008 ›) pinned at its top. */
+.my9-browse.is-search { display: flex; flex-direction: column; height: 100%; }
+.my9-season-bar { position: sticky; top: -20px; z-index: 2; box-shadow: 0 1px 0 rgb(var(--border)); }
+.my9-rail.is-editing .my9-browse { display: none; }
+.my9-backdrop { display: none; }
+.my9-main { padding: 12px; min-width: 0; }
+.my9-panel { position: sticky; top: calc(var(--spine-h) + 12px); }
+
+.my9-card {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
+  background: #fff;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.my9-stage[data-format='post'] .my9-card { max-width: 470px; }
+.my9-stage[data-format='story'] .my9-card { max-width: 330px; }
+.my9-card [data-slot] { cursor: pointer; outline: none; transition: filter 0.15s; }
+/* A tile lifts under the pointer: it is something you can pick up. */
+.my9-card [data-slot]:hover { filter: drop-shadow(0 6px 10px rgb(0 0 0 / 0.18)); }
+.my9-card [data-slot]:focus-visible { filter: drop-shadow(0 0 6px rgb(var(--interactive))); }
+.my9-card.is-shaking { animation: my9-shake 0.32s; }
+@keyframes my9-shake {
+  20% { transform: translateX(-5px); }
+  50% { transform: translateX(4px); }
+  80% { transform: translateX(-2px); }
+}
+
+.my9-drag-ghost {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 76px;
+  height: 76px;
+  pointer-events: none;
+  z-index: 60;
+  filter: drop-shadow(0 8px 16px rgb(0 0 0 / 0.25));
+}
+.my9-drag-ghost svg { width: 100%; height: 100%; display: block; }
+
+@media (max-width: 900px) {
+  .my9-grid { grid-template-columns: 1fr; }
+  .my9-rail { position: static; height: auto; overflow: visible; border-right: 0; border-top: 1px solid rgb(var(--border)); padding-bottom: 16px; }
+  .my9-browse.is-search { height: auto; }
+  /* The spine scrolls away on a phone, so the bar pins to the very top. */
+  .my9-season-bar { top: 0; }
+  /* On a phone the list is a window of its own under the card. */
+  .my9-list-wrap { flex: none; height: 72dvh; }
+  .my9-main { order: -1; }
+  .my9-panel { position: static; }
+  .my9-rail.is-editing .my9-browse { display: block; }
+  /* On a phone the editor is a sheet over the card, so the tile it edits
+     stays in view above it. */
+  .my9-editor {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 50;
+    max-height: 78dvh;
+    overflow-y: auto;
+    background: rgb(var(--surface));
+    border-top: 1px solid rgb(var(--border));
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -12px 32px rgb(0 0 0 / 0.16);
+    padding: 14px 16px calc(18px + env(safe-area-inset-bottom, 0px));
+  }
+  .my9-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 49;
+    background: rgb(21 24 28 / 0.2);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .my9-card.is-shaking { animation: none; }
+}

@@ -8,6 +8,7 @@ import PaywallOverlay from '../common/PaywallOverlay';
 import HorizontalScrollBar from '../common/HorizontalScrollBar';
 import TrackDriverCard from './TrackDriverCard';
 import MobileTrackResults from './MobileTrackResults';
+import My9Plus from '../my9/My9Plus';
 import { API_BASE_URL } from '../../utils/constants';
 import type { CircuitEdition, CircuitHistory } from '../../types/track';
 
@@ -79,6 +80,7 @@ const DesktopTrackGrid: React.FC<{ editions: CircuitEdition[]; onUnlock: () => v
             >
               <span className="text-sm leading-none font-semibold">{e.season}</span>
               {e.locked && <span className="text-2xs text-ink-muted mt-0.5">🔒 Archive</span>}
+              <My9Plus season={e.season} raceId={e.raceId} className="absolute top-1 right-1" />
             </div>
           ))}
 

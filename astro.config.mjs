@@ -44,6 +44,12 @@ export default defineConfig({
           target: 'http://localhost:52313',
           changeOrigin: true,
         },
+        // My 9 share links (/my9/<code> and its .png) are the Worker's; /my9
+        // itself is this site's page, which the Worker fetches back as the shell.
+        '/my9/': {
+          target: 'http://localhost:52313',
+          changeOrigin: true,
+        },
       },
     },
   },

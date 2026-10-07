@@ -30,6 +30,12 @@ function countryCodeToFlag(countryCode: string): string {
 
 const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
   const [isLoading, setIsLoading] = useState(false);
+  // After a download the modal stays open on one line pointing at My 9: someone
+  // who just exported an image is the likeliest person to share another.
+  const [saved, setSaved] = useState(false);
+  useEffect(() => {
+    if (isOpen) setSaved(false);
+  }, [isOpen]);
   const [error, setError] = useState<string | null>(null);
   const [title, setTitle] = useState('F1 CHAMPIONSHIP PREDICTIONS');
   const [subtitle, setSubtitle] = useState('Current predictions and standings');
@@ -137,7 +143,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
         selectedRaceCount
       );
 
-      onClose();
+      setSaved(true);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'unknown_error';
 
@@ -793,6 +799,22 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
               <p className="text-sm text-red-600">{error}</p>
             </div>
           )}
+          {saved ? (
+            <div className="flex items-center gap-3 flex-wrap">
+              <p className="text-sm text-ink-secondary flex-1 min-w-[200px]">
+                Saved to your downloads.{' '}
+                <a href="/my9" className="font-semibold text-interactive hover:underline">
+                  Now pick your 9 favourite races →
+                </a>
+              </p>
+              <button
+                onClick={onClose}
+                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition"
+              >
+                Done
+              </button>
+            </div>
+          ) : (
           <div className="flex gap-3">
             <button
               onClick={onClose}
@@ -813,6 +835,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
               {isLoading ? 'Generating...' : 'Generate Image'}
             </button>
           </div>
+          )}
           {isLoading && (
             <div className="mt-4 text-center">
               <p className="text-sm text-gray-500">
