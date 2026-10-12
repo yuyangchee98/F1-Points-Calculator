@@ -47,6 +47,9 @@ export async function fetchDriverCareer(driverId: string): Promise<DriverCareer>
   throw new Error(`[drivers] /api/driver?driverId=${driverId} failed: ${lastError}`);
 }
 
+/** A title season: P1 in a championship that is decided (not still being run). */
+export const isTitle = (s: { position: number | null; provisional?: true }) => s.position === 1 && !s.provisional;
+
 /** A driver who raced this season. Derived at read time, never stored, so a
  *  career blob written last year does not keep calling a retiree "active". */
 export const isActive = (d: { lastSeason: number }) => d.lastSeason >= CURRENT_SEASON;

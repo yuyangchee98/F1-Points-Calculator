@@ -17,6 +17,7 @@ import {
   seasonHref,
   teamSwatch,
   titleLine,
+  isTitle,
   verdict,
   yearList,
 } from '../../utils/drivers';
@@ -179,10 +180,10 @@ const byWins = circuits.some((c) => c.wins > 0);
 
 // Today's points system: the career total, and any title it would flip.
 const flips = career.seasons.filter(
-  (s) => s.position != null && s.todayPosition != null && (s.position === 1) !== (s.todayPosition === 1)
+  (s) => !s.provisional && s.position != null && s.todayPosition != null && (s.position === 1) !== (s.todayPosition === 1)
 );
 const showcase =
-  [...career.seasons].reverse().find((s) => s.position === 1 && s.todayPoints !== s.scored) ??
+  [...career.seasons].reverse().find((s) => isTitle(s) && s.todayPoints !== s.scored) ??
   [...career.seasons].sort((a, b) => b.todayPoints - b.scored - (a.todayPoints - a.scored))[0];
 const showToday = t.todayPoints !== t.scored || flips.length > 0;
 const showcaseLine = showcase
@@ -465,7 +466,7 @@ const delta = t.todayPoints - t.scored;
                     {s.teams[0] && <span class="dp-sw" style={teamSwatch(s.teams[0])}></span>}
                     {s.teams.map((tm) => tm.name).join(' / ')}
                   </td>
-                  <td class="r"><span class={`dp-pill ${s.position === 1 ? 'ch' : ''}`}>{s.excluded ? 'DSQ' : s.position ?? '–'}</span></td>
+                  <td class="r"><span class={`dp-pill ${isTitle(s) ? 'ch' : ''}`}>{s.excluded ? 'DSQ' : s.position ?? '–'}</span></td>
                   <td class="r tnum">
                     {fmtPoints(s.points)}{s.scored !== s.points && <span class="text-ink-muted"> ({fmtPoints(s.scored)} scored)</span>}
                   </td>

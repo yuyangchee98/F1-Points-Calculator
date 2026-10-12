@@ -1,5 +1,5 @@
 import React from 'react';
-import { fmtPoints, ordinal } from '../../utils/drivers';
+import { fmtPoints, ordinal, isTitle } from '../../utils/drivers';
 import type { CareerCurrent, CareerSeason } from '../../types/driver';
 
 // Rendered twice: statically by pages/drivers/[driver].astro (links, for
@@ -64,7 +64,7 @@ export const SeasonChart: React.FC<ChartProps> = ({ seasons, selected, onSelect,
         const cx = LEFT + COL * i + COL / 2;
         const pos = s.position;
         const h = pos != null ? barH(pos) : 0;
-        const champ = pos === 1;
+        const champ = isTitle(s);
         const label = `${s.season}: ${s.excluded ? 'excluded from the standings' : pos ? ordinal(pos) : 'not classified'}${
           s.teams[0] ? `, ${s.teams[0].name}` : ''
         }${s.locked ? ', archive season' : ''}`;
@@ -125,7 +125,7 @@ export const SeasonChart: React.FC<ChartProps> = ({ seasons, selected, onSelect,
 export const ChartLegend: React.FC<{ seasons: CareerSeason[] }> = ({ seasons }) => {
   const teams = new Map<string, string>();
   for (const s of seasons) if (s.teams[0] && !teams.has(s.teams[0].name)) teams.set(s.teams[0].name, s.teams[0].color || '#9AA3AC');
-  const champ = seasons.some((s) => s.position === 1);
+  const champ = seasons.some(isTitle);
   return (
     <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-2 text-[12.5px] text-ink-secondary">
       {[...teams].map(([name, color]) => (

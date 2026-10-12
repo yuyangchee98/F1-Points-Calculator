@@ -5,7 +5,7 @@ import { useAuth } from '../../hooks/useAuth';
 import AuthModal from '../auth/AuthModal';
 import PaywallOverlay from '../common/PaywallOverlay';
 import { API_BASE_URL } from '../../utils/constants';
-import { fmtPoints, ordinal, seasonHref, teamSwatch, titleLine, yearList } from '../../utils/drivers';
+import { fmtPoints, isTitle, ordinal, seasonHref, teamSwatch, titleLine, yearList } from '../../utils/drivers';
 import type { CareerCurrent, CareerSeason, DriverCareer } from '../../types/driver';
 import { ChartLegend, SeasonChart, ThisSeason } from './CareerParts';
 
@@ -24,7 +24,7 @@ interface Props {
 
 /** Season the strip opens on: the most recent title, else the most recent season. */
 const defaultSeason = (seasons: CareerSeason[]) =>
-  [...seasons].reverse().find((s) => s.position === 1)?.season ?? seasons[seasons.length - 1]?.season;
+  [...seasons].reverse().find(isTitle)?.season ?? seasons[seasons.length - 1]?.season;
 
 const posClass = (pos: number, pts: number) =>
   pos === 1 ? 'p1' : pos === 2 ? 'p2' : pos === 3 ? 'p3' : pts > 0 ? 'pts' : '';
@@ -105,7 +105,7 @@ const CareerEnhancer: React.FC<Props> = ({
                 {sel.scored !== sel.points && ` (${fmtPoints(sel.scored)} scored)`} · {sel.wins} win{sel.wins === 1 ? '' : 's'} ·{' '}
                 {sel.podiums} podium{sel.podiums === 1 ? '' : 's'}
                 {sel.teammates.length > 0 && ` · teammate ${sel.teammates.slice(0, 2).map((id) => mateNames[id] ?? id).join(', ')}`}
-                {sel.position === 1 && (
+                {isTitle(sel) && (
                   <span className="ml-1.5 inline-block rounded-full bg-gold/15 text-gold px-2 py-px text-2xs font-bold uppercase tracking-wide align-[1px]">
                     Champion
                   </span>

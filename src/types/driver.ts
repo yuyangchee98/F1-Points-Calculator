@@ -50,6 +50,9 @@ export interface CareerSeason {
   /** Main teammate(s) this season: most races shared first. */
   teammates: string[];
   excluded?: true;
+  /** The current season while its title is still open: `position` is today's
+   *  standing, not a final result, and P1 is not (yet) a title. */
+  provisional?: true;
   /** True when this caller may not see the race-by-race sheet (set by gateCareer). */
   locked: boolean;
   races: CareerRace[];
