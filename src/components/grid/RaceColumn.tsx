@@ -6,6 +6,8 @@ import { selectDriversByIdMap, selectTeamsByIdMap, getDriverLastName, getDriverD
 import DriverCard from '../drivers/DriverCard';
 import { selectDriver, copyDriver } from '../../store/slices/uiSlice';
 import { useConsensus, getTopConsensusDriver } from '../../hooks/useConsensus';
+import ConsensusSplit, { consensusTitle } from './ConsensusSplit';
+import { driverCode } from '../../utils/titleRace';
 import { useGridContext } from '../../contexts/GridContext';
 import { selectDriverStandings } from '../../store/selectors/resultsSelectors';
 import { useAppDispatch } from '../../store';
@@ -301,6 +303,7 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position, style }) => {
         ref={drop}
         role="button"
         aria-label={driver ? `Position ${position}: ${getDriverLastName(driver.id)}` : `Empty position ${position}`}
+        title={!driver && showConsensus && consensusData ? consensusTitle(consensusData, position) : undefined}
         tabIndex={0}
         style={{
           ...style,
@@ -319,13 +322,11 @@ const RaceColumn: React.FC<RaceColumnProps> = ({ race, position, style }) => {
             />
           </div>
         ) : showConsensus && topConsensus && driverById[topConsensus.driverId] ? (
-          <div className="consensus-hint">
-            <span className="text-xs font-medium">
-              {getDriverLastName(topConsensus.driverId)}
+          <div className="consensus-hint flex-col gap-1 w-full px-1.5">
+            <span className="text-xs font-display font-bold tracking-wide">
+              {driverCode(driverById[topConsensus.driverId], topConsensus.driverId)}
             </span>
-            <span className="text-2xs ml-1 tnum">
-              {topConsensus.percentage}%
-            </span>
+            <ConsensusSplit entries={consensusData?.positions?.[position] ?? []} />
           </div>
         ) : null}
       </div>

@@ -155,6 +155,10 @@ export const ThisSeason: React.FC<{ current: CareerCurrent; line: string | null 
   <section
     className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-[10px] border bg-surface-sunken px-4 py-3 text-sm"
     aria-label="This season"
+    // Read by the share card script, which draws this line on the image.
+    data-season={current.season}
+    data-season-pos={current.position ?? ''}
+    data-season-pts={fmtPoints(current.points)}
   >
     <span className="dp-live-dot" aria-hidden="true" />
     <span className="whitespace-nowrap">

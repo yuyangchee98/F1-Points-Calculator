@@ -138,7 +138,9 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
               iconOnly={isMobile}
               className="shrink-0"
               aria-label={showConsensus ? 'Hide Consensus' : 'Show what other players predicted'}
-              title={showConsensus ? 'Hide Consensus' : 'Show what other players predicted'}
+              title={showConsensus
+                ? 'Hide Consensus'
+                : 'Consensus: each empty slot shows the most popular pick by other players, with how their picks split'}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -215,17 +217,6 @@ const GridToolbar: React.FC<GridToolbarProps> = ({
             {!isMobile && <span>Reset</span>}
           </Button>
       </div>
-
-      {isCurrentSeason && showConsensus && (
-        <div className="px-3 md:px-4 py-2 border-t bg-surface-sunken">
-          <p className="text-ink-secondary text-sm flex items-start gap-2">
-            <svg className="w-4 h-4 mt-0.5 shrink-0 text-ink-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span><strong className="text-ink">Consensus</strong> shows the most popular pick by other players for each position. The percentage indicates how many players chose that driver.</span>
-          </p>
-        </div>
-      )}
 
       {showHowToUse && (
         <div className="px-3 md:px-4 py-2 border-t bg-surface-sunken">

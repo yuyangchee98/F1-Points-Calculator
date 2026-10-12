@@ -4,6 +4,7 @@ import SectionBar from '../../components/nav/SectionBar.astro';
 import DriverCareerIsland from '../../components/driverPages/DriverCareerIsland';
 import { ChartLegend, SeasonChart, ThisSeason } from '../../components/driverPages/CareerParts';
 import { fetchCircuitList } from '../../utils/circuits';
+import { driverCode } from '../../utils/titleRace';
 import {
   allTimeRanks,
   fetchDriverCareer,
@@ -123,6 +124,43 @@ const stats: Array<{ k: string; v: string; rank: string | null; note: string | n
   },
   { k: 'Starts', v: `${t.starts}`, rank: rankOf('starts'), note: `${plural(t.seasons, 'season')}, ${plural(t.teams, 'team')}` },
 ];
+// What the share card draws: every stat with its caption, the lead stat chosen
+// by the button tapped.
+// Pictures, not captions: titles become trophies, a rank becomes a small
+// all-time board (top three, plus this driver when outside it, only within the
+// top 25), and wins or podiums a grid of every start.
+const STAT_KEY = { Titles: 'titles', Wins: 'wins', Podiums: 'podiums', 'Career points': 'points', Starts: 'starts' } as const;
+const boardFor = (key: (typeof STAT_KEY)[keyof typeof STAT_KEY]) => {
+  // This driver first among equals, so a tie for 3rd still shows them.
+  const sorted = drivers
+    .filter((d) => d[key] > 0)
+    .sort((a, b) => b[key] - a[key] || (a.driverId === career.driverId ? -1 : b.driverId === career.driverId ? 1 : 0));
+  const mine = sorted.findIndex((d) => d.driverId === career.driverId);
+  if (mine < 0) return undefined;
+  const rank = (i: number) => sorted.filter((d) => d[key] > sorted[i][key]).length + 1;
+  if (rank(mine) > 25) return undefined;
+  const picks = mine < 3 ? [0, 1, 2] : [0, 1, 2, mine];
+  return picks
+    .filter((i) => i < sorted.length)
+    .map((i) => ({ rank: rank(i), code: driverCode(sorted[i], sorted[i].driverId), value: sorted[i][key], me: i === mine, gap: i === mine && mine > 3 }));
+};
+const cardData = {
+  givenName: career.givenName,
+  familyName: career.familyName,
+  meta: [career.code, yearsActive].filter(Boolean).join(' · '),
+  teamColor: career.latestTeam?.color,
+  teamSecondaryColor: career.latestTeam?.secondaryColor,
+  stats: stats.map((st) => ({
+    k: st.k,
+    short: st.k === 'Career points' ? 'Points' : st.k,
+    v: st.v,
+    gold: st.gold,
+    trophies: st.k === 'Titles' && t.titles > 0 ? t.titles : undefined,
+    board: boardFor(STAT_KEY[st.k as keyof typeof STAT_KEY]),
+    grid: st.k === 'Wins' ? { filled: t.wins, total: t.starts } : st.k === 'Podiums' ? { filled: t.podiums, total: t.starts } : undefined,
+  })),
+  path: `/drivers/${entry.slug}`,
+};
 const extras = [
   t.sprintStarts > 0 && `${plural(t.sprintWins, 'sprint win')} from ${t.sprintStarts} starts`,
   t.fastestLaps > 0 && `${plural(t.fastestLaps, 'fastest lap')} (recorded 1958–59 and 2004 on)`,
@@ -224,8 +262,13 @@ const delta = t.todayPoints - t.scored;
 
         <div>
           <dl class="dp-stats" aria-label="Career totals">
-            {stats.map((st) => (
-              <div class="dp-stat">
+            {stats.map((st, i) => (
+              <div class="dp-stat relative">
+                {!(st.k === 'Titles' && t.titles === 0) && (
+                  <button type="button" class="dp-share" data-share-stat={i} aria-label={`Share ${st.k.toLowerCase()} as an image`} title={`Share ${st.k.toLowerCase()} as an image`}>
+                    <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M7 1.5v7.5M4.2 4.2 7 1.4l2.8 2.8M2.5 7.5v4.2c0 .5.4.8.8.8h7.4c.4 0 .8-.3.8-.8V7.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                )}
                 <dt class="text-[12.5px] text-ink-muted">{st.k}</dt>
                 <dd class={`font-display font-extrabold text-[26px] sm:text-[32px] leading-[1.05] tracking-[-0.01em] tnum ${st.gold ? 'text-gold' : ''}`}>{st.v}</dd>
                 <dd class="text-[12.5px] text-ink-secondary">
@@ -454,4 +497,54 @@ const delta = t.todayPoints - t.scored;
       </p>
     </div>
   </div>
+  <script is:inline type="application/json" id="driver-card-data" set:html={JSON.stringify(cardData).replace(/</g, '\\u003c')}></script>
 </BaseLayout>
+
+<script>
+  // Share buttons on the career stats: draw that stat as a story image and hand
+  // it to the share sheet, or save it where there is none (most desktops).
+  import { canvasToFile, drawDriverCard, type CurrentSeason, type DriverCardData } from '../../utils/driverCard';
+  import { trackEvent } from '../../utils/analytics';
+
+  const dataEl = document.getElementById('driver-card-data');
+  const data: DriverCardData | null = dataEl ? JSON.parse(dataEl.textContent || 'null') : null;
+
+  // The live line is re-rendered by the career island with fresh numbers.
+  const currentSeason = (): CurrentSeason | null => {
+    const el = document.querySelector<HTMLElement>('section[data-season]');
+    if (!el) return null;
+    return { season: Number(el.dataset.season), position: el.dataset.seasonPos ? Number(el.dataset.seasonPos) : null, points: el.dataset.seasonPts ?? '' };
+  };
+
+  const save = (file: File) => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(file);
+    a.download = file.name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  };
+
+  document.querySelectorAll<HTMLButtonElement>('[data-share-stat]').forEach((btn) =>
+    btn.addEventListener('click', () => {
+      if (!data) return;
+      const hero = Number(btn.dataset.shareStat);
+      const stat = data.stats[hero];
+      const file = canvasToFile(drawDriverCard(data, hero, currentSeason()), `${data.familyName.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${stat.k.toLowerCase().replace(/\s+/g, '-')}.png`);
+      const url = `${location.origin}${data.path}`;
+      const label = `${data.givenName} ${data.familyName}: ${stat.v} ${stat.k.toLowerCase()}`;
+      if (navigator.canShare?.({ files: [file] })) {
+        navigator
+          .share({ files: [file], text: `${label} ${url}` })
+          .then(() => trackEvent('driver_card_share', 'drivers', `native:${stat.k}`))
+          .catch((e: Error) => {
+            if (e.name !== 'AbortError') save(file);
+          });
+        return;
+      }
+      save(file);
+      trackEvent('driver_card_share', 'drivers', `download:${stat.k}`);
+    }),
+  );
+</script>

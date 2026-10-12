@@ -39,3 +39,26 @@ export const toMetricData = (
     return value == null || lead == null ? null : lead - value;
   });
 };
+
+const rgbOf = (hex: string): [number, number, number] | null => {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+  if (!m) return null;
+  const n = parseInt(m[1], 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+};
+
+/**
+ * Dash any line whose colour (nearly) repeats one drawn before it: teammates
+ * share a team colour, and Ferrari, Haas and Audi are all red. The first line
+ * of a colour stays solid, the next is dashed, a third dotted.
+ */
+export const dashesForRepeatedColours = (colours: string[]): (number[] | undefined)[] => {
+  const seen: Array<[number, number, number]> = [];
+  return colours.map((c) => {
+    const rgb = rgbOf(c);
+    if (!rgb) return undefined;
+    const repeats = seen.filter((s) => Math.hypot(s[0] - rgb[0], s[1] - rgb[1], s[2] - rgb[2]) < 70).length;
+    seen.push(rgb);
+    return repeats === 0 ? undefined : repeats === 1 ? [6, 3] : [2, 3];
+  });
+};

@@ -473,6 +473,27 @@ body {
     box-sizing: border-box;
   }
 
+  /* The position column stays put while races scroll under it. Paint the
+     padding and gap either side of it with the grid's ground and draw a rule
+     plus a soft shadow on its right edge, so cards visibly pass beneath it
+     instead of reading as clipped names. */
+  .grid-sticky-edge {
+    box-shadow:
+      -8px 0 0 rgb(var(--surface)),
+      6px 0 0 rgb(var(--surface)),
+      12px 0 8px -8px rgb(21 24 28 / 0.2);
+  }
+  /* One rule down the whole column: each piece reaches across the row gap. */
+  .grid-sticky-edge::after {
+    content: '';
+    position: absolute;
+    top: -3px;
+    bottom: -3px;
+    right: -7px;
+    width: 1px;
+    background: rgb(var(--border));
+  }
+
   /* Podium positions anchor the eye like the mobile card view's pills */
   .position.position-podium {
     @apply bg-carbon-900 text-white;
@@ -542,6 +563,11 @@ body {
 .dp-stats { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border-block: 1px solid rgb(var(--border)); }
 .dp-stat { display: flex; flex-direction: column; gap: 2px; min-width: 0; padding: 14px 16px 14px 0; }
 .dp-stat dd { margin: 0; }
+/* Share a stat as a story image: a quiet icon that wakes on hover/focus. */
+.dp-share { position: absolute; top: 10px; right: 6px; width: 26px; height: 26px; display: grid; place-items: center; border-radius: 6px; color: rgb(var(--text-muted)); opacity: .55; transition: opacity .15s, background-color .15s, color .15s; }
+.dp-stat:hover .dp-share, .dp-share:focus-visible { opacity: 1; }
+.dp-share:hover, .dp-share:focus-visible { background: rgb(var(--interactive) / .1); color: rgb(var(--interactive)); outline: none; }
+@media (hover: none) { .dp-share { opacity: 1; } }
 .dp-stat + .dp-stat { padding-left: 16px; border-left: 1px solid rgb(var(--border)); }
 @media (max-width: 719px) {
   .dp-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }

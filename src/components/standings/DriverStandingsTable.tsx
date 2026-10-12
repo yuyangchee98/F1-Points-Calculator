@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { Fragment, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import type { DriverStanding } from '../../types';
 import type { RootState } from '../../store';
@@ -6,6 +6,8 @@ import { selectDriversByIdMap, getDriverLastName, selectTeamsByIdMap } from '../
 import { useStandingsAnimation } from '../../hooks/useStandingsAnimation';
 import { teamFillStyle } from '../../utils/color';
 import { useDriverHref } from '../../hooks/useDriverHref';
+import { selectTitleRace } from '../../store/selectors/titleRaceSelectors';
+import { fmtPoints } from '../../utils/drivers';
 
 interface DriverStandingsTableProps {
   standings: DriverStanding[];
@@ -16,6 +18,17 @@ const DriverStandingsTable: React.FC<DriverStandingsTableProps> = ({ standings }
   const teamById = useSelector(selectTeamsByIdMap);
   const showDelta = useSelector((state: RootState) => state.ui.driverShowDelta);
   const driverHref = useDriverHref();
+  const titleRace = useSelector(selectTitleRace);
+
+  // The title line: drivers above it are within the points still to be won and
+  // can take the title; those below fade. It moves with every drag. Once the
+  // lead is bigger than what is left, the line sits under P1 and P1 gets the
+  // trophy; with nothing left there is no line, only the trophy.
+  const gapById = new Map(titleRace?.chasers.map((c) => [c.driverId, c]) ?? []);
+  const lineAt = titleRace && titleRace.pointsLeft > 0
+    ? standings.findIndex((s, i) => i > 0 && gapById.get(s.driverId)?.alive === false)
+    : -1;
+  const champion = titleRace && titleRace.lead > titleRace.pointsLeft ? titleRace.leaderId : null;
 
   const animationOptions = useMemo(() => ({
     getItemId: (standing: DriverStanding) => standing.driverId,
@@ -47,12 +60,33 @@ const DriverStandingsTable: React.FC<DriverStandingsTableProps> = ({ standings }
               if (!driver) return null;
 
               const team = teamById[driver.team];
-              
+              const index = standings.indexOf(standing);
+              const chase = gapById.get(standing.driverId);
+              const out = lineAt > 0 && index >= lineAt;
+
               return (
-                <tr 
-                  key={standing.driverId} 
+                <Fragment key={standing.driverId}>
+                {index === lineAt && titleRace && (
+                  <tr aria-label={`Title line: drivers above it can still win, with ${fmtPoints(titleRace.pointsLeft)} points left`}>
+                    <td colSpan={3} className="px-2 py-0.5" title={`Above the line: within ${fmtPoints(titleRace.pointsLeft)} points of the lead, the most anyone can still score`}>
+                      <div className="flex items-center gap-1.5 text-2xs font-semibold text-success tnum">
+                        <span className="flex-1 h-px bg-success/40" />
+                        <svg className="w-3 h-3" viewBox="0 0 12 12" aria-hidden="true">
+                          <path d="M2.5 1v10.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                          <path d="M3 1.5h3v2.5H3zM6 4h3v2.5H6z" fill="currentColor" />
+                          <path d="M3 1.5h6v5H3z" fill="none" stroke="currentColor" strokeWidth="0.8" />
+                        </svg>
+                        <span>{fmtPoints(titleRace.pointsLeft)} left</span>
+                        <span className="flex-1 h-px bg-success/40" />
+                      </div>
+                    </td>
+                  </tr>
+                )}
+                <tr
+                  title={chase ? `${fmtPoints(chase.gap)} behind${out ? ', out of the title fight' : ''}` : undefined}
                   className={`
                     hover:bg-carbon-50
+                    ${out ? 'opacity-50' : ''}
                     ${animatedDrivers[standing.driverId] === 'up' ? 'animate-position-up' : ''}
                     ${animatedDrivers[standing.driverId] === 'down' ? 'animate-position-down' : ''}
                   `}
@@ -77,7 +111,7 @@ const DriverStandingsTable: React.FC<DriverStandingsTableProps> = ({ standings }
                         className="h-3.5 w-1 mr-2 rounded-full shrink-0"
                         style={teamFillStyle(team)}
                       />
-                      <div>
+                      <div className="flex items-center">
                         {driverHref(driver.id) ? (
                           <a
                             href={driverHref(driver.id)!}
@@ -87,6 +121,11 @@ const DriverStandingsTable: React.FC<DriverStandingsTableProps> = ({ standings }
                           </a>
                         ) : (
                           <div className="font-medium text-sm text-ink">{getDriverLastName(driver.id)}</div>
+                        )}
+                        {champion === standing.driverId && (
+                          <svg className="inline-block w-3.5 h-3.5 ml-1 -mt-0.5 text-gold" viewBox="0 0 16 16" role="img" aria-label="Champion">
+                            <path d="M4 1.5h8v4a4 4 0 0 1-8 0zM4 3H1.8v1.2A2.3 2.3 0 0 0 4 6.5M12 3h2.2v1.2A2.3 2.3 0 0 1 12 6.5M8 9.5v3M5.2 14.5h5.6l-.6-2H5.8z" fill="currentColor" stroke="currentColor" strokeWidth="1" strokeLinejoin="round" />
+                          </svg>
                         )}
                       </div>
                     </div>
@@ -104,6 +143,7 @@ const DriverStandingsTable: React.FC<DriverStandingsTableProps> = ({ standings }
                     </div>
                   </td>
                 </tr>
+                </Fragment>
               );
             })}
           </tbody>

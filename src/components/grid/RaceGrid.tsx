@@ -127,17 +127,16 @@ const RaceGrid: React.FC<RaceGridProps> = ({
         >
           <div style={{ display: 'flex', marginBottom: GAP, height: HEADER_HEIGHT }}>
             <div
-              className="position-header cursor-pointer flex flex-col items-center justify-center gap-0.5 group sticky left-0 z-header"
+              className="sticky left-0 z-header bg-surface grid-sticky-edge"
+              style={{ width: POSITION_COLUMN_WIDTH, height: HEADER_HEIGHT, flexShrink: 0 }}
+            >
+            <div
+              className="position-header cursor-pointer flex flex-col items-center justify-center gap-0.5 group w-full h-full"
               onClick={() => dispatch(togglePositionColumnMode())}
               role="button"
               tabIndex={0}
               onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); dispatch(togglePositionColumnMode()); } }}
               title={`Click to switch to ${positionColumnMode === 'position' ? 'championship standings' : 'grid positions'} view`}
-              style={{
-                width: POSITION_COLUMN_WIDTH,
-                height: HEADER_HEIGHT,
-                flexShrink: 0,
-              }}
             >
               <span className="text-2xs font-bold uppercase tracking-wide">
                 {positionColumnMode === 'position' ? 'Grid' : 'Driver'}
@@ -153,6 +152,7 @@ const RaceGrid: React.FC<RaceGridProps> = ({
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
               </svg>
+            </div>
             </div>
 
             <div style={{ width: GAP, flexShrink: 0 }} />
@@ -257,7 +257,7 @@ const RaceGrid: React.FC<RaceGridProps> = ({
                 }}
               >
                 <div
-                  className="sticky left-0 z-10"
+                  className="sticky left-0 z-10 bg-surface grid-sticky-edge"
                   style={{
                     width: POSITION_COLUMN_WIDTH,
                     height: ROW_HEIGHT,

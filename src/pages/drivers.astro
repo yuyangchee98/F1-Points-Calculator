@@ -17,12 +17,26 @@ import {
 } from '../components/nav/sectionBar';
 import { fetchDriverIndex, flagEmoji, fmtPoints, isActive, teamSwatch } from '../utils/drivers';
 import type { DriverListItem } from '../types/driver';
+import { CURRENT_SEASON } from '../utils/constants';
+import { currentGridStats, formHtml, type GridStat } from '../utils/currentGrid';
 
 const drivers = await fetchDriverIndex();
 
+// Standing, points and recent form for the current grid, scored by the
+// calculator's engine. Best effort at build time: without it the cards fall
+// back to name and team, and the script below fills them in either way.
+let gridStats: Record<string, GridStat> = {};
+try {
+  const res = await fetch(`${import.meta.env.PUBLIC_API_BASE_URL}/api/init?year=${CURRENT_SEASON}`);
+  if (res.ok) gridStats = currentGridStats(await res.json(), CURRENT_SEASON);
+} catch {
+  // Leave gridStats empty.
+}
 const current = drivers
   .filter(isActive)
-  .sort((a, b) => a.teamName.localeCompare(b.teamName) || a.familyName.localeCompare(b.familyName));
+  .sort((a, b) =>
+    (gridStats[a.driverId]?.position ?? 99) - (gridStats[b.driverId]?.position ?? 99) ||
+    a.teamName.localeCompare(b.teamName) || a.familyName.localeCompare(b.familyName));
 const champions = drivers
   .filter((d) => d.titles > 0)
   .sort((a, b) => b.titles - a.titles || b.wins - a.wins);
@@ -81,14 +95,14 @@ const schemaData = {
     {current.length > 0 && (
       <section class="mb-8">
         <h2 class="font-display text-lg font-bold text-ink mb-3">Current grid</h2>
-        <ul class="grid gap-2 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
+        <ul id="current-grid" data-season={CURRENT_SEASON} class="grid gap-2 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
           {current.map((d) => (
-            <li>
-              <a href={`/drivers/${d.slug}`} class="flex items-center gap-2 h-full bg-surface border rounded-lg px-3 py-2.5 shadow-xs hover:border-strong hover:shadow-sm transition-all">
-                <span class="dp-sw !h-8" style={teamSwatch({ color: d.teamColor, secondaryColor: d.teamSecondaryColor })}></span>
-                <span class="min-w-0">
-                  <span class="block text-sm font-semibold text-ink leading-snug truncate">{d.name}</span>
-                  <span class="block text-xs text-ink-muted truncate">{d.teamName}</span>
+            <li data-driver-id={d.driverId}>
+              <a href={`/drivers/${d.slug}`} class="flex gap-2 h-full bg-surface border rounded-lg px-3 py-2.5 shadow-xs hover:border-strong hover:shadow-sm transition-all">
+                <span class="dp-sw !h-auto self-stretch shrink-0" style={teamSwatch({ color: d.teamColor, secondaryColor: d.teamSecondaryColor })}></span>
+                <span class="min-w-0 flex flex-col gap-1">
+                  <span class="block text-sm font-semibold text-ink leading-snug truncate" title={d.teamName}>{d.name}</span>
+                  <span data-grid-stats class="flex flex-col gap-1 empty:hidden" set:html={gridStats[d.driverId] ? formHtml(gridStats[d.driverId]) : ''}></span>
                 </span>
               </a>
             </li>
@@ -148,6 +162,30 @@ const schemaData = {
 </style>
 
 <script>
+  // Refresh the current grid's standing and form from the live season, so a race
+  // run since this page was built still shows; then re-order by standing.
+  import { currentGridStats, formHtml } from '../utils/currentGrid';
+  const grid = document.getElementById('current-grid');
+  if (grid) {
+    const season = Number(grid.dataset.season);
+    fetch(`${import.meta.env.PUBLIC_API_BASE_URL}/api/init?year=${season}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((init) => {
+        if (!init) return;
+        const stats = currentGridStats(init, season);
+        const items = [...grid.querySelectorAll<HTMLElement>('li[data-driver-id]')];
+        for (const li of items) {
+          const s = stats[li.dataset.driverId ?? ''];
+          const slot = li.querySelector<HTMLElement>('[data-grid-stats]');
+          if (s && slot) slot.innerHTML = formHtml(s);
+        }
+        items
+          .sort((a, b) => (stats[a.dataset.driverId ?? '']?.position ?? 99) - (stats[b.dataset.driverId ?? '']?.position ?? 99))
+          .forEach((li) => grid.appendChild(li));
+      })
+      .catch(() => {});
+  }
+
   // Era filter: show drivers who raced in the chosen decade; hide empty letters.
   const buttons = document.querySelectorAll<HTMLButtonElement>('#era-filter .era-btn');
   buttons.forEach((btn) =>
