@@ -217,7 +217,32 @@ export function writeName(name: string): void {
 /* ----------------------------------------------------------------- links -- */
 
 export const SHARE_ORIGIN = 'https://f1pointscalculator.chyuang.com';
-export const shareUrl = (code: string) => `${SHARE_ORIGIN}/my9/${code}`;
+
+/** How a link left the page. It rides along as ?s=, so an opened link says which way it came. */
+export type ShareVia = 'native' | 'copy' | PostTo;
+export type PostTo = 'x' | 'reddit' | 'whatsapp';
+
+export const shareUrl = (code: string, via?: ShareVia) => `${SHARE_ORIGIN}/my9/${code}${via ? `?s=${via}` : ''}`;
+
+/**
+ * A platform's compose page with the link in the text. Posted as a link, not an
+ * image, the platform fetches the page and unfurls it into the card.
+ */
+export function postUrl(to: PostTo, code: string, text: string): string {
+  const url = shareUrl(code, to);
+  const q = (params: Record<string, string>) =>
+    Object.entries(params)
+      .map(([k, v]) => `${k}=${encodeURIComponent(v)}`)
+      .join('&');
+  switch (to) {
+    case 'x':
+      return `https://x.com/intent/post?${q({ text, url })}`;
+    case 'reddit':
+      return `https://www.reddit.com/submit?${q({ url, title: text })}`;
+    case 'whatsapp':
+      return `https://wa.me/?${q({ text: `${text} ${url}` })}`;
+  }
+}
 export const pngUrl = (code: string, f: 'og' | 'post' | 'story', name: string) =>
   `${API_BASE_URL}/my9/${code}.png?f=${f}&v=${CARD_VERSION}${name && f !== 'og' ? `&n=${encodeURIComponent(name)}` : ''}`;
 

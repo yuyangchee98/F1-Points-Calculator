@@ -11,6 +11,7 @@ import {
   norm,
   orderHits,
   pngUrl,
+  postUrl,
   readDraft,
   readName,
   searchRaces,
@@ -21,9 +22,10 @@ import {
   writeName,
   type ListSort,
   type My9Data,
+  type PostTo,
   type Slots,
 } from '../../utils/my9/client';
-import { DownloadIcon, DriverChoice, Dots, LinkIcon, SearchIcon, ShareIcon, StickerIcon, Tile } from './parts';
+import { DownloadIcon, DriverChoice, Dots, LinkIcon, RedditIcon, SearchIcon, ShareIcon, StickerIcon, Tile, WhatsAppIcon, XIcon } from './parts';
 import RaceList, { RaceRow } from './RaceList';
 import SeasonPicker from './SeasonPicker';
 
@@ -34,6 +36,13 @@ const FORMAT_OPTIONS: Array<{ value: CardFormat; label: string; title: string; i
   { value: 'link', label: 'Link', title: 'What a pasted link shows · 1200×630', icon: [16, 9] },
 ];
 const URL_FORMAT: Record<CardFormat, 'post' | 'story' | 'og'> = { post: 'post', story: 'story', link: 'og' };
+
+/** Straight to a platform with the link as text, which it unfurls into the card. */
+const POST_TO: Array<{ to: PostTo; title: string; Icon: React.FC }> = [
+  { to: 'x', title: 'Post on X', Icon: XIcon },
+  { to: 'reddit', title: 'Post to Reddit', Icon: RedditIcon },
+  { to: 'whatsapp', title: 'Send on WhatsApp', Icon: WhatsAppIcon },
+];
 
 interface Props {
   data: My9Data;
@@ -454,17 +463,17 @@ const Builder: React.FC<Props> = ({ data, add, q, ghosts }) => {
   const copy = async () => {
     if (!code) return;
     try {
-      await navigator.clipboard.writeText(shareUrl(code));
+      await navigator.clipboard.writeText(shareUrl(code, 'copy'));
       flash('copy');
       tally('copy');
     } catch {
-      window.prompt('Copy your link', shareUrl(code));
+      window.prompt('Copy your link', shareUrl(code, 'copy'));
     }
   };
 
   const share = async () => {
     if (!code || !imageUrl) return;
-    const url = shareUrl(code);
+    const url = shareUrl(code, 'native');
     const blob = blobs.current.get(imageUrl);
     try {
       if (blob) {
@@ -804,7 +813,7 @@ const Builder: React.FC<Props> = ({ data, add, q, ghosts }) => {
                       className="min-w-0 w-full bg-transparent outline-none text-sm font-medium"
                     />
                   </label>
-                  {/* Phones: a full-width Share over Save and Copy link; wider: one row. */}
+                  {/* Phones: a full-width Share, Save and Copy link, then X · Reddit · WhatsApp; wider: one row. */}
                   <div className="grid grid-cols-2 gap-2 w-full sm:flex sm:w-auto sm:ml-auto">
                     <Button variant="primary" onClick={share} disabled={preparing} className="h-10 px-5 font-semibold col-span-2">
                       <ShareIcon />
@@ -819,10 +828,26 @@ const Builder: React.FC<Props> = ({ data, add, q, ghosts }) => {
                       <DownloadIcon />
                       {flashed === 'download' ? 'Saved' : flashed === 'error' ? 'Try again' : saving ? 'Saving…' : 'Save'}
                     </Button>
-                    <Button onClick={copy} className={`h-10 ${flashed === 'copy' ? '!border-interactive !text-interactive' : ''}`} title={code ? shareUrl(code) : undefined}>
+                    <Button onClick={copy} className={`h-10 ${flashed === 'copy' ? '!border-interactive !text-interactive' : ''}`} title={code ? shareUrl(code, 'copy') : undefined}>
                       <LinkIcon />
                       {flashed === 'copy' ? 'Copied' : 'Copy link'}
                     </Button>
+                    <div className="col-span-2 grid grid-cols-3 h-10 bg-surface border border-strong rounded-md overflow-hidden divide-x divide-strong sm:flex">
+                      {POST_TO.map(({ to, title, Icon }) => (
+                        <a
+                          key={to}
+                          href={code ? postUrl(to, code, caption) : undefined}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={() => tally(to)}
+                          title={title}
+                          aria-label={title}
+                          className="grid place-items-center sm:w-9 text-ink hover:bg-carbon-50 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-interactive"
+                        >
+                          <Icon />
+                        </a>
+                      ))}
+                    </div>
                   </div>
                 </div>
               ) : (

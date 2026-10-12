@@ -38,7 +38,9 @@ const SharedView: React.FC<Props> = ({ data, code, picks, onMakeYours }) => {
     } catch {
       // keep 'direct'
     }
-    trackEvent('my9_view', 'my9', from);
+    // ?s= is how the sharer sent it (x, whatsapp, copy…): "x:direct".
+    const s = new URLSearchParams(window.location.search).get('s');
+    trackEvent('my9_view', 'my9', s && /^[a-z]{1,12}$/.test(s) ? `${s}:${from}` : from);
   }, []);
 
   const onCardClick = (e: React.MouseEvent) => {
