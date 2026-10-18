@@ -70,6 +70,20 @@ const ADS = [
     label: 'F2 Calculator',
     title: 'The same calculator, for Formula 2',
   },
+  {
+    id: 'pearcade',
+    href: 'https://pearcade.chyuang.com/',
+    emoji: '🎮',
+    label: 'Pearcade',
+    title: 'Try my new site: Pearcade, couch games for two!',
+  },
+  {
+    id: 'x',
+    href: 'https://x.com/chyuang2',
+    emoji: '𝕏',
+    label: '@chyuang2',
+    title: 'Follow me on X for F1 standings after every race',
+  },
 ];
 const ROTATING_ADS = ADS.filter((ad) => !ad.pinned);
 
@@ -174,6 +188,16 @@ const { section, account = true } = Astro.props;
           ads[i].style.display = i === pick ? '' : 'none';
         }
       })();
+      // One listener for the pills and the overflow menu's promo links, so
+      // each advertiser's clicks can be compared in GA by ad_id and placement.
+      document.addEventListener('click', function (e) {
+        var a = e.target.closest && e.target.closest('[data-ad]');
+        if (!a || typeof gtag !== 'function') return;
+        gtag('event', 'house_ad_click', {
+          ad_id: a.getAttribute('data-ad'),
+          placement: a.getAttribute('data-ad-placement') || 'spine',
+        });
+      });
     </script>
 
     {/* A native <details> so the overflow menu works with zero JS — /about and
@@ -206,6 +230,8 @@ const { section, account = true } = Astro.props;
           href="https://globeprix.chyuang.com/"
           target="_blank"
           rel="noopener noreferrer"
+          data-ad="globeprix"
+          data-ad-placement="menu"
           class="lg:hidden px-4 py-2 text-sm font-medium text-brand hover:bg-brand-subtle flex items-center gap-2"
         >
           <span class="text-base leading-none" aria-hidden="true">🌍</span>
@@ -215,15 +241,52 @@ const { section, account = true } = Astro.props;
           href="https://drawlineracing.chyuang.com/"
           target="_blank"
           rel="noopener noreferrer"
+          data-ad="drawlineracing"
+          data-ad-placement="menu"
           class="lg:hidden px-4 py-2 text-sm text-ink-secondary hover:bg-carbon-100 flex items-center gap-2"
         >
           <span class="text-base leading-none" aria-hidden="true">🏎️</span>
           Try Draw Line Racing
         </a>
         <a
+          href="https://dancedanceracing.chyuang.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-ad="dancedanceracing"
+          data-ad-placement="menu"
+          class="lg:hidden px-4 py-2 text-sm text-ink-secondary hover:bg-carbon-100 flex items-center gap-2"
+        >
+          <span class="text-base leading-none" aria-hidden="true">🕺</span>
+          Try Dance Dance Racing
+        </a>
+        <a
+          href="https://pearcade.chyuang.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-ad="pearcade"
+          data-ad-placement="menu"
+          class="lg:hidden px-4 py-2 text-sm text-ink-secondary hover:bg-carbon-100 flex items-center gap-2"
+        >
+          <span class="text-base leading-none" aria-hidden="true">🎮</span>
+          Play Pearcade
+        </a>
+        <a
+          href="https://x.com/chyuang2"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-ad="x"
+          data-ad-placement="menu"
+          class="lg:hidden px-4 py-2 text-sm text-ink-secondary hover:bg-carbon-100 flex items-center gap-2"
+        >
+          <span class="text-base leading-none" aria-hidden="true">𝕏</span>
+          Follow @chyuang2
+        </a>
+        <a
           href="https://f2pointscalculator.chyuang.com"
           target="_blank"
           rel="noopener noreferrer"
+          data-ad="f2"
+          data-ad-placement="menu"
           class="lg:hidden block px-4 py-2 text-sm text-ink-secondary hover:bg-carbon-100"
         >F2 calculator ↗</a>
       </nav>
