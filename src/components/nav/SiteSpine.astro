@@ -27,7 +27,8 @@ import SpineCompeteDot, { COMPETE_LINK_ID } from './SpineCompeteDot';
 /**
  * House ad inventory for the spine's promo slot.
  *
- * A `pinned` entry is always on screen. The rest share one rotating position,
+ * A `pinned` entry is always on screen, phones included (compact below lg).
+ * The rest share one rotating position,
  * one advertiser per pageview, picked at random — and only at xl+, because at
  * lg the section nav and account button leave room for one pill, not two. Add
  * an unpinned entry here and it joins the rotation — nothing else needs to
@@ -43,7 +44,10 @@ import SpineCompeteDot, { COMPETE_LINK_ID } from './SpineCompeteDot';
 const ADS = [
   {
     id: 'globeprix',
-    href: 'https://globeprix.chyuang.com/',
+    // ?ref= and a referrer-keeping rel (no noreferrer) so Globe Prix can count
+    // these visits as the calculator's instead of as direct traffic.
+    href: 'https://globeprix.chyuang.com/?ref=f1calc',
+    rel: 'noopener',
     emoji: '🌍',
     label: 'Globe Prix',
     title: 'Try my new game: Globe Prix, race every country on Earth!',
@@ -86,6 +90,7 @@ const ADS = [
   },
 ];
 const ROTATING_ADS = ADS.filter((ad) => !ad.pinned);
+const relFor = (ad: (typeof ADS)[number]) => ('rel' in ad && ad.rel) || 'noopener noreferrer';
 
 interface Props {
   section: SectionId;
@@ -114,9 +119,10 @@ const { section, account = true } = Astro.props;
     <span class="hidden sm:inline font-display font-bold text-sm text-ink tracking-tight">Points Calculator</span>
   </a>
 
-  {/* Six sections outgrow a phone's width, so below sm the row scrolls
-      sideways; the bottom tab bar carries every section there anyway. */}
-  <nav aria-label="Sections" class="flex items-center h-full min-w-0 max-sm:overflow-x-auto max-sm:overflow-y-hidden scrollbar-hide">
+  {/* Six sections outgrow the row below lg (more so with the Globe Prix pill
+      on the right), so there the row scrolls sideways instead of running
+      under the buttons; below sm the bottom tab bar carries every section too. */}
+  <nav aria-label="Sections" class="flex items-center h-full min-w-0 max-lg:overflow-x-auto max-lg:overflow-y-hidden scrollbar-hide">
     {SECTIONS.map((s) => (
       <a
         href={s.href}
@@ -124,9 +130,9 @@ const { section, account = true } = Astro.props;
         aria-current={s.id === section ? 'page' : undefined}
         class:list={[
           'relative flex items-center shrink-0 whitespace-nowrap h-full px-2 sm:px-3.5 text-xs sm:text-sm font-semibold transition-colors',
-          // Below sm the row scrolls, which clips anything past its edge, so
+          // Below lg the row scrolls, which clips anything past its edge, so
           // the underline sits inside it there.
-          'after:absolute after:inset-x-1.5 after:-bottom-px max-sm:after:bottom-0 after:h-[2.5px] after:rounded-t-sm',
+          'after:absolute after:inset-x-1.5 after:-bottom-px max-lg:after:bottom-0 after:h-[2.5px] after:rounded-t-sm',
           s.id === section
             ? 'text-ink after:bg-brand'
             : 'text-ink-secondary hover:text-ink after:bg-transparent',
@@ -139,22 +145,24 @@ const { section, account = true } = Astro.props;
   </nav>
 
   <div class="ml-auto flex items-center gap-1.5 sm:gap-2 shrink-0">
-    {/* The promo slot. Shown at lg+ where there is room; below lg the
-        destinations live in the overflow menu as ordinary links, since a menu is
-        navigation rather than ad inventory. */}
-    <div class="hidden lg:flex items-center gap-2 shrink-0" data-ad-slot>
+    {/* The promo slot. The pinned Globe Prix pill shows at every width,
+        compact below lg; the rotating pill needs xl. Below lg the other
+        destinations live in the overflow menu as ordinary links, since a menu
+        is navigation rather than ad inventory (Globe Prix is not repeated
+        there, since its pill is always on screen). */}
+    <div class="flex items-center gap-2 shrink-0" data-ad-slot>
       {ADS.map((ad) => (
         <a
           href={ad.href}
           target="_blank"
-          rel="noopener noreferrer"
+          rel={relFor(ad)}
           data-ad={ad.id}
           data-ad-rotate={ad.pinned ? undefined : ''}
           aria-label={ad.title}
           title={ad.title}
           style={ROTATING_ADS.indexOf(ad) > 0 ? 'display:none' : undefined}
           class:list={[
-            'group items-center gap-1.5 h-8 px-3 rounded-md text-sm font-medium whitespace-nowrap',
+            'group items-center gap-1 lg:gap-1.5 h-7 sm:h-8 px-2 lg:px-3 rounded-md text-xs sm:text-sm font-medium whitespace-nowrap',
             'bg-brand-subtle text-brand-strong border border-brand/25 hover:bg-brand-subtle/70 transition-colors',
             ad.pinned ? 'inline-flex' : 'hidden xl:inline-flex',
           ]}
@@ -162,7 +170,7 @@ const { section, account = true } = Astro.props;
           <span class="text-sm leading-none" aria-hidden="true">{ad.emoji}</span>
           <span>{ad.label}</span>
           <svg
-            class="h-3 w-3 group-hover:translate-x-0.5 transition-transform"
+            class="hidden lg:block h-3 w-3 group-hover:translate-x-0.5 transition-transform"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -226,17 +234,6 @@ const { section, account = true } = Astro.props;
           rel="noopener noreferrer"
           class="block px-4 py-2 text-sm font-medium text-brand hover:bg-brand-subtle"
         >Support</a>
-        <a
-          href="https://globeprix.chyuang.com/"
-          target="_blank"
-          rel="noopener noreferrer"
-          data-ad="globeprix"
-          data-ad-placement="menu"
-          class="lg:hidden px-4 py-2 text-sm font-medium text-brand hover:bg-brand-subtle flex items-center gap-2"
-        >
-          <span class="text-base leading-none" aria-hidden="true">🌍</span>
-          Play Globe Prix
-        </a>
         <a
           href="https://drawlineracing.chyuang.com/"
           target="_blank"

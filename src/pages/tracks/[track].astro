@@ -6,6 +6,7 @@ import CircuitPicker from '../../components/nav/CircuitPicker.astro';
 import { fetchCircuitList, flagSrcFor, stripVenueQualifier} from '../../utils/circuits';
 import type { CircuitHistory, CircuitListItem } from '../../types/track';
 import { fetchDriverIndex } from '../../utils/drivers';
+import { globePrixCountry, globePrixHref } from '../../utils/globePrix';
 
 const API_BASE_URL = import.meta.env.PUBLIC_API_BASE_URL;
 
@@ -54,6 +55,12 @@ const earliestSeason = seasons.length ? Math.min(...seasons) : null;
 // Local asset under public/flags (see flagSrcFor in utils/circuits.ts). '' when
 // there is no flag for this country, which both renderers treat as "no flag".
 const flagSrc = flagSrcFor(country);
+
+// Globe Prix has one track per country (its own design, not this circuit), so
+// the link names the country. No circuit there for the country → home page.
+const globePrix = globePrixCountry(country);
+const globePrixLink = globePrixHref(country);
+const globePrixLabel = globePrix ? `Race ${globePrix.name} in Globe Prix` : 'Play Globe Prix';
 
 // Aggregate trivia computed server-side over the full history (incl. premium years).
 const stats = history?.stats;
@@ -163,6 +170,18 @@ const schemaData = {
           <p class="text-2xs text-ink-muted mt-1 italic">Formerly {formerlyPhrase}.</p>
         )}
       </div>
+      <a
+        href={globePrixLink}
+        target="_blank"
+        rel="noopener"
+        data-ad="globeprix"
+        data-ad-placement="track"
+        class="self-start inline-flex items-center gap-1.5 min-h-8 px-3 py-1 rounded-md text-sm sm:text-xs font-medium
+               bg-brand-subtle text-brand-strong border border-brand/25 hover:bg-brand-subtle/70 transition-colors"
+      >
+        <span class="leading-none" aria-hidden="true">🌍</span>
+        <span>{globePrixLabel}</span>
+      </a>
     </header>
 
     {/* Main — the results. Right pane (full height) on desktop; the hero, right

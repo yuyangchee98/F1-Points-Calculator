@@ -9,6 +9,7 @@ import TableSkeleton from '../common/TableSkeleton';
 import { DriverPointsChart, TeamPointsChart } from '../charts/LazyCharts';
 import { useAppDispatch } from '../../store';
 import CompetitionCard from './CompetitionCard';
+import GlobePrixCard from './GlobePrixCard';
 import SegmentedControl from '../ui/SegmentedControl';
 import ChartSettingsButton from './ChartSettingsButton';
 import TableSettingsButton from './TableSettingsButton';
@@ -109,7 +110,8 @@ const StandingsSidebar: React.FC<Props> = ({ activeSeason }) => {
               )}
             </div>
 
-            <div className="px-3 pt-3">
+            <div className="px-3 pt-3 flex flex-col gap-2">
+              <GlobePrixCard />
               <CompetitionCard />
             </div>
           </>
@@ -147,7 +149,8 @@ const StandingsSidebar: React.FC<Props> = ({ activeSeason }) => {
               </Suspense>
             </div>
 
-            <div className="px-3 pt-3">
+            <div className="px-3 pt-3 flex flex-col gap-2">
+              <GlobePrixCard />
               <CompetitionCard />
             </div>
           </>
