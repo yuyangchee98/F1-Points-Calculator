@@ -1,0 +1,121 @@
+---
+/**
+ * The feedback box: a dialog over whatever page is open, so nothing under it
+ * moves or resets (a half-filled grid stays put). Opened by any element with
+ * [data-feedback] — the spine's Feedback button, which is a plain link to
+ * /feedback so it still works without JS. Posts to /api/feedback (the API keeps
+ * the note in D1, then emails it to me), with the page it was sent from.
+ */
+---
+
+<dialog
+  id="feedback-dialog"
+  aria-labelledby="feedback-dialog-title"
+  class="fbk w-[min(28rem,calc(100vw-2rem))] p-0 rounded-lg border bg-surface text-ink shadow-lg backdrop:bg-black/40"
+>
+  <form method="dialog" class="p-5 space-y-3" novalidate>
+    <h2 id="feedback-dialog-title" class="text-lg font-display font-bold">Feedback</h2>
+    <textarea
+      name="message"
+      maxlength="5000"
+      rows="5"
+      placeholder="Bug, idea, missing feature…"
+      aria-label="Your feedback"
+      class="w-full px-3 py-2 border rounded-md bg-surface text-ink text-base resize-y focus:outline-none focus:ring-2 focus:ring-brand"
+    ></textarea>
+    <input
+      type="email"
+      name="email"
+      maxlength="120"
+      autocomplete="email"
+      placeholder="Email (optional, for a reply)"
+      aria-label="Your email, optional"
+      class="w-full px-3 py-2 border rounded-md bg-surface text-ink text-base focus:outline-none focus:ring-2 focus:ring-brand"
+    />
+    {/* Honeypot: hidden from people, filled in by bots. */}
+    <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" class="hidden" />
+    <div class="flex items-center justify-end gap-2">
+      <p data-status class="mr-auto text-sm text-ink-secondary" role="status"></p>
+      <button
+        type="button"
+        data-cancel
+        class="inline-flex items-center h-9 px-4 rounded-md border text-sm font-medium text-ink-secondary hover:bg-carbon-100"
+      >Cancel</button>
+      <button
+        type="submit"
+        data-send
+        class="inline-flex items-center h-9 px-4 rounded-md bg-brand text-white text-sm font-semibold hover:opacity-90 disabled:opacity-50"
+      >Send</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+  const API = import.meta.env.PUBLIC_API_BASE_URL;
+  const dialog = document.getElementById('feedback-dialog') as HTMLDialogElement | null;
+  if (dialog) {
+    const form = dialog.querySelector('form')!;
+    const message = form.elements.namedItem('message') as HTMLTextAreaElement;
+    const email = form.elements.namedItem('email') as HTMLInputElement;
+    const website = form.elements.namedItem('website') as HTMLInputElement;
+    const status = dialog.querySelector('[data-status]')!;
+    const send = dialog.querySelector('[data-send]') as HTMLButtonElement;
+    const cancel = dialog.querySelector('[data-cancel]') as HTMLButtonElement;
+    const sync = () => { send.disabled = !message.value.trim(); };
+
+    const open = () => {
+      form.reset();
+      status.textContent = '';
+      message.disabled = email.disabled = false;
+      send.hidden = cancel.hidden = false;
+      sync();
+      dialog.showModal();
+      message.focus();
+    };
+
+    document.addEventListener('click', (e) => {
+      const t = (e.target as Element | null)?.closest?.('[data-feedback]');
+      if (!t || typeof dialog.showModal !== 'function') return;
+      e.preventDefault();
+      t.closest('details')?.removeAttribute('open');
+      open();
+    });
+    cancel.addEventListener('click', () => dialog.close());
+    // A click on the backdrop (outside the panel) closes it, as Esc does.
+    dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
+    message.addEventListener('input', sync);
+    email.addEventListener('input', () => { status.textContent = ''; });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const text = message.value.trim();
+      if (!text || send.disabled) return;
+      const mail = email.value.trim();
+      if (mail && !email.checkValidity()) { status.textContent = 'That email looks off.'; email.focus(); return; }
+      send.disabled = true;
+      message.disabled = email.disabled = true;
+      status.textContent = 'Sending…';
+      try {
+        const res = await fetch(`${API}/api/feedback`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text, email: mail, website: website.value, page: location.pathname + location.search }),
+        });
+        const body = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(body.error || 'Couldn’t send. Try again.');
+        status.textContent = 'Sent. Thank you.';
+        send.hidden = cancel.hidden = true;
+        setTimeout(() => dialog.close(), 1400);
+      } catch (err) {
+        status.textContent = err instanceof Error && err.message !== 'Failed to fetch' ? err.message : 'Couldn’t send. Try again.';
+        message.disabled = email.disabled = false;
+        sync();
+      }
+    });
+  }
+</script>
+
+<style>
+  /* Centred in the top layer; the browser's default dialog margin does this, Tailwind's preflight doesn't undo it. */
+  .fbk[open] { margin: auto; }
+</style>
