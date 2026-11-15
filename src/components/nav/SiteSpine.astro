@@ -90,6 +90,15 @@ const ADS = [
     title: 'Follow me on X for F1 standings after every race',
   },
 ];
+/**
+ * The sister calculators, opened from the series chip by the logo. ?ref= and a
+ * referrer-keeping rel so the sister sites can count these visits.
+ */
+const SERIES = [
+  { id: 'f1', chip: 'F1', name: 'Formula 1', href: '/', current: true },
+  { id: 'f2', chip: 'F2', name: 'Formula 2', href: 'https://f2pointscalculator.chyuang.com/?ref=f1calc', current: false },
+  { id: 'motogp', chip: 'MotoGP', name: 'MotoGP', href: 'https://motogppointscalculator.chyuang.com/?ref=f1calc', current: false },
+];
 const ROTATING_ADS = ADS.filter((ad) => !ad.pinned);
 const relFor = (ad: (typeof ADS)[number]) => ('rel' in ad && ad.rel) || 'noopener noreferrer';
 
@@ -115,10 +124,38 @@ const { section, account = true } = Astro.props;
   class="sticky top-0 z-header h-[var(--spine-h)] shrink-0 bg-surface border-b
          flex items-center gap-1 px-2 sm:px-4"
 >
-  <a href="/" class="flex items-center gap-2 mr-2 sm:mr-5 shrink-0" aria-label="F1 Points Calculator, home">
-    <span class="bg-brand text-white text-2xs sm:text-xs font-bold px-1.5 py-1 rounded-sm leading-none">F1</span>
-    <span class="hidden sm:inline font-display font-bold text-sm text-ink tracking-tight">Points Calculator</span>
-  </a>
+  {/* The series chip opens the sister calculators (SERIES above); its first row
+      is this site's home. A <details> like the ☰ menu, so it needs no JS and the
+      outside-click script at the bottom closes it too. Mirrored in the API's
+      shell/spine.ts. */}
+  <div class="flex items-center gap-2 mr-2 sm:mr-5 shrink-0">
+    <details class="spine-more relative">
+      <summary
+        class="list-none inline-flex items-center gap-0.5 bg-brand text-white text-2xs sm:text-xs font-bold pl-1.5 pr-1 py-1 rounded-sm leading-none cursor-pointer hover:opacity-90"
+        aria-label="F1 Points Calculator. Switch series"
+        title="Switch series"
+      >
+        F1
+        <svg class="w-3 h-3 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 9l6 6 6-6" />
+        </svg>
+      </summary>
+      <nav aria-label="Series" class="absolute left-0 mt-2 w-52 bg-surface rounded-lg shadow-lg border py-1 z-overlay">
+        {SERIES.map((x) => (
+          <a
+            href={x.href}
+            {...(x.current ? { 'aria-current': 'page' } : { target: '_blank', rel: 'noopener', 'data-ad': x.id, 'data-ad-placement': 'series' })}
+            class={`flex items-center gap-2.5 px-3 py-2 text-sm hover:bg-carbon-100 ${x.current ? 'text-ink font-semibold' : 'text-ink-secondary'}`}
+          >
+            <span class="inline-flex justify-center w-14 shrink-0 bg-brand text-white text-2xs font-bold px-1.5 py-1 rounded-sm leading-none">{x.chip}</span>
+            <span class="flex-1">{x.name}</span>
+            <span class="text-xs text-ink-muted" aria-hidden="true">{x.current ? '✓' : '↗'}</span>
+          </a>
+        ))}
+      </nav>
+    </details>
+    <a href="/" class="hidden sm:inline font-display font-bold text-sm text-ink tracking-tight" aria-label="F1 Points Calculator, home">Points Calculator</a>
+  </div>
 
   {/* Six sections outgrow the row below lg (more so with the Globe Prix pill
       on the right), so there the row scrolls sideways instead of running
