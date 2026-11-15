@@ -83,6 +83,9 @@ export default {
         sticky: '10',
         header: '20',
         overlay: '30',
+        // The spine: above the standings sidebar (z-20 desktop, z-30 phone standings view) so the
+        // series and ☰ menus open over it; below the phone tab bar, modals and toasts.
+        spine: '35',
         nav: '40',
         modal: '50',
         toast: '60',
