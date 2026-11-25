@@ -43,6 +43,7 @@ const ICONS: Record<string, string> = {
     <a
       href={s.href}
       aria-current={s.id === section ? 'page' : undefined}
+      data-compete-dot={s.id === 'compete' ? 'tab' : undefined}
       class:list={[
         'relative flex-1 flex flex-col items-center justify-center gap-1 transition-colors',
         s.id === section ? 'text-white' : 'text-carbon-400',
@@ -54,6 +55,11 @@ const ICONS: Record<string, string> = {
       <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={ICONS[s.id]} />
       </svg>
+      {/* The spine's section row is hidden at this width, so its "new" dot
+          lives here instead. */}
+      {s.fresh && (
+        <span class="absolute top-2 left-1/2 ml-2 w-1.5 h-1.5 rounded-full bg-brand" aria-label="new" />
+      )}
       <span class="text-2xs font-medium leading-none">{s.label}</span>
     </a>
   ))}

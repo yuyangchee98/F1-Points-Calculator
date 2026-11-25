@@ -49,21 +49,26 @@ export const COMPETE_LINK_ID = 'spine-compete';
 function Dot() {
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
   const nextRaceToLock = useSelector(selectNextRaceToLock);
-  const [host, setHost] = useState<HTMLElement | null>(null);
+  const [hosts, setHosts] = useState<HTMLElement[]>([]);
 
-  // In an effect rather than during render: the anchor is static Astro markup
-  // that is always in the DOM by hydration, but reading it here keeps the
-  // component pure and costs one frame nobody can see.
-  useEffect(() => setHost(document.getElementById(COMPETE_LINK_ID)), []);
+  // In an effect rather than during render: the anchors are static Astro markup
+  // that is always in the DOM by hydration, but reading them here keeps the
+  // component pure and costs one frame nobody can see. Two hosts: the spine's
+  // Compete link (sm+) and the bottom tab bar's (phones, where the spine's
+  // section row is hidden).
+  useEffect(() => setHosts(Array.from(document.querySelectorAll<HTMLElement>('[data-compete-dot]'))), []);
 
-  if (!host || !isAuthenticated || !nextRaceToLock) return null;
+  if (!hosts.length || !isAuthenticated || !nextRaceToLock) return null;
 
-  return createPortal(
+  return hosts.map((host) => createPortal(
     <>
       <span
         aria-hidden="true"
-        className="absolute top-1.5 sm:top-2 right-0.5 sm:right-1.5 w-2 h-2 rounded-full
-                   bg-brand ring-2 ring-surface motion-safe:animate-pulse"
+        className={
+          host.dataset.competeDot === 'tab'
+            ? 'absolute top-2 left-1/2 ml-2 w-2 h-2 rounded-full bg-brand ring-2 ring-carbon-900 motion-safe:animate-pulse'
+            : 'absolute top-1.5 sm:top-2 right-0.5 sm:right-1.5 w-2 h-2 rounded-full bg-brand ring-2 ring-surface motion-safe:animate-pulse'
+        }
       />
       {/* Folds into the link's accessible name — "Compete (prediction open)" —
           so the dot is not a colour-only signal. Parenthesised rather than
@@ -72,7 +77,8 @@ function Dot() {
       <span className="sr-only">(prediction open)</span>
     </>,
     host,
-  );
+    host.dataset.competeDot,
+  ));
 }
 
 export default function SpineCompeteDot() {

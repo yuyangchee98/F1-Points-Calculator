@@ -163,7 +163,7 @@ const StandingsSidebar: React.FC<Props> = ({ activeSeason }) => {
           <a href="/changelog" className="hover:text-ink">Changelog</a>
           <a href="https://f1-dash.com/" className="hover:text-ink" target="_blank" rel="noopener noreferrer">F1 Dash</a>
           <a href="https://f1calendar.com/" className="hover:text-ink" target="_blank" rel="noopener noreferrer">F1 Calendar</a>
-          <a href="https://drawlineracing.chyuang.com/" className="hover:text-ink" target="_blank" rel="noopener noreferrer">Draw Line Racing</a>
+          <a href="https://globeprix.chyuang.com/?ref=f1calc" data-ad="globeprix" data-ad-placement="footer" className="hover:text-ink" target="_blank" rel="noopener">Globe Prix</a>
         </div>
       </div>
     </div>
