@@ -162,15 +162,19 @@ export const gridSlice = createSlice({
       }
     },
 
-    clearPosition: (state, action: PayloadAction<{ raceId: string; position: number }>) => {
-      const { raceId, position } = action.payload;
+    clearPosition: (state, action: PayloadAction<{ raceId: string; position: number; force?: boolean }>) => {
+      const { raceId, position, force } = action.payload;
 
       const positionIndex = state.positions.findIndex(
         p => p.raceId === raceId && p.position === position
       );
 
-      if (positionIndex !== -1 && !state.positions[positionIndex].isOfficialResult) {
+      // force: dragged back to the pool, which also removes an official result.
+      if (positionIndex !== -1 && (force || !state.positions[positionIndex].isOfficialResult)) {
         state.positions[positionIndex].driverId = null;
+        state.positions[positionIndex].isOfficialResult = false;
+        state.positions[positionIndex].hasFastestLap = false;
+        state.positions[positionIndex].teamId = undefined;
       }
     },
 

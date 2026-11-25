@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
+import { useDrop } from 'react-dnd';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../store';
 import { selectDriver } from '../../store/slices/uiSlice';
 import DriverCard from './DriverCard';
 import { useAppDispatch } from '../../store';
 import { getDriverLastName } from '../../store/selectors/dataSelectors';
+import { useGridContext } from '../../contexts/GridContext';
+import { ItemTypes, type DriverDragItem } from '../../types/dragTypes';
 
 const DriverSelection: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -14,6 +17,15 @@ const DriverSelection: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(() => window.innerWidth >= 1024);
 
   const drivers = allDrivers;
+
+  // Dropping a card from the grid back on the pool takes it out of that race.
+  const { clearPosition } = useGridContext();
+  const [{ removing }, poolDrop] = useDrop<DriverDragItem, void, { removing: boolean }>({
+    accept: ItemTypes.DRIVER,
+    canDrop: (item) => !!item.sourceRaceId && !!item.sourcePosition,
+    drop: (item) => { clearPosition({ raceId: item.sourceRaceId!, position: item.sourcePosition!, force: true }); },
+    collect: (monitor) => ({ removing: monitor.isOver() && monitor.canDrop() }),
+  }, [clearPosition]);
 
   const handleDriverClick = (driverId: string) => {
     if (selectedDriverId === driverId) {
@@ -26,7 +38,7 @@ const DriverSelection: React.FC = () => {
   };
 
   return (
-    <div className="mb-1.5">
+    <div ref={poolDrop} className={`mb-1.5 rounded-lg transition-shadow ${removing ? 'ring-2 ring-brand' : ''}`} title={removing ? 'Drop to remove from the race' : undefined}>
       <div className="flex justify-between items-center mb-1">
         <h2 className="text-2xs font-semibold text-ink-muted uppercase tracking-wider">Drivers</h2>
         <button

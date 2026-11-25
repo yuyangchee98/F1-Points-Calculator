@@ -34,7 +34,7 @@ interface GridContextValue {
     fromRaceId?: string;
     fromPosition?: number;
   }) => void;
-  clearPosition: (payload: { raceId: string; position: number }) => void;
+  clearPosition: (payload: { raceId: string; position: number; force?: boolean }) => void;
   resetGrid: () => void;
   fillRestOfSeason: (payload: {
     driverId: string;
